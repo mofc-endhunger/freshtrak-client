@@ -1,42 +1,54 @@
-import React from 'react';
-import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
-import { render, fireEvent, act, getByText } from '@testing-library/react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import FamilyContainer from '../FamilyContainer.js';
-import { mockEvent } from '../../../Testing';
+import React from "react";
+import { Provider } from "react-redux";
+import configureStore from "redux-mock-store";
+import { render, fireEvent, act, getByText } from "@testing-library/react";
+import { BrowserRouter as Router } from "react-router-dom";
+import FamilyContainer from "../FamilyContainer";
+import { mockEvent } from "../../../Testing";
+
+// Mock React Hook Form
+jest.mock("react-hook-form", () => ({
+	useForm: () => ({
+		register: jest.fn(),
+		handleSubmit: jest.fn(fn => fn),
+		formState: { errors: {} },
+		getValues: jest.fn(),
+		setValue: jest.fn(),
+		watch: jest.fn(),
+	}),
+}));
 
 const mockStore = configureStore([]);
 
 /*** Mock Google Maps JavaScript API ***/
 jest.mock("react-places-autocomplete", () => {
-  const React = require("react"); // eslint-disable-line
-  class PlacesAutocomplete extends React.Component {
-    renderProps = {
-      getInputProps: jest.fn(),
-      suggestions: [],
-      getSuggestionItemProps: jest.fn(),
-    };
+	const React = require("react"); // eslint-disable-line
+	class PlacesAutocomplete extends React.Component {
+		renderProps = {
+			getInputProps: jest.fn(),
+			suggestions: [],
+			getSuggestionItemProps: jest.fn(),
+		};
 
-    render() {
-      return <>{this.props.children(this.renderProps)}</>;
-    }
-  }
+		render() {
+			return <>{this.props.children(this.renderProps)}</>;
+		}
+	}
 
-  return PlacesAutocomplete;
+	return PlacesAutocomplete;
 });
 
-test('it should render without errors', () => {
-  const store = mockStore({ event: { event: mockEvent } });
-  expect(() => {
-    render(
-      <Provider store={store}>
-        <Router>
-          <FamilyContainer />
-        </Router>
-      </Provider>
-    );
-  }).not.toThrowError();
+test("it should render without errors", () => {
+	const store = mockStore({ event: { event: mockEvent } });
+	expect(() => {
+		render(
+			<Provider store={store as any}>
+				<Router>
+					<FamilyContainer />
+				</Router>
+			</Provider>
+		);
+	}).not.toThrow();
 });
 
 // test(`should show to click 'No Phone Available' if no phone available is not clicked and nothing is in the phone number`, async () => {
@@ -94,7 +106,7 @@ test('it should render without errors', () => {
 //       {
 //         target: { checked: true }
 //       }
-//     );    
+//     );
 //     fireEvent.click(getByTestId(/continue button/i));
 //   });
 //   expect(queryByTestId('no email error')).toBeNull();

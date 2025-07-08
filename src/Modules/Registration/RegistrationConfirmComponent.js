@@ -15,6 +15,7 @@ import { formatMMDDYYYY } from '../../Utils/DateFormat';
 import EventCardComponent from '../Events/EventCardComponent';
 import QRCode from 'qrcode.react';
 
+<<<<<<< Updated upstream
 const RegistrationConfirmComponent = props => {
   const user_data = props.location.state.user;
   
@@ -46,6 +47,30 @@ const RegistrationConfirmComponent = props => {
       return '';
     }
   };
+=======
+const RegistrationConfirmComponent = () => {
+	const location = useLocation();
+	const user_data = location.state?.user;
+
+	const dispatch = useDispatch();
+	const event = useSelector(selectEvent);
+	let HOME_OR_ROOT_URL = RENDER_URL.HOME_URL;
+	const event_slot_id = location.state?.eventTimeStamp?.event_slot_id;
+	const [userToken, setUserToken] = useState(undefined);
+	const [isError, setIsError] = useState(false);
+	const [selectedEvent, setSelectedEvent] = useState(event);
+	const [pageError, setPageError] = useState(false);
+	const currentUser = useSelector(selectUser);
+	const [user, setUser] = useState(currentUser);
+	const eventDateId = sessionStorage.getItem("registeredEventDateID");
+
+	if (!JSON.parse(localStorage.getItem("isLoggedIn") || "false")) {
+		HOME_OR_ROOT_URL = RENDER_URL.ROOT_URL;
+		localStorage.removeItem("userToken");
+		localStorage.removeItem("tokenExpiresAt");
+		localStorage.removeItem("search_zip");
+	}
+>>>>>>> Stashed changes
 
   const getUser = async token => {
     const { GUEST_USER } = API_URL;
@@ -71,6 +96,7 @@ const RegistrationConfirmComponent = props => {
 
   useEffect(fetchBusinesses, []);
 
+<<<<<<< Updated upstream
   function fetchBusinesses(){
     setUserToken(localStorage.getItem('userToken'));
     if (!isError && !pageError) {
@@ -82,6 +108,9 @@ const RegistrationConfirmComponent = props => {
       }
     }
   }
+=======
+	useEffect(fetchBusinesses, []);
+>>>>>>> Stashed changes
 
   const getEvent = async () => {
     try {

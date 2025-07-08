@@ -13,7 +13,7 @@ const PrivacyComponent = () => {
 				</div>
 				<div className="row mt-3">
 					<div className="col-12">
-						<div class="privacy">
+						<div className="privacy">
 							<h2 className="font-weight-bold mobile-text-left">
 								<center>FreshTrak Privacy Policy</center>
 							</h2>

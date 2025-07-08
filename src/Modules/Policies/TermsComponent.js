@@ -96,7 +96,7 @@ const TermsComponent = props => {
       Governing Law, Arbitration, and Waiver of Class Action
       </h4>
       <p className="mobile-text-left caption-text">
-      The laws of the State of Illinois (excluding any principles of conflicts of laws) govern your use of the Website, the services and these Terms. You agree that the parties shall settle any claim or dispute relating to these Terms by binding arbitration in Chicago, Illinois under the Commercial Arbitration Rules of the American Arbitration Association. To the fullest extent permitted by applicable law, no arbitration under these Terms shall be joined to an arbitration involving any other party subject to these Terms, whether through class arbitration proceedings or otherwise. Notwithstanding the dispute resolution requirements set forth above, for any injunctive relief relating to the access to, or use of, the Website including, without limitation, related services, you agree and hereby submit to the exclusive jurisdiction and venue of the appropriate state or federal courts located in Illinois.
+      The laws of the State of Ohio (excluding any principles of conflicts of laws) govern your use of the Website, the services and these Terms. You agree that the parties shall settle any claim or dispute relating to these Terms by binding arbitration in Columbus, Ohio under the Commercial Arbitration Rules of the American Arbitration Association. To the fullest extent permitted by applicable law, no arbitration under these Terms shall be joined to an arbitration involving any other party subject to these Terms, whether through class arbitration proceedings or otherwise. Notwithstanding the dispute resolution requirements set forth above, for any injunctive relief relating to the access to, or use of, the Website including, without limitation, related services, you agree and hereby submit to the exclusive jurisdiction and venue of the appropriate state or federal courts located in Ohio.
       Whether in arbitration or court, you waive the right to prosecute or participate in class action, collective action, or other representative action. You may seek relief only on behalf of yourself and only to the extent necessary to remedy your individual claim. This class action waiver is a material and essential part of and cannot be severed from this provision.
       </p>
       <h4>
@@ -115,7 +115,7 @@ const TermsComponent = props => {
       Contact Us
       </h4>
       <p className="mobile-text-left caption-text">
-      Please contact us with any questions you have. If you would like to contact us, please send us an email at freshtrak@feedingamerica.org.
+      Please contact us with any questions you have. If you would like to contact us, please call 614-317-9450 or send us an email at freshtrak@midohiofoodbank.org.
       </p>
     </div>
     </Fragment>

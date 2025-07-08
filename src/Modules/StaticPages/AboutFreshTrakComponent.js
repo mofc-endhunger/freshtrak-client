@@ -32,7 +32,7 @@ const AboutFreshTrakComponent = () => {
               assistance in your local area.
             </div>
             <p className="mobile-text-left caption-text">
-              Supported by the Feeding America, we’re working to make it easier
+              Built by the Mid-Ohio Foodbank, we’re working to make it easier
               for you to support your family whenever and wherever we can. For
               nearly 40 years we’ve been helping our friends and neighbors stay
               fed through local action. FreshTrak is our way of using the
@@ -95,16 +95,16 @@ const AboutFreshTrakComponent = () => {
           <p className="mobile-text-left  text-center caption-text">
               We get there by listening to our neighbors, understanding their
               needs, and being available when you need us the most. If you’d
-              like to know more about Feeding America and our mission,
+              like to know more about the Mid-Ohio Foodbank and our mission,
               please visit us at{" "}
               <span>
                 <a
-                  href="http://www.feedingamerica.org/"
+                  href="http://www.midohiofoodbank.com/"
                   className="color-green"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                    www.feedingamerica.org
+                    www.midohiofoodbank.org
                 </a>
               </span>
               .

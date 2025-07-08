@@ -137,7 +137,7 @@ const PrivacyComponent = props => {
         Children’s Privacy
         </h4>
       <p className="mobile-text-left caption-text">
-        Our Website is not intended for children under the age of 13. No one under 13 should share any personal information with us. We do not knowingly collect any personal information from children under 13. If we learn that we have collected the personal information of a child under the age of 13, we will make reasonable efforts to delete that information from our records. To request deletion of personal information relating to a child under 13, please email us at freshtrak@feedingamerica.org.
+        Our Website is not intended for children under the age of 13. No one under 13 should share any personal information with us. We do not knowingly collect any personal information from children under 13. If we learn that we have collected the personal information of a child under the age of 13, we will make reasonable efforts to delete that information from our records. To request deletion of personal information relating to a child under 13, please email us at freshtrak@midohiofoodbank.org.
       </p>
       <h4 className="mb-2 medium-title font-weight-bold">
         Supported Web Browsers and Do Not Track Signals
@@ -161,7 +161,7 @@ const PrivacyComponent = props => {
       Contact Information
         </h4>
       <p className="mobile-text-left caption-text">
-        Please send your privacy-related questions, comments, and concerns to us via email at freshtrak@feedingamerica.org. 
+        Please send your privacy-related questions, comments, and concerns to us via email at freshtrak@midohiofoodbank.org. 
       </p>
       <h4 className="mb-2 medium-title font-weight-bold">
       Changes to this Statement

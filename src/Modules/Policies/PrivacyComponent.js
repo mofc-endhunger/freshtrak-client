@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import NavigationBtnComponent from "../General/NavigationBtnComponent";
 import "../../Assets/scss/main.scss";
 
-const PrivacyComponent = () => {
+const PrivacyComponent = props => {
 	return (
 		<Fragment>
 			<div className="container pt-100 pb-100 register-confirmation">
@@ -13,7 +13,7 @@ const PrivacyComponent = () => {
 				</div>
 				<div className="row mt-3">
 					<div className="col-12">
-						<div className="privacy">
+						<div class="privacy">
 							<h2 className="font-weight-bold mobile-text-left">
 								<center>FreshTrak Privacy Policy</center>
 							</h2>
@@ -28,7 +28,7 @@ const PrivacyComponent = () => {
 								personal information. This Privacy Policy
 								applies to our Website and to our communications
 								with you. Throughout this Policy, we may refer
-								to FreshTrak as "we," "us," or "our." "Website"
+								to FreshTrak as “we,” “us,” or “our.” “Website”
 								refers to https://freshtrak.com/ and any other
 								microsites or mobile websites we operate or use.
 							</p>
@@ -278,7 +278,7 @@ const PrivacyComponent = () => {
 								</li>
 							</ul>
 							<h4 className="mb-2 medium-title font-weight-bold">
-								Children's Privacy
+								Children’s Privacy
 							</h4>
 							<p className="mobile-text-left caption-text">
 								Our Website is not intended for children under
@@ -291,7 +291,7 @@ const PrivacyComponent = () => {
 								efforts to delete that information from our
 								records. To request deletion of personal
 								information relating to a child under 13, please
-								email us at freshtrak@feedingamerica.org.
+								email us at freshtrak@midohiofoodbank.org.
 							</p>
 							<h4 className="mb-2 medium-title font-weight-bold">
 								Supported Web Browsers and Do Not Track Signals
@@ -301,8 +301,8 @@ const PrivacyComponent = () => {
 								versions to optimize your experience. Older web
 								browser versions may not be able to access or
 								utilize all pages on our website as intended. We
-								may not be able to receive or honor "Do Not
-								Track" signals and our Website may continue to
+								may not be able to receive or honor “Do Not
+								Track” signals and our Website may continue to
 								collect information in the manner described
 								within this privacy notice.
 							</p>
@@ -343,7 +343,7 @@ const PrivacyComponent = () => {
 							<p className="mobile-text-left caption-text">
 								Please send your privacy-related questions,
 								comments, and concerns to us via email at
-								freshtrak@feedingamerica.org.
+								freshtrak@midohiofoodbank.org.
 							</p>
 							<h4 className="mb-2 medium-title font-weight-bold">
 								Changes to this Statement

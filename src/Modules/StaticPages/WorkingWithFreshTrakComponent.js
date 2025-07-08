@@ -33,9 +33,9 @@ const WorkingWithFreshTrakComponent = () => {
                     </div>
                     <div className="row mt-3">
                         <div className="col-12">
-                            <div className="mb-2 medium-title font-weight-bold">Because no one should go hungry.</div>
+                            <div className="mb-2 medium-title font-weight-bold">The Mid-Ohio Foodbank was established with an audacious goal in mind: No one goes hungry. </div>
                             <div className="mobile-text-left caption-text">
-                                <p>Through the Feeding America network of 200 foodbanks we’ve been working on a national scale to learn, share, and organize in an effort to get meals to as many hungry families as possible.</p>
+                                <p>For 40 years we’ve been focused on feeding our friends and neighbors. As part of the Feeding America network we’ve been working on a national scale to learn, share, and organize in an effort to get meals to as many hungry families as possible.</p>
 
                                 <p>With FreshTrak, we’re looking to leverage our experience to create a tool that feeds families faster, more securely, with solutions that fit their unique challenges. This new tool is designed for food banks to do the work that we do, while leveraging our collective power to help get meals where they are needed the most.</p>
 

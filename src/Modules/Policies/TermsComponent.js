@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import NavigationBtnComponent from "../General/NavigationBtnComponent";
 import "../../Assets/scss/main.scss";
 
-const TermsComponent = () => {
+const TermsComponent = props => {
 	return (
 		<Fragment>
 			<div className="container pt-100 pb-100 register-confirmation">
@@ -18,14 +18,14 @@ const TermsComponent = () => {
 					Effective Date: January 01, 2021
 				</p>
 				<p className="mobile-text-left caption-text">
-					These Terms of Use (these "Terms") apply to our websites,
+					These Terms of Use (these “Terms”) apply to our websites,
 					microsites, and mobile versions of these websites
-					(collectively, the "Website") that expressly adopt and
+					(collectively, the “Website”) that expressly adopt and
 					display or link to these Terms, as may be revised from time
 					to time, and that are owned, operated, or controlled by
 					FreshTrak, its affiliates and subsidiaries (collectively
-					referred to as "FreshTrak," "we," "us," or "our"). By
-					accessing and using this Website, you (the "User")
+					referred to as “FreshTrak,” “we,” “us,” or “our”). By
+					accessing and using this Website, you (the “User”)
 					acknowledge and agree to accept and be bound by these Terms.
 				</p>
 				<h4 className="mb-2 medium-title font-weight-bold">
@@ -45,7 +45,7 @@ const TermsComponent = () => {
 					All Website Content, including, without limitation, all
 					text, graphics, audio, video, music, icons, images,
 					hyperlinks, displays, products, HTML code and scripts
-					(collectively, the "Website Content"), and the collection,
+					(collectively, the “Website Content”), and the collection,
 					arrangement and assembly of the Website Content, is the
 					property of FreshTrak and its sponsors, distributors, or
 					licensors, and is protected by copyright law and other U.S.
@@ -64,14 +64,14 @@ const TermsComponent = () => {
 				</h4>
 				<p className="mobile-text-left caption-text">
 					All rights regarding any trademarks, trade names, service
-					marks, logos and/or trade dress (collectively, "Marks")
+					marks, logos and/or trade dress (collectively, “Marks”)
 					contained in, or used in connection with, the Website are
 					expressly reserved by FreshTrak and its licensors. The
 					Marks, and all associated logos or images, are registered
 					and/or common law trademarks, and are protected by U.S. and
 					international laws and treaties. No license with respect to
 					the use of the Marks is granted to the User under these
-					Terms or by virtue of User's use of the Website. The Marks
+					Terms or by virtue of User’s use of the Website. The Marks
 					may not be copied, imitated or used, in whole or in part,
 					without the prior written consent of FreshTrak or the
 					applicable rights holder.
@@ -81,7 +81,7 @@ const TermsComponent = () => {
 				</h4>
 				<p className="mobile-text-left caption-text">
 					The Website may allow the User to upload photographs,
-					videos, or other content ("User Content"). The
+					videos, or other content (“User Content”). The
 					<br />
 					User shall be solely responsible for the User Content and
 					the consequences of submitting and publishing the User
@@ -105,7 +105,7 @@ const TermsComponent = () => {
 					make available via the Website any content or materials (i)
 					that are unlawful, threatening, abusive, harassing,
 					defamatory, libelous, obscene, vulgar, profane, injurious to
-					third parties, or which invade another person's privacy,
+					third parties, or which invade another person’s privacy,
 					further the commission or concealment of a crime, or are
 					otherwise objectionable; (ii) infringe the copyright or
 					other intellectual property rights of a third party; or
@@ -146,18 +146,18 @@ const TermsComponent = () => {
 				<p>
 					The User understands and agrees that FreshTrak does not
 					control and is not responsible for any User Content made
-					available on the Website by other users. The User's use of,
+					available on the Website by other users. The User’s use of,
 					or reliance on, any information contained in such third
-					party Content is at the User's sole risk. Under no
+					party Content is at the User’s sole risk. Under no
 					circumstances will FreshTrak be liable for any such third
 					party Content or for any loss or damage resulting from the
-					User's use of, or reliance on, such third party Content.
+					User’s use of, or reliance on, such third party Content.
 				</p>
 				<h4 className="mb-2 medium-title font-weight-bold">
 					Acceptable Use
 				</h4>
 				<p className="mobile-text-left caption-text">
-					The User's permitted use of the Website and Website content
+					The User’s permitted use of the Website and Website content
 					is limited to the standard functionality of the Website. In
 					no event may the Website be used in a manner that (i) is
 					unlawful, fraudulent, or deceptive, (ii) harasses, abuses,
@@ -170,10 +170,10 @@ const TermsComponent = () => {
 					code, files or programs that interrupt, destroy or limit the
 					functionality of any computer software, hardware, or
 					telecommunications equipment, (v) attempts to gain
-					unauthorized access to FreshTrak's systems or user accounts,
+					unauthorized access to FreshTrak’s systems or user accounts,
 					(vi) encourages conduct that would constitute a criminal
 					offense or that gives rise to civil liability, (vii)
-					attempts to damage, disable or overburden FreshTrak's
+					attempts to damage, disable or overburden FreshTrak’s
 					servers or networks, or (viii) fails to comply with
 					applicable third-party terms. The User must comply with all
 					applicable third-party terms of use (e.g., wireless carrier
@@ -182,7 +182,7 @@ const TermsComponent = () => {
 					terminate the license granted to the User hereunder and/or
 					bring legal action against the User if the User engages in,
 					or FreshTrak reasonably believes the User has engaged in or
-					is engaging in, use that violates these Terms. FreshTrak's
+					is engaging in, use that violates these Terms. FreshTrak’s
 					failure or delay in taking such actions does not constitute
 					a waiver of its rights to enforce these Terms.
 				</p>
@@ -195,7 +195,7 @@ const TermsComponent = () => {
 					enter into these Terms and to abide by the terms hereof;
 					(ii) the User is not located in a country that is subject to
 					a U.S. Government embargo or that has been designated by the
-					U.S. Government as a "terrorist support" country, and (iii)
+					U.S. Government as a “terrorist support” country, and (iii)
 					the User is not included on any U.S. Government list of
 					prohibited or restricted parties. The Website is not
 					intended for children under the age of 13. FreshTrak
@@ -203,7 +203,7 @@ const TermsComponent = () => {
 					America. FreshTrak does not represent the Website is
 					available or appropriate for use in other jurisdictions. Any
 					access to or use of the Website from other jurisdictions is
-					at the User's sole risk and the User is responsible for
+					at the User’s sole risk and the User is responsible for
 					complying with all applicable local laws
 				</p>
 				<h4 className="mb-2 medium-title font-weight-bold">
@@ -242,8 +242,8 @@ const TermsComponent = () => {
 					Website or our services, and your reliance upon any data,
 					information, or results accessed using the Website or
 					services, is at your own risk. This Website and all content
-					of the Website are provided to our Users "as is" and "as
-					available" and without any warranties of any kind, whether
+					of the Website are provided to our Users “as is” and “as
+					available” and without any warranties of any kind, whether
 					express or implied, including but not limited to those of
 					merchantability, fitness for a particular purpose, title, or
 					noninfringement. You acknowledge by your use of the Website,
@@ -256,14 +256,14 @@ const TermsComponent = () => {
 					Indemnity
 				</h4>
 				<p className="mobile-text-left caption-text">
-					Upon FreshTrak's request, the User agrees to indemnify,
+					Upon FreshTrak’s request, the User agrees to indemnify,
 					defend and hold harmless FreshTrak and its employees,
 					contractors, officers, directors, and licensors from and
 					against all claims, suits, demands, damages, liabilities,
-					loss, cost, and expense (including reasonable attorneys'
-					fees) that arise from: (i) the User's use or misuse of the
-					Website; (ii) the User's violation of these Terms; or (iii)
-					the User's violation of any third party right, including
+					loss, cost, and expense (including reasonable attorneys’
+					fees) that arise from: (i) the User’s use or misuse of the
+					Website; (ii) the User’s violation of these Terms; or (iii)
+					the User’s violation of any third party right, including
 					without limitation any copyright, property, or privacy
 					right. FreshTrak reserves the right to assume the exclusive
 					defense and control of any matter otherwise subject to
@@ -285,14 +285,14 @@ const TermsComponent = () => {
 					Governing Law, Arbitration, and Waiver of Class Action
 				</h4>
 				<p className="mobile-text-left caption-text">
-					The laws of the State of Illinois (excluding any principles
-					of conflicts of laws) govern your use of the Website, the
+					The laws of the State of Ohio (excluding any principles of
+					conflicts of laws) govern your use of the Website, the
 					services and these Terms. You agree that the parties shall
 					settle any claim or dispute relating to these Terms by
-					binding arbitration in Chicago, Illinois under the
-					Commercial Arbitration Rules of the American Arbitration
-					Association. To the fullest extent permitted by applicable
-					law, no arbitration under these Terms shall be joined to an
+					binding arbitration in Columbus, Ohio under the Commercial
+					Arbitration Rules of the American Arbitration Association.
+					To the fullest extent permitted by applicable law, no
+					arbitration under these Terms shall be joined to an
 					arbitration involving any other party subject to these
 					Terms, whether through class arbitration proceedings or
 					otherwise. Notwithstanding the dispute resolution
@@ -300,14 +300,13 @@ const TermsComponent = () => {
 					relating to the access to, or use of, the Website including,
 					without limitation, related services, you agree and hereby
 					submit to the exclusive jurisdiction and venue of the
-					appropriate state or federal courts located in Illinois.
-					Whether in arbitration or court, you waive the right to
-					prosecute or participate in class action, collective action,
-					or other representative action. You may seek relief only on
-					behalf of yourself and only to the extent necessary to
-					remedy your individual claim. This class action waiver is a
-					material and essential part of and cannot be severed from
-					this provision.
+					appropriate state or federal courts located in Ohio. Whether
+					in arbitration or court, you waive the right to prosecute or
+					participate in class action, collective action, or other
+					representative action. You may seek relief only on behalf of
+					yourself and only to the extent necessary to remedy your
+					individual claim. This class action waiver is a material and
+					essential part of and cannot be severed from this provision.
 				</p>
 				<h4>Changes to Website</h4>
 				<p className="mobile-text-left caption-text">
@@ -324,9 +323,9 @@ const TermsComponent = () => {
 				<p className="mobile-text-left caption-text">
 					FreshTrak reserves the right to change these Terms at any
 					time, and in its sole discretion, by changing these Terms
-					within the Website. The User's continued use of the Website
+					within the Website. The User’s continued use of the Website
 					after any such changes to these Terms are made available
-					through the Website will constitute the User's acceptance of
+					through the Website will constitute the User’s acceptance of
 					those changes. These Terms shall govern any updates to, or
 					supplements or replacements for, the Website unless separate
 					terms are provided in conjunction with such updates,
@@ -338,8 +337,8 @@ const TermsComponent = () => {
 				</h4>
 				<p className="mobile-text-left caption-text">
 					Please contact us with any questions you have. If you would
-					like to contact us, please send us an email at
-					freshtrak@feedingamerica.org.
+					like to contact us, please call 614-317-9450 or send us an
+					email at freshtrak@midohiofoodbank.org.
 				</p>
 			</div>
 		</Fragment>

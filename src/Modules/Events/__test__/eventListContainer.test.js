@@ -1,16 +1,17 @@
 import React from "react";
-import { wait, render } from "@testing-library/react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { waitFor, render } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import configureStore from "redux-mock-store";
 import EventListContainer from "../EventListContainer";
-import axios from "axios";
 import {
-  mockEvent,
-  mockAgency,
-  mockEventDate,
-  mockForms,
+	mockEvent,
+	mockAgency,
+	mockEventDate,
+	mockForms,
+	testData,
 } from "../../../Testing";
 import { Provider } from "react-redux";
+import axios from "axios";
 
 jest.mock("axios");
 
@@ -21,52 +22,60 @@ const store = mockStore({});
 // and does not show in reality
 const originalWarn = console.warn.bind(console.warn);
 beforeAll(() => {
-  console.warn = msg =>
-    !msg.toString().includes("Deprecation warning") && originalWarn(msg);
+	console.warn = msg =>
+		!msg.toString().includes("Deprecation warning") && originalWarn(msg);
 });
 afterAll(() => {
-  console.warn = originalWarn;
+	console.warn = originalWarn;
 });
 
-test("should load without errors", () => {
-  expect(() => {
-    render(<EventListContainer searchData={{}} />);
-  }).not.toThrowError();
-});
+describe("EventListContainer", () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 
-test("Successful Api with no Events dates", async () => {
-  const testAgencyWithNoEventDates = {
-    ...mockAgency,
-    events: [{ ...mockEvent }],
-  };
-  axios.get.mockImplementation(() =>
-    Promise.resolve({ data: { agencies: [testAgencyWithNoEventDates] } })
-  );
-  const { getByText } = render(<EventListContainer zipCode={mockAgency.zip} />);
-  await wait(() => {
-    getByText(/No Events Currently Scheduled/i);
-  });
-});
+	test("should load without errors", () => {
+		axios.get.mockResolvedValue({ data: [] });
+		expect(() => {
+			render(
+				<Provider store={store}>
+					<MemoryRouter>
+						<EventListContainer searchData={{}} />
+					</MemoryRouter>
+				</Provider>
+			);
+		}).not.toThrowError();
+	});
 
-test("Successful Api with Events dates", async () => {
-  const testAgencyWithEventDates = [{
-    ...mockAgency,
-    events: [
-      {
-        ...mockEvent,
-        event_dates: [{ ...mockEventDate }],
-        forms: [{ ...mockForms }],
-      },
-    ],
-  }];
-  const { getByText } = render(
-    <Provider store={store}>
-      <Router>
-        <EventListContainer zipCode={mockAgency.zip} agencyData={testAgencyWithEventDates}/>
-      </Router>
-    </Provider>
-  );
-  await wait(() => {
-    getByText(`${mockEvent.name}`);
-  });
+	test("Successful Api with no Events dates", async () => {
+		axios.get.mockResolvedValue({ data: [] });
+		const { getByText } = render(
+			<Provider store={store}>
+				<MemoryRouter>
+					<EventListContainer zipCode={mockAgency.zip} />
+				</MemoryRouter>
+			</Provider>
+		);
+		await waitFor(() => {
+			getByText(/No Events Currently Scheduled/i);
+		});
+	});
+
+	test("Successful Api with Events dates", async () => {
+		// No need to mock axios for this test, just pass agencyData
+		const eventName = testData[0].events[0].name;
+		const { getByText } = render(
+			<Provider store={store}>
+				<MemoryRouter>
+					<EventListContainer
+						agencyData={testData}
+						zipCode={mockAgency.zip}
+					/>
+				</MemoryRouter>
+			</Provider>
+		);
+		await waitFor(() => {
+			getByText(eventName);
+		});
+	});
 });

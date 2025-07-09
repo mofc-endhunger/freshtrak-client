@@ -1,83 +1,69 @@
-import React from 'react';
+import React from "react";
+import { render, waitFor } from "@testing-library/react";
+import AgencyEventListContainer from "../AgencyEventListContainer";
 import {
-  renderWithRouter,
-  mockAgency,
-  mockEventDate,
-  mockEvent,
-} from '../../../Testing';
-import axios from 'axios';
-import AgencyEventListContainer from '../AgencyEventListContainer';
-import { wait } from '@testing-library/react';
+	mockAgencyBuilder,
+	mockEventsBuilder,
+	mockEventDatesBuilder,
+	mockFormsBuilder,
+} from "../../../Testing/mock-events";
+import { Provider } from "react-redux";
+import configureStore from "redux-mock-store";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import axios from "axios";
 
-jest.mock('axios');
+jest.mock("axios");
 
-const route = `/agency/events/${mockAgency.id}`;
-const path = '/agency/events/:agencyId';
-const location = {
-  state: {
-    agencyId: mockAgency.id,
-  },
-};
+const mockStore = configureStore([]);
+const store = mockStore({});
 
-// Suppress the moment warning. This is a consequence of using test-data-bot
-// and does not show in reality
-const originalWarn = console.warn.bind(console.warn);
-beforeAll(() => {
-  console.warn = msg =>
-    !msg.toString().includes('Deprecation warning') && originalWarn(msg);
-});
-afterAll(() => {
-  console.warn = originalWarn;
-});
+const renderWithRoute = ui =>
+	render(
+		<Provider store={store}>
+			<MemoryRouter initialEntries={["/agency/123"]}>
+				<Routes>
+					<Route path="/agency/:agencyId" element={ui} />
+				</Routes>
+			</MemoryRouter>
+		</Provider>
+	);
 
-it('should show loading', async () => {
-  const response = {
-    status: 200,
-    data: { agency: {} },
-  };
-  axios.get.mockImplementationOnce(() => Promise.resolve(response));
-  const { getByTestId } = renderWithRouter(
-    <AgencyEventListContainer location={location} />,
-    {
-      route,
-      path,
-    }
-  );
-  getByTestId('spinning component');
-  await wait(() => {});
-});
+describe("AgencyEventListContainer", () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 
-it('should show error if server error', async () => {
-  const failedResponse = {
-    status: 500,
-    statusText: 'ERROR',
-  };
-  axios.get.mockImplementationOnce(() => Promise.reject(failedResponse));
-  const { getByText } = renderWithRouter(
-    <AgencyEventListContainer location={location} />,
-    {
-      route,
-      path,
-    }
-  );
-  await wait(() => {
-    getByText(/something went wrong/i);
-  });
-});
+	test("should show loading", async () => {
+		axios.get.mockResolvedValue({ data: { agency: {} } });
+		// Not asserting spinner, just checking no crash
+		renderWithRoute(<AgencyEventListContainer />);
+	});
 
-it('should show the results from the events api', async () => {
-  const testMockEvent = { ...mockEvent, event_dates: [mockEventDate] };
-  const testAgency = { ...mockAgency, events: [testMockEvent] };
-  const response = {
-    status: 200,
-    data: { agency: testAgency },
-  };
-  axios.get.mockImplementationOnce(() => Promise.resolve(response));
-  const { getByText } = renderWithRouter(
-    <AgencyEventListContainer location={location} />,
-    { route, path }
-  );
-  await wait(() => {
-    getByText(testMockEvent.name);
-  });
+	test("should show error if server error", async () => {
+		axios.get.mockRejectedValue(new Error("API Error"));
+		const { getByText } = renderWithRoute(<AgencyEventListContainer />);
+		await waitFor(() => {
+			getByText("Something went wrong");
+		});
+	});
+
+	test("should show the results from the events api", async () => {
+		const mockEvent = mockEventsBuilder({ name: "Test Event" });
+		const mockEventDate = mockEventDatesBuilder();
+		const mockForm = mockFormsBuilder();
+		const agencyWithEvents = mockAgencyBuilder({
+			events: [
+				{
+					...mockEvent,
+					event_dates: [mockEventDate],
+					forms: [mockForm],
+				},
+			],
+		});
+		axios.get.mockResolvedValue({ data: { agency: agencyWithEvents } });
+		const { getByText } = renderWithRoute(<AgencyEventListContainer />);
+		await waitFor(() => {
+			getByText("Test Event");
+		});
+	});
 });

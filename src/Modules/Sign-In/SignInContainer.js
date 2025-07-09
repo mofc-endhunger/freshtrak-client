@@ -4,7 +4,11 @@ import { useNavigate } from "react-router-dom";
 import SignInFormComponent from "./SignInFormComponent";
 
 const SignInContainer = () => {
-	const { register, handleSubmit, errors } = useForm();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm();
 	const navigate = useNavigate();
 	const onSubmit = data => {
 		console.log(data);

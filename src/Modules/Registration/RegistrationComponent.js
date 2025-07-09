@@ -130,7 +130,7 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 	}, [user, reset]);
 	const onSubmit = data => {
 		data = { ...data, ...formValues };
-		data["identification_code"] = user["identification_code"];
+		data["identification_code"] = user?.["identification_code"] || "";
 		data["date_of_birth"] = formatDateForServer(data["date_of_birth"]);
 		data = sanatizeInput(data);
 		onRegister(data);

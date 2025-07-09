@@ -219,13 +219,40 @@ const RegistrationContainer = props => {
 		return <ErrorComponent error={errors} />;
 	}
 
+	if (!user) {
+		return <SpinnerComponent />;
+	}
+
+	const defaultUser = {
+		first_name: "",
+		middle_name: "",
+		last_name: "",
+		suffix: "",
+		date_of_birth: "",
+		gender: "",
+		address_line_1: "",
+		address_line_2: "",
+		city: "",
+		state: "",
+		zip_code: "",
+		phone: "",
+		permission_to_text: false,
+		email: "",
+		permission_to_email: false,
+		seniors_in_household: 0,
+		adults_in_household: 0,
+		children_in_household: 0,
+		license_plate: "",
+		identification_code: "",
+	};
+
 	return (
 		<Fragment>
 			{isLoading && <SpinnerComponent />}
 			<Fragment>
 				<NotifyToast />
 				<RegistrationComponent
-					user={user}
+					user={user || defaultUser}
 					onRegister={register}
 					event={selectedEvent}
 					disabled={disabled}

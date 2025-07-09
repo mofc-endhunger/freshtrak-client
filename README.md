@@ -1,4 +1,3 @@
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## First Steps
@@ -7,7 +6,7 @@ Make sure you have [yarn](https://yarnpkg.com/) or [npm](https://www.npmjs.com/)
 
 In root folder run
 
-### `yarn` or  `npm i`
+### `yarn` or `npm i`
 
 to get the dependencies.
 
@@ -34,11 +33,10 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-
 ## Address Autocomplete
 
 Autocomplete feature is setup with Google Places API on dev environment.
-API key is intentionally removed from env variables. Contact Mark for the API key or ping `@ashikvarma11` 
+API key is intentionally removed from env variables. Contact Mark for the API key or ping `@ashikvarma11`
 You'll see error on console as Invalid key while typing on Search component without proper API key.
 Styles are added on main.scss under `.search-area`.
 
@@ -49,4 +47,5 @@ The cloudformation template can be found in [freshtrak-infrastructure](https://g
 
 ```
 AWS_PROFILE=<profile> AWS_REGION=us-east-2 ./deploy.sh <env>
+
 ```

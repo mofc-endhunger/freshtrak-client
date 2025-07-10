@@ -53,8 +53,9 @@ const RegistrationEventDetailsContainer = props => {
 
 	const fetchUserToken = async response => {
 		setLoading(true);
-		const { GUEST_AUTH, FB_AUTH } = API_URL;
+		const { GUEST_AUTH, FB_AUTH, GUEST_USER } = API_URL;
 		try {
+			let token, expires_at;
 			if (response) {
 				const resp = await axios({
 					method: "post",
@@ -62,25 +63,25 @@ const RegistrationEventDetailsContainer = props => {
 					data: JSON.stringify(response),
 					headers: { "Content-Type": "application/json" },
 				});
-				const {
-					data: { authentication },
-				} = resp;
-				TagManager.dataLayer({
-					dataLayer: { event: "returning-customer-login" },
-				});
-				localStorage.setItem("userToken", authentication.token);
-				localStorage.setItem(
-					"tokenExpiresAt",
-					authentication.expires_at
-				);
+				const { authentication } = resp.data;
+				token = authentication.token;
+				expires_at = authentication.expires_at;
 			} else {
 				const resp = await axios.post(GUEST_AUTH);
-				const {
-					data: { token, expires_at },
-				} = resp;
-				localStorage.setItem("userToken", token);
-				localStorage.setItem("tokenExpiresAt", expires_at);
+				token = resp.data.token;
+				expires_at = resp.data.expires_at;
 			}
+			localStorage.setItem("userToken", token);
+			localStorage.setItem("tokenExpiresAt", expires_at);
+
+			// Fetch user profile
+			const userResp = await axios.get(GUEST_USER, {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			localStorage.setItem("userProfile", JSON.stringify(userResp.data));
+
+			setLoading(false);
+			setshowAuthenticationModal(false);
 			navigate(`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`);
 		} catch (e) {
 			console.error(e);

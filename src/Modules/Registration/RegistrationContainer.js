@@ -13,6 +13,7 @@ import { EventFormat } from "../../Utils/EventHandler";
 import { formatMMDDYYYY } from "../../Utils/DateFormat";
 import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
+import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
 
 const RegistrationContainer = props => {
 	const dispatch = useDispatch();
@@ -25,6 +26,7 @@ const RegistrationContainer = props => {
 	const [pageError, setPageError] = useState(false);
 	const [errors, setErrors] = useState([]);
 	const [disabled, setDisabled] = useState(false);
+	const [showAuthModal, setShowAuthModal] = useState(false);
 
 	const event = useSelector(selectEvent);
 	const [selectedEvent, setSelectedEvent] = useState(event);
@@ -33,7 +35,31 @@ const RegistrationContainer = props => {
 	const [user, setUser] = useState(currentUser);
 	const CLIENT_URL = process.env.REACT_APP_CLIENT_URL;
 
-	useEffect(fetchBusinesses);
+	useEffect(() => {
+		const token = localStorage.getItem("userToken");
+		const userProfile = localStorage.getItem("userProfile");
+		setUserToken(token);
+		if (!isError && !pageError) {
+			if (Object.keys(selectedEvent).length === 0) {
+				getEvent();
+			}
+			if (!token) {
+				setShowAuthModal(true);
+			} else if (!user && userProfile) {
+				setUser(JSON.parse(userProfile));
+			}
+		}
+	}, [isError, pageError, selectedEvent, user]);
+
+	const handleAuthLogin = () => {
+		const token = localStorage.getItem("userToken");
+		const userProfile = localStorage.getItem("userProfile");
+		if (token && userProfile) {
+			setUserToken(token);
+			setUser(JSON.parse(userProfile));
+			setShowAuthModal(false);
+		}
+	};
 
 	function fetchBusinesses() {
 		setUserToken(localStorage.getItem("userToken"));
@@ -217,6 +243,16 @@ const RegistrationContainer = props => {
 
 	if (pageError) {
 		return <ErrorComponent error={errors} />;
+	}
+
+	if (showAuthModal) {
+		return (
+			<AuthenticationModalComponent
+				show={showAuthModal}
+				setshow={setShowAuthModal}
+				onLogin={handleAuthLogin}
+			/>
+		);
 	}
 
 	if (!user) {

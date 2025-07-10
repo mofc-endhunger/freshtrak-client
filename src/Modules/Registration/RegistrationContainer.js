@@ -15,6 +15,39 @@ import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
 import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
 
+// Utility to sanitize user object
+function sanitizeUser(user) {
+	if (!user) return {};
+	return {
+		first_name: user.first_name || "",
+		middle_name: user.middle_name || "",
+		last_name: user.last_name || "",
+		suffix: user.suffix || "",
+		date_of_birth: user.date_of_birth || "",
+		gender: user.gender || "",
+		address_line_1: user.address_line_1 || "",
+		address_line_2: user.address_line_2 || "",
+		city: user.city || "",
+		state: user.state || "",
+		zip_code: user.zip_code || "",
+		phone: user.phone || "",
+		permission_to_text: user.permission_to_text || false,
+		email: user.email || "",
+		permission_to_email: user.permission_to_email || false,
+		seniors_in_household: user.seniors_in_household || 0,
+		adults_in_household: user.adults_in_household || 0,
+		children_in_household: user.children_in_household || 0,
+		license_plate: user.license_plate || "",
+		identification_code: user.identification_code || "",
+		id: user.id,
+		user_type: user.user_type,
+		created_at: user.created_at,
+		updated_at: user.updated_at,
+		credential_id: user.credential_id,
+		user_detail_id: user.user_detail_id,
+	};
+}
+
 const RegistrationContainer = props => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -46,17 +79,31 @@ const RegistrationContainer = props => {
 			if (!token) {
 				setShowAuthModal(true);
 			} else if (!user && userProfile) {
-				setUser(JSON.parse(userProfile));
+				setUser(sanitizeUser(JSON.parse(userProfile)));
 			}
 		}
-	}, [isError, pageError, selectedEvent, user]);
+		// If modal is closed and no user, redirect to event details
+		if (!showAuthModal && !user && !isLoading) {
+			navigate(`/registration/event-details/${eventDateId}`);
+		}
+	}, [
+		isError,
+		pageError,
+		selectedEvent,
+		user,
+		userToken,
+		showAuthModal,
+		isLoading,
+		eventDateId,
+		navigate,
+	]);
 
 	const handleAuthLogin = () => {
 		const token = localStorage.getItem("userToken");
 		const userProfile = localStorage.getItem("userProfile");
 		if (token && userProfile) {
 			setUserToken(token);
-			setUser(JSON.parse(userProfile));
+			setUser(sanitizeUser(JSON.parse(userProfile)));
 			setShowAuthModal(false);
 		}
 	};
@@ -115,7 +162,7 @@ const RegistrationContainer = props => {
 				data["phone"] = data["phone"].replace(phoneRegex, "($1) $2-$3");
 			}
 			dispatch(setCurrentUser(data));
-			setUser(data);
+			setUser(sanitizeUser(data));
 			setLoading(false);
 		} catch (e) {
 			console.error(e);

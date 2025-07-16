@@ -1,6 +1,5 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { LinkContainer } from "react-router-bootstrap";
-import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import { API_URL, RENDER_URL } from "../../Utils/Urls";
@@ -11,14 +10,14 @@ const EventSlotsModalComponent = props => {
 	const {
 		event: { id: eventDateId, acceptReservations },
 		targetUrl,
+		selectedSlotId,
+		onSlotChange,
 	} = props;
 	const handleClose = () => setShow(false);
 	const handleShow = () => setShow(true);
 	const [eventHour, setEventHour] = useState([]);
 	const [show, setShow] = useState(false);
 	const [eventDate, setEventDate] = useState("");
-	const { register, watch } = useForm();
-	const event_slot_id = watch("time_slot");
 	const navigate = useNavigate();
 	const backHome = () => {
 		navigate(-1);
@@ -86,6 +85,7 @@ const EventSlotsModalComponent = props => {
 							item.event_slots
 								.filter((e, i) => e.open_slots > 0)
 								.map((e, i) => {
+									const radioId = `time_slot_${e.event_slot_id}`;
 									return (
 										<div
 											className="form-check p-2"
@@ -95,10 +95,18 @@ const EventSlotsModalComponent = props => {
 												className="form-check-input"
 												type="radio"
 												name="time_slot"
+												id={radioId}
 												value={e.event_slot_id}
-												ref={register}
+												checked={
+													String(selectedSlotId) ===
+													String(e.event_slot_id)
+												}
+												onChange={onSlotChange}
 											/>
-											<label className="form-check-label pl-2">
+											<label
+												className="form-check-label pl-2"
+												htmlFor={radioId}
+											>
 												{e.start_time} - {e.end_time}
 											</label>
 										</div>
@@ -115,21 +123,20 @@ const EventSlotsModalComponent = props => {
 					>
 						Go Back
 					</button>
-					{/* <LinkContainer to={`${RENDER_URL.REGISTRATION_FORM_URL}/${eventDateId}/${event_slot_id}`}> */}
 					<LinkContainer
 						to={{
 							pathname: `${
 								targetUrl || RENDER_URL.REGISTRATION_FORM_URL
-							}/${eventDateId}/${event_slot_id}`,
+							}/${eventDateId}/${selectedSlotId}`,
 							state: {
-								event_slot: findEventSlot(event_slot_id),
+								event_slot: findEventSlot(selectedSlotId),
 								event_date: eventDate,
 							},
 						}}
 					>
 						<button
 							type="submit"
-							disabled={!event_slot_id}
+							disabled={!selectedSlotId}
 							className="btn primary-button ml-1 flex-grow-1"
 							onClick={handleClose}
 						>

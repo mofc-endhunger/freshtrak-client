@@ -13,7 +13,7 @@ import "@one-platform/opc-timeline";
 const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 	const {
 		register,
-		triggerValidation,
+		trigger,
 		handleSubmit,
 		errors,
 		getValues,
@@ -23,6 +23,10 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 	} = useForm({ mode: "onChange" });
 	const [formStep, setFormStep] = useState(0);
 	const [formValues, setFormValues] = useState({});
+	const [selectedSlotId, setSelectedSlotId] = useState("");
+	const handleSlotChange = e => {
+		setSelectedSlotId(e.target.value);
+	};
 	const configureTimeLine = () => {
 		const timeline = document.querySelector("#timeline");
 		if (timeline) {
@@ -76,7 +80,7 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 		if (validateEmail) {
 			field_array.push("email");
 		}
-		const res = await triggerValidation(field_array);
+		const res = await trigger(field_array);
 		if (res) {
 			const values = getValues();
 			setFormValues({ ...formValues, ...values });
@@ -85,27 +89,28 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 	};
 
 	useEffect(() => {
+		const safeUser = user && typeof user === "object" ? user : {};
 		const {
-			first_name,
-			middle_name,
-			last_name,
-			suffix,
-			date_of_birth,
-			gender,
-			address_line_1,
-			address_line_2,
-			city,
-			state,
-			zip_code,
-			phone,
-			permission_to_text,
-			email,
-			permission_to_email,
-			seniors_in_household,
-			adults_in_household,
-			children_in_household,
-			license_plate,
-		} = user || {};
+			first_name = "",
+			middle_name = "",
+			last_name = "",
+			suffix = "",
+			date_of_birth = "",
+			gender = "",
+			address_line_1 = "",
+			address_line_2 = "",
+			city = "",
+			state = "",
+			zip_code = "",
+			phone = "",
+			permission_to_text = false,
+			email = "",
+			permission_to_email = false,
+			seniors_in_household = 0,
+			adults_in_household = 0,
+			children_in_household = 0,
+			license_plate = "",
+		} = safeUser;
 		reset({
 			first_name,
 			middle_name,
@@ -129,7 +134,10 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 		});
 	}, [user, reset]);
 	const onSubmit = data => {
-		data = { ...data, ...formValues };
+		// Get all current form values including household member counts from the final step
+		const allFormValues = getValues();
+		// Merge with current form values taking precedence over previous step values
+		data = { ...formValues, ...allFormValues };
 		data["identification_code"] = user?.["identification_code"] || "";
 		data["date_of_birth"] = formatDateForServer(data["date_of_birth"]);
 		data = sanatizeInput(data);
@@ -156,7 +164,7 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 	};
 
 	const santizeString = input => {
-		let modifiedInput = input.trim();
+		let modifiedInput = (input ?? "").toString().trim();
 		modifiedInput = modifiedInput.replace(/\s\s+/g, " ");
 		modifiedInput = modifiedInput.replace(/[^A-Za-z0-9 \-_.@'`]/g, "");
 		return modifiedInput;
@@ -180,12 +188,16 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 					</opc-timeline>
 					<div className="registration-form">
 						<div className="content-wrapper">
-							<EventSlotsModalComponent event={event} />
+							<EventSlotsModalComponent
+								event={event}
+								selectedSlotId={selectedSlotId}
+								onSlotChange={handleSlotChange}
+							/>
 							<form onSubmit={submitHandlerFocus}>
 								{formStep === 0 && (
 									<PrimaryInfoFormComponent
 										register={register}
-										triggerValidation={triggerValidation}
+										trigger={trigger}
 										continueHandler={continueHandler}
 										getValues={getValues}
 										errors={errors}
@@ -229,9 +241,7 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 										{" "}
 										<MemberCountFormComponent
 											register={register}
-											triggerValidation={
-												triggerValidation
-											}
+											trigger={trigger}
 											continueHandler={continueHandler}
 											event={event}
 											errors={errors}

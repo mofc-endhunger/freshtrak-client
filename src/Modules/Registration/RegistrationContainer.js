@@ -195,7 +195,7 @@ const RegistrationContainer = props => {
 	const notify = (msg, error) => {
 		let formatted_msg =
 			(msg.user_id && msg.user_id[0]) ||
-			msg.event_date_id[0] ||
+			(msg.event_date_id && msg.event_date_id[0]) ||
 			"Something Went Wrong";
 		showToast(formatted_msg, error);
 	};
@@ -235,16 +235,18 @@ const RegistrationContainer = props => {
 		setDisabled(!disabled);
 		const event_date_id = parseInt(eventDateId, 10);
 		const event_slot_id = parseInt(eventSlotId, 10);
-		// First save user
 		const { GUEST_USER, CREATE_RESERVATION } = API_URL;
+		let updatedUser = user;
 		try {
-			await axios.post(
+			const userResp = await axios.post(
 				GUEST_USER,
 				{ user },
 				{
 					headers: { Authorization: `Bearer ${userToken}` },
 				}
 			);
+			// Use the response data, which should include identification_code
+			updatedUser = userResp.data;
 		} catch (e) {
 			console.log(e);
 		}
@@ -263,12 +265,12 @@ const RegistrationContainer = props => {
 					event: "reservation",
 				},
 			});
-			if (user["permission_to_text"]) {
-				send_sms(user);
+			if (updatedUser["permission_to_text"]) {
+				send_sms(updatedUser);
 			}
-			if (user["permission_to_email"]) {
+			if (updatedUser["permission_to_email"]) {
 				sendRegistrationConfirmationEmail(
-					user,
+					updatedUser,
 					selectedEvent,
 					location
 				);
@@ -276,11 +278,7 @@ const RegistrationContainer = props => {
 			sessionStorage.setItem("registeredEventDateID", eventDateId);
 			navigate(RENDER_URL.REGISTRATION_CONFIRM_URL, {
 				state: {
-					user: {
-						...user,
-						identification_code:
-							currentUser?.identification_code || "",
-					},
+					user: updatedUser,
 					eventDateId: eventDateId,
 					eventTimeStamp: {
 						start_time: location.state?.event_slot?.start_time,

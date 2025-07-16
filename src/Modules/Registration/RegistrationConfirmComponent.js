@@ -19,7 +19,6 @@ const RegistrationConfirmComponent = props => {
 	const location = useLocation();
 	const currentUser = useSelector(selectUser);
 	const user_data = location.state?.user || currentUser || {};
-	console.log("user_data", user_data);
 
 	const dispatch = useDispatch();
 	const event = useSelector(selectEvent);
@@ -118,7 +117,8 @@ const RegistrationConfirmComponent = props => {
 			if (Object.keys(selectedEvent).length === 0) {
 				getEvent();
 			}
-			if (user === null) {
+			// Only fetch user if token is present
+			if (user === null && userToken) {
 				getUser(userToken);
 			}
 		}

@@ -95,18 +95,48 @@ const PrimaryInfoFormComponent = ({
 				)}
 			</div>
 			<div className="form-group">
+				<label htmlFor="suffix">{localization.suffix}</label>
+				<select
+					className="form-control"
+					name="suffix"
+					id="suffix"
+					{...register("suffix")}
+				>
+					<option value=""></option>
+					<option value="Jr">Jr</option>
+					<option value="Sr">Sr</option>
+					<option value="II">II</option>
+					<option value="III">III</option>
+					<option value="IV">IV</option>
+					<option value="V">V</option>
+				</select>
+			</div>
+			<div className="form-group">
 				<label htmlFor="date_of_birth">
-					{localization.date_of_birth}
+					{localization.dob}
+					<span className="text-danger">*</span>
 				</label>
 				<input
 					type="text"
-					className="form-control"
+					className={`form-control ${
+						errors?.date_of_birth && "invalid"
+					}`}
 					name="date_of_birth"
 					id="date_of_birth"
 					value={date_of_birth}
 					onChange={handleChangeDob}
 					placeholder="MM / DD / YYYY"
+					{...register("date_of_birth", {
+						validate: value =>
+							isValidDob(value) ||
+							"Please enter a valid date of birth.",
+					})}
 				/>
+				{errors?.date_of_birth && (
+					<span className="text-danger">
+						{errors.date_of_birth.message}
+					</span>
+				)}
 			</div>
 			<div className="form-group">
 				<label htmlFor="gender">

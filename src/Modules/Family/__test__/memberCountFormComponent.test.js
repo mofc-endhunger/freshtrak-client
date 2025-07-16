@@ -27,7 +27,7 @@ test("should not allow member count to go below zero", () => {
 			setValue={noop}
 		/>
 	);
-	const input = getByLabelText("Seniors");
+	const input = getByLabelText("Number of Seniors (60+)");
 	expect(input.value).toEqual("0");
 
 	// Find the decrement button (first button in the seniors group)

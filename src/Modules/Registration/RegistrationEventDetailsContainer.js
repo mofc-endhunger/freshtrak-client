@@ -82,7 +82,13 @@ const RegistrationEventDetailsContainer = props => {
 
 			setLoading(false);
 			setshowAuthenticationModal(false);
-			navigate(`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`);
+			if (selectedEvent && selectedEvent.id) {
+				navigate(
+					`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`
+				);
+			} else {
+				setPageError(true);
+			}
 		} catch (e) {
 			console.error(e);
 			setshowAuthenticationModal(false);
@@ -103,9 +109,14 @@ const RegistrationEventDetailsContainer = props => {
 				? fetchUserToken(response)
 				: setshowAuthenticationModal(true);
 		} else {
-			// setUserToken(localUserToken);
 			setshowAuthenticationModal(false);
-			navigate(`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`);
+			if (selectedEvent && selectedEvent.id) {
+				navigate(
+					`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`
+				);
+			} else {
+				setPageError(true);
+			}
 		}
 	};
 

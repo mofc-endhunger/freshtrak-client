@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 const App = () => {
 	React.useEffect(() => {}, []);
 	const language = useSelector(state => state.language.language);
-	console.log("inside app routes app.js lan", language);
 	return (
 		<div className="App">
 			<div className="main-wrapper">

@@ -1,23 +1,28 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, {
+	Fragment,
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+} from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import TagManager from "react-gtm-module";
 import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
-import { setCurrentUser, selectUser } from "../../Store/userSlice";
+import { selectUser } from "../../Store/userSlice";
 import SpinnerComponent from "../General/SpinnerComponent";
 import ErrorComponent from "../General/ErrorComponent";
 import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import RegistrationComponent from "./RegistrationComponent";
 import { EventFormat } from "../../Utils/EventHandler";
-import { formatMMDDYYYY } from "../../Utils/DateFormat";
 import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
 import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
 
 // Utility to sanitize user object
 function sanitizeUser(user) {
-	if (!user) return {};
+	if (!user || typeof user !== "object") return { ...defaultUser };
 	return {
 		first_name: user.first_name || "",
 		middle_name: user.middle_name || "",
@@ -48,6 +53,29 @@ function sanitizeUser(user) {
 	};
 }
 
+const defaultUser = {
+	first_name: "",
+	middle_name: "",
+	last_name: "",
+	suffix: "",
+	date_of_birth: "",
+	gender: "",
+	address_line_1: "",
+	address_line_2: "",
+	city: "",
+	state: "",
+	zip_code: "",
+	phone: "",
+	permission_to_text: false,
+	email: "",
+	permission_to_email: false,
+	seniors_in_household: 0,
+	adults_in_household: 0,
+	children_in_household: 0,
+	license_plate: "",
+	identification_code: "",
+};
+
 const RegistrationContainer = props => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -60,6 +88,7 @@ const RegistrationContainer = props => {
 	const [errors, setErrors] = useState([]);
 	const [disabled, setDisabled] = useState(false);
 	const [showAuthModal, setShowAuthModal] = useState(false);
+	const redirectTimeout = useRef();
 
 	const event = useSelector(selectEvent);
 	const [selectedEvent, setSelectedEvent] = useState(event);
@@ -68,59 +97,7 @@ const RegistrationContainer = props => {
 	const [user, setUser] = useState(currentUser);
 	const CLIENT_URL = process.env.REACT_APP_CLIENT_URL;
 
-	useEffect(() => {
-		const token = localStorage.getItem("userToken");
-		const userProfile = localStorage.getItem("userProfile");
-		setUserToken(token);
-		if (!isError && !pageError) {
-			if (Object.keys(selectedEvent).length === 0) {
-				getEvent();
-			}
-			if (!token) {
-				setShowAuthModal(true);
-			} else if (!user && userProfile) {
-				setUser(sanitizeUser(JSON.parse(userProfile)));
-			}
-		}
-		// If modal is closed and no user, redirect to event details
-		if (!showAuthModal && !user && !isLoading) {
-			navigate(`/registration/event-details/${eventDateId}`);
-		}
-	}, [
-		isError,
-		pageError,
-		selectedEvent,
-		user,
-		userToken,
-		showAuthModal,
-		isLoading,
-		eventDateId,
-		navigate,
-	]);
-
-	const handleAuthLogin = () => {
-		const token = localStorage.getItem("userToken");
-		const userProfile = localStorage.getItem("userProfile");
-		if (token && userProfile) {
-			setUserToken(token);
-			setUser(sanitizeUser(JSON.parse(userProfile)));
-			setShowAuthModal(false);
-		}
-	};
-
-	function fetchBusinesses() {
-		setUserToken(localStorage.getItem("userToken"));
-		if (!isError && !pageError) {
-			if (Object.keys(selectedEvent).length === 0) {
-				getEvent();
-			}
-			if (user === null) {
-				getUser(localStorage.getItem("userToken"));
-			}
-		}
-	}
-
-	const getEvent = async () => {
+	const getEvent = useCallback(async () => {
 		try {
 			const resp = await axios.get(
 				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
@@ -142,32 +119,67 @@ const RegistrationContainer = props => {
 				setErrors(e.response.data);
 			}
 		}
-	};
+	}, [eventDateId, dispatch]);
 
-	const getUser = async token => {
-		setLoading(true);
-		const { GUEST_USER } = API_URL;
-		try {
-			const resp = await axios.get(GUEST_USER, {
-				params: {},
-				headers: { Authorization: `Bearer ${token}` },
-			});
-			const { data } = resp;
-			if (data["date_of_birth"] !== null) {
-				data["date_of_birth"] = formatMMDDYYYY(data["date_of_birth"]);
+	useEffect(() => {
+		const token = localStorage.getItem("userToken");
+		const userProfile = localStorage.getItem("userProfile");
+		setUserToken(token);
+		if (!isError && !pageError) {
+			if (Object.keys(selectedEvent).length === 0) {
+				getEvent();
 			}
-			if (data["phone"] !== null) {
-				const phoneRegex =
-					/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-				data["phone"] = data["phone"].replace(phoneRegex, "($1) $2-$3");
+			if (!token) {
+				setShowAuthModal(true);
+			} else if (!user && userProfile) {
+				try {
+					setUser(sanitizeUser(JSON.parse(userProfile)));
+				} catch (error) {
+					console.error("Error parsing userProfile:", error);
+				}
 			}
-			dispatch(setCurrentUser(data));
-			setUser(sanitizeUser(data));
-			setLoading(false);
-		} catch (e) {
-			console.error(e);
+		}
+		// Only redirect if user is still not set after 1 second
+		if (!showAuthModal && !user && !isLoading) {
+			if (redirectTimeout.current) clearTimeout(redirectTimeout.current);
+			redirectTimeout.current = setTimeout(() => {
+				if (!user) {
+					setErrors([
+						"Unable to load user profile. Please try again or contact support.",
+					]);
+					setPageError(true);
+				}
+			}, 1000);
+		} else {
+			if (redirectTimeout.current) clearTimeout(redirectTimeout.current);
+		}
+	}, [
+		isError,
+		pageError,
+		selectedEvent,
+		user,
+		userToken,
+		showAuthModal,
+		isLoading,
+		eventDateId,
+		navigate,
+		getEvent,
+	]);
+
+	const handleAuthLogin = () => {
+		const token = localStorage.getItem("userToken");
+		const userProfile = localStorage.getItem("userProfile");
+		if (token && userProfile) {
+			setUserToken(token);
+			try {
+				setUser(sanitizeUser(JSON.parse(userProfile)));
+			} catch (error) {
+				console.error("Error parsing userProfile:", error);
+			}
+			setShowAuthModal(false);
 		}
 	};
+
 	const getReservationText = () => {
 		return location.state
 			? `at ${event.agencyName} on ${location.state.event_date} from ${location.state.event_slot.start_time} - ${location.state.event_slot.end_time}. For more information, including a reservation QR code,`
@@ -266,7 +278,8 @@ const RegistrationContainer = props => {
 				state: {
 					user: {
 						...user,
-						identification_code: currentUser.identification_code,
+						identification_code:
+							currentUser?.identification_code || "",
 					},
 					eventDateId: eventDateId,
 					eventTimeStamp: {
@@ -302,32 +315,9 @@ const RegistrationContainer = props => {
 		);
 	}
 
-	if (!user) {
+	if (!user || typeof user !== "object") {
 		return <SpinnerComponent />;
 	}
-
-	const defaultUser = {
-		first_name: "",
-		middle_name: "",
-		last_name: "",
-		suffix: "",
-		date_of_birth: "",
-		gender: "",
-		address_line_1: "",
-		address_line_2: "",
-		city: "",
-		state: "",
-		zip_code: "",
-		phone: "",
-		permission_to_text: false,
-		email: "",
-		permission_to_email: false,
-		seniors_in_household: 0,
-		adults_in_household: 0,
-		children_in_household: 0,
-		license_plate: "",
-		identification_code: "",
-	};
 
 	return (
 		<Fragment>
@@ -335,7 +325,7 @@ const RegistrationContainer = props => {
 			<Fragment>
 				<NotifyToast />
 				<RegistrationComponent
-					user={user || defaultUser}
+					user={user && typeof user === "object" ? user : defaultUser}
 					onRegister={register}
 					event={selectedEvent}
 					disabled={disabled}

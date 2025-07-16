@@ -55,7 +55,7 @@ const FooterComponent = () => (
 		</div>
 		<div className="row pt-2 pb-3">
 			<div className="col-md-12">
-				<p className="copy-right">© 2020 FreshTrak</p>
+				<p className="copy-right">© 2021 FreshTrak</p>
 			</div>
 		</div>
 	</div>

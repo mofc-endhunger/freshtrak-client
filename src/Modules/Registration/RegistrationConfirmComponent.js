@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { API_URL, RENDER_URL, BASE_URL } from "../../Utils/Urls";
 import axios from "axios";
@@ -13,25 +13,27 @@ import idImg from "../../Assets/img/id_img.png";
 import { EventFormat } from "../../Utils/EventHandler";
 import { formatMMDDYYYY } from "../../Utils/DateFormat";
 import EventCardComponent from "../Events/EventCardComponent";
-import QRCode from "qrcode.react";
+import QRCode from "react-qr-code";
 
 const RegistrationConfirmComponent = props => {
-	const user_data = props.location.state.user;
+	const location = useLocation();
+	const currentUser = useSelector(selectUser);
+	const user_data = location.state?.user || currentUser || {};
+	console.log("user_data", user_data);
 
 	const dispatch = useDispatch();
 	const event = useSelector(selectEvent);
 	let HOME_OR_ROOT_URL = RENDER_URL.HOME_URL;
-	const location = useLocation();
 	const event_slot_id = location.state?.eventTimeStamp?.event_slot_id;
 	const [userToken, setUserToken] = useState(undefined);
 	const [isError, setIsError] = useState(false);
 	const [selectedEvent, setSelectedEvent] = useState(event);
 	const [pageError, setPageError] = useState(false);
-	const currentUser = useSelector(selectUser);
 	const [user, setUser] = useState(currentUser);
 	const eventDateId = sessionStorage.getItem("registeredEventDateID");
 
-	if (!JSON.parse(localStorage.getItem("isLoggedIn"))) {
+	const isLoggedIn = localStorage.getItem("isLoggedIn");
+	if (!isLoggedIn || !JSON.parse(isLoggedIn)) {
 		HOME_OR_ROOT_URL = RENDER_URL.ROOT_URL;
 		localStorage.removeItem("userToken");
 		localStorage.removeItem("tokenExpiresAt");
@@ -41,50 +43,44 @@ const RegistrationConfirmComponent = props => {
 	const formatPhoneNumber = input => {
 		const regExp = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 		if (input) {
-			return input.replace(regExp, "($1) $2-$3");
+			return String(input).replace(regExp, "($1) $2-$3");
 		} else {
 			return "";
 		}
 	};
 
-	const getUser = async token => {
-		const { GUEST_USER } = API_URL;
-		try {
-			const resp = await axios.get(GUEST_USER, {
-				params: {},
-				headers: { Authorization: `Bearer ${token}` },
-			});
-			const { data } = resp;
-			if (data["date_of_birth"] !== null) {
-				data["date_of_birth"] = formatMMDDYYYY(data["date_of_birth"]);
+	const getUser = useCallback(
+		async token => {
+			const { GUEST_USER } = API_URL;
+			try {
+				const resp = await axios.get(GUEST_USER, {
+					params: {},
+					headers: { Authorization: `Bearer ${token}` },
+				});
+				const { data } = resp;
+				if (data["date_of_birth"] !== null) {
+					data["date_of_birth"] = formatMMDDYYYY(
+						data["date_of_birth"]
+					);
+				}
+				if (data["phone"] !== null) {
+					const phoneRegex =
+						/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+					data["phone"] = String(data["phone"]).replace(
+						phoneRegex,
+						"($1) $2-$3"
+					);
+				}
+				dispatch(setCurrentUser(data));
+				setUser(data);
+			} catch (e) {
+				console.error(e);
 			}
-			if (data["phone"] !== null) {
-				const phoneRegex =
-					/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-				data["phone"] = data["phone"].replace(phoneRegex, "($1) $2-$3");
-			}
-			dispatch(setCurrentUser(data));
-			setUser(data);
-		} catch (e) {
-			console.error(e);
-		}
-	};
+		},
+		[dispatch]
+	);
 
-	useEffect(fetchBusinesses);
-
-	function fetchBusinesses() {
-		setUserToken(localStorage.getItem("userToken"));
-		if (!isError && !pageError) {
-			if (Object.keys(selectedEvent).length === 0) {
-				getEvent();
-			}
-			if (user === null) {
-				getUser(userToken);
-			}
-		}
-	}
-
-	const getEvent = async () => {
+	const getEvent = useCallback(async () => {
 		try {
 			const resp = await axios.get(
 				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
@@ -104,22 +100,44 @@ const RegistrationConfirmComponent = props => {
 				setPageError(true);
 			}
 		}
-	};
+	}, [eventDateId, dispatch]);
+
+	useEffect(fetchBusinesses, [
+		getEvent,
+		getUser,
+		isError,
+		pageError,
+		selectedEvent,
+		user,
+		userToken,
+	]);
+
+	function fetchBusinesses() {
+		setUserToken(localStorage.getItem("userToken"));
+		if (!isError && !pageError) {
+			if (Object.keys(selectedEvent).length === 0) {
+				getEvent();
+			}
+			if (user === null) {
+				getUser(userToken);
+			}
+		}
+	}
 
 	const {
-		first_name,
-		middle_name,
-		last_name,
-		suffix,
-		address_line_1,
-		address_line_2,
-		city,
-		zip_code,
-		state,
-		phone,
-		identification_code,
-		license_plate,
-	} = user_data;
+		first_name = "",
+		middle_name = "",
+		last_name = "",
+		suffix = "",
+		address_line_1 = "",
+		address_line_2 = "",
+		city = "",
+		zip_code = "",
+		state = "",
+		phone = "",
+		identification_code = "",
+		license_plate = "",
+	} = user_data || {};
 
 	return (
 		<Fragment>
@@ -156,14 +174,15 @@ const RegistrationConfirmComponent = props => {
 						</div>
 						<div>
 							<h2>Your QR Code:</h2>
-							<QRCode
-								className="qr-code"
-								value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
-									event_slot_id
-										? "&event_slot_id=" + event_slot_id
-										: ""
-								}`}
-							/>
+							<div className="qr-code">
+								<QRCode
+									value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
+										event_slot_id
+											? "&event_slot_id=" + event_slot_id
+											: ""
+									}`}
+								/>
+							</div>
 							<br />
 						</div>
 						{event && (

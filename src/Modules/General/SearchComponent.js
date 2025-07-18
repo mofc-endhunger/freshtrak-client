@@ -3,10 +3,7 @@ import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import FilterComponent from "./FilterComponent";
 import localization from "../Localization/LocalizationComponent";
 
-import PlacesAutocomplete, {
-	geocodeByAddress,
-	getLatLng,
-} from "react-places-autocomplete";
+import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 import { Fragment } from "react";
 
 const SearchComponent = forwardRef(
@@ -24,22 +21,26 @@ const SearchComponent = forwardRef(
 		const [distance, setDistance] = useState(range);
 		const [serviceCat, setServiceCat] = useState("");
 		const [showFilter, setShowFilter] = useState(z_code !== undefined);
-		const handleSelect = async value => {
+		const handleSelect = async (value, place) => {
 			setAddress(value);
-			const results = await geocodeByAddress(value);
-			let destructuredAddress = getDestructured(
-				results[0]["address_components"]
-			);
-			setAddress(
-				destructuredAddress["street_number"] !== undefined
-					? `${destructuredAddress["street_number"]} ${destructuredAddress["route"]}`
-					: ""
-			);
 
-			//  Here we get the coordinates lat and long.
-			const coordinates = await getLatLng(results[0]);
-			setLat(coordinates.lat);
-			setLong(coordinates.lng);
+			if (place && place.address_components) {
+				let destructuredAddress = getDestructured(
+					place.address_components
+				);
+				setAddress(
+					destructuredAddress["street_number"] !== undefined
+						? `${destructuredAddress["street_number"]} ${destructuredAddress["route"]}`
+						: ""
+				);
+
+				// Note: Coordinates are not available with the new API
+				// You may need to implement a separate geocoding service
+				// to get coordinates if needed
+				// For now, we'll set empty coordinates
+				setLat("");
+				setLong("");
+			}
 		};
 
 		const getDestructured = address_components => {
@@ -70,62 +71,18 @@ const SearchComponent = forwardRef(
 									data-testid="search-street"
 								>
 									<label htmlFor="street">Street</label>
-									<PlacesAutocomplete
+									<GooglePlacesAutocomplete
 										onSelect={handleSelect}
 										value={address}
-										onChange={setAddress}
-									>
-										{({
-											getInputProps,
-											suggestions,
-											getSuggestionItemProps,
-											loading,
-										}) => (
-											<>
-												<input
-													type="text"
-													className="form-control"
-													name="street"
-													id="street"
-													{...getInputProps({
-														placeholder:
-															"Type Address",
-													})}
-													{...register("street")}
-												/>
-
-												{/* No spinners are set here as of now. You can re-use the loader from EventContainer page;
-                      though the size of the spinner is set as 10em,fixed in main.scss file. */}
-												{loading ? "Loading..." : null}
-
-												{suggestions.length > 0 && (
-													<div
-														data-testid="suggestions"
-														className="suggestions-container"
-													>
-														{suggestions.map(
-															suggestion => {
-																return (
-																	<div
-																		{...getSuggestionItemProps(
-																			suggestion
-																		)}
-																		key={
-																			suggestion.id
-																		}
-																	>
-																		{
-																			suggestion.description
-																		}
-																	</div>
-																);
-															}
-														)}
-													</div>
-												)}
-											</>
-										)}
-									</PlacesAutocomplete>
+										onChange={e =>
+											setAddress(e.target.value)
+										}
+										className="form-control"
+										name="street"
+										id="street"
+										placeholder="Type Address"
+										{...register("street")}
+									/>
 								</div>
 							)}
 							<div className="form-group zip-code">

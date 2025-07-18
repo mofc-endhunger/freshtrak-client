@@ -16,24 +16,26 @@ const mockStore = configureStore([]);
 const store = mockStore(initialState);
 
 // Mocking Google API library without which it shows error.
-jest.mock("react-places-autocomplete", () => {
+jest.mock("../../General/GooglePlacesAutocomplete", () => {
 	const React = require("react"); // eslint-disable-line
-	class PlacesAutocomplete extends React.Component {
-		renderProps = {
-			getInputProps: jest.fn(({ placeholder, className }) => ({
-				placeholder,
-				className,
-			})),
-			suggestions: [],
-			getSuggestionItemProps: jest.fn(),
-		};
-
+	class GooglePlacesAutocomplete extends React.Component {
 		render() {
-			return <>{this.props.children(this.renderProps)}</>;
+			return (
+				<input
+					type="text"
+					className={this.props.className}
+					id={this.props.id}
+					name={this.props.name}
+					value={this.props.value}
+					onChange={this.props.onChange}
+					placeholder={this.props.placeholder}
+					{...this.props}
+				/>
+			);
 		}
 	}
 
-	return PlacesAutocomplete;
+	return GooglePlacesAutocomplete;
 });
 
 const renderWithRoute = ui =>

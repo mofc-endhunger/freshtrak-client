@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import StateDropdownComponent from "./StateDropdownComponent";
 import localization from "../Localization/LocalizationComponent";
+import LoadingSpinner from "../General/LoadingSpinner";
 import PlacesAutocomplete, {
 	geocodeByAddress,
 } from "react-places-autocomplete";
@@ -114,7 +115,7 @@ const AddressComponent = ({
 									This field is required
 								</span>
 							)}
-							{loading ? "Loading..." : null}
+							{loading ? <LoadingSpinner size="small" /> : null}
 							{suggestions.length > 0 && (
 								<div
 									data-testid="suggestions"

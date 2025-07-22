@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { ProgressBar } from "react-bootstrap";
 import SearchComponent from "../General/SearchComponent";
-import SpinnerComponent from "../General/SpinnerComponent";
+import LoadingSpinner from "../General/LoadingSpinner";
 import LocalFoodBankComponent from "../Home/LocalFoodBankComponent";
 import UsersRegistrations from "../Home/UsersRegistrations";
 import EventNearByComponent from "../Home/EventNearByComponent";
@@ -143,7 +142,7 @@ const HomeContainer = () => {
 				/>
 			);
 		}
-		return <SpinnerComponent variant="small" />;
+		return <LoadingSpinner size="small" />;
 	};
 	return (
 		<div>
@@ -160,11 +159,7 @@ const HomeContainer = () => {
 						</form>
 						{loading && (
 							<div className="pt-4">
-								<ProgressBar
-									animated
-									now={100}
-									data-testid="loading"
-								/>
+								<LoadingSpinner size="medium" />
 							</div>
 						)}
 					</div>

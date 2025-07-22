@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { ProgressBar } from "react-bootstrap";
 import SearchComponent from "../General/SearchComponent";
 import ResourceListComponent from "./ResourceListComponent";
 import EventListContainer from "./EventListContainer";
@@ -12,7 +11,7 @@ import axios from "axios";
 import "../../Assets/scss/main.scss";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import serviceCatFilter from "../../Utils/serviceCatFilter";
-import SpinnerComponent from "../General/SpinnerComponent";
+import LoadingSpinner from "../General/LoadingSpinner";
 
 const EventContainer = () => {
 	const {
@@ -143,11 +142,7 @@ const EventContainer = () => {
 						</form>
 						{loading && (
 							<div className="pt-4">
-								<ProgressBar
-									animated
-									now={100}
-									data-testid="loading"
-								/>
+								<LoadingSpinner size="medium" />
 							</div>
 						)}
 						{!loading && <ResourceList />}
@@ -160,7 +155,7 @@ const EventContainer = () => {
 							serviceCat={serviceCat}
 						/>
 					)}
-					{loading && <SpinnerComponent />}
+					{loading && <LoadingSpinner />}
 				</div>
 			</section>
 		</div>

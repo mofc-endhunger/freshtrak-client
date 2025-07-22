@@ -2,6 +2,7 @@ import React, { forwardRef, useState } from "react";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import FilterComponent from "./FilterComponent";
 import localization from "../Localization/LocalizationComponent";
+import LoadingSpinner from "./LoadingSpinner";
 
 import PlacesAutocomplete, {
 	geocodeByAddress,
@@ -94,9 +95,9 @@ const SearchComponent = forwardRef(
 													{...register("street")}
 												/>
 
-												{/* No spinners are set here as of now. You can re-use the loader from EventContainer page;
-                      though the size of the spinner is set as 10em,fixed in main.scss file. */}
-												{loading ? "Loading..." : null}
+												{loading ? (
+													<LoadingSpinner size="small" />
+												) : null}
 
 												{suggestions.length > 0 && (
 													<div

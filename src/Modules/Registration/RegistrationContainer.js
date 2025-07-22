@@ -296,6 +296,7 @@ const RegistrationContainer = props => {
 			setDisabled(disabled);
 			console.error(e);
 			setErrors(e);
+			throw e; // Re-throw the error so it can be caught by the calling component
 		}
 	};
 

@@ -5,6 +5,7 @@ import Modal from "react-bootstrap/Modal";
 import { API_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import alarmIcon from "../../Assets/img/alarm.svg";
+import LoadingSpinner from "../General/LoadingSpinner";
 
 const EventSlotsModalComponent = props => {
 	const {
@@ -18,6 +19,7 @@ const EventSlotsModalComponent = props => {
 	const [eventHour, setEventHour] = useState([]);
 	const [show, setShow] = useState(false);
 	const [eventDate, setEventDate] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 	const navigate = useNavigate();
 	const backHome = () => {
 		navigate(-1);
@@ -46,6 +48,7 @@ const EventSlotsModalComponent = props => {
 	}, [eventDateId, acceptReservations]);
 
 	const getEventHours = async eventDateId => {
+		setIsLoading(true);
 		try {
 			const { EVENT_DATES_URL } = API_URL;
 			const resp = await axios.get(
@@ -62,6 +65,8 @@ const EventSlotsModalComponent = props => {
 			}
 		} catch (e) {
 			console.error(e);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 	return (
@@ -81,37 +86,46 @@ const EventSlotsModalComponent = props => {
 				</Modal.Header>
 				<Modal.Body>
 					<div className="container">
-						{eventHour.map((item, index) =>
-							item.event_slots
-								.filter((e, i) => e.open_slots > 0)
-								.map((e, i) => {
-									const radioId = `time_slot_${e.event_slot_id}`;
-									return (
-										<div
-											className="form-check p-2"
-											key={index + "-" + i}
-										>
-											<input
-												className="form-check-input"
-												type="radio"
-												name="time_slot"
-												id={radioId}
-												value={e.event_slot_id}
-												checked={
-													String(selectedSlotId) ===
-													String(e.event_slot_id)
-												}
-												onChange={onSlotChange}
-											/>
-											<label
-												className="form-check-label pl-2"
-												htmlFor={radioId}
+						{isLoading ? (
+							<div className="d-flex justify-content-center py-4">
+								<LoadingSpinner size="medium" />
+							</div>
+						) : (
+							eventHour.map((item, index) =>
+								item.event_slots
+									.filter((e, i) => e.open_slots > 0)
+									.map((e, i) => {
+										const radioId = `time_slot_${e.event_slot_id}`;
+										return (
+											<div
+												className="form-check p-2"
+												key={index + "-" + i}
 											>
-												{e.start_time} - {e.end_time}
-											</label>
-										</div>
-									);
-								})
+												<input
+													className="form-check-input"
+													type="radio"
+													name="time_slot"
+													id={radioId}
+													value={e.event_slot_id}
+													checked={
+														String(
+															selectedSlotId
+														) ===
+														String(e.event_slot_id)
+													}
+													onChange={onSlotChange}
+												/>
+												<label
+													className="form-check-label pl-2"
+													htmlFor={radioId}
+												>
+													{e.start_time} -{" "}
+													{e.end_time}
+												</label>
+											</div>
+										);
+									})
+							)
 						)}
 					</div>
 				</Modal.Body>

@@ -28,12 +28,8 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 				window.google.maps.places
 			) {
 				try {
-					// Try to use the new AutocompleteSuggestion API if available
-					if (window.google.maps.places.AutocompleteSuggestion) {
-						autocompleteService.current =
-							new window.google.maps.places.AutocompleteSuggestion();
-					} else if (window.google.maps.places.AutocompleteService) {
-						// Fallback to the deprecated AutocompleteService
+					// Use the legacy AutocompleteService
+					if (window.google.maps.places.AutocompleteService) {
 						autocompleteService.current =
 							new window.google.maps.places.AutocompleteService();
 					}
@@ -75,8 +71,6 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 				autocompleteService.current &&
 				autocompleteService.current.getPlacePredictions
 			) {
-				console.log("Using Google Places API");
-
 				const request = {
 					input,
 					sessionToken: sessionToken.current,
@@ -86,10 +80,6 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 				autocompleteService.current.getPlacePredictions(
 					request,
 					(predictions, status) => {
-						console.log("Places API response:", {
-							predictions,
-							status,
-						});
 						if (
 							status ===
 								window.google.maps.places.PlacesServiceStatus
@@ -123,10 +113,6 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 							);
 							setSuggestions([]);
 						} else {
-							console.log(
-								"No predictions found or other status:",
-								status
-							);
 							setSuggestions([]);
 						}
 						setLoading(false);
@@ -134,10 +120,6 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 				);
 			} else {
 				// Fallback: provide basic autocomplete functionality
-				console.log(
-					"Google Places API not available (likely domain-restricted), using basic autocomplete"
-				);
-
 				// Don't show fallback suggestions to avoid confusion
 				// Just let the user type their address manually
 				setSuggestions([]);
@@ -179,17 +161,52 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 		};
 		onChange(event);
 
-		if (onSelect) {
-			// Create a simplified place object since we don't have detailed components
-			const place = {
-				place_id: suggestion.place_id,
-				description: suggestion.description,
-				// Note: Detailed address components and geometry are not available
-				// with the new API. You may need to implement a separate geocoding
-				// service to get these details if needed.
+		// Fetch detailed place information
+		if (window.google && window.google.maps && window.google.maps.places) {
+			const placesService = new window.google.maps.places.PlacesService(
+				document.createElement("div")
+			);
+
+			const request = {
+				placeId: suggestion.place_id,
+				fields: [
+					"address_components",
+					"formatted_address",
+					"geometry",
+					"name",
+					"place_id",
+				],
 			};
 
-			onSelect(suggestion.description, place);
+			placesService.getDetails(request, (place, status) => {
+				if (
+					status ===
+						window.google.maps.places.PlacesServiceStatus.OK &&
+					place
+				) {
+					if (onSelect) {
+						onSelect(suggestion.description, place);
+					}
+				} else {
+					// Fallback if detailed place info fails
+					if (onSelect) {
+						const fallbackPlace = {
+							place_id: suggestion.place_id,
+							description: suggestion.description,
+						};
+						onSelect(suggestion.description, fallbackPlace);
+					}
+				}
+			});
+		} else {
+			// Fallback when Places API is not available
+			if (onSelect) {
+				const fallbackPlace = {
+					place_id: suggestion.place_id,
+					description: suggestion.description,
+				};
+				onSelect(suggestion.description, fallbackPlace);
+			}
 		}
 	};
 
@@ -229,14 +246,6 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 							{suggestion.description}
 						</div>
 					))}
-				</div>
-			)}
-
-			{/* Show a helpful message when Google Places is not available */}
-			{!autocompleteService.current && (
-				<div className="text-muted small mt-1">
-					Type your address manually (autocomplete not available due
-					to domain restrictions)
 				</div>
 			)}
 		</div>

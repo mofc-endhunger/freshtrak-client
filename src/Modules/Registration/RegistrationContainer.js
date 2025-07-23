@@ -192,11 +192,78 @@ const RegistrationContainer = props => {
 		}`;
 	};
 
+	const formatErrorMessage = message => {
+		// Make error messages more user-friendly
+		const errorMappings = {
+			"is at capacity":
+				"This time slot is at capacity. Please select a different time.",
+			"is required": "This field is required.",
+			"is invalid": "This field contains invalid data.",
+			"not found": "The requested resource was not found.",
+			"already exists": "This record already exists.",
+			"permission denied":
+				"You do not have permission to perform this action.",
+			unauthorized: "Please log in to continue.",
+			forbidden: "Access denied.",
+			"not available": "This option is not available.",
+			expired: "This session has expired. Please log in again.",
+			"invalid token": "Your session has expired. Please log in again.",
+			"network error":
+				"Network error. Please check your connection and try again.",
+			timeout: "Request timed out. Please try again.",
+			"server error": "Server error. Please try again later.",
+		};
+
+		// Check for exact matches first
+		if (errorMappings[message.toLowerCase()]) {
+			return errorMappings[message.toLowerCase()];
+		}
+
+		// Check for partial matches
+		for (const [key, value] of Object.entries(errorMappings)) {
+			if (message.toLowerCase().includes(key)) {
+				return value;
+			}
+		}
+
+		// Return the original message if no mapping found
+		return message;
+	};
+
 	const notify = (msg, error) => {
-		let formatted_msg =
-			(msg.user_id && msg.user_id[0]) ||
-			(msg.event_date_id && msg.event_date_id[0]) ||
-			"Something Went Wrong";
+		let formatted_msg = "Something Went Wrong";
+
+		// Extract error messages from different possible fields
+		if (msg && typeof msg === "object") {
+			// Check for specific error fields
+			const errorFields = [
+				"user_id",
+				"event_date_id",
+				"event_slot_id",
+				"reservation",
+			];
+			for (const field of errorFields) {
+				if (
+					msg[field] &&
+					Array.isArray(msg[field]) &&
+					msg[field].length > 0
+				) {
+					formatted_msg = formatErrorMessage(msg[field][0]);
+					break;
+				}
+			}
+
+			// If no specific field found, try to get the first error message from any field
+			if (formatted_msg === "Something Went Wrong") {
+				const firstError = Object.values(msg).find(
+					value => Array.isArray(value) && value.length > 0
+				);
+				if (firstError && firstError.length > 0) {
+					formatted_msg = formatErrorMessage(firstError[0]);
+				}
+			}
+		}
+
 		showToast(formatted_msg, error);
 	};
 	const send_sms = async user => {
@@ -248,7 +315,9 @@ const RegistrationContainer = props => {
 			// Use the response data, which should include identification_code
 			updatedUser = userResp.data;
 		} catch (e) {
-			console.log(e);
+			console.error("User creation error:", e);
+			// If user creation fails, we should still try to create the reservation
+			// but log the error for debugging
 		}
 		try {
 			await axios.post(
@@ -288,13 +357,36 @@ const RegistrationContainer = props => {
 				},
 			});
 		} catch (e) {
-			if (!e.response) {
-				e.response = { data: { user_id: ["Something Went Wrong"] } };
+			console.error("Registration error:", e);
+
+			// Handle different types of errors
+			if (e.response && e.response.data) {
+				// API error with response data
+				notify(e.response.data, "error");
+			} else if (e.request) {
+				// Network error (no response received)
+				notify(
+					{
+						network_error: [
+							"Network error. Please check your connection and try again.",
+						],
+					},
+					"error"
+				);
+			} else {
+				// Other errors (like axios configuration errors)
+				notify(
+					{
+						general_error: [
+							"Something went wrong. Please try again.",
+						],
+					},
+					"error"
+				);
 			}
-			notify(e.response.data, "error");
+
 			setTimeout(() => window.scrollTo(0, 0));
 			setDisabled(disabled);
-			console.error(e);
 			setErrors(e);
 			throw e; // Re-throw the error so it can be caught by the calling component
 		}

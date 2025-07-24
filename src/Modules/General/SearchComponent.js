@@ -2,7 +2,6 @@ import React, { forwardRef, useState } from "react";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import FilterComponent from "./FilterComponent";
 import localization from "../Localization/LocalizationComponent";
-import LoadingSpinner from "./LoadingSpinner";
 
 import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 import { Fragment } from "react";

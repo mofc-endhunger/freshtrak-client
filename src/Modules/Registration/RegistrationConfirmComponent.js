@@ -7,9 +7,6 @@ import { setCurrentUser, selectUser } from "../../Store/userSlice";
 import { useLocation } from "react-router-dom";
 import { formatDateDayAndDate } from "../../Utils/DateFormat";
 import { Link } from "react-router-dom";
-import identificationCodeImg1 from "../../Assets/img/id_code1.png";
-import identificationCodeImg2 from "../../Assets/img/id_code2.png";
-import idImg from "../../Assets/img/id_img.png";
 import { EventFormat } from "../../Utils/EventHandler";
 import { formatMMDDYYYY } from "../../Utils/DateFormat";
 import EventCardComponent from "../Events/EventCardComponent";
@@ -136,7 +133,6 @@ const RegistrationConfirmComponent = props => {
 		state = "",
 		phone = "",
 		identification_code = "",
-		license_plate = "",
 	} = user_data || {};
 
 	return (
@@ -209,53 +205,7 @@ const RegistrationConfirmComponent = props => {
 							{zip_code} <br />
 							{formatPhoneNumber(phone)} <br />
 						</div>
-						<div className="mt-5">
-							As a part of our contactless service process, please
-							display the above confirmation number <br />
-							<div className="mb-2">
-								Notes: This code is unique to you, please write
-								it on a piece of paper and display in your
-								driver-side front window.
-								<div className=" ">
-									<img
-										src={identificationCodeImg1}
-										alt="identificationCodeImg1"
-										height="300"
-										width="auto"
-									/>
-									<img
-										className="ml-2"
-										src={identificationCodeImg2}
-										alt="identificationCodeImg2"
-										height="300"
-										width="auto"
-									/>
-								</div>
-								For expedite service at many locations, please
-								also include an ID, and a document with your
-								current address
-								<div className=" ">
-									<img
-										src={idImg}
-										alt="idImg"
-										height="300"
-										width="auto"
-									/>
-								</div>
-							</div>
-						</div>
-						{license_plate && license_plate.length > 0 && (
-							<div className="mt-4 mb-4">
-								<span>
-									Special Instructions: You included a license
-									plate in your registration:{" "}
-									<b> {license_plate} </b>
-								</span>
-								<br />
-								For the possibility of expedited service, please
-								try to arrive in this vehicle.
-							</div>
-						)}
+
 						{event.eventDetails &&
 							event.eventDetails.length > 0 && (
 								<h5>

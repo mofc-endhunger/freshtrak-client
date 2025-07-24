@@ -1,9 +1,7 @@
 import React, { Fragment } from "react";
 import StateDropdownComponent from "./StateDropdownComponent";
 import localization from "../Localization/LocalizationComponent";
-import PlacesAutocomplete, {
-	geocodeByAddress,
-} from "react-places-autocomplete";
+import GooglePlacesAutocomplete from "../General/GooglePlacesAutocomplete";
 
 const AddressComponent = ({
 	register,
@@ -16,26 +14,26 @@ const AddressComponent = ({
 	const shortStateName = watch("state") || "";
 	const zip = watch("zip_code") || "";
 
-	const handleSelect = async value => {
-		const results = await geocodeByAddress(value);
+	const handleSelect = async (value, place) => {
 		//remove errors when selecting a new address
 		delete errors.city;
 		delete errors.zip_code;
-		let destructuredAddress = getDestructured(
-			results[0]["address_components"]
-		);
-		setValue(
-			"address_line_1",
-			destructuredAddress["street_number"] !== undefined
-				? `${destructuredAddress["street_number"]} ${destructuredAddress["route"]}`
-				: ""
-		);
-		setValue("city", destructuredAddress["locality"]);
-		setValue(
-			"state",
-			destructuredAddress["administrative_area_level_1_short"]
-		);
-		setValue("zip_code", destructuredAddress["postal_code"]);
+
+		if (place && place.address_components) {
+			let destructuredAddress = getDestructured(place.address_components);
+			setValue(
+				"address_line_1",
+				destructuredAddress["street_number"] !== undefined
+					? `${destructuredAddress["street_number"]} ${destructuredAddress["route"]}`
+					: ""
+			);
+			setValue("city", destructuredAddress["locality"]);
+			setValue(
+				"state",
+				destructuredAddress["administrative_area_level_1_short"]
+			);
+			setValue("zip_code", destructuredAddress["postal_code"]);
+		}
 	};
 
 	const getDestructured = address_components => {
@@ -84,61 +82,22 @@ const AddressComponent = ({
 					{localization.street_address}
 					<span className="text-danger">*</span>
 				</label>
-				<PlacesAutocomplete
+				<GooglePlacesAutocomplete
 					value={addressLine1}
-					onChange={e => setValue("address_line_1", e)}
+					onChange={e => setValue("address_line_1", e.target.value)}
 					onSelect={handleSelect}
-				>
-					{({
-						getInputProps,
-						suggestions,
-						getSuggestionItemProps,
-						loading,
-					}) => (
-						<>
-							<input
-								type="text"
-								className={`form-control ${
-									errors.address_line_1 && "invalid"
-								}`}
-								name={addressFieldName}
-								id="address_line_1"
-								{...getInputProps()}
-								{...register(addressFieldName, {
-									required: true,
-								})}
-								autoComplete="off"
-							/>
-							{errors.address_line_1 && (
-								<span className="text-danger">
-									This field is required
-								</span>
-							)}
-							{loading ? "Loading..." : null}
-							{suggestions.length > 0 && (
-								<div
-									data-testid="suggestions"
-									id="suggestions"
-									name="suggestions"
-									className="suggestions-container"
-								>
-									{suggestions.map(suggestion => {
-										return (
-											<div
-												{...getSuggestionItemProps(
-													suggestion
-												)}
-												key={suggestion.id}
-											>
-												{suggestion.description}
-											</div>
-										);
-									})}
-								</div>
-							)}
-						</>
-					)}
-				</PlacesAutocomplete>
+					className={`form-control ${
+						errors.address_line_1 && "invalid"
+					}`}
+					name={addressFieldName}
+					id="address_line_1"
+					{...register(addressFieldName, {
+						required: true,
+					})}
+				/>
+				{errors.address_line_1 && (
+					<span className="text-danger">This field is required</span>
+				)}
 			</div>
 
 			<div className="form-group">

@@ -172,20 +172,6 @@ const MemberCountFormComponent = ({ register, event, watch, setValue }) => {
 					</button>
 				</div>
 			</div>
-
-			<div className="form-group">
-				<label htmlFor="license_plate">
-					{localization.license_plate}
-				</label>
-				<input
-					type="text"
-					className="form-control"
-					name="license_plate"
-					id="license_plate"
-					{...register("license_plate")}
-				/>
-				<small>{localization.arrive_disribution}</small>
-			</div>
 		</Fragment>
 	);
 };

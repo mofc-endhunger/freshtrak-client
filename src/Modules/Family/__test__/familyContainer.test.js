@@ -1,7 +1,7 @@
 import React from "react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import { render, fireEvent, act, getByText } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import FamilyContainer from "../FamilyContainer.js";
 
@@ -33,21 +33,26 @@ jest.mock("../AddressComponent", () => () => (
 ));
 
 /*** Mock Google Maps JavaScript API ***/
-jest.mock("react-places-autocomplete", () => {
+jest.mock("../../General/GooglePlacesAutocomplete", () => {
 	const React = require("react"); // eslint-disable-line
-	class PlacesAutocomplete extends React.Component {
-		renderProps = {
-			getInputProps: jest.fn(),
-			suggestions: [],
-			getSuggestionItemProps: jest.fn(),
-		};
-
+	class GooglePlacesAutocomplete extends React.Component {
 		render() {
-			return <>{this.props.children(this.renderProps)}</>;
+			return (
+				<input
+					type="text"
+					className={this.props.className}
+					id={this.props.id}
+					name={this.props.name}
+					value={this.props.value}
+					onChange={this.props.onChange}
+					placeholder={this.props.placeholder}
+					{...this.props}
+				/>
+			);
 		}
 	}
 
-	return PlacesAutocomplete;
+	return GooglePlacesAutocomplete;
 });
 
 test("it should render without errors", () => {

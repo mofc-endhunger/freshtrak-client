@@ -1,80 +1,77 @@
 import React, { useEffect, useState, Fragment } from "react";
 
 import mainLogo from "../../Assets/img/logo.png";
-import closeIcon from '../../Assets/img/close.svg';
+import closeIcon from "../../Assets/img/close.svg";
 // import navBarIcon from "../../Assets/img/menu.svg";
 import { Link } from "react-router-dom";
-import { LinkContainer } from 'react-router-bootstrap';
-import localization from '../Localization/LocalizationComponent';
-import { useDispatch } from 'react-redux';
-import {setCurrentLanguage} from '../../Store/languageSlice';
-import CountryListComponent from '../Localization/countryListComponent'
-import 'semantic-ui-css/semantic.min.css'
-import {
-  Nav,
-  Navbar,
-} from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
+import localization from "../Localization/LocalizationComponent";
+import { useDispatch } from "react-redux";
+import { setCurrentLanguage } from "../../Store/languageSlice";
+import CountryListComponent from "../Localization/countryListComponent";
+import "semantic-ui-css/semantic.min.css";
+import { Nav, Navbar } from "react-bootstrap";
 
 import { RENDER_URL } from "../../Utils/Urls";
-const HeaderComponent = (props) => {
-  const [navbarShrink, setNavbarShrink] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const shortHeader = props.shortHeader || "";
-  const dispatch = useDispatch();
-  const change = (event,data) => {
-    localization.setLanguage(data.value);
-    dispatch(setCurrentLanguage(data.value));
-  }
-  const localIsLoggedIn = localStorage.getItem("isLoggedIn");
-  const [showMobileMenu, setMobileMenu] = useState(false);
-  const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
-  useEffect(() => {
-    let localStorageLoggedIn = localStorage.getItem('isLoggedIn');
-    if (localStorageLoggedIn === null || localStorageLoggedIn === 'false') {
-      setIsLoggedIn(false);
-    } else {
-      setIsLoggedIn(true);
-    }
+const HeaderComponent = props => {
+	const [navbarShrink, setNavbarShrink] = useState("");
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const shortHeader = props.shortHeader || "";
+	const dispatch = useDispatch();
+	const change = (event, data) => {
+		localization.setLanguage(data.value);
+		dispatch(setCurrentLanguage(data.value));
+	};
+	const localIsLoggedIn = localStorage.getItem("isLoggedIn");
+	const [showMobileMenu, setMobileMenu] = useState(false);
+	const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
+	useEffect(() => {
+		let localStorageLoggedIn = localStorage.getItem("isLoggedIn");
+		if (localStorageLoggedIn === null || localStorageLoggedIn === "false") {
+			setIsLoggedIn(false);
+		} else {
+			setIsLoggedIn(true);
+		}
 
-    window.onscroll = () => {
-      if (window.pageYOffset > 100) {
-        setNavbarShrink("navbar-shrink");
-      } else {
-        setNavbarShrink("");
-      }
-    };
-  }, [localIsLoggedIn, isLoggedIn]);
+		window.onscroll = () => {
+			if (window.pageYOffset > 100) {
+				setNavbarShrink("navbar-shrink");
+			} else {
+				setNavbarShrink("");
+			}
+		};
+	}, [localIsLoggedIn, isLoggedIn]);
 
-  const logOut = () => {
-    localStorage.setItem('isLoggedIn', false);
-    setIsLoggedIn(false);
+	const logOut = () => {
+		localStorage.setItem("isLoggedIn", false);
+		setIsLoggedIn(false);
 
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('tokenExpiresAt');
-    localStorage.removeItem('search_zip');
-    window.FB.logout()
-  }
-  
-  return (
-    <Fragment>
-      <Nav
-        className={`navbar navbar-expand-md navbar-light fixed-top ${navbarShrink} ${shortHeader}`}
-        id="mainNav"
-      >
-        <div className="container">
-          <Navbar expand="md" className="w-100">
-            <Navbar.Brand className="my-auto mobile-view">
-              <span className="my-auto mobile-view">
-                <Link to={RENDER_URL.ROOT_URL}>
-                  <img
-                    src={mainLogo}
-                    alt="FreshTrak"
-                    className="d-inline-block"
-                  />{" "}
-                </Link>
-              </span>
-              {/* Out of Scope */}
-              {/* <button
+		localStorage.removeItem("userToken");
+		localStorage.removeItem("tokenExpiresAt");
+		localStorage.removeItem("search_zip");
+		// window.FB.logout() // Removed Facebook logout
+	};
+
+	return (
+		<Fragment>
+			<Nav
+				className={`navbar navbar-expand-md navbar-light fixed-top ${navbarShrink} ${shortHeader}`}
+				id="mainNav"
+			>
+				<div className="container">
+					<Navbar expand="md" className="w-100">
+						<Navbar.Brand className="my-auto mobile-view">
+							<span className="my-auto mobile-view">
+								<Link to={RENDER_URL.ROOT_URL}>
+									<img
+										src={mainLogo}
+										alt="FreshTrak"
+										className="d-inline-block"
+									/>{" "}
+								</Link>
+							</span>
+							{/* Out of Scope */}
+							{/* <button
                 className="navbar-toggler mr-2"
                 type="button"
                 data-toggle="collapse"
@@ -85,10 +82,10 @@ const HeaderComponent = (props) => {
                   <img src={navBarIcon} alt="UserLogo" className="img-fluid" />
                 </span>
               </button> */}
-            </Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            {/* Out of Scope */}
-            {/* <Navbar.Collapse
+						</Navbar.Brand>
+						<Navbar.Toggle aria-controls="basic-navbar-nav" />
+						{/* Out of Scope */}
+						{/* <Navbar.Collapse
               id="navbarCollapse"
               className="justify-content-end"
             >
@@ -122,27 +119,27 @@ const HeaderComponent = (props) => {
               </Nav>
             </Navbar.Collapse> */}
 
-            {/* Out of Scope */}
+						{/* Out of Scope */}
 
-            {/* {!isLoggedIn && (
+						{/* {!isLoggedIn && (
               <LinkContainer to={RENDER_URL.SIGN_IN}>
                 <Nav.Link href="" className="header-sign-in">
                     SIGN IN
                 </Nav.Link>
               </LinkContainer>
             )}*/}
-            {isLoggedIn && (
-              <LinkContainer to={RENDER_URL.ROOT_URL}>
-                <button
-                type="submit"
-                className="btn btn-link header-sign-in"
-                onClick={logOut}
-                >
-                  LOG OUT
-                </button>
-              </LinkContainer>
-            )}
-            {/* <div>
+						{isLoggedIn && (
+							<LinkContainer to={RENDER_URL.ROOT_URL}>
+								<button
+									type="submit"
+									className="btn btn-link header-sign-in"
+									onClick={logOut}
+								>
+									LOG OUT
+								</button>
+							</LinkContainer>
+						)}
+						{/* <div>
               <label>Select Language ?</label>
               <select onChange={change} value={language.language}>
                 <option value= "en"> English </option>
@@ -156,37 +153,48 @@ const HeaderComponent = (props) => {
                 <option value= "nep"> Nepali </option>
               </select>
             </div> */}
-            <CountryListComponent change={change}/>
-          </Navbar>
-        </div>
-      </Nav>
-      {/* Menu popup div */}
-      {showMobileMenu && (
-        <div id="menuSlider" className="mobile-menu fadeIn">
-          <div className="d-flex h-100 justify-content-end flex-column">
-            <div className="mobile-menu-items">
-              <div className="menu-item-title">FIND RESOURCES</div>
-              <ul className="mt-2">
-                <li>
-                  <Link to={RENDER_URL.FRESHTRAK_ABOUT}>
-                    About FreshTrak
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="mobile-menu-items mt-4 mb-4">
-              <div className="menu-item-title">For Foodbanks & Agencies</div>
-              <ul className="mt-2">
-                <li>
-                  <a href={FRESHTRAK_PARTNERS_URL} target="_blank" rel="noopener noreferrer" > FreshTrak: Partner </a>
-                </li>
-              </ul>
-            </div>
-            <hr></hr>
-            {/* Out of Scope */}
-            {/* <div className="status-info"> */}
-            {/* {isLoggedIn ? */}
-            {/* <div className="user-avatar">
+						<CountryListComponent change={change} />
+					</Navbar>
+				</div>
+			</Nav>
+			{/* Menu popup div */}
+			{showMobileMenu && (
+				<div id="menuSlider" className="mobile-menu fadeIn">
+					<div className="d-flex h-100 justify-content-end flex-column">
+						<div className="mobile-menu-items">
+							<div className="menu-item-title">
+								FIND RESOURCES
+							</div>
+							<ul className="mt-2">
+								<li>
+									<Link to={RENDER_URL.FRESHTRAK_ABOUT}>
+										About FreshTrak
+									</Link>
+								</li>
+							</ul>
+						</div>
+						<div className="mobile-menu-items mt-4 mb-4">
+							<div className="menu-item-title">
+								For Foodbanks & Agencies
+							</div>
+							<ul className="mt-2">
+								<li>
+									<a
+										href={FRESHTRAK_PARTNERS_URL}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{" "}
+										FreshTrak: Partner{" "}
+									</a>
+								</li>
+							</ul>
+						</div>
+						<hr></hr>
+						{/* Out of Scope */}
+						{/* <div className="status-info"> */}
+						{/* {isLoggedIn ? */}
+						{/* <div className="user-avatar">
                 <NavDropdown title={
                     <div className="d-flex align-items-center">
                         <span>
@@ -194,14 +202,14 @@ const HeaderComponent = (props) => {
                     </span>
                     <span className="text-uppercase ml-2">MANAGE YOUR ACCOUNT</span>
                     </div> */}
-                {/* }> */}
-                    {/* <DropdownItem eventKey={1.3} onClick={(() => { localStorage.removeItem('isLoggedIn', false); setIsLoggedIn(false); window.location.reload(); })}>
+						{/* }> */}
+						{/* <DropdownItem eventKey={1.3} onClick={(() => { localStorage.removeItem('isLoggedIn', false); setIsLoggedIn(false); window.location.reload(); })}>
                         <i className="fa fa-sign-out"></i> Logout
                     </DropdownItem>
                 </NavDropdown> */}
-                {/* <div className="user-avatar">
+						{/* <div className="user-avatar">
                 {isLoggedIn == false ? <LoggedInComponent/> : <SignInComponent/>} */}
-            {/* 
+						{/* 
             </div>
             :
 
@@ -209,14 +217,17 @@ const HeaderComponent = (props) => {
                 Sign In
                 </button>}
             </div> */}
-          </div>
-          <button className="mobile-close" onClick={() => setMobileMenu(false)}>
-            <img alt="close menu" src={closeIcon}/>
-          </button>
-        </div>
-      )}
-    </Fragment>
-  );
+					</div>
+					<button
+						className="mobile-close"
+						onClick={() => setMobileMenu(false)}
+					>
+						<img alt="close menu" src={closeIcon} />
+					</button>
+				</div>
+			)}
+		</Fragment>
+	);
 };
 
 export default HeaderComponent;

@@ -4,7 +4,6 @@
   "private": true,
   "homepage": "https://freshtrak.com",
   "dependencies": {
-    "@greatsumini/react-facebook-login": "^3.4.0",
     "@one-platform/opc-timeline": "0.0.3-prerelease",
     "@reduxjs/toolkit": "^1.9.7",
     "@testing-library/jest-dom": "^5.16.5",

@@ -8,7 +8,6 @@ import axios from "axios";
 import RegistrationTextInfoComponent from "../Registration/RegistrationTextInfoComponent";
 import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
 import { EventFormat } from "../../Utils/EventHandler";
-import TagManager from "react-gtm-module";
 
 const RegistrationEventDetailsContainer = props => {
 	const navigate = useNavigate();
@@ -51,26 +50,14 @@ const RegistrationEventDetailsContainer = props => {
 		}
 	};
 
-	const fetchUserToken = async response => {
+	const fetchUserToken = async () => {
 		setLoading(true);
-		const { GUEST_AUTH, FB_AUTH, GUEST_USER } = API_URL;
+		const { GUEST_AUTH, GUEST_USER } = API_URL;
 		try {
 			let token, expires_at;
-			if (response) {
-				const resp = await axios({
-					method: "post",
-					url: FB_AUTH,
-					data: JSON.stringify(response),
-					headers: { "Content-Type": "application/json" },
-				});
-				const { authentication } = resp.data;
-				token = authentication.token;
-				expires_at = authentication.expires_at;
-			} else {
-				const resp = await axios.post(GUEST_AUTH);
-				token = resp.data.token;
-				expires_at = resp.data.expires_at;
-			}
+			const resp = await axios.post(GUEST_AUTH);
+			token = resp.data.token;
+			expires_at = resp.data.expires_at;
 			localStorage.setItem("userToken", token);
 			localStorage.setItem("tokenExpiresAt", expires_at);
 
@@ -96,7 +83,7 @@ const RegistrationEventDetailsContainer = props => {
 		}
 	};
 
-	const getUserToken = response => {
+	const getUserToken = () => {
 		const localUserToken = localStorage.getItem("userToken");
 		const tokenExpiresAt = localStorage.getItem("tokenExpiresAt");
 
@@ -106,7 +93,7 @@ const RegistrationEventDetailsContainer = props => {
 			localUserToken === "undefined"
 		) {
 			showAuthenticationModal
-				? fetchUserToken(response)
+				? fetchUserToken()
 				: setshowAuthenticationModal(true);
 		} else {
 			setshowAuthenticationModal(false);
@@ -141,5 +128,4 @@ const RegistrationEventDetailsContainer = props => {
 		</Fragment>
 	);
 };
-
 export default RegistrationEventDetailsContainer;

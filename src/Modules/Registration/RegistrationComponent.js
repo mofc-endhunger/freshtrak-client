@@ -111,7 +111,6 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 			seniors_in_household = 0,
 			adults_in_household = 0,
 			children_in_household = 0,
-			license_plate = "",
 		} = safeUser;
 		reset({
 			first_name,
@@ -132,7 +131,6 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 			seniors_in_household,
 			adults_in_household,
 			children_in_household,
-			license_plate,
 		});
 	}, [user, reset]);
 	const onSubmit = async data => {

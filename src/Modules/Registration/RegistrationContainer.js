@@ -72,7 +72,7 @@ const defaultUser = {
 	seniors_in_household: 0,
 	adults_in_household: 0,
 	children_in_household: 0,
-	license_plate: "",
+
 	identification_code: "",
 };
 

@@ -12,12 +12,7 @@ const DashBoardDataComponent = () => {
 		formState: { errors },
 	} = useForm();
 	const navigate = useNavigate();
-	const isFaceBookLoggedIn = localStorage.getItem("isLoggedIn");
-
-	//Flag to turn off/on Home Page Container for Loggedin user feature
-	if (isFaceBookLoggedIn === true) {
-		navigate("/home");
-	}
+	// Removed Facebook login logic
 
 	const onSubmit = ({ zip_code, distance }) => {
 		let url = `/events/list/`;
@@ -48,4 +43,5 @@ const DashBoardDataComponent = () => {
 		</div>
 	);
 };
+
 export default DashBoardDataComponent;

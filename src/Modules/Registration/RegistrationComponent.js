@@ -7,6 +7,7 @@ import MemberCountFormComponent from "../Family/MemberCountFormComponent";
 import EventSlotsModalComponent from "../Family/EventSlotsModalComponent";
 import { formatDateForServer } from "../../Utils/DateFormat";
 import BackButtonComponent from "../General/BackButtonComponent";
+import LoadingSpinner from "../General/LoadingSpinner";
 import localization from "../Localization/LocalizationComponent";
 import "@one-platform/opc-timeline";
 
@@ -24,6 +25,7 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 	const [formStep, setFormStep] = useState(0);
 	const [formValues, setFormValues] = useState({});
 	const [selectedSlotId, setSelectedSlotId] = useState("");
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const handleSlotChange = e => {
 		setSelectedSlotId(e.target.value);
 	};
@@ -131,15 +133,22 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 			children_in_household,
 		});
 	}, [user, reset]);
-	const onSubmit = data => {
-		// Get all current form values including household member counts from the final step
-		const allFormValues = getValues();
-		// Merge with current form values taking precedence over previous step values
-		data = { ...formValues, ...allFormValues };
-		data["identification_code"] = user?.["identification_code"] || "";
-		data["date_of_birth"] = formatDateForServer(data["date_of_birth"]);
-		data = sanatizeInput(data);
-		onRegister(data);
+	const onSubmit = async data => {
+		setIsSubmitting(true);
+		try {
+			// Get all current form values including household member counts from the final step
+			const allFormValues = getValues();
+			// Merge with current form values taking precedence over previous step values
+			data = { ...formValues, ...allFormValues };
+			data["identification_code"] = user?.["identification_code"] || "";
+			data["date_of_birth"] = formatDateForServer(data["date_of_birth"]);
+			data = sanatizeInput(data);
+			await onRegister(data);
+		} catch (error) {
+			console.error("Registration error:", error);
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	const sanatizeInput = data => {
@@ -247,16 +256,24 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 											setValue={setValue}
 										/>
 										<div className="button-wrap mt-4">
-											<button
-												type="submit"
-												className="btn custom-button"
-												disabled={disabled}
-												data-testid="continue button"
-											>
-												{
-													localization.registartion_register
-												}
-											</button>
+											{isSubmitting ? (
+												<div className="d-flex justify-content-center">
+													<LoadingSpinner size="medium" />
+												</div>
+											) : (
+												<button
+													type="submit"
+													className="btn custom-button"
+													disabled={
+														disabled || isSubmitting
+													}
+													data-testid="continue button"
+												>
+													{
+														localization.registartion_register
+													}
+												</button>
+											)}
 										</div>{" "}
 									</>
 								)}

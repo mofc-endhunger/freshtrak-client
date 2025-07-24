@@ -28,7 +28,7 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 				window.google.maps.places
 			) {
 				try {
-					// Use the legacy AutocompleteService
+					// Use the current standard AutocompleteService provided by the Google Places API
 					if (window.google.maps.places.AutocompleteService) {
 						autocompleteService.current =
 							new window.google.maps.places.AutocompleteService();

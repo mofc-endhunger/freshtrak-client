@@ -119,9 +119,9 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 					}
 				);
 			} else {
-				// Fallback: provide basic autocomplete functionality
-				// Don't show fallback suggestions to avoid confusion
-				// Just let the user type their address manually
+				// No fallback suggestions are provided intentionally
+				// Users are expected to manually type their address
+				// when the Google Places API is unavailable
 				setSuggestions([]);
 				setLoading(false);
 			}

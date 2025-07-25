@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App";
 import store from "./Store/store";
 import { Provider } from "react-redux";
+import "leaflet/dist/leaflet.css";
 
 const GA_ID = process.env.REACT_APP_GA_ID;
 if (GA_ID) {

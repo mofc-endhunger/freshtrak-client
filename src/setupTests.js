@@ -35,7 +35,12 @@ window.google = {
 		},
 
 		MarkerClusterer: class {},
-		Geocoder: class {},
+		Geocoder: class {
+			geocode(request, callback) {
+				// In test environment, return null to avoid real HTTP requests
+				callback([], "ZERO_RESULTS");
+			}
+		},
 	},
 };
 

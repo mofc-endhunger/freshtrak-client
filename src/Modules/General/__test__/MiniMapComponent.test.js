@@ -59,17 +59,23 @@ describe("MiniMapComponent", () => {
 		expect(screen.getByText("Loading map...")).toBeInTheDocument();
 	});
 
-	it("should render error state when address is missing", () => {
-		render(
-			<MiniMapComponent
-				address=""
-				city=""
-				state=""
-				zip=""
-				onClick={jest.fn()}
-			/>
-		);
-		expect(screen.getByText("Map unavailable")).toBeInTheDocument();
+	it("should render error state when address is missing", async () => {
+		await act(async () => {
+			render(
+				<MiniMapComponent
+					address=""
+					city=""
+					state=""
+					zip=""
+					onClick={jest.fn()}
+				/>
+			);
+		});
+
+		// Wait for the async state updates to complete
+		await waitFor(() => {
+			expect(screen.getByText("Map unavailable")).toBeInTheDocument();
+		});
 	});
 
 	it("should render error state when geocoding fails", async () => {

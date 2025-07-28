@@ -95,24 +95,24 @@ const SearchComponent = forwardRef(
 									id="zip_code"
 									name="zip_code"
 									defaultValue={zipCode}
-									onChange={e => {
-										if (e.target.value.length === 5) {
-											setShowAddress(false);
-											setZipCode(e.target.value);
-											setDistance(DEFAULT_DISTANCE);
-											setShowFilter(true);
-											setServiceCat(null);
-											onSubmitHandler({
-												zip_code: e.target.value,
-												distance: DEFAULT_DISTANCE,
-												serviceCat: null,
-											});
-										} else {
-											setShowFilter(false);
-										}
-									}}
 									{...register("zip_code", {
 										required: true,
+										onChange: e => {
+											if (e.target.value.length === 5) {
+												setShowAddress(false);
+												setZipCode(e.target.value);
+												setDistance(DEFAULT_DISTANCE);
+												setShowFilter(true);
+												setServiceCat("");
+												onSubmitHandler({
+													zip_code: e.target.value,
+													distance: DEFAULT_DISTANCE,
+													serviceCat: "",
+												});
+											} else {
+												setShowFilter(false);
+											}
+										},
 									})}
 								/>
 
@@ -165,7 +165,7 @@ const SearchComponent = forwardRef(
 								onSubmitHandler({
 									zip_code: zipCode,
 									distance: null,
-									serviceCat: null,
+									serviceCat: "",
 								});
 							}}
 							distance={{

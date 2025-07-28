@@ -37,18 +37,56 @@ export const geocodeAddress = async (address, city, state, zip) => {
 								lng: location.lng(),
 							});
 						} else {
-							// If Google fails for any reason, return null
-							resolve(null);
+							// If Google fails, try Nominatim as fallback (but not in test environment)
+							if (process.env.NODE_ENV !== "test") {
+								geocodeWithNominatim(fullAddress).then(resolve);
+							} else {
+								resolve(null);
+							}
 						}
 					}
 				);
 			});
 		}
 
-		// If Google API is not available at all, return null
+		// If Google API is not available, use Nominatim as fallback (but not in test environment)
+		if (process.env.NODE_ENV !== "test") {
+			return await geocodeWithNominatim(fullAddress);
+		}
+
 		return null;
 	} catch (error) {
 		console.error("Error geocoding address:", error);
+		return null;
+	}
+};
+
+/**
+ * Geocodes an address using Nominatim API
+ * @param {string} address - The full address to geocode
+ * @returns {Promise<{lat: number, lng: number} | null>} - Returns coordinates or null if geocoding fails
+ */
+const geocodeWithNominatim = async address => {
+	try {
+		const encodedAddress = encodeURIComponent(address);
+		const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`;
+
+		const response = await fetch(url);
+		if (!response.ok) {
+			return null;
+		}
+
+		const data = await response.json();
+		if (data && data.length > 0) {
+			return {
+				lat: parseFloat(data[0].lat),
+				lng: parseFloat(data[0].lon),
+			};
+		}
+
+		return null;
+	} catch (error) {
+		console.error("Error geocoding with Nominatim:", error);
 		return null;
 	}
 };

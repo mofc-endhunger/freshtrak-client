@@ -64,6 +64,13 @@ const EventCardComponent = props => {
 		setMapCoordinates(null);
 	};
 
+	const handleGetDirections = () => {
+		const address = `${eventAddress}, ${eventCity}, ${eventState} ${eventZip}`;
+		const encodedAddress = encodeURIComponent(address);
+		const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`;
+		window.open(directionsUrl, "_blank");
+	};
+
 	const getButton = (buttonName, targetUrl) => {
 		return (
 			<LinkContainer to={targetUrl}>
@@ -182,6 +189,12 @@ const EventCardComponent = props => {
 								{!showDetails ? "View Details" : "Hide details"}
 							</button>
 						)}
+						<button
+							className="btn custom-button ml-1 flex-grow-1"
+							onClick={handleGetDirections}
+						>
+							Get Directions
+						</button>
 						{ButtonView()}
 					</div>
 				</div>

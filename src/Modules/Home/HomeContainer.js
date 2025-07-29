@@ -9,7 +9,6 @@ import EventNearByComponent from "../Home/EventNearByComponent";
 import { API_URL, RENDER_URL } from "../../Utils/Urls";
 import { setCurrentZip } from "../../Store/Search/searchSlice";
 import axios from "axios";
-import "../../Assets/scss/main.scss";
 import EventListComponent from "../Events/EventListComponent";
 import { EventHandler, HomeEventFormat } from "../../Utils/EventHandler";
 import moment from "moment";

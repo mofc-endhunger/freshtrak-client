@@ -1,13 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import custom styles for complex components */
+@import url("./Assets/css/custom-styles.css");
+
+/* Base styles */
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	margin: 0;
+	font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+		"Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+		"Helvetica Neue", sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background: #ffffff;
+	color: #616161;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+		monospace;
+}
+
+/* Global typography styles */
+section h2 {
+	color: #392947;
+}
+
+.relative {
+	position: relative;
+}
+
+/* Typography utilities that can be replaced with Tailwind */
+.big-title {
+	@apply text-6xl font-bold text-text-primary tracking-tight;
+}
+
+.med-title {
+	@apply text-2xl;
+}
+
+.medium-title {
+	@apply text-lg;
+}
+
+.small-title {
+	@apply text-sm;
+}
+
+.caption-text {
+	@apply font-varela tracking-wide;
+}
+
+.caption-text .link-wrap {
+	@apply break-words;
+}
+
+/* Spacing utilities that can be replaced with Tailwind */
+.pt-200 {
+	@apply pt-200;
+}
+.pt-150 {
+	@apply pt-150;
+}
+.pb-150 {
+	@apply pb-150;
+}
+.pt-100 {
+	@apply pt-100;
+}
+.pb-100 {
+	@apply pb-100;
+}
+.pt-50 {
+	@apply pt-50;
+}
+.pb-50 {
+	@apply pb-50;
+}
+.mt-60 {
+	@apply mt-60;
+}
+.mt-100 {
+	@apply mt-100;
+}
+
+/* Navigation styles that can be replaced with Tailwind */
+.navbar-toggler .navbar-toggler-icon {
+	background-image: none !important;
+}
+
+.navbar-toggler:focus {
+	outline: none;
+}
+
+/* QR Code styles */
+.qrcode {
+	@apply mt-2.5 mb-2.5 flex items-center justify-center;
+}
+
+/* Color utilities */
+.color-green {
+	@apply text-primary;
+}
+
+/* Custom list styles */
+.custom-list {
+	@apply mt-4 mb-0 p-0 list-none;
+}
+
+.custom-list li {
+	@apply mb-2;
 }

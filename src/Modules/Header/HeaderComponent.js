@@ -9,7 +9,6 @@ import localization from "../Localization/LocalizationComponent";
 import { useDispatch } from "react-redux";
 import { setCurrentLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
-import "semantic-ui-css/semantic.min.css";
 import { Nav, Navbar } from "react-bootstrap";
 
 import { RENDER_URL } from "../../Utils/Urls";

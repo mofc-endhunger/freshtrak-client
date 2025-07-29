@@ -2,7 +2,6 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import ReactGA from "react-ga";
 import TagManager from "react-gtm-module";
-import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App";
 import store from "./Store/store";
 import { Provider } from "react-redux";

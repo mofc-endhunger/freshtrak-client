@@ -1,5 +1,4 @@
 import React from "react";
-import "./LoadingSpinner.scss";
 
 const LoadingSpinner = ({
 	size = "medium",

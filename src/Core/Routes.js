@@ -1,7 +1,6 @@
 //routing files
 import React, { lazy, Suspense } from "react";
 import { RENDER_URL } from "../Utils/Urls";
-import "../Assets/scss/main.scss";
 import {
 	BrowserRouter as Router,
 	Routes,

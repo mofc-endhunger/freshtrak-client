@@ -31,6 +31,19 @@ module.exports = {
 				150: "150px",
 				200: "200px",
 			},
+			animation: {
+				"spin-slow": "spin 1.2s linear infinite",
+			},
+			borderWidth: {
+				3: "3px",
+				5: "5px",
+			},
+			minHeight: {
+				25: "100px",
+			},
+			minWidth: {
+				55: "220px",
+			},
 		},
 	},
 	plugins: [

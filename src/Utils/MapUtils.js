@@ -71,7 +71,11 @@ const geocodeWithNominatim = async address => {
 		const encodedAddress = encodeURIComponent(address);
 		const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`;
 
-		const response = await fetch(url);
+		const response = await fetch(url, {
+			headers: {
+				'User-Agent': 'FreshTrak/1.0 (https://freshtrak.com)',
+			},
+		});
 		if (!response.ok) {
 			return null;
 		}

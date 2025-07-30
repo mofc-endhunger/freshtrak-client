@@ -35,6 +35,42 @@ window.google = {
 		},
 
 		MarkerClusterer: class {},
-		Geocoder: class {},
+		Geocoder: class {
+			geocode(request, callback) {
+				// In test environment, return null to avoid real HTTP requests
+				callback([], "ZERO_RESULTS");
+			}
+		},
+	},
+};
+
+// Mock Leaflet for tests
+window.L = {
+	map: jest.fn(() => ({
+		setView: jest.fn(),
+		fitBounds: jest.fn(),
+		remove: jest.fn(),
+		on: jest.fn(),
+		off: jest.fn(),
+	})),
+	tileLayer: jest.fn(() => ({
+		addTo: jest.fn(),
+	})),
+	marker: jest.fn(() => ({
+		addTo: jest.fn(),
+		bindPopup: jest.fn(() => ({
+			openPopup: jest.fn(),
+		})),
+		getLatLng: jest.fn(() => ({
+			toBounds: jest.fn(),
+		})),
+	})),
+	Icon: {
+		Default: {
+			prototype: {
+				_getIconUrl: jest.fn(),
+			},
+			mergeOptions: jest.fn(),
+		},
 	},
 };

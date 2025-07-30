@@ -1,51 +1,89 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# FreshTrak Client
 
-## First Steps
+A React-based web application for managing food bank events and registrations.
+
+## Quick Start
+
+### Prerequisites
 
 Make sure you have [yarn](https://yarnpkg.com/) or [npm](https://www.npmjs.com/) installed.
 
-In root folder run
+### Installation
 
-### `yarn` or `npm i`
+```bash
+# Install dependencies
+yarn install
+# or
+npm install
+```
 
-to get the dependencies.
+### Development
 
-### `yarn start` or `npm start`
+```bash
+# Start development server
+yarn start
+# or
+npm start
+```
 
-Runs the app in the development mode.<br />
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### Testing
 
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-## Address Autocomplete
-
-Autocomplete feature is setup with Google Places API on dev environment.
-API key is intentionally removed from env variables. Contact Mark for the API key or ping `@ashikvarma11`
-You'll see error on console as Invalid key while typing on Search component without proper API key.
-Styles are added on main.scss under `.search-area`.
-
-## Deployment to AWS
-
-This project is deployed to AWS as a CloudFront distribution.
-The cloudformation template can be found in [freshtrak-infrastructure](https://github.com/midohiofoodbank/freshtrak-infrastructure)
-
+```bash
+# Run tests
+yarn test
+# or
+npm test
 ```
-AWS_PROFILE=<profile> AWS_REGION=us-east-2 ./deploy.sh <env>
 
+### Building for Production
+
+```bash
+# Build the app
+yarn build
+# or
+npm run build
 ```
+
+## Documentation
+
+This project's documentation is organized in the `docs/` directory:
+
+### 📁 [General Documentation](docs/general/)
+
+-   [Project Overview](docs/general/README.md) - Complete project setup and development guide
+
+### 📁 [Frontend Documentation](docs/frontend/)
+
+-   [Setup Guide](docs/frontend/setup/) - Frontend development setup and configuration
+-   [Features](docs/frontend/features/) - Detailed feature documentation
+    -   [Map Feature](docs/frontend/features/MAP_FEATURE_README.md) - Interactive maps implementation
+
+### 📁 [Deployment Documentation](docs/deployment/)
+
+-   AWS deployment configuration and procedures
+
+## Key Features
+
+-   **Interactive Maps**: Location-based services with Google Maps integration
+-   **Event Management**: Comprehensive event creation and management
+-   **User Registration**: Streamlined user registration process
+-   **Responsive Design**: Mobile-first responsive interface
+-   **Real-time Updates**: Live data synchronization
+
+## Technology Stack
+
+-   **Frontend**: React, Redux, React Router
+-   **Styling**: SCSS, Bootstrap (migrating to Tailwind CSS)
+-   **Maps**: Google Maps API, Leaflet
+-   **Testing**: Jest, React Testing Library
+-   **Build**: Create React App, Webpack
+
+## Contributing
+
+Please refer to the documentation in the `docs/` directory for detailed development guidelines and feature specifications.
+
+## License
+
+This project is part of the FreshTrak platform for food bank management.

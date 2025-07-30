@@ -103,7 +103,7 @@ const SearchComponent = forwardRef(
 												setZipCode(e.target.value);
 												setDistance(DEFAULT_DISTANCE);
 												setShowFilter(true);
-												setServiceCat("");
+												setServiceCat(null);
 												onSubmitHandler({
 													zip_code: e.target.value,
 													distance: DEFAULT_DISTANCE,

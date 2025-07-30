@@ -73,7 +73,8 @@ const geocodeWithNominatim = async address => {
 
 		const response = await fetch(url, {
 			headers: {
-				'User-Agent': 'FreshTrak/1.0 (https://freshtrak.com)',
+				"User-Agent":
+					"FreshTrak-Client/1.0 (https://github.com/mofc-endhunger/freshtrak-client; contact@freshtrak.com)",
 			},
 		});
 		if (!response.ok) {

@@ -1,46 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#000000" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    
-    <meta name="title" content="FreshTrak"/>
-    <meta name="description" content="Find Food Resources In Your Neighborhood. Register Now. Save Time. Stay Safe." />
-    <meta name="keywords" content="food bank near me, food pantries near me, food pantry, foodbank, food bank, fpg, free produce giveaway" />
-    
-    <!-- Open Graph Meta for FB, and other Social -->
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, shrink-to-fit=no"
+		/>
+		<meta name="theme-color" content="#000000" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
 
-    <meta property="og:site_name"  		content="FreshTrak" />
-    <meta property="og:type" 		      content="website" />
-    <meta property="og:title" 		    content="Register Now. Save Time. Stay Safe." />
-    <meta property="og:url" 		      content="https://freshtrak.com" />
-    <meta property="og:description" 	content="Find Food Resources In Your Neighborhood. To get started, all you need is a zip code." />
-    <meta property="og:image" 		    content="https://images.pantrytrak.com/pt_images/ft_og.png" />
-    
-    <title>FreshTrak</title>
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico">
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon.ico" />
-    <!--
+		<meta name="title" content="FreshTrak" />
+		<meta
+			name="description"
+			content="Find Food Resources In Your Neighborhood. Register Now. Save Time."
+		/>
+		<meta
+			name="keywords"
+			content="food bank near me, food pantries near me, food pantry, foodbank, food bank, fpg, free produce giveaway"
+		/>
+
+		<!-- Open Graph Meta for FB, and other Social -->
+
+		<meta property="og:site_name" content="FreshTrak" />
+		<meta property="og:type" content="website" />
+		<meta
+			property="og:title"
+			content="Register Now. Save Time. Stay Safe."
+		/>
+		<meta property="og:url" content="https://freshtrak.com" />
+		<meta
+			property="og:description"
+			content="Find Food Resources In Your Neighborhood. To get started, all you need is a zip code."
+		/>
+		<meta
+			property="og:image"
+			content="https://images.pantrytrak.com/pt_images/ft_og.png"
+		/>
+
+		<title>FreshTrak</title>
+		<link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+		<link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon.ico" />
+		<!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
+		<link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+		<!-- Leaflet CSS for maps -->
+		<link
+			rel="stylesheet"
+			href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+			integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+			crossorigin=""
+		/>
+		<!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
       Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
+    --></head>
+	<body>
+		<noscript>You need to enable JavaScript to run this app.</noscript>
+		<div id="root"></div>
+		<!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
       You can add webfonts, meta tags, or analytics to this file.
@@ -48,6 +72,6 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=%REACT_APP_GOOGLE_API_KEY%&libraries=places"></script>
-  </body>
+		<script src="https://maps.googleapis.com/maps/api/js?key=%REACT_APP_GOOGLE_GEOLOCATION_KEY%&libraries=places"></script>
+	</body>
 </html>

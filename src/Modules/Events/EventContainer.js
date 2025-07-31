@@ -45,6 +45,7 @@ const EventContainer = () => {
 				const {
 					data: { agencies },
 				} = resp;
+
 				setAgencyData(agencies);
 				if (zip !== zipCode || filteredData.length === 0) {
 					setZip(zipCode);

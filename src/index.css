@@ -3,112 +3,127 @@
 @tailwind utilities;
 
 /* Import custom styles for complex components */
-@import url("./Assets/css/custom-styles.css");
+@import url('./Assets/css/custom-styles.css');
 
 /* Base styles */
 body {
-	margin: 0;
-	font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
-		"Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-		"Helvetica Neue", sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	background: #ffffff;
-	color: #616161;
+  margin: 0;
+  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #ffffff;
+  color: #616161;
 }
 
 code {
-	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-		monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
 
 /* Global typography styles */
 section h2 {
-	color: #392947;
+  color: #392947;
 }
 
 .relative {
-	position: relative;
+  position: relative;
 }
 
 /* Typography utilities that can be replaced with Tailwind */
 .big-title {
-	@apply text-6xl font-bold text-text-primary tracking-tight;
+  font-size: 3.75rem;
+  font-weight: 700;
+  color: #392947;
+  letter-spacing: -0.025em;
 }
 
 .med-title {
-	@apply text-2xl;
+  font-size: 1.5rem;
 }
 
 .medium-title {
-	@apply text-lg;
+  font-size: 1.125rem;
 }
 
 .small-title {
-	@apply text-sm;
+  font-size: 0.875rem;
 }
 
 .caption-text {
-	@apply font-varela tracking-wide;
+  font-family: 'Varela Round', sans-serif;
+  letter-spacing: 0.05em;
 }
 
 .caption-text .link-wrap {
-	@apply break-words;
+  word-break: break-word;
 }
 
 /* Spacing utilities that can be replaced with Tailwind */
 .pt-200 {
-	@apply pt-200;
+  padding-top: 200px;
 }
 .pt-150 {
-	@apply pt-150;
+  padding-top: 150px;
 }
 .pb-150 {
-	@apply pb-150;
+  padding-bottom: 150px;
 }
 .pt-100 {
-	@apply pt-100;
+  padding-top: 100px;
 }
 .pb-100 {
-	@apply pb-100;
+  padding-bottom: 100px;
 }
 .pt-50 {
-	@apply pt-50;
+  padding-top: 50px;
 }
 .pb-50 {
-	@apply pb-50;
+  padding-bottom: 50px;
 }
 .mt-60 {
-	@apply mt-60;
+  margin-top: 60px;
 }
 .mt-100 {
-	@apply mt-100;
+  margin-top: 100px;
 }
 
 /* Navigation styles that can be replaced with Tailwind */
 .navbar-toggler .navbar-toggler-icon {
-	background-image: none !important;
+  background-image: none !important;
 }
 
 .navbar-toggler:focus {
-	outline: none;
+  outline: none;
+}
+
+/* Custom header background for Tailwind migration */
+.header {
+  background: #28ce85 url(./Assets/img/banner-bg.png) no-repeat center center;
+  background-size: cover;
 }
 
 /* QR Code styles */
 .qrcode {
-	@apply mt-2.5 mb-2.5 flex items-center justify-center;
+  margin-top: 0.625rem;
+  margin-bottom: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Color utilities */
 .color-green {
-	@apply text-primary;
+  color: #28ce85;
 }
 
 /* Custom list styles */
 .custom-list {
-	@apply mt-4 mb-0 p-0 list-none;
+  list-style: none;
+  padding: 0;
 }
 
 .custom-list li {
-	@apply mb-2;
+  margin-bottom: 0.5rem;
 }

@@ -1,10 +1,9 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
+import { useLocation } from 'react-router-dom';
+import { HeaderContext } from '../../Store/ContextApi/HeaderContext';
+import { RENDER_URL } from '../../Utils/Urls';
 import HeaderComponent from './HeaderComponent';
 import HeaderDataComponent from './HeaderDataComponent';
-import { HeaderContext } from '../../Store/ContextApi/HeaderContext';
-import { useLocation } from 'react-router-dom';
-import { RENDER_URL } from '../../Utils/Urls';
-import '../../Assets/scss/main.scss';
 
 const HeaderContainer = () => {
   let location = useLocation();
@@ -23,7 +22,7 @@ const HeaderContainer = () => {
       location.pathname.includes(RENDER_URL.REGISTRATION_FORM_URL) ? (
         <HeaderComponent shortHeader={shortHeader} />
       ) : (
-        <header className="header">
+        <header className='header h-[300px] sm:h-[400px]'>
           <HeaderComponent />
           <HeaderDataComponent />
         </header>

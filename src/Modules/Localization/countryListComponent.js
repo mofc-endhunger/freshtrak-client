@@ -2,15 +2,16 @@ import React from "react";
 import { Dropdown } from "semantic-ui-react";
 
 const countryOptions = [
-	{ key: "en", value: "en", flag: "us", text: "English" },
-	{ key: "spa", value: "spa", flag: "mx", text: "Spanish" },
-	{ key: "som", value: "som", flag: "so", text: "Somali" },
-	{ key: "rus", value: "rus", flag: "ru", text: "Russian" },
-	{ key: "tur", value: "tur", flag: "tr", text: "Turkish" },
-	{ key: "ara", value: "ara", flag: "ae", text: "Arabic" },
-	{ key: "zho", value: "zho", flag: "cn", text: "China" },
-	{ key: "hin", value: "hin", flag: "in", text: "Hindi" },
-	{ key: "nep", value: "nep", flag: "np", text: "Nepali" },
+	{ key: "en", value: "en", text: "English" },
+	{ key: "spa", value: "spa", text: "Español" },
+	{ key: "som", value: "som", text: "Soomaali" },
+	{ key: "rus", value: "rus", text: "Русский" },
+	{ key: "tur", value: "tur", text: "Türkçe" },
+	{ key: "ara", value: "ara", text: "العربية" },
+	{ key: "zho", value: "zho", text: "中文" },
+	{ key: "hin", value: "hin", text: "हिन्दी" },
+	{ key: "nep", value: "nep", text: "नेपाली" },
+	{ key: "tag", value: "tag", text: "Tagalog" },
 ];
 
 const CountryListComponent = props => (

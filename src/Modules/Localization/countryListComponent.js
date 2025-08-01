@@ -11,7 +11,7 @@ const countryOptions = [
 	{ key: "zho", value: "zho", text: "中文" },
 	{ key: "hin", value: "hin", text: "हिन्दी" },
 	{ key: "nep", value: "nep", text: "नेपाली" },
-	{ key: "tag", value: "tag", text: "Tagalog" },
+	{ key: "tgl", value: "tgl", text: "Tagalog" },
 ];
 
 const CountryListComponent = props => (

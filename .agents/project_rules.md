@@ -1,7 +1,7 @@
 # FreshTrak Client - AI and Developer Rules
 
 ## Project Overview
-This is a React-based foor pantry locator and registration application with Redux state management, React Router navigation, and Leaflet maps integration.
+This is a React-based food pantry locator and registration application with Redux state management, React Router navigation, and Leaflet maps integration.
 
 ## Code Style & Architecture
 

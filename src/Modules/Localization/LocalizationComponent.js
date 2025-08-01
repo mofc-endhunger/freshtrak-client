@@ -777,7 +777,7 @@ nep: {
   food_bank_serving: "पिन कोडको सेवा गर्ने खाद्य बैंक"
 
 },
-tag: {
+tgl: {
   home_freshtrack:"Nandito ang FreshTrak para tumulong!",
   home_stay:"Manatiling Na-update",
   home_findfood:"Maghanap ng Pagkain",
@@ -788,7 +788,7 @@ tag: {
   home_dashboard_org: "Ihanda ang iyong organisasyon para sa pagdagsa ng pangangailangan sa pagkain sa pamamagitan ng pag-streamline ng pagpaparehistro, pagpaplano ng mga window ng serbisyo, at pagtataya ng mga pangangailangan. Maglingkod sa mas maraming pamilya—parehong kasalukuyan at bago—sa iyong komunidad.",
   home_before_footer1: "Magparehistro ng mga kapitbahay nang maaga o, kung posible, mag-iskedyul ng appointment sa pag-pick up, ang iyong organisasyon ay maaaring magplano para sa anumang pagtaas sa pangangailangan.",
   home_before_footer2: "Nagpo-post ka ng mga kaganapan sa pag-access sa pagkain sa iyong komunidad—mula sa pang-araw-araw na oras ng pantry hanggang sa pop-up na mga kaganapan sa pagkain—at ang mga kapitbahay ay naglalagay ng kanilang zip code para makakonekta sa kanila.",
-  home_before_footer3: "Alisin ang bottleneck mula sa pamamahagi sa online na pre-registration ng customer. Maglingkod sa mas maraming customer, nang ligtas!",
+  home_before_footer3: "Alisin ang bottleneck mula sa pamamahagi sa online na pre-registration ng customer. Maglingkod sa mas maraming customer, nang mas mabilis!",
   home_before_footer1_header: "Hulaan ang Pangangailangan",
   home_before_footer2_header: "Maglingkod ng Pagkain",
   home_before_footer3_header:"Mabilis na Gumalaw",

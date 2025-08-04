@@ -2,6 +2,9 @@ import React, { forwardRef, useState } from "react";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import FilterComponent from "./FilterComponent";
 import localization from "../Localization/LocalizationComponent";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
 
 import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 import { Fragment } from "react";
@@ -62,22 +65,22 @@ const SearchComponent = forwardRef(
 		};
 		return (
 			<Fragment>
-				<div className=" row align-items-end">
-					<div className="col-sm-6 col-md-6 col-lg-7 col-xl-8 search-order-1">
-						<div className="d-flex">
+				<div className="flex flex-wrap items-end gap-4">
+					<div className="flex-1 min-w-0">
+						<div className="flex gap-4">
 							{showAddress && (
 								<div
-									className="form-group flex-grow-1"
+									className="flex-1"
 									data-testid="search-street"
 								>
-									<label htmlFor="street">Street</label>
+									<Label htmlFor="street">Street</Label>
 									<GooglePlacesAutocomplete
 										onSelect={handleSelect}
 										value={address}
 										onChange={e =>
 											setAddress(e.target.value)
 										}
-										className="form-control"
+										className="mt-1"
 										name="street"
 										id="street"
 										placeholder="Type Address"
@@ -85,16 +88,16 @@ const SearchComponent = forwardRef(
 									/>
 								</div>
 							)}
-							<div className="form-group zip-code">
-								<label htmlFor="zip_code">
+							<div className="w-full">
+								<Label htmlFor="zip_code">
 									{localization.house_hold_zip}
-								</label>
-								<input
+								</Label>
+								<Input
 									type="text"
-									className="form-control zip"
 									id="zip_code"
 									name="zip_code"
 									defaultValue={zipCode}
+									className="mt-1 min-h-[50px] border-[#392947] w-full text-gray-600 bg-white outline-none focus:border-[#392947] focus:shadow-[0_0_0_0.2rem_rgba(0,123,255,0.25)] focus:ring-0 focus-visible:border-[#392947] focus-visible:ring-0 focus-visible:ring-transparent"
 									{...register("zip_code", {
 										required: true,
 										onChange: e => {
@@ -117,7 +120,7 @@ const SearchComponent = forwardRef(
 								/>
 
 								{errors.zip_code && (
-									<span className="validationError">
+									<span className="text-sm text-[#ff0000] absolute">
 										This field is required
 									</span>
 								)}
@@ -136,21 +139,22 @@ const SearchComponent = forwardRef(
 							/>
 						</div>
 					</div>
-					<div className="col-sm-6 col-md-6 col-lg-5 col-xl-4 text-right search-order-3">
-						<button
+					<div className="flex-shrink-0">
+						<Button
 							type="submit"
+							variant="mofcprimary"
 							name="searchForResources"
 							dataid=""
 							id="search-resource"
 							value="Search For Resources"
-							className="btn custom-button search-button"
+							className="w-full sm:w-auto min-h-[50px]"
 						>
 							{localization.search_for_resources}
-						</button>
+						</Button>
 					</div>
-					<div className="col-12 search-order-2 mt-2">
+					<div className="w-full mt-2">
 						{address.length === 0 && showAddress && (
-							<p>
+							<p className="text-sm text-gray-600">
 								Enter your address for customized results
 								(Optional){" "}
 							</p>

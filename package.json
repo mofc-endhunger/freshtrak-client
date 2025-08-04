@@ -5,6 +5,9 @@
   "homepage": "https://freshtrak.com",
   "dependencies": {
     "@one-platform/opc-timeline": "0.0.3-prerelease",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-select": "^2.2.5",
+    "@radix-ui/react-slot": "^1.2.3",
     "@reduxjs/toolkit": "^1.9.7",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -12,8 +15,11 @@
     "ajv": "^8.0.0",
     "axios": "^0.27.2",
     "bootstrap": "^4.6.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "history": "^5.3.0",
     "leaflet": "^1.9.4",
+    "lucide-react": "^0.536.0",
     "moment": "^2.29.4",
     "popper.js": "^1.16.1",
     "qrcode.react": "^3.1.0",
@@ -38,7 +44,9 @@
     "sass": "^1.63.6",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^3.0.0-beta.2",
-    "sweetalert2": "^11.7.32"
+    "sweetalert2": "^11.7.32",
+    "tailwind-merge": "^3.3.1",
+    "tw-animate-css": "^1.3.6"
   },
   "scripts": {
     "start": "env-cmd -f .env.development react-scripts start",
@@ -69,6 +77,9 @@
     "@babel/preset-react": "^7.27.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
+    "@types/node": "^24.1.0",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.4.21",
     "babel-jest": "^30.0.4",
     "env-cmd": "^10.1.0",
@@ -76,6 +87,7 @@
     "postcss": "^8.5.6",
     "redux-mock-store": "^1.5.4",
     "tailwindcss": "^3.4.0",
-    "test-data-bot": "^0.8.0"
+    "test-data-bot": "^0.8.0",
+    "typescript": "^4.9.5"
   }
 }

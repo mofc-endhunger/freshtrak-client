@@ -180,19 +180,19 @@ input[type="radio"].toggle {
 		}
 	}
 }
-select {
-	width: 268px;
-	padding: 5px;
-	font-size: 16px;
-	line-height: 1;
-	border: 0;
-	border-radius: 5px;
-	height: 34px;
-	background: #ffffff url(../img/down.svg) no-repeat 97% center !important;
-	-webkit-appearance: none;
-	appearance: none;
-	background-position-x: 244px;
-}
+// select {
+// 	width: 268px;
+// 	padding: 5px;
+// 	font-size: 16px;
+// 	line-height: 1;
+// 	border: 0;
+// 	border-radius: 5px;
+// 	height: 34px;
+// 	background: #ffffff url(../img/down.svg) no-repeat 97% center !important;
+// 	-webkit-appearance: none;
+// 	appearance: none;
+// 	background-position-x: 244px;
+// }
 .modal-content {
 	background: $secondary-color;
 	color: $color-white;

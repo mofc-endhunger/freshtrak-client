@@ -125,8 +125,8 @@ const PrimaryInfoFormComponent = ({
 					id="date_of_birth"
 					value={date_of_birth}
 					onChange={handleChangeDob}
-					placeholder="MM / DD / YYYY"
-					{...register("date_of_birth", {
+					placeholder="mm/dd/yyyy"
+					ref={register("date_of_birth", {
 						validate: value =>
 							isValidDob(value) ||
 							"Please enter a valid date of birth.",

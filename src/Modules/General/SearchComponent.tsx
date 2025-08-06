@@ -5,26 +5,61 @@ import localization from "../Localization/LocalizationComponent";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
-
 import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 import { Fragment } from "react";
+import { UseFormRegister, FieldErrors } from "react-hook-form";
 
-const SearchComponent = forwardRef(
+interface AddressComponent {
+	long_name: string;
+	short_name: string;
+	types: string[];
+}
+
+interface Place {
+	address_components: AddressComponent[];
+}
+
+interface ServiceCategory {
+	id: number;
+	service_category_name: string;
+}
+
+interface SearchFormData {
+	zip_code: string;
+	distance: string;
+	serviceCat: string;
+	street?: string;
+	lat?: string;
+	long?: string;
+}
+
+interface SearchComponentProps {
+	register: UseFormRegister<SearchFormData>;
+	errors: FieldErrors<SearchFormData>;
+	onSubmitHandler: (data: SearchFormData) => void;
+	z_code: string;
+	range: string;
+	categories: ServiceCategory[];
+}
+
+const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 	(
 		{ register, errors = {}, onSubmitHandler, z_code, range, categories },
 		ref
 	) => {
-		const [address, setAddress] = useState("");
-		// const [zip] = React.useState("");
-		const [lat, setLat] = useState("");
-		const [long, setLong] = useState("");
-		const [showAddress, setShowAddress] = useState(false);
-		const showDistance = z_code.length > 4 ? true : false;
-		const [zipCode, setZipCode] = useState(z_code);
-		const [distance, setDistance] = useState(range);
-		const [serviceCat, setServiceCat] = useState("");
-		const [showFilter, setShowFilter] = useState(z_code !== undefined);
-		const handleSelect = async (value, place) => {
+		const [address, setAddress] = useState<string>("");
+		const [lat, setLat] = useState<string>("");
+		const [long, setLong] = useState<string>("");
+		const [showAddress, setShowAddress] = useState<boolean>(false);
+		const showDistance = z_code?.length > 4 ? true : false;
+		const [zipCode, setZipCode] = useState<string>(z_code);
+		const [distance, setDistance] = useState<string>(range);
+		const [serviceCat, setServiceCat] = useState<string>("");
+		const [showFilter, setShowFilter] = useState<boolean>(
+			z_code !== undefined
+		);
+
+		const handleSelect = async (value: string, place: Place) => {
 			setAddress(value);
 
 			if (place && place.address_components) {
@@ -46,8 +81,8 @@ const SearchComponent = forwardRef(
 			}
 		};
 
-		const getDestructured = address_components => {
-			let destructured = {};
+		const getDestructured = (address_components: AddressComponent[]) => {
+			let destructured: Record<string, string> = {};
 			// eslint-disable-next-line array-callback-return
 			address_components.filter(component => {
 				switch (component["types"][0]) {
@@ -63,28 +98,30 @@ const SearchComponent = forwardRef(
 			});
 			return destructured;
 		};
+
 		return (
 			<Fragment>
-				<div className="flex flex-wrap items-end gap-4">
-					<div className="flex-1 min-w-0">
-						<div className="flex gap-4">
+				<div
+					className="grid grid-cols-1 gap-6 sm:grid-cols-3 gap-4 items-end"
+					ref={ref}
+				>
+					<div className="sm:col-span-2">
+						<div className="flex flex-col gap-4">
 							{showAddress && (
 								<div
-									className="flex-1"
+									className="w-full"
 									data-testid="search-street"
 								>
 									<Label htmlFor="street">Street</Label>
 									<GooglePlacesAutocomplete
 										onSelect={handleSelect}
 										value={address}
-										onChange={e =>
-											setAddress(e.target.value)
-										}
+										onChange={(
+											e: React.ChangeEvent<HTMLInputElement>
+										) => setAddress(e.target.value)}
 										className="mt-1"
-										name="street"
 										id="street"
 										placeholder="Type Address"
-										{...register("street")}
 									/>
 								</div>
 							)}
@@ -95,21 +132,25 @@ const SearchComponent = forwardRef(
 								<Input
 									type="text"
 									id="zip_code"
-									name="zip_code"
 									defaultValue={zipCode}
 									className="mt-1 min-h-[50px] border-[#392947] w-full text-gray-600 bg-white outline-none focus:border-[#392947] focus:shadow-[0_0_0_0.2rem_rgba(0,123,255,0.25)] focus:ring-0 focus-visible:border-[#392947] focus-visible:ring-0 focus-visible:ring-transparent"
 									{...register("zip_code", {
 										required: true,
-										onChange: e => {
+										onChange: (
+											e: React.ChangeEvent<HTMLInputElement>
+										) => {
 											if (e.target.value.length === 5) {
 												setShowAddress(false);
 												setZipCode(e.target.value);
-												setDistance(DEFAULT_DISTANCE);
+												setDistance(
+													DEFAULT_DISTANCE.toString()
+												);
 												setShowFilter(true);
-												setServiceCat(null);
+												setServiceCat("");
 												onSubmitHandler({
 													zip_code: e.target.value,
-													distance: DEFAULT_DISTANCE,
+													distance:
+														DEFAULT_DISTANCE.toString(),
 													serviceCat: "",
 												});
 											} else {
@@ -120,7 +161,7 @@ const SearchComponent = forwardRef(
 								/>
 
 								{errors.zip_code && (
-									<span className="text-sm text-[#ff0000] absolute">
+									<span className="text-sm text-[#ff0000] absolute my-1">
 										This field is required
 									</span>
 								)}
@@ -139,15 +180,14 @@ const SearchComponent = forwardRef(
 							/>
 						</div>
 					</div>
-					<div className="flex-shrink-0">
+					<div className="sm:col-span-1">
 						<Button
 							type="submit"
 							variant="mofcprimary"
 							name="searchForResources"
-							dataid=""
 							id="search-resource"
 							value="Search For Resources"
-							className="w-full sm:w-auto min-h-[50px]"
+							className="w-full min-h-[50px]"
 						>
 							{localization.search_for_resources}
 						</Button>
@@ -168,14 +208,16 @@ const SearchComponent = forwardRef(
 								setShowFilter(false);
 								onSubmitHandler({
 									zip_code: zipCode,
-									distance: null,
+									distance: "",
 									serviceCat: "",
 								});
 							}}
 							distance={{
 								show: showDistance,
 								defaultValue: distance,
-								onChangeHandler: e => {
+								onChangeHandler: (e: {
+									target: { value: string };
+								}) => {
 									setDistance(e.target.value);
 									onSubmitHandler({
 										zip_code: zipCode,
@@ -188,7 +230,9 @@ const SearchComponent = forwardRef(
 								show: showDistance,
 								defaultValue: serviceCat,
 								data: categories,
-								onChangeHandler: e => {
+								onChangeHandler: (e: {
+									target: { value: string };
+								}) => {
 									setServiceCat(e.target.value);
 									onSubmitHandler({
 										zip_code: zipCode,
@@ -205,8 +249,6 @@ const SearchComponent = forwardRef(
 	}
 );
 
-SearchComponent.defaultProps = {
-	range: "",
-	z_code: "",
-};
+SearchComponent.displayName = "SearchComponent";
+
 export default SearchComponent;

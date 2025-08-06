@@ -1,8 +1,8 @@
 import React, { forwardRef } from "react";
 import { Fragment } from "react";
+import localization from "../Localization/LocalizationComponent";
 import closeIcon from "../../Assets/img/close.svg";
 import funnelIcon from "../../Assets/img/funnel.svg";
-import localization from "../Localization/LocalizationComponent";
 import {
 	Select,
 	SelectContent,
@@ -13,12 +13,36 @@ import {
 import { Label } from "../../components/ui/label";
 import { Button } from "../../components/ui/button";
 
-const FilterComponent = forwardRef(
+interface ServiceCategory {
+	id: number;
+	service_category_name: string;
+}
+
+interface FilterOption {
+	show: boolean;
+	defaultValue: string;
+	onChangeHandler: (event: { target: { value: string } }) => void;
+}
+
+interface ServiceCategoryFilter extends FilterOption {
+	data: ServiceCategory[];
+}
+
+interface FilterComponentProps {
+	distance: FilterOption;
+	serviceCat: ServiceCategoryFilter;
+	closeFilter: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 	({ distance, serviceCat, closeFilter }, ref) => {
 		return (
 			<Fragment>
 				{(distance.show || serviceCat.show) && (
-					<div className="border border-[#cbd4dc] rounded-sm p-5 mt-2.5 text-xs">
+					<div
+						className="border border-[#cbd4dc] rounded-sm p-5 mt-2.5 text-xs"
+						ref={ref}
+					>
 						<div className="flex justify-between items-center">
 							<div className="flex items-center">
 								<span className=" flex flex-row items-center text-[#495057] font-bold text-sm uppercase">
@@ -43,8 +67,8 @@ const FilterComponent = forwardRef(
 								/>
 							</Button>
 						</div>
-						<div className="flex flex-wrap items-end gap-4 pt-3">
-							<div className="flex-1 min-w-0">
+						<div className="flex flex-col sm:flex-row flex-wrap items-end gap-4 pt-3">
+							<div className="w-full sm:flex-1 min-w-0">
 								{distance.show && (
 									<div className="space-y-2">
 										<Label htmlFor="distance">
@@ -85,7 +109,7 @@ const FilterComponent = forwardRef(
 									</div>
 								)}
 							</div>
-							<div className="flex-1 min-w-0">
+							<div className="w-full sm:flex-1 min-w-0">
 								{serviceCat.show && (
 									<div className="space-y-2">
 										<Label htmlFor="serviceCat">
@@ -125,8 +149,8 @@ const FilterComponent = forwardRef(
 									</div>
 								)}
 							</div>
-							<div className="flex-1 min-w-0"></div>
-							<div className="flex-1 min-w-0"></div>
+							<div className="w-full sm:flex-1 min-w-0"></div>
+							<div className="w-full sm:flex-1 min-w-0"></div>
 						</div>
 					</div>
 				)}
@@ -134,5 +158,7 @@ const FilterComponent = forwardRef(
 		);
 	}
 );
+
+FilterComponent.displayName = "FilterComponent";
 
 export default FilterComponent;

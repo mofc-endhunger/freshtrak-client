@@ -13,25 +13,52 @@ import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import serviceCatFilter from "../../Utils/serviceCatFilter";
 import LoadingSpinner from "../General/LoadingSpinner";
 
-const EventContainer = () => {
+interface Agency {
+	id: string;
+	name: string;
+	nickname: string;
+	events: any[];
+	[key: string]: any;
+}
+
+interface FoodBankData {
+	foodbanks: any[];
+	[key: string]: any;
+}
+
+interface SearchFormData {
+	zip_code: string;
+	distance: string;
+	serviceCat: string;
+}
+
+const EventContainer: React.FC = () => {
 	const {
 		zipCode = "",
 		distance = DEFAULT_DISTANCE,
 		serviceCat,
-	} = useParams();
-	const [foodBankResponse, setFoodBankResponse] = useState(false);
-	let [foodBankData, setFoodBankData] = useState({});
-	let [searchDetails, setSearchDetails] = useState({});
-	const [serverError, setServerError] = useState(false);
-	const [loading, setLoading] = useState(false);
-	const [agencyData, setAgencyData] = useState([]);
-	const [filteredData, setFilteredData] = useState([]);
-	const [zip, setZip] = useState(null);
+	} = useParams<{
+		zipCode?: string;
+		distance?: string;
+		serviceCat?: string;
+	}>();
+
+	const [foodBankResponse, setFoodBankResponse] = useState<boolean>(false);
+	const [foodBankData, setFoodBankData] = useState<FoodBankData>({
+		foodbanks: [],
+	});
+
+	const [serverError, setServerError] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [agencyData, setAgencyData] = useState<Agency[]>([]);
+	const [filteredData, setFilteredData] = useState<Agency[]>([]);
+	const [zip, setZip] = useState<string | null>(null);
+
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const categories = serviceCatFilter(filteredData);
 
-	const getEvents = async () => {
+	const getEvents = async (): Promise<void> => {
 		if (zipCode) {
 			setLoading(true);
 			try {
@@ -72,7 +99,7 @@ const EventContainer = () => {
 		}
 	}, [zipCode, dispatch]);
 
-	const ResourceList = () => {
+	const ResourceList: React.FC = () => {
 		if (foodBankResponse) {
 			return <ResourceListComponent dataToChild={foodBankData} />;
 		}
@@ -86,13 +113,12 @@ const EventContainer = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm();
+	} = useForm<SearchFormData>();
 
-	const getFoodbanks = async zip => {
+	const getFoodbanks = async (zip: string): Promise<void> => {
 		if (zip) {
 			setLoading(true);
 			let foodBankUri = API_URL.FOODBANK_LIST;
-			setSearchDetails(zip);
 
 			try {
 				const resp = await axios.get(foodBankUri, {
@@ -109,7 +135,11 @@ const EventContainer = () => {
 		}
 	};
 
-	const onSubmit = ({ zip_code, distance, serviceCat }) => {
+	const onSubmit = ({
+		zip_code,
+		distance,
+		serviceCat,
+	}: SearchFormData): void => {
 		let url = `/events/list/`;
 		if (zip_code) {
 			url += zip_code + "/";
@@ -122,22 +152,21 @@ const EventContainer = () => {
 		}
 		navigate(url);
 	};
+
 	localStorage.setItem("search_zip", `${zipCode}`);
 
 	return (
 		<div>
-			<section className="gray-bg">
-				<div className="container pt-150 pb-150">
-					<div className="search-area text-left">
+			<section className="bg-[#F2F0F4]">
+				<div className="container mx-auto px-4 pt-24 pb-24">
+					<div className="min-h-[130px] bg-white rounded-lg shadow-md -mt-56 mb-12 mx-auto p-8 text-left sm:w-full sm:min-w-auto sm:p-6 sm:-mt-36 md:w-11/12 md:min-w-auto lg:min-w-[600px] lg:w-auto lg:max-w-[900px]">
 						<form onSubmit={handleSubmit(onSubmit)}>
 							<SearchComponent
 								register={register}
 								errors={errors}
 								onSubmitHandler={onSubmit}
-								searchData={searchDetails}
 								z_code={zipCode}
-								range={distance}
-								agencyData={agencyData}
+								range={distance?.toString() || ""}
 								categories={categories}
 							/>
 						</form>
@@ -152,8 +181,6 @@ const EventContainer = () => {
 						<EventListContainer
 							agencyData={agencyData}
 							zipCode={zipCode}
-							distance={distance}
-							serviceCat={serviceCat}
 						/>
 					)}
 					{loading && <LoadingSpinner />}

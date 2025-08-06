@@ -1,6 +1,66 @@
 import React, { useState, useEffect, useRef, forwardRef } from "react";
 
-const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
+interface GooglePlacesAutocompleteProps {
+	value: string;
+	onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	onSelect?: (value: string, place: any) => void;
+	placeholder?: string;
+	className?: string;
+	id?: string;
+	name?: string;
+	[key: string]: any;
+}
+
+interface GooglePlace {
+	place_id: string;
+	description: string;
+	structured_formatting?: {
+		main_text: string;
+		secondary_text: string;
+	};
+}
+
+interface GooglePlaceDetails {
+	place_id: string;
+	address_components: Array<{
+		long_name: string;
+		short_name: string;
+		types: string[];
+	}>;
+	formatted_address: string;
+	geometry?: {
+		location: {
+			lat: () => number;
+			lng: () => number;
+		};
+	};
+	name?: string;
+}
+
+declare global {
+	interface Window {
+		google: {
+			maps: {
+				places: {
+					AutocompleteService: new () => any;
+					AutocompleteSessionToken: new () => any;
+					PlacesService: new (div: HTMLElement) => any;
+					PlacesServiceStatus: {
+						OK: string;
+						REQUEST_DENIED: string;
+						OVER_QUERY_LIMIT: string;
+						INVALID_REQUEST: string;
+					};
+				};
+			};
+		};
+	}
+}
+
+const GooglePlacesAutocomplete = forwardRef<
+	HTMLInputElement,
+	GooglePlacesAutocompleteProps
+>(function GooglePlacesAutocomplete(
 	{
 		value,
 		onChange,
@@ -13,11 +73,11 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 	},
 	ref
 ) {
-	const [suggestions, setSuggestions] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [showSuggestions, setShowSuggestions] = useState(false);
-	const autocompleteService = useRef(null);
-	const sessionToken = useRef(null);
+	const [suggestions, setSuggestions] = useState<GooglePlace[]>([]);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+	const autocompleteService = useRef<any>(null);
+	const sessionToken = useRef<any>(null);
 
 	useEffect(() => {
 		// Initialize Google Places Autocomplete Service
@@ -57,7 +117,7 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 		}
 	}, []);
 
-	const getPlacePredictions = async input => {
+	const getPlacePredictions = async (input: string) => {
 		if (!input.trim()) {
 			setSuggestions([]);
 			setLoading(false);
@@ -79,7 +139,7 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 
 				autocompleteService.current.getPlacePredictions(
 					request,
-					(predictions, status) => {
+					(predictions: GooglePlace[], status: string) => {
 						if (
 							status ===
 								window.google.maps.places.PlacesServiceStatus
@@ -132,7 +192,7 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 		}
 	};
 
-	const handleInputChange = e => {
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const inputValue = e.target.value;
 
 		// Always pass the event object to maintain compatibility
@@ -149,7 +209,7 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 		}
 	};
 
-	const handleSuggestionClick = suggestion => {
+	const handleSuggestionClick = (suggestion: GooglePlace) => {
 		setShowSuggestions(false);
 
 		// Create a proper event object for onChange
@@ -158,7 +218,7 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 				value: suggestion.description,
 				name: name || "address",
 			},
-		};
+		} as React.ChangeEvent<HTMLInputElement>;
 		onChange(event);
 
 		// Fetch detailed place information
@@ -178,26 +238,29 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 				],
 			};
 
-			placesService.getDetails(request, (place, status) => {
-				if (
-					status ===
-						window.google.maps.places.PlacesServiceStatus.OK &&
-					place
-				) {
-					if (onSelect) {
-						onSelect(suggestion.description, place);
-					}
-				} else {
-					// Fallback if detailed place info fails
-					if (onSelect) {
-						const fallbackPlace = {
-							place_id: suggestion.place_id,
-							description: suggestion.description,
-						};
-						onSelect(suggestion.description, fallbackPlace);
+			placesService.getDetails(
+				request,
+				(place: GooglePlaceDetails, status: string) => {
+					if (
+						status ===
+							window.google.maps.places.PlacesServiceStatus.OK &&
+						place
+					) {
+						if (onSelect) {
+							onSelect(suggestion.description, place);
+						}
+					} else {
+						// Fallback if detailed place info fails
+						if (onSelect) {
+							const fallbackPlace = {
+								place_id: suggestion.place_id,
+								description: suggestion.description,
+							};
+							onSelect(suggestion.description, fallbackPlace);
+						}
 					}
 				}
-			});
+			);
 		} else {
 			// Fallback when Places API is not available
 			if (onSelect) {
@@ -251,5 +314,7 @@ const GooglePlacesAutocomplete = forwardRef(function GooglePlacesAutocomplete(
 		</div>
 	);
 });
+
+GooglePlacesAutocomplete.displayName = "GooglePlacesAutocomplete";
 
 export default GooglePlacesAutocomplete;

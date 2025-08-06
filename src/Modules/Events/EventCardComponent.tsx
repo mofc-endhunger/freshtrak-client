@@ -11,10 +11,48 @@ import MiniMapComponent from "../General/MiniMapComponent";
 import FullMapModalComponent from "../General/FullMapModalComponent";
 import "../../Assets/scss/main.scss";
 
-const EventCardComponent = props => {
-	const [showDetails, setShowDetails] = useState(false);
-	const [showMapModal, setShowMapModal] = useState(false);
-	const [mapCoordinates, setMapCoordinates] = useState(null);
+interface Event {
+	id: string;
+	startTime: string;
+	endTime: string;
+	date: string;
+	eventAddress: string;
+	eventCity: string;
+	eventState: string;
+	eventZip: string;
+	phoneNumber: string;
+	agencyName: string;
+	eventName: string;
+	eventService: string;
+	acceptReservations: boolean;
+	acceptInterest: boolean;
+	acceptWalkin: boolean;
+	eventDetails: string;
+	exceptionNote?: string;
+	latitude?: number;
+	longitude?: number;
+}
+
+interface Coordinates {
+	lat: number;
+	lng: number;
+}
+
+interface EventCardComponentProps {
+	event: Event;
+	registrationView?: boolean;
+	alreadyRegistered?: boolean;
+	agencyLatitude?: number;
+	agencyLongitude?: number;
+	targetUrl?: string;
+}
+
+const EventCardComponent: React.FC<EventCardComponentProps> = props => {
+	const [showDetails, setShowDetails] = useState<boolean>(false);
+	const [showMapModal, setShowMapModal] = useState<boolean>(false);
+	const [mapCoordinates, setMapCoordinates] = useState<Coordinates | null>(
+		null
+	);
 	const dispatch = useDispatch();
 	const {
 		event: {
@@ -54,7 +92,7 @@ const EventCardComponent = props => {
 	const showRsvpRequired =
 		acceptInterest && !acceptReservations && !acceptWalkin;
 
-	const handleMapClick = (coordinates, addressData) => {
+	const handleMapClick = (coordinates: Coordinates, addressData?: any) => {
 		setMapCoordinates(coordinates);
 		setShowMapModal(true);
 	};
@@ -71,12 +109,12 @@ const EventCardComponent = props => {
 		window.open(directionsUrl, "_blank");
 	};
 
-	const getButton = (buttonName, targetUrl) => {
+	const getButton = (buttonName: string, targetUrl: string) => {
 		return (
 			<LinkContainer to={targetUrl}>
 				<button
 					type="button"
-					className="btn custom-button ml-1 flex-grow-1"
+					className="btn bg-[#392947] text-white px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px] ml-1 w-full"
 					onClick={() => dispatch(setCurrentEvent(props.event))}
 				>
 					{buttonName}
@@ -104,19 +142,25 @@ const EventCardComponent = props => {
 
 	return (
 		<section
-			className={registrationView ? "" : "col-lg-4 col-xl-4"}
-			tabIndex="0"
+			className={registrationView ? "" : "lg:col-span-1 xl:col-span-1"}
+			tabIndex={0}
 		>
-			<div className="day-view-item">
-				<div className="day-view-item-header">
-					<div className="day-view-header-title">{agencyName}</div>
-					<div className="day-view-header-title">{eventName}</div>
-					<div className="day-view-item-location d-flex justify-content-between">
-						<div className="day-view-item-name">{eventService}</div>
+			<div className="bg-white rounded-lg shadow-md">
+				<div className="bg-primary text-white p-4 rounded-t-lg">
+					<div className="text-lg font-bold pb-2 truncate">
+						{agencyName}
+					</div>
+					<div className="text-lg font-bold pb-2 truncate">
+						{eventName}
+					</div>
+					<div className="flex justify-between text-xs">
+						<div className="flex-grow truncate font-varela">
+							{eventService}
+						</div>
 					</div>
 				</div>
-				<div className="day-view-item-details mb-3 d-flex flex-column justify-content-between">
-					<div className="timings d-flex justify-content-between">
+				<div className="p-4 min-h-[280px] flex flex-col justify-between">
+					<div className="text-sm font-varela flex justify-between mb-2">
 						<div className="date-wrapper">
 							{formatDateDayAndDate(date)}
 						</div>
@@ -124,7 +168,7 @@ const EventCardComponent = props => {
 							{startTime} - {endTime}
 						</div>
 					</div>
-					<div className="address-wrap">
+					<div className="text-xs font-varela max-w-[150px] my-2">
 						{eventAddress}
 						<br />
 						{eventCity} {eventState} {eventZip}
@@ -142,11 +186,11 @@ const EventCardComponent = props => {
 						longitude={longitude}
 					/>
 					{exceptionNote && exceptionNote !== "" && (
-						<div className="timings">
+						<div className="text-sm font-varela my-2">
 							Service Area Limitations:
 							<br />
 							<span
-								className="text-danger"
+								className="text-red-600"
 								data-testid="exception-note"
 							>
 								{exceptionNote}
@@ -164,38 +208,47 @@ const EventCardComponent = props => {
 						</div>
 					)}
 					{!!showRsvpOptional && (
-						<span className="text-danger font-size-point-85rem">
+						<span className="text-red-600 text-sm">
 							RSVP is optional for this event
 						</span>
 					)}
 					{!!showRsvpRequired && (
-						<span className="text-danger font-size-point-85rem">
+						<span className="text-red-600 text-sm">
 							RSVP is required for this event
 						</span>
 					)}
 					{alreadyRegistered && (
-						<span className="text-danger font-size-point-85rem">
+						<span className="text-red-600 text-sm">
 							Already Registered
 						</span>
 					)}
-					<div className="day-view-item-detail-footer d-flex mt-3">
-						{eventDetails && eventDetails.length > 0 && (
+					<div className="space-y-3 mt-3">
+						{/* Details and Directions buttons row */}
+						<div className="flex flex-col sm:flex-row gap-2">
+							{eventDetails && eventDetails.length > 0 && (
+								<button
+									className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
+									onClick={() => {
+										setShowDetails(!showDetails);
+									}}
+								>
+									{!showDetails
+										? "View Details"
+										: "Hide details"}
+								</button>
+							)}
 							<button
-								className="btn default-button flex-grow-1"
-								onClick={() => {
-									setShowDetails(!showDetails);
-								}}
+								className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
+								onClick={handleGetDirections}
 							>
-								{!showDetails ? "View Details" : "Hide details"}
+								Get Directions
 							</button>
+						</div>
+
+						{/* Reserve button on separate row */}
+						{ButtonView() && (
+							<div className="w-full">{ButtonView()}</div>
 						)}
-						<button
-							className="btn custom-button ml-1 flex-grow-1"
-							onClick={handleGetDirections}
-						>
-							Get Directions
-						</button>
-						{ButtonView()}
 					</div>
 				</div>
 			</div>

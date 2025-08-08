@@ -10,6 +10,7 @@ import MemberCountFormComponent from "../Family/MemberCountFormComponent";
 import EventSlotsModalComponent from "../Family/EventSlotsModalComponent";
 import BackButtonComponent from "../General/BackButtonComponent";
 import LoadingSpinner from "../General/LoadingSpinner";
+import { Button } from "../../components/ui/button";
 
 // Utility imports
 import { formatDateForServer } from "../../Utils/DateFormat";
@@ -89,15 +90,14 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 
 	const previousButton = (): JSX.Element => {
 		return (
-			<button
+			<Button
 				type="button"
 				onClick={previousHandler}
-				className="btn custom-button"
+				variant="custom"
 				data-testid="previous button"
 			>
-				{" "}
 				Previous
-			</button>
+			</Button>
 		);
 	};
 
@@ -229,15 +229,15 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 	return (
 		<Fragment>
 			<div className="mt-4">
-				<section className="container pt-100 pb-100 register-confirmation">
+				<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 max-w-md mx-auto my-5">
 					{formStep === 0 && <BackButtonComponent />}
 					{/* @ts-ignore */}
 					<opc-timeline id="timeline" current-step-index={formStep}>
 						<div slot="form-timeline"></div>
 						{/* @ts-ignore */}
 					</opc-timeline>
-					<div className="registration-form">
-						<div className="content-wrapper">
+					<div className="max-w-4xl mx-auto">
+						<div className="max-w-6xl mx-auto px-4">
 							<EventSlotsModalComponent
 								event={event}
 								selectedSlotId={selectedSlotId}
@@ -271,18 +271,17 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 											watch={watchField}
 											setValue={setValue}
 										/>
-										<div className="d-flex">
+										<div className="flex">
 											{previousButton()}
-											<button
+											<Button
 												type="button"
 												onClick={test}
-												style={{ marginLeft: 20 }}
-												className="btn custom-button"
+												className="ml-5"
+												variant="custom"
 												data-testid="continue button"
 											>
-												{" "}
 												Continue
-											</button>
+											</Button>
 										</div>
 									</Fragment>
 								)}
@@ -295,15 +294,15 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 											watch={watch}
 											setValue={setValue}
 										/>
-										<div className="button-wrap mt-4">
+										<div className="flex justify-center mt-4">
 											{isSubmitting ? (
-												<div className="d-flex justify-content-center">
+												<div className="flex justify-center">
 													<LoadingSpinner size="medium" />
 												</div>
 											) : (
-												<button
+												<Button
 													type="submit"
-													className="btn custom-button"
+													variant="custom"
 													disabled={
 														disabled || isSubmitting
 													}
@@ -312,7 +311,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 													{
 														localization.registartion_register
 													}
-												</button>
+												</Button>
 											)}
 										</div>{" "}
 									</>

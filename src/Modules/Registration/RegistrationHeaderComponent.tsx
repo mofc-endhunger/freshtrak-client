@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Fragment } from "react";
-import "../../Assets/scss/main.scss";
 import RegistrationTextComponent from "./RegistrationTextComponent";
 import localization from "../Localization/LocalizationComponent";
 import { Event } from "./types/registration.types";
@@ -14,10 +13,10 @@ const RegistrationHeaderComponent: React.FC<
 > = ({ event }) => {
 	return (
 		<Fragment>
-			<div className="row">
-				<div className="col-12">
-					<div className="title-wrap">
-						<h1 className="big-title mt-5 mb-5 mobile-mb">
+			<div className="w-full">
+				<div className="w-full">
+					<div className="text-center">
+						<h1 className="text-4xl font-bold mt-5 mb-5 md:text-5xl lg:text-6xl">
 							{localization.register}
 							<br />
 							{localization.save_time}

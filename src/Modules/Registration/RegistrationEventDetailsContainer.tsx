@@ -124,8 +124,8 @@ const RegistrationEventDetailsContainer: React.FC<
 				onLogin={getUserToken}
 			/>
 			{!isLoading && isSuccessful && (
-				<div className="mt-4">
-					<section className="container pt-100 pb-100 register-confirmation">
+						<div className="mt-4">
+			<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 register-confirmation">
 						<RegistrationTextInfoComponent
 							event={selectedEvent}
 							onRegisterNow={getUserToken}

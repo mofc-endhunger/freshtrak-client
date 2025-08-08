@@ -12,6 +12,8 @@ import { EventFormat } from "../../Utils/EventHandler";
 import { formatMMDDYYYY } from "../../Utils/DateFormat";
 import EventCardComponent from "../Events/EventCardComponent";
 import QRCode from "react-qr-code";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
 
 // Type imports from registration.types.ts
 import {
@@ -152,8 +154,8 @@ const RegistrationConfirmComponent: React.FC<
 	return (
 		<Fragment>
 			{event && (
-				<div className="mt-4 content-wrapper">
-					<section className="container pb-100 register-confirmation">
+				<div className="mt-4 max-w-6xl mx-auto px-4">
+					<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 register-confirmation">
 						<h1 className="big-title med-title mt-5 mb-5 mobile-mb">
 							You're Registered
 						</h1>
@@ -184,7 +186,7 @@ const RegistrationConfirmComponent: React.FC<
 						</div>
 						<div>
 							<h2>Your QR Code:</h2>
-							<div className="qr-code">
+							<div className="flex justify-center p-4 bg-white rounded-lg shadow-md">
 								<QRCode
 									value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
 										event_slot_id
@@ -196,15 +198,17 @@ const RegistrationConfirmComponent: React.FC<
 							<br />
 						</div>
 						{event && (
-							<div className="col-6 reg-confirm-card">
-								<div className="day-view">
-									<EventCardComponent
-										key={event.id}
-										event={event as any}
-										registrationView={true}
-									/>
-								</div>
-							</div>
+							<Card className="w-full md:w-1/2">
+								<CardContent className="p-6">
+									<div className="day-view">
+										<EventCardComponent
+											key={event.id}
+											event={event as any}
+											registrationView={true}
+										/>
+									</div>
+								</CardContent>
+							</Card>
 						)}
 						<h5 className="mb-4">
 							<b> Your Information </b>
@@ -228,14 +232,14 @@ const RegistrationConfirmComponent: React.FC<
 							)}
 						<p className="mb-5">{event.eventDetails}</p>
 						<Link to={HOME_OR_ROOT_URL}>
-							<div className="button-wrap mt-4">
-								<button
+							<div className="flex justify-center mt-4">
+								<Button
 									type="submit"
-									className="btn custom-button"
+									variant="custom"
 									data-testid="continue button"
 								>
 									Back To Home
-								</button>
+								</Button>
 							</div>
 						</Link>
 					</section>

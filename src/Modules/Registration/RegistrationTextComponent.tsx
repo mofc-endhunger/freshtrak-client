@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import "../../Assets/scss/main.scss";
 import localization from "../Localization/LocalizationComponent";
 import { Event } from "./types/registration.types";
 
@@ -24,9 +23,9 @@ const RegistrationTextComponent: React.FC<RegistrationTextComponentProps> = ({
 
 	return (
 		<div>
-			<div className="content-wrapper page-info-wrap">
-				<p>
-					<span className="font-weight-bold">
+			<div className="max-w-4xl mx-auto px-4 py-6 text-center">
+				<p className="text-lg">
+					<span className="font-bold">
 						{localization.advance_registration} {isRegRequired}.
 					</span>{" "}
 					{localization.by_registration}

@@ -8,6 +8,8 @@ import BackButtonComponent from "../General/BackButtonComponent";
 import { getItemLocalStorage } from "../../Utils/Util";
 import localization from "../Localization/LocalizationComponent";
 import { Event } from "./types/registration.types";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
 
 interface RegistrationTextInfoComponentProps {
 	event: Event;
@@ -32,26 +34,28 @@ const RegistrationTextInfoComponent: React.FC<
 			<BackButtonComponent />
 			{!isLoggedIn && <RegistrationHeaderComponent event={event} />}
 			{event && (
-				<div className="col-6">
-					<div className="day-view">
-						<EventCardComponent
-							key={event.id}
-							event={event as any}
-							registrationView={true}
-						/>
-					</div>
-				</div>
+				<Card className="w-full md:w-1/2">
+					<CardContent className="p-6">
+						<div className="day-view">
+							<EventCardComponent
+								key={event.id}
+								event={event as any}
+								registrationView={true}
+							/>
+						</div>
+					</CardContent>
+				</Card>
 			)}
 
-			<div className="button-wrap mt-4">
-				<button
+			<div className="flex justify-center mt-4">
+				<Button
 					type="submit"
-					className="btn custom-button"
+					variant="custom"
 					data-testid="continue button"
 					onClick={clickedRegisterNow}
 				>
 					{localization.register}
-				</button>
+				</Button>
 			</div>
 		</Fragment>
 	);

@@ -1,4 +1,5 @@
-import React, { Fragment, useEffect, useState } from "react";
+import * as React from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectEvent } from "../../Store/Events/eventSlice";
@@ -8,21 +9,28 @@ import axios from "axios";
 import RegistrationTextInfoComponent from "../Registration/RegistrationTextInfoComponent";
 import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
 import { EventFormat } from "../../Utils/EventHandler";
+import { Event, EventApiResponse } from "./types/registration.types";
 
-const RegistrationEventDetailsContainer = props => {
+interface RegistrationEventDetailsContainerProps {
+	// Add specific props as needed
+}
+
+const RegistrationEventDetailsContainer: React.FC<
+	RegistrationEventDetailsContainerProps
+> = props => {
 	const navigate = useNavigate();
 
 	const { id: eventDateId } = useParams();
-	const [isLoading, setLoading] = useState(false);
+	const [isLoading, setLoading] = useState<boolean>(false);
 	const [showAuthenticationModal, setshowAuthenticationModal] =
-		useState(false);
+		useState<boolean>(false);
 	// const [ setUserToken] = useState(undefined);
-	const [isSuccessful, setSuccessful] = useState(true);
-	const [isError, setIsError] = useState(false);
-	const [pageError, setPageError] = useState(false);
+	const [isSuccessful, setSuccessful] = useState<boolean>(true);
+	const [isError, setIsError] = useState<boolean>(false);
+	const [pageError, setPageError] = useState<boolean>(false);
 
-	const event = useSelector(selectEvent);
-	const [selectedEvent, setSelectedEvent] = useState(event);
+	const event = useSelector(selectEvent) as Event;
+	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
 
 	useEffect(() => {
 		if (Object.keys(selectedEvent).length === 0 && !isError && !pageError) {
@@ -30,27 +38,26 @@ const RegistrationEventDetailsContainer = props => {
 		}
 	});
 
-	const getEvent = async () => {
+	const getEvent = async (): Promise<void> => {
 		try {
-			const resp = await axios
-				.get(`${BASE_URL}api/event_dates/${eventDateId}/event_details`)
-				.catch(error => {
-					setIsError(true);
-				});
+			const resp = await axios.get<EventApiResponse>(
+				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
+			);
 			const { data } = resp;
-			if (data && data.event !== undefined) {
+			if (data?.event !== undefined) {
 				setSelectedEvent(EventFormat(data.event, eventDateId));
 				setLoading(false);
 				setSuccessful(true);
 			} else {
 				setPageError(true);
 			}
-		} catch (e) {
+		} catch (e: unknown) {
 			console.error(e);
+			setIsError(true);
 		}
 	};
 
-	const fetchUserToken = async () => {
+	const fetchUserToken = async (): Promise<void> => {
 		setLoading(true);
 		const { GUEST_AUTH, GUEST_USER } = API_URL;
 		try {
@@ -76,18 +83,19 @@ const RegistrationEventDetailsContainer = props => {
 			} else {
 				setPageError(true);
 			}
-		} catch (e) {
+		} catch (e: unknown) {
 			console.error(e);
 			setshowAuthenticationModal(false);
 			setLoading(false);
 		}
 	};
 
-	const getUserToken = () => {
+	const getUserToken = (): void => {
 		const localUserToken = localStorage.getItem("userToken");
 		const tokenExpiresAt = localStorage.getItem("tokenExpiresAt");
 
 		if (
+			!tokenExpiresAt ||
 			new Date(tokenExpiresAt) < new Date() ||
 			!localUserToken ||
 			localUserToken === "undefined"

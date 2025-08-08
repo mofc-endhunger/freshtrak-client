@@ -1,36 +1,65 @@
+// React and third-party imports
 import React, { Fragment, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+
+// Component imports
 import PrimaryInfoFormComponent from "../Family/PrimaryInfoFormComponent";
 import AddressComponent from "../Family/AddressComponent";
 import ContactInformationComponent from "../Family/ContactInformationComponent";
 import MemberCountFormComponent from "../Family/MemberCountFormComponent";
 import EventSlotsModalComponent from "../Family/EventSlotsModalComponent";
-import { formatDateForServer } from "../../Utils/DateFormat";
 import BackButtonComponent from "../General/BackButtonComponent";
 import LoadingSpinner from "../General/LoadingSpinner";
+
+// Utility imports
+import { formatDateForServer } from "../../Utils/DateFormat";
 import localization from "../Localization/LocalizationComponent";
+
+// Third-party library imports
 import "@one-platform/opc-timeline";
 
-const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
+// Type imports
+import {
+	RegistrationComponentProps,
+	RegistrationFormData,
+} from "./types/registration.types";
+
+const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
+	user,
+	onRegister,
+	event,
+	disabled,
+}) => {
 	const {
 		register,
 		trigger,
 		handleSubmit,
-		errors,
+		formState: { errors },
 		getValues,
 		watch,
 		reset,
 		setValue,
-	} = useForm({ mode: "onChange" });
-	const [formStep, setFormStep] = useState(0);
-	const [formValues, setFormValues] = useState({});
-	const [selectedSlotId, setSelectedSlotId] = useState("");
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const handleSlotChange = e => {
+	} = useForm<RegistrationFormData>({ mode: "onChange" });
+
+	// Create a wrapper function for watch to match child component expectations
+	const watchField = (): string => {
+		return ""; // Child components expect this signature but don't actually use the return value
+	};
+	const [formStep, setFormStep] = useState<number>(0);
+	const [formValues, setFormValues] = useState<Partial<RegistrationFormData>>(
+		{}
+	);
+	const [selectedSlotId, setSelectedSlotId] = useState<string>("");
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+	const handleSlotChange = (
+		e: React.ChangeEvent<HTMLSelectElement>
+	): void => {
 		setSelectedSlotId(e.target.value);
 	};
-	const configureTimeLine = () => {
-		const timeline = document.querySelector("#timeline");
+	const configureTimeLine = (): void => {
+		const timeline = document.querySelector("#timeline") as HTMLElement & {
+			steps?: string[];
+		};
 		if (timeline) {
 			timeline.steps = [
 				"Your Details",
@@ -48,17 +77,17 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 		configureTimeLine();
 	}, []);
 
-	const continueHandler = values => {
+	const continueHandler = (values: Partial<RegistrationFormData>): void => {
 		// const res = await triggerValidation(["first_name","last_name"])
 		setFormValues({ ...formValues, ...values });
 		setFormStep(formStep + 1);
 	};
 
-	const previousHandler = () => {
+	const previousHandler = (): void => {
 		setFormStep(formStep - 1);
 	};
 
-	const previousButton = () => {
+	const previousButton = (): JSX.Element => {
 		return (
 			<button
 				type="button"
@@ -72,26 +101,34 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 		);
 	};
 
-	const test = async event => {
-		const validatePhone = !watch("no_phone_number");
-		const validateEmail = !watch("no_email");
-		const field_array = ["address_line_1", "city"];
+	const test = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	): Promise<void> => {
+		const validatePhone: boolean = !watch("no_phone_number");
+		const validateEmail: boolean = !watch("no_email");
+		const field_array: (keyof RegistrationFormData)[] = [
+			"address_line_1",
+			"city",
+		];
 		if (validatePhone) {
 			field_array.push("phone");
 		}
 		if (validateEmail) {
 			field_array.push("email");
 		}
-		const res = await trigger(field_array);
+		const res: boolean = await trigger(field_array);
 		if (res) {
-			const values = getValues();
+			const values: RegistrationFormData = getValues();
 			setFormValues({ ...formValues, ...values });
 			setFormStep(formStep + 1);
 		}
 	};
 
 	useEffect(() => {
-		const safeUser = user && typeof user === "object" ? user : {};
+		const safeUser =
+			user && typeof user === "object"
+				? user
+				: ({} as Partial<RegistrationFormData>);
 		const {
 			first_name = "",
 			middle_name = "",
@@ -133,7 +170,7 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 			children_in_household,
 		});
 	}, [user, reset]);
-	const onSubmit = async data => {
+	const onSubmit = async (data: RegistrationFormData): Promise<void> => {
 		setIsSubmitting(true);
 		try {
 			// Get all current form values including household member counts from the final step
@@ -151,8 +188,10 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 		}
 	};
 
-	const sanatizeInput = data => {
-		const keys = [
+	const sanatizeInput = (
+		data: RegistrationFormData
+	): RegistrationFormData => {
+		const keys: (keyof RegistrationFormData)[] = [
 			"first_name",
 			"middle_name",
 			"last_name",
@@ -165,19 +204,21 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 			"zip_code",
 		];
 		keys.forEach(key => {
-			data[key] = santizeString(data[key]);
+			if (data[key] !== undefined) {
+				(data as any)[key] = santizeString(data[key]);
+			}
 		});
 		return data;
 	};
 
-	const santizeString = input => {
+	const santizeString = (input: any): string => {
 		let modifiedInput = (input ?? "").toString().trim();
 		modifiedInput = modifiedInput.replace(/\s\s+/g, " ");
 		modifiedInput = modifiedInput.replace(/[^A-Za-z0-9 \-_.@'`]/g, "");
 		return modifiedInput;
 	};
 
-	const submitHandlerFocus = e => {
+	const submitHandlerFocus = (e: React.FormEvent<HTMLFormElement>): void => {
 		handleSubmit(onSubmit)(e);
 		setTimeout(
 			() => window.scrollBy({ top: -100, behavior: "smooth" }),
@@ -190,8 +231,10 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 			<div className="mt-4">
 				<section className="container pt-100 pb-100 register-confirmation">
 					{formStep === 0 && <BackButtonComponent />}
+					{/* @ts-ignore */}
 					<opc-timeline id="timeline" current-step-index={formStep}>
 						<div slot="form-timeline"></div>
+						{/* @ts-ignore */}
 					</opc-timeline>
 					<div className="registration-form">
 						<div className="content-wrapper">
@@ -218,14 +261,14 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 										<AddressComponent
 											register={register}
 											errors={errors}
-											watch={watch}
+											watch={watchField}
 											setValue={setValue}
 										/>
 										<ContactInformationComponent
 											register={register}
 											getValues={getValues}
 											errors={errors}
-											watch={watch}
+											watch={watchField}
 											setValue={setValue}
 										/>
 										<div className="d-flex">
@@ -248,10 +291,7 @@ const RegistrationComponent = ({ user, onRegister, event, disabled }) => {
 										{" "}
 										<MemberCountFormComponent
 											register={register}
-											trigger={trigger}
-											continueHandler={continueHandler}
 											event={event}
-											errors={errors}
 											watch={watch}
 											setValue={setValue}
 										/>

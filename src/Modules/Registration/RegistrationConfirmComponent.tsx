@@ -1,4 +1,5 @@
-import React, { Fragment, useEffect, useState, useCallback } from "react";
+import * as React from "react";
+import { Fragment, useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { API_URL, RENDER_URL, BASE_URL } from "../../Utils/Urls";
 import axios from "axios";
@@ -12,20 +13,31 @@ import { formatMMDDYYYY } from "../../Utils/DateFormat";
 import EventCardComponent from "../Events/EventCardComponent";
 import QRCode from "react-qr-code";
 
-const RegistrationConfirmComponent = props => {
+// Type imports from registration.types.ts
+import {
+	RegistrationConfirmProps,
+	RegistrationFormData,
+	Event,
+	UserApiResponse,
+	EventApiResponse,
+} from "./types/registration.types";
+
+const RegistrationConfirmComponent: React.FC<
+	RegistrationConfirmProps
+> = props => {
 	const location = useLocation();
-	const currentUser = useSelector(selectUser);
+	const currentUser = useSelector(selectUser) as RegistrationFormData | null;
 	const user_data = location.state?.user || currentUser || {};
 
 	const dispatch = useDispatch();
-	const event = useSelector(selectEvent);
+	const event = useSelector(selectEvent) as Event;
 	let HOME_OR_ROOT_URL = RENDER_URL.HOME_URL;
 	const event_slot_id = location.state?.eventTimeStamp?.event_slot_id;
-	const [userToken, setUserToken] = useState(undefined);
-	const [isError, setIsError] = useState(false);
-	const [selectedEvent, setSelectedEvent] = useState(event);
-	const [pageError, setPageError] = useState(false);
-	const [user, setUser] = useState(currentUser);
+	const [userToken, setUserToken] = useState<string | undefined>(undefined);
+	const [isError, setIsError] = useState<boolean>(false);
+	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
+	const [pageError, setPageError] = useState<boolean>(false);
+	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
 	const eventDateId = sessionStorage.getItem("registeredEventDateID");
 
 	const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -36,7 +48,7 @@ const RegistrationConfirmComponent = props => {
 		localStorage.removeItem("search_zip");
 	}
 
-	const formatPhoneNumber = input => {
+	const formatPhoneNumber = (input: string | null): string => {
 		const regExp = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 		if (input) {
 			return String(input).replace(regExp, "($1) $2-$3");
@@ -46,29 +58,30 @@ const RegistrationConfirmComponent = props => {
 	};
 
 	const getUser = useCallback(
-		async token => {
+		async (token: string): Promise<void> => {
 			const { GUEST_USER } = API_URL;
 			try {
-				const resp = await axios.get(GUEST_USER, {
+				const resp = await axios.get<UserApiResponse>(GUEST_USER, {
 					params: {},
 					headers: { Authorization: `Bearer ${token}` },
 				});
 				const { data } = resp;
-				if (data["date_of_birth"] !== null) {
-					data["date_of_birth"] = formatMMDDYYYY(
-						data["date_of_birth"]
-					);
+				if (
+					data?.date_of_birth !== null &&
+					data?.date_of_birth !== undefined
+				) {
+					data.date_of_birth = formatMMDDYYYY(data.date_of_birth);
 				}
-				if (data["phone"] !== null) {
+				if (data?.phone !== null && data?.phone !== undefined) {
 					const phoneRegex =
 						/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-					data["phone"] = String(data["phone"]).replace(
+					data.phone = String(data.phone).replace(
 						phoneRegex,
 						"($1) $2-$3"
 					);
 				}
-				dispatch(setCurrentUser(data));
-				setUser(data);
+				dispatch(setCurrentUser(data as RegistrationFormData));
+				setUser(data as RegistrationFormData);
 			} catch (e) {
 				console.error(e);
 			}
@@ -76,9 +89,9 @@ const RegistrationConfirmComponent = props => {
 		[dispatch]
 	);
 
-	const getEvent = useCallback(async () => {
+	const getEvent = useCallback(async (): Promise<void> => {
 		try {
-			const resp = await axios.get(
+			const resp = await axios.get<EventApiResponse>(
 				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
 			);
 			const { data } = resp;
@@ -89,10 +102,10 @@ const RegistrationConfirmComponent = props => {
 			} else {
 				setPageError(true);
 			}
-		} catch (e) {
+		} catch (e: unknown) {
 			console.error(e);
 			setIsError(true);
-			if (e.response) {
+			if (e && typeof e === "object" && "response" in e) {
 				setPageError(true);
 			}
 		}
@@ -108,8 +121,9 @@ const RegistrationConfirmComponent = props => {
 		userToken,
 	]);
 
-	function fetchBusinesses() {
-		setUserToken(localStorage.getItem("userToken"));
+	function fetchBusinesses(): void {
+		const token = localStorage.getItem("userToken");
+		setUserToken(token || undefined);
 		if (!isError && !pageError) {
 			if (Object.keys(selectedEvent).length === 0) {
 				getEvent();
@@ -186,7 +200,7 @@ const RegistrationConfirmComponent = props => {
 								<div className="day-view">
 									<EventCardComponent
 										key={event.id}
-										event={event}
+										event={event as any}
 										registrationView={true}
 									/>
 								</div>

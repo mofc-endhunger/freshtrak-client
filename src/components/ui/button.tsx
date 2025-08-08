@@ -21,6 +21,7 @@ const buttonVariants = cva(
 				link: "text-primary underline-offset-4 hover:underline",
 				mofcprimary:
 					"bg-[#392947] uppercase text-white py-[.375rem] px-[.75rem] text-[.85rem] tracking-wider",
+				custom: "bg-default-button text-text-color hover:bg-default-button/90 min-w-[220px]",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",

@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import * as React from "react";
+import { Fragment } from "react";
 import TagManager from "react-gtm-module";
 
 import RegistrationHeaderComponent from "./RegistrationHeaderComponent";
@@ -6,11 +7,19 @@ import EventCardComponent from "../Events/EventCardComponent";
 import BackButtonComponent from "../General/BackButtonComponent";
 import { getItemLocalStorage } from "../../Utils/Util";
 import localization from "../Localization/LocalizationComponent";
+import { Event } from "./types/registration.types";
 
-const RegistrationTextInfoComponent = ({ event, onRegisterNow }) => {
+interface RegistrationTextInfoComponentProps {
+	event: Event;
+	onRegisterNow: (value: boolean) => void;
+}
+
+const RegistrationTextInfoComponent: React.FC<
+	RegistrationTextInfoComponentProps
+> = ({ event, onRegisterNow }) => {
 	const isLoggedInValue = getItemLocalStorage("isLoggedIn");
 	const isLoggedIn = isLoggedInValue ? JSON.parse(isLoggedInValue) : false;
-	const clickedRegisterNow = () => {
+	const clickedRegisterNow = (): void => {
 		onRegisterNow(true);
 		TagManager.dataLayer({
 			dataLayer: {
@@ -27,7 +36,7 @@ const RegistrationTextInfoComponent = ({ event, onRegisterNow }) => {
 					<div className="day-view">
 						<EventCardComponent
 							key={event.id}
-							event={event}
+							event={event as any}
 							registrationView={true}
 						/>
 					</div>

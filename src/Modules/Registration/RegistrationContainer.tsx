@@ -20,8 +20,16 @@ import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
 import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
 
+// Type imports from registration.types.ts
+import {
+	RegistrationContainerProps,
+	RegistrationFormData,
+	Event,
+	ApiResponse,
+} from "./types/registration.types";
+
 // Utility to sanitize user object
-function sanitizeUser(user) {
+function sanitizeUser(user: any): RegistrationFormData {
 	if (!user || typeof user !== "object") return { ...defaultUser };
 	return {
 		first_name: user.first_name || "",
@@ -53,7 +61,7 @@ function sanitizeUser(user) {
 	};
 }
 
-const defaultUser = {
+const defaultUser: RegistrationFormData = {
 	first_name: "",
 	middle_name: "",
 	last_name: "",
@@ -76,42 +84,46 @@ const defaultUser = {
 	identification_code: "",
 };
 
-const RegistrationContainer = props => {
+/**
+ * RegistrationContainer - Main container component for user registration flow
+ * Handles authentication, event fetching, user registration, and navigation
+ */
+const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { eventDateId, eventSlotId } = useParams();
-	const [isLoading, setLoading] = useState(false);
-	const [userToken, setUserToken] = useState(undefined);
-	const [isError, setIsError] = useState(false);
-	const [pageError, setPageError] = useState(false);
-	const [errors, setErrors] = useState([]);
-	const [disabled, setDisabled] = useState(false);
-	const [showAuthModal, setShowAuthModal] = useState(false);
-	const redirectTimeout = useRef();
+	const [isLoading, setLoading] = useState<boolean>(false);
+	const [userToken, setUserToken] = useState<string | undefined>(undefined);
+	const [isError, setIsError] = useState<boolean>(false);
+	const [pageError, setPageError] = useState<boolean>(false);
+	const [errors, setErrors] = useState<string[]>([]);
+	const [disabled, setDisabled] = useState<boolean>(false);
+	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
 
 	const event = useSelector(selectEvent);
-	const [selectedEvent, setSelectedEvent] = useState(event);
+	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
 
 	const currentUser = useSelector(selectUser);
-	const [user, setUser] = useState(currentUser);
+	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
 	const CLIENT_URL = process.env.REACT_APP_CLIENT_URL;
 
-	const getEvent = useCallback(async () => {
+	const getEvent = useCallback(async (): Promise<void> => {
 		try {
-			const resp = await axios.get(
+			const resp = await axios.get<{ data: Event; errors?: string[] }>(
 				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
 			);
 			const { data } = resp;
-			if (data && data.event !== undefined) {
-				const eventData = EventFormat(data.event, eventDateId);
+			if (data && data.data) {
+				const eventData = EventFormat(data.data, eventDateId);
 				dispatch(setCurrentEvent(eventData));
 				setSelectedEvent(eventData);
 			} else {
 				setPageError(true);
 				setErrors(data.errors || []);
 			}
-		} catch (e) {
+		} catch (e: any) {
 			console.error(e);
 			setIsError(true);
 			if (e.response) {
@@ -124,9 +136,9 @@ const RegistrationContainer = props => {
 	useEffect(() => {
 		const token = localStorage.getItem("userToken");
 		const userProfile = localStorage.getItem("userProfile");
-		setUserToken(token);
+		setUserToken(token || undefined);
 		if (!isError && !pageError) {
-			if (Object.keys(selectedEvent).length === 0) {
+			if (selectedEvent && Object.keys(selectedEvent).length === 0) {
 				getEvent();
 			}
 			if (!token) {
@@ -166,11 +178,11 @@ const RegistrationContainer = props => {
 		getEvent,
 	]);
 
-	const handleAuthLogin = () => {
+	const handleAuthLogin = (): void => {
 		const token = localStorage.getItem("userToken");
 		const userProfile = localStorage.getItem("userProfile");
 		if (token && userProfile) {
-			setUserToken(token);
+			setUserToken(token || undefined);
 			try {
 				setUser(sanitizeUser(JSON.parse(userProfile)));
 			} catch (error) {
@@ -180,21 +192,21 @@ const RegistrationContainer = props => {
 		}
 	};
 
-	const getReservationText = () => {
+	const getReservationText = (): string => {
 		return location.state
 			? `at ${event.agencyName} on ${location.state.event_date} from ${location.state.event_slot.start_time} - ${location.state.event_slot.end_time}. For more information, including a reservation QR code,`
 			: "";
 	};
 
-	const getCodeURL = identification_code => {
+	const getCodeURL = (identification_code: string): string => {
 		return `Your QRCode for the Reservation ${CLIENT_URL}qrcode/${identification_code}/${eventDateId}${
 			eventSlotId ? "/" + eventSlotId : ""
 		}`;
 	};
 
-	const formatErrorMessage = message => {
+	const formatErrorMessage = (message: string): string => {
 		// Make error messages more user-friendly
-		const errorMappings = {
+		const errorMappings: Record<string, string> = {
 			"is at capacity":
 				"This time slot is at capacity. Please select a different time.",
 			"is required": "This field is required.",
@@ -230,7 +242,7 @@ const RegistrationContainer = props => {
 		return message;
 	};
 
-	const notify = (msg, error) => {
+	const notify = (msg: any, error: string): void => {
 		let formatted_msg = "Something Went Wrong";
 
 		// Extract error messages from different possible fields
@@ -256,7 +268,8 @@ const RegistrationContainer = props => {
 			// If no specific field found, try to get the first error message from any field
 			if (formatted_msg === "Something Went Wrong") {
 				const firstError = Object.values(msg).find(
-					value => Array.isArray(value) && value.length > 0
+					(value): value is string[] =>
+						Array.isArray(value) && value.length > 0
 				);
 				if (firstError && firstError.length > 0) {
 					formatted_msg = formatErrorMessage(firstError[0]);
@@ -266,46 +279,54 @@ const RegistrationContainer = props => {
 
 		showToast(formatted_msg, error);
 	};
-	const send_sms = async user => {
+	const send_sms = async (user: RegistrationFormData): Promise<void> => {
 		const { TWILIO_SMS } = API_URL;
 		let to_phone_number = user["phone"];
 		let identification_code = user["identification_code"];
-		let message = `You have successfully registered for an event, ${getReservationText()} Your confirmation code is ${identification_code.toUpperCase()}.
+		if (identification_code) {
+			let message = `You have successfully registered for an event, ${getReservationText()} Your confirmation code is ${identification_code.toUpperCase()}.
     ${getCodeURL(identification_code)}`;
-		let search_zip = localStorage.getItem("search_zip");
-		if (search_zip) {
-			setLoading(true);
-			let foodBankUri = API_URL.FOODBANK_LIST;
-			try {
-				const resp = await axios.get(foodBankUri, {
-					params: { zip_code: search_zip },
-				});
-				const { data } = resp;
-				let from_phone_number = data.foodbanks[0].twilio_phone_number;
+			let search_zip = localStorage.getItem("search_zip");
+			if (search_zip) {
+				setLoading(true);
+				let foodBankUri = API_URL.FOODBANK_LIST;
 				try {
-					await axios.post(TWILIO_SMS, {
-						from_phone_number,
-						to_phone_number,
-						message,
+					const resp = await axios.get(foodBankUri, {
+						params: { zip_code: search_zip },
 					});
-				} catch (e) {
-					console.log(e);
+					const { data } = resp;
+					let from_phone_number =
+						data.foodbanks[0].twilio_phone_number;
+					try {
+						await axios.post(TWILIO_SMS, {
+							from_phone_number,
+							to_phone_number,
+							message,
+						});
+					} catch (e) {
+						console.log(e);
+					}
+					setLoading(false);
+				} catch (err) {
+					setLoading(false);
 				}
-				setLoading(false);
-			} catch (err) {
-				setLoading(false);
 			}
 		}
 	};
 
-	const register = async (user, event) => {
+	const register = async (
+		user: RegistrationFormData,
+		event: Event
+	): Promise<void> => {
 		setDisabled(!disabled);
-		const event_date_id = parseInt(eventDateId, 10);
-		const event_slot_id = parseInt(eventSlotId, 10);
+		const event_date_id = parseInt(eventDateId || "0", 10);
+		const event_slot_id = parseInt(eventSlotId || "0", 10);
 		const { GUEST_USER, CREATE_RESERVATION } = API_URL;
 		let updatedUser = user;
 		try {
-			const userResp = await axios.post(
+			const userResp = await axios.post<
+				ApiResponse<RegistrationFormData>
+			>(
 				GUEST_USER,
 				{ user },
 				{
@@ -313,14 +334,14 @@ const RegistrationContainer = props => {
 				}
 			);
 			// Use the response data, which should include identification_code
-			updatedUser = userResp.data;
-		} catch (e) {
+			updatedUser = userResp.data.data || user;
+		} catch (e: any) {
 			console.error("User creation error:", e);
 			// If user creation fails, we should still try to create the reservation
 			// but log the error for debugging
 		}
 		try {
-			await axios.post(
+			await axios.post<ApiResponse<any>>(
 				CREATE_RESERVATION,
 				{
 					reservation: eventSlotId
@@ -344,7 +365,9 @@ const RegistrationContainer = props => {
 					location
 				);
 			}
-			sessionStorage.setItem("registeredEventDateID", eventDateId);
+			if (eventDateId) {
+				sessionStorage.setItem("registeredEventDateID", eventDateId);
+			}
 			navigate(RENDER_URL.REGISTRATION_CONFIRM_URL, {
 				state: {
 					user: updatedUser,
@@ -356,7 +379,7 @@ const RegistrationContainer = props => {
 					},
 				},
 			});
-		} catch (e) {
+		} catch (e: any) {
 			console.error("Registration error:", e);
 
 			// Handle different types of errors
@@ -417,7 +440,9 @@ const RegistrationContainer = props => {
 				<NotifyToast />
 				<RegistrationComponent
 					user={user && typeof user === "object" ? user : defaultUser}
-					onRegister={register}
+					onRegister={(data: RegistrationFormData) =>
+						register(data, selectedEvent)
+					}
 					event={selectedEvent}
 					disabled={disabled}
 				/>

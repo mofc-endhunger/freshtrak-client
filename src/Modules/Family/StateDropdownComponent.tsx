@@ -1,19 +1,36 @@
 import React, { Fragment } from "react";
 
-const StateDropdownComponent = ({ register, errors, value }) => (
+interface StateDropdownProps {
+	register: any;
+	errors?: any;
+	value?: string;
+}
+
+const StateDropdownComponent: React.FC<StateDropdownProps> = ({
+	register,
+	errors = {},
+	value,
+}) => (
 	<Fragment>
-		<div className="form-group ml-2">
-			<label htmlFor="state">
-				State<span className="text-danger">*</span>
+		<div className="ml-2 space-y-2">
+			<label
+				htmlFor="state"
+				className="block text-sm font-medium text-gray-700"
+			>
+				State<span className="text-red-500 ml-1">*</span>
 			</label>
 			<select
-				className={`form-control ${errors.state && "invalid"}`}
+				className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+					errors?.state
+						? "border-red-500 focus:ring-red-500 focus:border-red-500"
+						: "border-gray-300"
+				}`}
 				id="state"
 				name="state"
 				defaultValue={value}
 				{...register("state", { required: true })}
 			>
-				<option value="" defaultValue></option>
+				<option value="" defaultValue=""></option>
 				<option value="AK">Alaska</option>
 				<option value="AL">Alabama</option>
 				<option value="AR">Arkansas</option>
@@ -67,8 +84,10 @@ const StateDropdownComponent = ({ register, errors, value }) => (
 				<option value="WV">West Virginia</option>
 				<option value="WY">Wyoming</option>
 			</select>
-			{errors.state && (
-				<span className="text-danger">This field is required</span>
+			{errors?.state && (
+				<span className="text-sm text-red-600">
+					This field is required
+				</span>
 			)}
 		</div>
 	</Fragment>

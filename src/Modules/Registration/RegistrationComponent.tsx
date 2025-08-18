@@ -43,9 +43,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 	} = useForm<RegistrationFormData>({ mode: "onChange" });
 
 	// Create a wrapper function for watch to match child component expectations
-	const watchField = (): string => {
-		return ""; // Child components expect this signature but don't actually use the return value
-	};
+	const watchField = watch;
 	const [formStep, setFormStep] = useState<number>(0);
 	const [formValues, setFormValues] = useState<Partial<RegistrationFormData>>(
 		{}
@@ -53,7 +51,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 	const [selectedSlotId, setSelectedSlotId] = useState<string>("");
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 	const handleSlotChange = (
-		e: React.ChangeEvent<HTMLSelectElement>
+		e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
 	): void => {
 		setSelectedSlotId(e.target.value);
 	};
@@ -293,6 +291,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 											event={event}
 											watch={watch}
 											setValue={setValue}
+											errors={errors}
 										/>
 										<div className="flex justify-center mt-4">
 											{isSubmitting ? (

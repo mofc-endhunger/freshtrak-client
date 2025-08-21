@@ -34,8 +34,8 @@ const RegistrationTextInfoComponent: React.FC<
 			<BackButtonComponent />
 			{!isLoggedIn && <RegistrationHeaderComponent event={event} />}
 			{event && (
-				<Card className="w-full md:w-1/2">
-					<CardContent className="p-6">
+				<Card className="w-full md:w-1/2 border-none shadow-none p-0">
+					<CardContent className="py-6 px-0">
 						<div className="day-view">
 							<EventCardComponent
 								key={event.id}
@@ -47,12 +47,13 @@ const RegistrationTextInfoComponent: React.FC<
 				</Card>
 			)}
 
-			<div className="flex justify-center mt-4">
+			<div className="flex mt-4">
 				<Button
 					type="submit"
 					variant="custom"
 					data-testid="continue button"
 					onClick={clickedRegisterNow}
+					className="cursor-pointer px-2 bg-highlight text-white min-h-12 uppercase"
 				>
 					{localization.register}
 				</Button>

@@ -198,8 +198,8 @@ const RegistrationConfirmComponent: React.FC<
 							<br />
 						</div>
 						{event && (
-							<Card className="w-full md:w-1/2">
-								<CardContent className="p-6">
+							<Card className="w-full md:w-1/2 border-none shadow-none">
+								<CardContent className="py-6 px-0">
 									<div className="day-view">
 										<EventCardComponent
 											key={event.id}

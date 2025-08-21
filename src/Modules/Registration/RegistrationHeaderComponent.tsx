@@ -15,7 +15,7 @@ const RegistrationHeaderComponent: React.FC<
 		<Fragment>
 			<div className="w-full">
 				<div className="w-full">
-					<div className="text-center">
+					<div className="text-left text-text-primary">
 						<h1 className="text-4xl font-bold mt-5 mb-5 md:text-5xl lg:text-6xl">
 							{localization.register}
 							<br />

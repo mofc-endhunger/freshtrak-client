@@ -23,8 +23,8 @@ const RegistrationTextComponent: React.FC<RegistrationTextComponentProps> = ({
 
 	return (
 		<div>
-			<div className="max-w-4xl mx-auto px-4 py-6 text-center">
-				<p className="text-lg">
+			<div className="max-w-xl">
+				<p className="text-xs">
 					<span className="font-bold">
 						{localization.advance_registration} {isRegRequired}.
 					</span>{" "}

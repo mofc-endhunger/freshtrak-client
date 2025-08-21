@@ -25,15 +25,6 @@ export interface EventSlotsModalProps {
 	) => void;
 }
 
-// Type for navigation state
-interface NavigationState {
-	pathname: string;
-	state: {
-		event_slot: EventSlot | undefined;
-		event_date: string;
-	};
-}
-
 interface EventSlot {
 	event_slot_id: string;
 	start_time: string;
@@ -110,9 +101,9 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	return (
 		<Fragment>
 			<Dialog open={show} onOpenChange={setShow}>
-				<DialogContent className="sm:max-w-md">
-					<DialogHeader>
-						<DialogTitle className="flex items-center">
+				<DialogContent className="sm:max-w-md bg-highlight border-none text-white">
+					<DialogHeader className=" border-b border-white">
+						<DialogTitle className="flex items-center py-2">
 							<span className="pr-3">
 								<img
 									aria-hidden="true"
@@ -155,7 +146,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 													onChange={onSlotChange}
 												/>
 												<label
-													className="ml-2 text-sm font-medium text-gray-900 cursor-pointer"
+													className="ml-2 text-sm font-medium cursor-pointer"
 													htmlFor={radioId}
 												>
 													{e.start_time} -{" "}
@@ -172,7 +163,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 							type="button"
 							variant="outline"
 							onClick={backHome}
-							className="w-full sm:w-auto"
+							className="w-full sm:w-auto bg-white text-highlight min-h-12 uppercase"
 						>
 							Go Back
 						</Button>
@@ -193,7 +184,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 							<Button
 								type="submit"
 								disabled={!selectedSlotId}
-								className="w-full sm:w-auto flex-1"
+								className="w-full sm:w-auto flex-1 bg-primary text-white min-h-12 uppercase"
 								onClick={handleClose}
 							>
 								Save and Continue

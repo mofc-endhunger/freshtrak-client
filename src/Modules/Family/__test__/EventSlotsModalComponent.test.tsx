@@ -20,7 +20,7 @@ jest.mock("react-router-bootstrap", () => ({
 }));
 
 // Mock LoadingSpinner
-jest.mock("../General/LoadingSpinner", () => {
+jest.mock("../../General/LoadingSpinner", () => {
 	return function MockLoadingSpinner({ size }: { size: string }) {
 		return (
 			<div data-testid="loading-spinner" data-size={size}>

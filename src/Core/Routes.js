@@ -39,7 +39,7 @@ const RegistrationEventDetailsContainer = lazy(() =>
 const RegistrationConfirmComponent = lazy(() =>
 	import("../Modules/Registration/RegistrationConfirmComponent")
 );
-const HomeContainer = lazy(() => import("../Modules/Home/HomeContainer"));
+const HomeContainer = lazy(() => import("../Modules/Home/HomeContainer.tsx"));
 const QRCodeComponent = lazy(() =>
 	import("../Modules/Registration/QRCodeComponent")
 );

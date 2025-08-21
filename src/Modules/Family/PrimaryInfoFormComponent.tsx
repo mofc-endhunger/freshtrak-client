@@ -9,6 +9,7 @@ import {
 } from "react-hook-form";
 import moment from "moment";
 import localization from "../Localization/LocalizationComponent";
+import { Button } from "../../components/ui/button";
 
 // Component props interface
 interface PrimaryInfoFormComponentProps {
@@ -21,16 +22,6 @@ interface PrimaryInfoFormComponentProps {
 	continueHandler?: (values: any) => void;
 	className?: string;
 	"data-testid"?: string;
-}
-
-// Form data interface
-interface PrimaryInfoFormData {
-	first_name: string;
-	middle_name?: string;
-	last_name: string;
-	suffix?: string;
-	date_of_birth?: string;
-	gender?: string;
 }
 
 const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
@@ -102,7 +93,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 
 	return (
 		<div className={`space-y-6 ${className}`} data-testid={testId}>
-			<h2 className="text-lg font-semibold text-gray-900">
+			<h2 className="text-lg font-semibold text-highlight">
 				{localization.register_who_are_you}
 			</h2>
 
@@ -307,19 +298,15 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 			</div>
 
 			{/* Continue Button */}
-			<div className="flex justify-end pt-4">
-				<button
+			<div className="flex justify-start pt-4">
+				<Button
 					type="button"
 					onClick={handleContinue}
-					className="px-6 py-3 text-base font-medium text-white bg-indigo-600 
-                   border border-transparent rounded-md shadow-sm 
-                   hover:bg-indigo-700 focus:outline-none focus:ring-2 
-                   focus:ring-offset-2 focus:ring-indigo-500 
-                   transition-colors duration-200"
+					variant="highlight"
 					data-testid="continue-button"
 				>
 					Continue
-				</button>
+				</Button>
 			</div>
 		</div>
 	);

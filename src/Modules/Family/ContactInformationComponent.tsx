@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import {
 	UseFormRegister,
 	UseFormWatch,
@@ -17,16 +17,6 @@ interface ContactInformationComponentProps {
 	watch: UseFormWatch<any>;
 	className?: string;
 	"data-testid"?: string;
-}
-
-// Contact information data interface
-interface ContactInformationData {
-	phone: string;
-	email: string;
-	no_phone_number: boolean;
-	no_email: boolean;
-	permission_to_text: boolean;
-	permission_to_email: boolean;
 }
 
 const ContactInformationComponent: React.FC<

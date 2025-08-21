@@ -91,7 +91,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 			<Button
 				type="button"
 				onClick={previousHandler}
-				variant="custom"
+				variant="highlight"
 				data-testid="previous button"
 			>
 				Previous
@@ -226,14 +226,23 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 
 	return (
 		<Fragment>
-			<div className="mt-4">
-				<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 max-w-md mx-auto my-5">
-					{formStep === 0 && <BackButtonComponent />}
+			<div className="mx-auto px-24 py-24">
+				{/* Back button in its own row, aligned left */}
+				{formStep === 0 && (
+					<div className="w-full flex justify-start mb-4">
+						<BackButtonComponent />
+					</div>
+				)}
+
+				{/* Timeline in its own row with 100% width */}
+				<div className="w-full my-6 mx-auto">
 					{/* @ts-ignore */}
 					<opc-timeline id="timeline" current-step-index={formStep}>
 						<div slot="form-timeline"></div>
 						{/* @ts-ignore */}
 					</opc-timeline>
+				</div>
+				<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 max-w-md mx-auto my-5">
 					<div className="max-w-4xl mx-auto">
 						<div className="max-w-6xl mx-auto px-4">
 							<EventSlotsModalComponent
@@ -274,8 +283,8 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 											<Button
 												type="button"
 												onClick={test}
+												variant="highlight"
 												className="ml-5"
-												variant="custom"
 												data-testid="continue button"
 											>
 												Continue
@@ -293,7 +302,11 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 											setValue={setValue}
 											errors={errors}
 										/>
-										<div className="flex justify-center mt-4">
+										<div className="flex justify-between mt-4 gap-4">
+											{/* Previous button */}
+											{previousButton()}
+
+											{/* Submit button */}
 											{isSubmitting ? (
 												<div className="flex justify-center">
 													<LoadingSpinner size="medium" />
@@ -301,7 +314,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 											) : (
 												<Button
 													type="submit"
-													variant="custom"
+													variant="highlight"
 													disabled={
 														disabled || isSubmitting
 													}

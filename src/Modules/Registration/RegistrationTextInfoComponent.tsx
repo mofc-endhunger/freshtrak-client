@@ -50,10 +50,9 @@ const RegistrationTextInfoComponent: React.FC<
 			<div className="flex mt-4">
 				<Button
 					type="submit"
-					variant="custom"
+					variant="highlight"
 					data-testid="continue button"
 					onClick={clickedRegisterNow}
-					className="cursor-pointer px-2 bg-highlight text-white min-h-12 uppercase"
 				>
 					{localization.register}
 				</Button>

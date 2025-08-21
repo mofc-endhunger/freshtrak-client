@@ -31,7 +31,7 @@ let localization = new LocalizedStrings({
 		refine_your_results: "REFINE YOUR RESULTS",
 		by_distance: "by Distance",
 		by_service_catogory: "by Service Category",
-		register: "Register Now.",
+		register: "Register Now",
 		save_time: "Save Time.",
 		stay_safe: "Stay Safe.",
 		register_who_are_you: "Who you are",

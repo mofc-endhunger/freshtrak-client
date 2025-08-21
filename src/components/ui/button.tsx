@@ -22,6 +22,8 @@ const buttonVariants = cva(
 				mofcprimary:
 					"bg-[#392947] uppercase text-white py-[.375rem] px-[.75rem] text-[.85rem] tracking-wider",
 				custom: "bg-default-button text-text-color hover:bg-default-button/90 min-w-[220px]",
+				highlight:
+					"bg-highlight text-white min-h-12 uppercase min-w-48",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",

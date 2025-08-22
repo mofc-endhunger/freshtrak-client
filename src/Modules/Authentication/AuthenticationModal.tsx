@@ -69,7 +69,11 @@ const AuthenticationModal: React.FC<AuthenticationModalProps> = ({
 	};
 
 	return (
-		<Dialog open={show} onOpenChange={setshow}>
+		<Dialog
+			key={show ? "open" : "closed"}
+			open={show}
+			onOpenChange={setshow}
+		>
 			<DialogContent className="sm:max-w-md bg-highlight border-none text-white">
 				<DialogHeader className=" border-b border-white">
 					<DialogTitle className="text-center w-full py-2">

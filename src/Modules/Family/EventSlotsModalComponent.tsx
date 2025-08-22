@@ -101,7 +101,11 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 
 	return (
 		<Fragment>
-			<Dialog open={show} onOpenChange={setShow}>
+			<Dialog
+				key={show ? "open" : "closed"}
+				open={show}
+				onOpenChange={setShow}
+			>
 				<DialogContent className="sm:max-w-md bg-highlight border-none text-white">
 					<DialogHeader className=" border-b border-white">
 						<DialogTitle className="flex items-center py-2">

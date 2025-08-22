@@ -212,6 +212,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 
 							{/* Mobile menu trigger */}
 							<Dialog
+								key={showMobileMenu ? "open" : "closed"}
 								open={showMobileMenu}
 								onOpenChange={setMobileMenu}
 							>

@@ -111,6 +111,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
+			setLoading(true);
 			const resp = await axios.get<{ data: Event; errors?: string[] }>(
 				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
 			);
@@ -119,13 +120,16 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				const eventData = EventFormat(data.data, eventDateId);
 				dispatch(setCurrentEvent(eventData));
 				setSelectedEvent(eventData);
+				setLoading(false);
 			} else {
 				setPageError(true);
 				setErrors(data.errors || []);
+				setLoading(false);
 			}
 		} catch (e: any) {
 			console.error(e);
 			setIsError(true);
+			setLoading(false);
 			if (e.response) {
 				setPageError(true);
 				setErrors(e.response.data);
@@ -137,10 +141,15 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		const token = localStorage.getItem("userToken");
 		const userProfile = localStorage.getItem("userProfile");
 		setUserToken(token || undefined);
+
+		// Only proceed if we're not in an error state
 		if (!isError && !pageError) {
-			if (selectedEvent && Object.keys(selectedEvent).length === 0) {
+			// Check if we need to fetch event data
+			if (!selectedEvent || Object.keys(selectedEvent).length === 0) {
 				getEvent();
 			}
+
+			// Handle user authentication and profile
 			if (!token) {
 				setShowAuthModal(true);
 			} else if (!user && userProfile) {
@@ -151,7 +160,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				}
 			}
 		}
-		// Only redirect if user is still not set after 1 second
+
+		// Only redirect if user is still not set after 2 seconds (increased from 1)
 		if (!showAuthModal && !user && !isLoading) {
 			if (redirectTimeout.current) clearTimeout(redirectTimeout.current);
 			redirectTimeout.current = setTimeout(() => {
@@ -161,7 +171,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					]);
 					setPageError(true);
 				}
-			}, 1000);
+			}, 2000);
 		} else {
 			if (redirectTimeout.current) clearTimeout(redirectTimeout.current);
 		}
@@ -416,7 +426,14 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	};
 
 	if (pageError) {
-		return <ErrorComponent error={errors} />;
+		// Format errors to match ErrorComponent interface
+		const formattedErrors = {
+			message: Array.isArray(errors)
+				? errors.join(", ")
+				: "An error occurred while loading the page.",
+			status: "error",
+		};
+		return <ErrorComponent error={formattedErrors} />;
 	}
 
 	if (showAuthModal) {
@@ -429,7 +446,14 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		);
 	}
 
-	if (!user || typeof user !== "object") {
+	// Show spinner while loading or if user/event data is not ready
+	if (
+		isLoading ||
+		!user ||
+		typeof user !== "object" ||
+		!selectedEvent ||
+		Object.keys(selectedEvent).length === 0
+	) {
 		return <SpinnerComponent />;
 	}
 

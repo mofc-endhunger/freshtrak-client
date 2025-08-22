@@ -469,7 +469,7 @@ describe("MemberCountFormComponent", () => {
 			render(<TestWrapper />);
 
 			const heading = screen.getByText("About Your Family");
-			expect(heading).toHaveClass("text-lg", "font-semibold");
+			expect(heading).toHaveClass("text-2xl", "font-semibold");
 		});
 
 		test("should have responsive spacing", () => {

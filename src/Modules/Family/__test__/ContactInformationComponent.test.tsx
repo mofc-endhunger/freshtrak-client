@@ -326,13 +326,35 @@ describe("ContactInformationComponent", () => {
 
 	describe("Form Registration", () => {
 		test("should register all form fields", () => {
+			// Ensure email field is visible by setting no_email to false
+			mockWatch.mockImplementation((fieldName: string) => {
+				const mockValues: { [key: string]: any } = {
+					phone: "",
+					email: "",
+					no_phone_number: false,
+					no_email: false, // This ensures email field is visible
+					permission_to_text: false,
+					permission_to_email: false,
+				};
+				return mockValues[fieldName] || "";
+			});
+
 			renderComponent();
 
+			// Check that all expected fields are registered
 			expect(mockRegister).toHaveBeenCalledWith("no_phone_number");
 			expect(mockRegister).toHaveBeenCalledWith("permission_to_text");
-			expect(mockRegister).toHaveBeenCalledWith("email");
+			expect(mockRegister).toHaveBeenCalledWith("phone", {
+				required: "Phone number is required",
+			});
+			expect(mockRegister).toHaveBeenCalledWith("email", {
+				required: "Email is required",
+			});
 			expect(mockRegister).toHaveBeenCalledWith("no_email");
 			expect(mockRegister).toHaveBeenCalledWith("permission_to_email");
+
+			// Verify total number of registration calls
+			expect(mockRegister).toHaveBeenCalledTimes(6);
 		});
 
 		test("should watch form values", () => {

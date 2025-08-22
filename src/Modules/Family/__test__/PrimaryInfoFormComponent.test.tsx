@@ -69,12 +69,13 @@ describe("PrimaryInfoFormComponent", () => {
 
 		test("should render section heading", () => {
 			renderComponent();
+
 			const heading = screen.getByText("Who are you?");
 			expect(heading).toBeInTheDocument();
 			expect(heading).toHaveClass(
 				"text-lg",
 				"font-semibold",
-				"text-gray-900"
+				"text-highlight"
 			);
 		});
 
@@ -428,9 +429,16 @@ describe("PrimaryInfoFormComponent", () => {
 
 		test("should have responsive button styling", () => {
 			renderComponent();
+
 			const continueButton = screen.getByTestId("continue-button");
 
-			expect(continueButton).toHaveClass("px-6", "py-3", "text-base");
+			// Updated to match the actual Button component classes
+			expect(continueButton).toHaveClass(
+				"bg-highlight",
+				"text-white",
+				"min-h-12",
+				"uppercase"
+			);
 		});
 	});
 

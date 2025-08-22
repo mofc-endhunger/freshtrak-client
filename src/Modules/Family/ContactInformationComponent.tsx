@@ -69,6 +69,15 @@ const ContactInformationComponent: React.FC<
 							setValue("phone", e);
 						}}
 					/>
+					{/* Hidden input for phone validation */}
+					<input
+						type="hidden"
+						{...register("phone", {
+							required: !watch("no_phone_number")
+								? "Phone number is required"
+								: false,
+						})}
+					/>
 					{errors.phone && (
 						<span
 							className="text-sm text-red-600"
@@ -142,7 +151,11 @@ const ContactInformationComponent: React.FC<
 						id="email"
 						autoComplete="off"
 						data-testid="email-input"
-						{...register("email")}
+						{...register("email", {
+							required: !watch("no_email")
+								? "Email is required"
+								: false,
+						})}
 					/>
 					<div className="text-sm text-gray-500">
 						No Email?{" "}

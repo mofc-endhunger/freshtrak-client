@@ -186,7 +186,7 @@ const RegistrationConfirmComponent: React.FC<
 						</div>
 						<div>
 							<h2>Your QR Code:</h2>
-							<div className="flex justify-center p-4 bg-white rounded-lg shadow-md">
+							<div className="flex justify-center p-4 bg-white">
 								<QRCode
 									value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
 										event_slot_id
@@ -235,7 +235,7 @@ const RegistrationConfirmComponent: React.FC<
 							<div className="flex justify-center mt-4">
 								<Button
 									type="submit"
-									variant="custom"
+									variant="highlight"
 									data-testid="continue button"
 								>
 									Back To Home

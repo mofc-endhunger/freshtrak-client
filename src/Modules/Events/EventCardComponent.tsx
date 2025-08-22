@@ -146,7 +146,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = props => {
 			tabIndex={0}
 		>
 			<div className="bg-white rounded-lg shadow-md">
-				<div className="bg-primary text-white p-4 rounded-t-lg">
+				<div className="bg-text-primary text-white p-4 rounded-t-lg">
 					<div className="text-lg font-bold pb-2 truncate">
 						{agencyName}
 					</div>
@@ -224,7 +224,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = props => {
 					)}
 					<div className="space-y-3 mt-3">
 						{/* Details and Directions buttons row */}
-						<div className="flex flex-col sm:flex-row gap-2">
+						<div className="flex flex-col gap-2">
 							{eventDetails && eventDetails.length > 0 && (
 								<button
 									className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"

@@ -98,11 +98,7 @@ section h2 {
   outline: none;
 }
 
-/* Custom header background for Tailwind migration */
-.header {
-  background: #28ce85 url(./Assets/img/banner-bg.png) no-repeat center center;
-  background-size: cover;
-}
+/* Header background migrated to Tailwind CSS in HeaderContainer component */
 
 /* QR Code styles */
 .qrcode {

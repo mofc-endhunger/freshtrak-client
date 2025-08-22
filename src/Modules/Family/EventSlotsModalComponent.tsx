@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogFooter,
@@ -114,6 +115,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 							</span>
 							Choose Time Slot
 						</DialogTitle>
+						<DialogDescription></DialogDescription>
 					</DialogHeader>
 					<div className="container py-4">
 						{isLoading ? (

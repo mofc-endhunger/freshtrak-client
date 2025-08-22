@@ -67,10 +67,10 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 				className="font-bold mt-2"
 				data-testid="member-count-form-component"
 			>
-				<h2 className="text-lg font-semibold text-text-color mb-2">
+				<h2 className="text-2xl font-semibold text-text-color mb-2">
 					{localization.register_about_family}
 				</h2>
-				<div className="text-content-text mb-3">
+				<div className="text-content-text mb-3 text-xs">
 					{localization.family_count}
 				</div>
 
@@ -86,7 +86,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 							data-testid="count_senior_dec"
 							variant="outline"
 							size="sm"
-							className="w-8 h-8 rounded-full p-0 flex items-center justify-center hover:bg-gray-100"
+							className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 							type="button"
 							aria-label="Decrease number of seniors"
 						>
@@ -108,7 +108,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						</Label>
 						<Input
 							type="text"
-							className="w-16 h-8 text-center mx-2 border-gray-300 rounded-md"
+							className="w-16 h-8 text-center mx-2 border-none"
 							name="seniors_in_household"
 							id="seniors_in_household"
 							value={countSenior}
@@ -120,7 +120,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 							data-testid="count_senior_inc"
 							variant="outline"
 							size="sm"
-							className="w-8 h-8 rounded-full p-0 flex items-center justify-center hover:bg-gray-100"
+							className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 							aria-label="Increase number of seniors"
 						>
 							<span className="sr-only">
@@ -147,7 +147,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						data-testid="count_adult_dec"
 						variant="outline"
 						size="sm"
-						className="w-8 h-8 rounded-full p-0 flex items-center justify-center hover:bg-gray-100"
+						className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 						type="button"
 						aria-label="Decrease number of adults"
 					>
@@ -166,7 +166,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 					</Label>
 					<Input
 						type="text"
-						className="w-16 h-8 text-center mx-2 border-gray-300 rounded-md"
+						className="w-16 h-8 text-center mx-2 border-none"
 						name="adults_in_household"
 						id="adults_in_household"
 						value={countAdult}
@@ -178,7 +178,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						data-testid="count_adult_inc"
 						variant="outline"
 						size="sm"
-						className="w-8 h-8 rounded-full p-0 flex items-center justify-center hover:bg-gray-100"
+						className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 						aria-label="Increase number of adults"
 					>
 						<span className="sr-only">
@@ -204,7 +204,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						data-testid="count_kid_dec"
 						variant="outline"
 						size="sm"
-						className="w-8 h-8 rounded-full p-0 flex items-center justify-center hover:bg-gray-100"
+						className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 						type="button"
 						aria-label="Decrease number of kids"
 					>
@@ -221,7 +221,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 					</Label>
 					<Input
 						type="text"
-						className="w-16 h-8 text-center mx-2 border-gray-300 rounded-md"
+						className="w-16 h-8 text-center mx-2 border-none"
 						name="children_in_household"
 						id="children_in_household"
 						value={countKid}
@@ -233,7 +233,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						data-testid="count_kid_inc"
 						variant="outline"
 						size="sm"
-						className="w-8 h-8 rounded-full p-0 flex items-center justify-center hover:bg-gray-100"
+						className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 						aria-label="Increase number of kids"
 					>
 						<span className="sr-only">Increase number of kids</span>

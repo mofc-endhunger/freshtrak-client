@@ -302,16 +302,16 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 											setValue={setValue}
 											errors={errors}
 										/>
-										<div className="flex justify-between mt-4 gap-4">
-											{/* Previous button */}
-											{previousButton()}
+										{isSubmitting ? (
+											<div className="flex justify-center mt-4">
+												<LoadingSpinner size="medium" />
+											</div>
+										) : (
+											<div className="flex justify-between mt-4 gap-4">
+												{/* Previous button */}
+												{previousButton()}
 
-											{/* Submit button */}
-											{isSubmitting ? (
-												<div className="flex justify-center">
-													<LoadingSpinner size="medium" />
-												</div>
-											) : (
+												{/* Submit button */}
 												<Button
 													type="submit"
 													variant="highlight"
@@ -324,8 +324,8 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 														localization.registartion_register
 													}
 												</Button>
-											)}
-										</div>{" "}
+											</div>
+										)}{" "}
 									</>
 								)}
 							</form>

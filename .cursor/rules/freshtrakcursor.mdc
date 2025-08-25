@@ -1,0 +1,5 @@
+@include .agents/project_rules.md
+description:
+globs:
+alwaysApply: false
+---

@@ -22,14 +22,15 @@ interface CountryListComponentProps {
 
 const countryOptions: CountryOption[] = [
 	{ key: "en", value: "en", text: "English" },
-	{ key: "spa", value: "spa", text: "Spanish" },
-	{ key: "som", value: "som", text: "Somali" },
-	{ key: "rus", value: "rus", text: "Russian" },
-	{ key: "tur", value: "tur", text: "Turkish" },
-	{ key: "ara", value: "ara", text: "Arabic" },
-	{ key: "zho", value: "zho", text: "China" },
-	{ key: "hin", value: "hin", text: "Hindi" },
-	{ key: "nep", value: "nep", text: "Nepali" },
+	{ key: "spa", value: "spa", text: "Español" },
+	{ key: "som", value: "som", text: "Soomaali" },
+	{ key: "rus", value: "rus", text: "Русский" },
+	{ key: "tur", value: "tur", text: "Türkçe" },
+	{ key: "ara", value: "ara", text: "العربية" },
+	{ key: "zho", value: "zho", text: "中文" },
+	{ key: "hin", value: "hin", text: "हिन्दी" },
+	{ key: "nep", value: "nep", text: "नेपाली" },
+	{ key: "tgl", value: "tgl", text: "Tagalog" },
 ];
 
 const CountryListComponent: React.FC<CountryListComponentProps> = props => {

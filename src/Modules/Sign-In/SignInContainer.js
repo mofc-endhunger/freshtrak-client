@@ -11,7 +11,6 @@ const SignInContainer = () => {
 	} = useForm();
 	const navigate = useNavigate();
 	const onSubmit = data => {
-		console.log(data);
 		if (data) {
 			localStorage.setItem("isLoggedIn", true);
 			navigate(-1);

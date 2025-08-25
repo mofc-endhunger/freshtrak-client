@@ -2,6 +2,7 @@ import React from "react";
 import LogoComponent from "../General/LogoComponent";
 import { Link } from "react-router-dom";
 import { RENDER_URL } from "../../Utils/Urls";
+import { getFormattedAppVersion } from "../../Utils/VersionUtils";
 
 const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
 
@@ -68,6 +69,7 @@ const FooterComponent: React.FC = () => (
 		<div className="pt-2 pb-3 mt-8">
 			<div className="text-center md:text-right">
 				<p className="text-xs">© 2025 FreshTrak</p>
+				<p className="text-xs mt-1">{getFormattedAppVersion()}</p>
 			</div>
 		</div>
 	</div>

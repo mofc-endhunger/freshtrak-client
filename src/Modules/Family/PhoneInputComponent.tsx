@@ -15,7 +15,8 @@ export interface PhoneInputProps {
 const normalizeInput = (value: unknown): string => {
 	try {
 		if (typeof value !== "string" && typeof value !== "number") {
-			// Invalid input type for phone normalization
+			// Only string and number types are valid for phone normalization.
+			// Other types (e.g., objects, booleans, undefined) cannot be converted to a phone number format and are considered invalid.
 			return "";
 		}
 		const strValue = String(value);

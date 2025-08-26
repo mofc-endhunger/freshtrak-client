@@ -30,7 +30,7 @@ const StateDropdownComponent: React.FC<StateDropdownProps> = ({
 				defaultValue={value}
 				{...register("state", { required: true })}
 			>
-				<option value="" defaultValue=""></option>
+				<option value=""></option>
 				<option value="AK">Alaska</option>
 				<option value="AL">Alabama</option>
 				<option value="AR">Arkansas</option>

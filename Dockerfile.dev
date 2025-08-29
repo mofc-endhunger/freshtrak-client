@@ -1,0 +1,27 @@
+# FreshTrak React Application - Development Dockerfile
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies for native modules (if needed)
+RUN apk add --no-cache python3 make g++
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Expose port 3000 for React dev server
+EXPOSE 3000
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+
+# Start development server
+CMD ["npm", "start"]

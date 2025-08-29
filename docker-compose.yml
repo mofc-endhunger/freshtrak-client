@@ -1,0 +1,68 @@
+# FreshTrak React Application - Docker Compose for Development
+version: "3.8"
+
+services:
+    # Development service
+    freshtrak-dev:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        container_name: freshtrak-dev
+        ports:
+            - "3000:3000"
+        volumes:
+            # Mount source code for hot reload
+            - .:/app
+            # Exclude node_modules to use container's version
+            - /app/node_modules
+            # Exclude build directory
+            - /app/build
+        environment:
+            - NODE_ENV=development
+            - CHOKIDAR_USEPOLLING=true
+            - WATCHPACK_POLLING=true
+        env_file:
+            - .env.development
+        networks:
+            - freshtrak-network
+        restart: unless-stopped
+        healthcheck:
+            test:
+                [
+                    "CMD",
+                    "wget",
+                    "--no-verbose",
+                    "--tries=1",
+                    "--spider",
+                    "http://localhost:3000/",
+                ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+
+    # Production build test service
+    freshtrak-prod-test:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: production
+        container_name: freshtrak-prod-test
+        ports:
+            - "8080:80"
+        environment:
+            - NODE_ENV=production
+        networks:
+            - freshtrak-network
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost/health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+
+networks:
+    freshtrak-network:
+        driver: bridge
+        name: freshtrak-network

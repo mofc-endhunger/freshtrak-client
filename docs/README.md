@@ -28,6 +28,8 @@ Deployment and infrastructure documentation for AWS and other environments.
 
 **Files:**
 
+-   [Dockerization PRD](deployment/DOCKERIZATION_PRD.md) - Comprehensive requirements for containerizing and deploying FreshTrak
+-   [Dockerization Tasks](deployment/DOCKERIZATION_TASKS.md) - Detailed implementation tasks and tracking for the dockerization project
 -   AWS deployment procedures and configuration
 
 ## 🚀 Quick Navigation

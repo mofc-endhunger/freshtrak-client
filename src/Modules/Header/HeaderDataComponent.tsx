@@ -45,6 +45,7 @@ const HeaderDataComponent: React.FC<HeaderDataComponentProps> = () => {
 
 	const currentPath = getPath(location.pathname);
 	const isSearchResultsPage = currentPath === "/events/list";
+	const isLandingPage = location.pathname === "/";
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
@@ -54,18 +55,31 @@ const HeaderDataComponent: React.FC<HeaderDataComponentProps> = () => {
 						<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight">
 							{localization.resource_zip_code} {zip}
 						</h1>
+					) : isLandingPage ? (
+						<>
+							<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight">
+								Welcome
+							</h1>
+							<p
+								className="text-center text-white font-varela text-[0.9rem] sm:text-[1.2rem] mt-4"
+								data-testid="subtext-on-header"
+							>
+								Create a username and password to create
+								FreshTrak account.
+							</p>
+						</>
 					) : (
-						<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight">
-							{localization.home_freshtrack}
-						</h1>
-					)}
-					{!isSearchResultsPage && (
-						<p
-							className="text-center text-secondary font-varela text-[0.9rem] sm:text-[1.2rem] mt-4"
-							data-testid="subtext-on-header"
-						>
-							{localization.home_header_component}
-						</p>
+						<>
+							<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight">
+								{localization.home_freshtrack}
+							</h1>
+							<p
+								className="text-center text-secondary font-varela text-[0.9rem] sm:text-[1.2rem] mt-4"
+								data-testid="subtext-on-header"
+							>
+								{localization.home_header_component}
+							</p>
+						</>
 					)}
 				</div>
 			</div>

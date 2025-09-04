@@ -7,6 +7,7 @@ import {
 	resetPassword,
 	confirmResetPassword,
 	resendSignUpCode,
+	fetchUserAttributes,
 } from "aws-amplify/auth";
 import { AuthContextType } from "./types/authentication.types";
 
@@ -55,9 +56,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			});
 
 			if (result.isSignedIn) {
+				// Get user attributes to fetch name
+				let userName = email; // fallback to email
+				try {
+					const userAttributes = await fetchUserAttributes();
+					userName =
+						userAttributes.name || userAttributes.email || email;
+				} catch (userError) {
+					console.warn("Could not fetch user attributes:", userError);
+				}
+
 				// Store user data
 				const userData = {
 					email,
+					name: userName,
 					isSignedIn: true,
 					signInDetails: result,
 				};
@@ -76,7 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const handleSignUp = async (
 		email: string,
 		password: string,
-		name?: string
+		name: string
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
@@ -86,7 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				options: {
 					userAttributes: {
 						email,
-						...(name && { name }),
+						name,
 					},
 				},
 			});
@@ -94,13 +106,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			// Store pending user data
 			const pendingUser = {
 				email,
+				name,
 				isPendingConfirmation: true,
 				userId: result.userId,
 			};
 			localStorage.setItem("pendingUser", JSON.stringify(pendingUser));
 		} catch (error: any) {
 			console.error("Sign up error:", error);
-			throw new Error(error.message || "Failed to sign up");
+			// Provide more user-friendly error messages
+			let errorMessage = "Failed to create account";
+			if (error.message?.includes("name.formatted")) {
+				errorMessage = "Name is required. Please enter your full name.";
+			} else if (error.message?.includes("email")) {
+				errorMessage = "Please enter a valid email address.";
+			} else if (error.message?.includes("password")) {
+				errorMessage = "Password must be at least 8 characters long.";
+			} else if (error.message) {
+				errorMessage = error.message;
+			}
+			throw new Error(errorMessage);
 		} finally {
 			setIsLoading(false);
 		}
@@ -116,6 +140,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				username: email,
 				confirmationCode: code,
 			});
+
+			// Get pending user data to retrieve name
+			const pendingUserData = localStorage.getItem("pendingUser");
+			let userName = email; // fallback to email
+
+			if (pendingUserData) {
+				try {
+					const pendingUser = JSON.parse(pendingUserData);
+					userName = pendingUser.name || email;
+				} catch (parseError) {
+					console.warn(
+						"Could not parse pending user data:",
+						parseError
+					);
+				}
+			}
+
+			// Store confirmed user data
+			const userData = {
+				email,
+				name: userName,
+				isSignedIn: true,
+				isConfirmed: true,
+			};
+			setUser(userData);
+			localStorage.setItem("cognitoUser", JSON.stringify(userData));
+			localStorage.setItem("isLoggedIn", "true");
 
 			// Clear pending user data
 			localStorage.removeItem("pendingUser");

@@ -53,7 +53,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const dispatch = useDispatch();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { isAuthenticated, signOut } = useAuth();
+	const { isAuthenticated, signOut, user } = useAuth();
 
 	const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
 
@@ -64,8 +64,13 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const getPageType = (): PageType => {
 		const { pathname } = location;
 
-		// Main page
+		// Landing page
 		if (pathname === RENDER_URL.ROOT_URL) {
+			return "main";
+		}
+
+		// Home page (dashboard)
+		if (pathname === RENDER_URL.HOME_URL) {
 			return "main";
 		}
 
@@ -118,6 +123,8 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 			localStorage.removeItem("userToken");
 			localStorage.removeItem("tokenExpiresAt");
 			localStorage.removeItem("search_zip");
+			// Redirect to landing page after logout
+			navigate("/");
 		} catch (error) {
 			console.error("Logout error:", error);
 		}
@@ -134,7 +141,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	 * Handles successful authentication - redirect to home page
 	 */
 	const handleAuthSuccess = (): void => {
-		navigate("/");
+		navigate("/home");
 	};
 
 	useEffect(() => {
@@ -169,6 +176,9 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		pageType,
 		isScrolled
 	);
+
+	// Check if we're on the landing page
+	const isLandingPage = location.pathname === RENDER_URL.ROOT_URL;
 
 	// Mobile menu sections
 	const mobileMenuSections: MobileMenuSection[] = [
@@ -212,7 +222,11 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 						{/* Logo - centered on desktop, left-aligned on mobile */}
 						<div className="md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
 							<Link
-								to={RENDER_URL.ROOT_URL}
+								to={
+									isLandingPage
+										? RENDER_URL.ROOT_URL
+										: RENDER_URL.HOME_URL
+								}
 								className="flex items-center"
 							>
 								<img
@@ -224,26 +238,37 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 						</div>
 
 						<div className="flex items-center space-x-2 md:space-x-4 ml-auto w-full justify-end">
-							{!isLoggedIn ? (
-								<Button
-									type="button"
-									variant="ghost"
-									className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
-									onClick={handleAuthClick}
-								>
-									SIGN IN
-								</Button>
-							) : (
-								<Button
-									type="button"
-									variant="ghost"
-									className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
-									onClick={logOut}
-								>
-									LOG OUT
-								</Button>
-							)}
 							<CountryListComponent change={change} />
+							{/* Show authentication buttons only on non-landing pages */}
+							{!isLandingPage && (
+								<>
+									{!isLoggedIn ? (
+										<Button
+											type="button"
+											variant="ghost"
+											className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
+											onClick={handleAuthClick}
+										>
+											SIGN IN
+										</Button>
+									) : (
+										<>
+											{/* Show user name when logged in */}
+											<span className="text-white font-medium text-xs md:text-sm">
+												{user?.name || "Guest"}
+											</span>
+											<Button
+												type="button"
+												variant="ghost"
+												className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
+												onClick={logOut}
+											>
+												LOG OUT
+											</Button>
+										</>
+									)}
+								</>
+							)}
 
 							{/* Mobile menu trigger */}
 							<Dialog

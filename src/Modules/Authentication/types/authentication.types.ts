@@ -48,7 +48,7 @@ export interface SignUpFormData {
   email: string;
   password: string;
   confirmPassword: string;
-  name?: string;
+  name: string;
 }
 
 export interface SignInFormData {
@@ -78,7 +78,7 @@ export interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name?: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<void>;
   confirmSignUp: (email: string, code: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;

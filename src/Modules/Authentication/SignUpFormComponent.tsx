@@ -14,7 +14,7 @@ const signUpSchema = z
 		email: z.string().email("Please enter a valid email address"),
 		password: z.string().min(8, "Password must be at least 8 characters"),
 		confirmPassword: z.string(),
-		name: z.string().optional(),
+		name: z.string().min(1, "Name is required"),
 	})
 	.refine(data => data.password === data.confirmPassword, {
 		message: "Passwords don't match",
@@ -71,7 +71,7 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 			<div className="space-y-2">
-				<Label htmlFor="name">Name (Optional)</Label>
+				<Label htmlFor="name">Name</Label>
 				<Input
 					id="name"
 					type="text"

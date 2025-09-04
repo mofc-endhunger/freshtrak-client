@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Fragment } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -7,6 +7,8 @@ import mainLogo from "../../Assets/img/logo.png";
 import localization from "../Localization/LocalizationComponent";
 import { setCurrentLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
+import AuthenticationModal from "../Authentication/AuthenticationModal";
+import { useAuth } from "../Authentication/AuthContext";
 import { Button } from "../../components/ui/button";
 import {
 	Dialog,
@@ -47,8 +49,11 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const [navbarShrink, setNavbarShrink] = useState<string>("");
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 	const [showMobileMenu, setMobileMenu] = useState<boolean>(false);
+	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
 	const dispatch = useDispatch();
 	const location = useLocation();
+	const navigate = useNavigate();
+	const { isAuthenticated, signOut } = useAuth();
 
 	const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
 
@@ -105,21 +110,42 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	/**
 	 * Handles user logout
 	 */
-	const logOut = (): void => {
-		localStorage.setItem("isLoggedIn", "false");
-		setIsLoggedIn(false);
-		localStorage.removeItem("userToken");
-		localStorage.removeItem("tokenExpiresAt");
-		localStorage.removeItem("search_zip");
+	const logOut = async (): Promise<void> => {
+		try {
+			await signOut();
+			setIsLoggedIn(false);
+			localStorage.setItem("isLoggedIn", "false");
+			localStorage.removeItem("userToken");
+			localStorage.removeItem("tokenExpiresAt");
+			localStorage.removeItem("search_zip");
+		} catch (error) {
+			console.error("Logout error:", error);
+		}
+	};
+
+	/**
+	 * Handles authentication modal opening
+	 */
+	const handleAuthClick = (): void => {
+		setShowAuthModal(true);
+	};
+
+	/**
+	 * Handles successful authentication - redirect to home page
+	 */
+	const handleAuthSuccess = (): void => {
+		navigate("/");
 	};
 
 	useEffect(() => {
-		// Check authentication status
+		// Check authentication status - use both Cognito auth and localStorage
 		const localStorageLoggedIn = localStorage.getItem("isLoggedIn");
-		if (localStorageLoggedIn === null || localStorageLoggedIn === "false") {
-			setIsLoggedIn(false);
-		} else {
+		const isCognitoAuthenticated = isAuthenticated;
+
+		if (localStorageLoggedIn === "true" || isCognitoAuthenticated) {
 			setIsLoggedIn(true);
+		} else {
+			setIsLoggedIn(false);
 		}
 
 		// Handle scroll events for background color logic
@@ -134,7 +160,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		return () => {
 			window.removeEventListener("scroll", handleScroll);
 		};
-	}, []);
+	}, [isAuthenticated]);
 
 	// Get current page type and background state
 	const pageType = getPageType();
@@ -198,7 +224,16 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 						</div>
 
 						<div className="flex items-center space-x-2 md:space-x-4 ml-auto w-full justify-end">
-							{isLoggedIn && (
+							{!isLoggedIn ? (
+								<Button
+									type="button"
+									variant="ghost"
+									className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
+									onClick={handleAuthClick}
+								>
+									SIGN IN
+								</Button>
+							) : (
 								<Button
 									type="button"
 									variant="ghost"
@@ -307,6 +342,15 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 					</div>
 				</div>
 			</nav>
+
+			{/* Authentication Modal */}
+			<AuthenticationModal
+				show={showAuthModal}
+				setshow={setShowAuthModal}
+				onLogin={handleAuthSuccess}
+				initialTab="signin"
+				showGuestLogin={true}
+			/>
 		</Fragment>
 	);
 };

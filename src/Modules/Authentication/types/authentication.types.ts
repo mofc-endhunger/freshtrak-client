@@ -42,3 +42,57 @@ export interface AuthenticationError {
   code?: string;
   timestamp: Date;
 }
+
+// Cognito-specific types
+export interface SignUpFormData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  name?: string;
+}
+
+export interface SignInFormData {
+  email: string;
+  password: string;
+}
+
+export interface ConfirmSignUpFormData {
+  email: string;
+  code: string;
+}
+
+export interface ResetPasswordFormData {
+  email: string;
+}
+
+export interface ConfirmResetPasswordFormData {
+  email: string;
+  code: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+// Authentication context types
+export interface AuthContextType {
+  user: any | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name?: string) => Promise<void>;
+  confirmSignUp: (email: string, code: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  confirmResetPassword: (email: string, code: string, newPassword: string) => Promise<void>;
+  resendConfirmationCode: (email: string) => Promise<void>;
+}
+
+// Authentication modal tab types
+export type AuthModalTab = 'signin' | 'signup' | 'confirm' | 'reset' | 'guest';
+
+// Extended AuthenticationModal props
+export interface ExtendedAuthenticationModalProps extends AuthenticationModalProps {
+  /** Initial tab to show in the modal */
+  initialTab?: AuthModalTab;
+  /** Whether to show guest login option */
+  showGuestLogin?: boolean;
+}

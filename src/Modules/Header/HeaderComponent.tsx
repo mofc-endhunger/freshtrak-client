@@ -7,7 +7,6 @@ import mainLogo from "../../Assets/img/logo.png";
 import localization from "../Localization/LocalizationComponent";
 import { setCurrentLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
-import AuthenticationModal from "../Authentication/AuthenticationModal";
 import { useAuth } from "../Authentication/AuthContext";
 import { Button } from "../../components/ui/button";
 import {
@@ -49,7 +48,6 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const [navbarShrink, setNavbarShrink] = useState<string>("");
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 	const [showMobileMenu, setMobileMenu] = useState<boolean>(false);
-	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
 	const dispatch = useDispatch();
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -64,13 +62,8 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const getPageType = (): PageType => {
 		const { pathname } = location;
 
-		// Landing page
+		// Main page (dashboard)
 		if (pathname === RENDER_URL.ROOT_URL) {
-			return "main";
-		}
-
-		// Home page (dashboard)
-		if (pathname === RENDER_URL.HOME_URL) {
 			return "main";
 		}
 
@@ -130,20 +123,6 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		}
 	};
 
-	/**
-	 * Handles authentication modal opening
-	 */
-	const handleAuthClick = (): void => {
-		setShowAuthModal(true);
-	};
-
-	/**
-	 * Handles successful authentication - redirect to home page
-	 */
-	const handleAuthSuccess = (): void => {
-		navigate("/home");
-	};
-
 	useEffect(() => {
 		// Check authentication status - use both Cognito auth and localStorage
 		const localStorageLoggedIn = localStorage.getItem("isLoggedIn");
@@ -177,8 +156,8 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		isScrolled
 	);
 
-	// Check if we're on the landing page
-	const isLandingPage = location.pathname === RENDER_URL.ROOT_URL;
+	// Check if we're on the login page
+	const isLoginPage = location.pathname === "/login";
 
 	// Mobile menu sections
 	const mobileMenuSections: MobileMenuSection[] = [
@@ -222,11 +201,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 						{/* Logo - centered on desktop, left-aligned on mobile */}
 						<div className="md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
 							<Link
-								to={
-									isLandingPage
-										? RENDER_URL.ROOT_URL
-										: RENDER_URL.HOME_URL
-								}
+								to={RENDER_URL.ROOT_URL}
 								className="flex items-center"
 							>
 								<img
@@ -239,32 +214,39 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 
 						<div className="flex items-center space-x-2 md:space-x-4 ml-auto w-full justify-end">
 							<CountryListComponent change={change} />
-							{/* Show authentication buttons only on non-landing pages */}
-							{!isLandingPage && (
+							{/* Show authentication buttons on all pages except login page */}
+							{!isLoginPage && (
 								<>
 									{!isLoggedIn ? (
 										<Button
 											type="button"
 											variant="ghost"
 											className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
-											onClick={handleAuthClick}
+											onClick={() => navigate("/login")}
 										>
-											SIGN IN
+											LOG IN
 										</Button>
 									) : (
 										<>
-											{/* Show user name when logged in */}
-											<span className="text-white font-medium text-xs md:text-sm">
-												{user?.name || "Guest"}
-											</span>
-											<Button
-												type="button"
-												variant="ghost"
-												className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
-												onClick={logOut}
-											>
-												LOG OUT
-											</Button>
+											{/* Show user name and logout only for authenticated users (not guests) */}
+											{user?.name &&
+												user?.name !== user?.email && (
+													<span className="text-white font-medium text-xs md:text-sm">
+														{user.name}
+													</span>
+												)}
+											{/* Only show logout button for authenticated users, not guests */}
+											{user?.name &&
+												user?.name !== user?.email && (
+													<Button
+														type="button"
+														variant="ghost"
+														className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
+														onClick={logOut}
+													>
+														LOG OUT
+													</Button>
+												)}
 										</>
 									)}
 								</>
@@ -367,15 +349,6 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 					</div>
 				</div>
 			</nav>
-
-			{/* Authentication Modal */}
-			<AuthenticationModal
-				show={showAuthModal}
-				setshow={setShowAuthModal}
-				onLogin={handleAuthSuccess}
-				initialTab="signin"
-				showGuestLogin={true}
-			/>
 		</Fragment>
 	);
 };

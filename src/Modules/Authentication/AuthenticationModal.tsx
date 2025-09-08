@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TagManager from "react-gtm-module";
-import GuestLoginButtonComponent from "./GuestLoginButtonComponent";
 import SignInFormComponent from "./SignInFormComponent";
 import SignUpFormComponent from "./SignUpFormComponent";
 import ConfirmSignUpFormComponent from "./ConfirmSignUpFormComponent";
@@ -59,6 +58,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	 * Handles guest login process
 	 */
 	const onGuestLogin = async (): Promise<void> => {
+		setCurrentTab("loading");
 		setIsLoading(true);
 		try {
 			localStorage.setItem("isLoggedIn", "false");
@@ -77,6 +77,10 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 			TagManager.dataLayer({
 				dataLayer: gtmEvent,
 			});
+		} catch (error) {
+			console.error("Guest login error:", error);
+			handleAuthError("Failed to login as guest. Please try again.");
+			setCurrentTab("signin"); // Go back to signin tab on error
 		} finally {
 			setIsLoading(false);
 		}
@@ -145,8 +149,8 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 				return "Create Account";
 			case "confirm":
 				return "Confirm Account";
-			case "guest":
-				return "Login";
+			case "loading":
+				return "Processing...";
 			default:
 				return "Authentication";
 		}
@@ -168,7 +172,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 
 				<div className="p-6">
 					{/* Tab Navigation */}
-					{currentTab !== "confirm" && (
+					{currentTab !== "confirm" && currentTab !== "loading" && (
 						<div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
 							<Button
 								variant={
@@ -238,19 +242,21 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 								/>
 							)}
 
-							{currentTab === "guest" && showGuestLogin && (
-								<GuestLoginButtonComponent
-									onGuestLogin={onGuestLogin}
-									disabled={isLoading}
-								/>
+							{currentTab === "loading" && (
+								<div className="w-full flex flex-col items-center justify-center py-8">
+									<LoadingSpinner size="large" />
+									<p className="mt-4 text-gray-600 text-center">
+										Processing your request...
+									</p>
+								</div>
 							)}
 						</>
 					)}
 
 					{/* Guest Login Option */}
 					{showGuestLogin &&
-						currentTab !== "guest" &&
-						currentTab !== "confirm" && (
+						currentTab !== "confirm" &&
+						currentTab !== "loading" && (
 							<div className="mt-6 pt-4 border-t border-gray-200">
 								<div className="text-center">
 									<p className="text-sm text-gray-600 mb-3">
@@ -258,7 +264,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 									</p>
 									<Button
 										variant="outline"
-										onClick={() => switchTab("guest")}
+										onClick={onGuestLogin}
 										className="w-full"
 									>
 										Continue as Guest

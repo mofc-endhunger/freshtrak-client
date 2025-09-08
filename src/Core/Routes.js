@@ -47,7 +47,7 @@ const PrivacyComponent = lazy(() =>
 	import("../Modules/Policies/PrivacyComponent")
 );
 const TermsComponent = lazy(() => import("../Modules/Policies/TermsComponent"));
-const LandingPage = lazy(() => import("../Modules/Authentication/LandingPage"));
+const LoginPage = lazy(() => import("../Modules/Authentication/LoginPage"));
 
 const AppRoutes = () => {
 	React.useEffect(() => {}, []);
@@ -60,12 +60,9 @@ const AppRoutes = () => {
 					<Routes>
 						<Route
 							path={RENDER_URL.ROOT_URL}
-							element={<LandingPage />}
-						/>
-						<Route
-							path={RENDER_URL.HOME_URL}
 							element={<DashBoardContainer />}
 						/>
+						<Route path="/login" element={<LoginPage />} />
 						<Route
 							path={RENDER_URL.EVENT_LIST_URL}
 							element={<EventContainer />}

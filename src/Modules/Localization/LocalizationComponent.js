@@ -74,6 +74,9 @@ let localization = new LocalizedStrings({
 		female: "Female",
 		other: "Other",
 		not_to_say: "Prefer Not To Specify",
+		guest_signin_prompt:
+			"Sign in or create an account to save time in the future",
+		guest_signin_button: "Sign In / Create Account",
 	},
 
 	spa: {
@@ -149,6 +152,9 @@ let localization = new LocalizedStrings({
 		female: "Mujer",
 		other: "Otra/Otro",
 		not_to_say: "Prefiero no especificar",
+		guest_signin_prompt:
+			"Inicia sesión o crea una cuenta para ahorrar tiempo en el futuro",
+		guest_signin_button: "Iniciar Sesión / Crear Cuenta",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -223,6 +229,9 @@ let localization = new LocalizedStrings({
 		female: "Dheddig",
 		other: "Kale",
 		not_to_say: "Doorbida Inaan Cadeyn",
+		guest_signin_prompt:
+			"Gali ama samee akoon si aad waqti u badbaadiso mustaqbalka",
+		guest_signin_button: "Gali / Samee Akoon",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -298,6 +307,9 @@ let localization = new LocalizedStrings({
 		female: "женский",
 		other: "Другой",
 		not_to_say: "Предпочитаю не указывать",
+		guest_signin_prompt:
+			"Войдите в систему или создайте аккаунт, чтобы сэкономить время в будущем",
+		guest_signin_button: "Войти / Создать Аккаунт",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -372,6 +384,9 @@ let localization = new LocalizedStrings({
 		female: "Kadın",
 		other: "Diğer",
 		not_to_say: "Belirtmemeyi Tercih Et",
+		guest_signin_prompt:
+			"Gelecekte zaman kazanmak için giriş yapın veya hesap oluşturun",
+		guest_signin_button: "Giriş Yap / Hesap Oluştur",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -445,6 +460,9 @@ let localization = new LocalizedStrings({
 		female: "أنثى",
 		other: "آخر",
 		not_to_say: "تفضل عدم التحديد",
+		guest_signin_prompt:
+			"سجل الدخول أو أنشئ حسابًا لتوفير الوقت في المستقبل",
+		guest_signin_button: "تسجيل الدخول / إنشاء حساب",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -516,6 +534,8 @@ let localization = new LocalizedStrings({
 		female: "女性",
 		other: "其他",
 		not_to_say: "不想指定",
+		guest_signin_prompt: "登录或创建账户以在未来节省时间",
+		guest_signin_button: "登录 / 创建账户",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -590,6 +610,9 @@ let localization = new LocalizedStrings({
 		female: "महिला",
 		other: "अन्य",
 		not_to_say: "निर्दिष्ट नहीं करना चाहते हैं",
+		guest_signin_prompt:
+			"भविष्य में समय बचाने के लिए साइन इन करें या खाता बनाएं",
+		guest_signin_button: "साइन इन / खाता बनाएं",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -664,6 +687,9 @@ let localization = new LocalizedStrings({
 		female: "महिला",
 		other: "अन्य",
 		not_to_say: "निर्दिष्ट नगर्न मन पर्छ",
+		guest_signin_prompt:
+			"भविष्यमा समय बचाउन साइन इन गर्नुहोस् वा खाता बनाउनुहोस्",
+		guest_signin_button: "साइन इन / खाता बनाउनुहोस्",
 	},
 });
 

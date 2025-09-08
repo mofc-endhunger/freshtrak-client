@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import SearchComponent from "../General/SearchComponent";
 import ResourceListComponent from "./ResourceListComponent";
@@ -30,6 +30,8 @@ interface SearchFormData {
 	zip_code: string;
 	distance: string;
 	serviceCat: string;
+	availability: string;
+	reservations: string;
 }
 
 const EventContainer: React.FC = () => {
@@ -42,6 +44,11 @@ const EventContainer: React.FC = () => {
 		distance?: string;
 		serviceCat?: string;
 	}>();
+
+	const location = useLocation();
+	const searchParams = new URLSearchParams(location.search);
+	const availability = searchParams.get("availability") || "All";
+	const reservations = searchParams.get("reservations") || "false";
 
 	const [foodBankResponse, setFoodBankResponse] = useState<boolean>(false);
 	const [foodBankData, setFoodBankData] = useState<FoodBankData>({
@@ -90,7 +97,7 @@ const EventContainer: React.FC = () => {
 			getEvents();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [zipCode, distance, serviceCat]);
+	}, [zipCode, distance, serviceCat, availability, reservations]);
 
 	useEffect(() => {
 		if (zipCode) {
@@ -139,6 +146,8 @@ const EventContainer: React.FC = () => {
 		zip_code,
 		distance,
 		serviceCat,
+		availability,
+		reservations,
 	}: SearchFormData): void => {
 		let url = `/events/list/`;
 		if (zip_code) {
@@ -147,9 +156,24 @@ const EventContainer: React.FC = () => {
 		if (distance) {
 			url += distance + "/";
 		}
-		if (serviceCat) {
+		// Only add serviceCat if it's not "All" or empty
+		if (serviceCat && serviceCat !== "All") {
 			url += serviceCat + "/";
 		}
+
+		// Use query parameters for availability and reservations to avoid URL structure issues
+		const queryParams = new URLSearchParams();
+		if (availability && availability !== "All") {
+			queryParams.set("availability", availability);
+		}
+		if (reservations && reservations !== "false") {
+			queryParams.set("reservations", reservations);
+		}
+
+		if (queryParams.toString()) {
+			url += `?${queryParams.toString()}`;
+		}
+
 		navigate(url);
 	};
 
@@ -181,6 +205,8 @@ const EventContainer: React.FC = () => {
 						<EventListContainer
 							agencyData={agencyData}
 							zipCode={zipCode}
+							availabilityFilter={availability}
+							reservationsFilter={reservations}
 						/>
 					)}
 					{loading && <LoadingSpinner />}

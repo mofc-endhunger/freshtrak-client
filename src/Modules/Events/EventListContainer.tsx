@@ -1,6 +1,10 @@
 import React, { Fragment } from "react";
 import EventListComponent from "./EventListComponent";
 import { EventHandler } from "../../Utils/EventHandler";
+import {
+	filterEventsByAvailability,
+	filterEventsByReservations,
+} from "../../Utils/availabilityFilter";
 
 interface Agency {
 	id: string;
@@ -13,17 +17,29 @@ interface Agency {
 interface EventListContainerProps {
 	zipCode: string;
 	agencyData: Agency[];
+	availabilityFilter?: string;
+	reservationsFilter?: string;
 }
 
 const EventListContainer: React.FC<EventListContainerProps> = ({
 	zipCode,
 	agencyData,
+	availabilityFilter = "All",
+	reservationsFilter = "false",
 }) => {
 	const EventList: React.FC = () => {
 		const agencyDataSorted = EventHandler(agencyData);
+		const availabilityFilteredEvents = filterEventsByAvailability(
+			agencyDataSorted,
+			availabilityFilter
+		);
+		const filteredEvents = filterEventsByReservations(
+			availabilityFilteredEvents,
+			reservationsFilter
+		);
 		return (
 			<EventListComponent
-				events={agencyDataSorted as Record<string, any[]>}
+				events={filteredEvents as Record<string, any[]>}
 				zipCode={zipCode}
 			/>
 		);

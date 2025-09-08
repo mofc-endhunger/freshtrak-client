@@ -12,6 +12,7 @@ import {
 } from "../../components/ui/select";
 import { Label } from "../../components/ui/label";
 import { Button } from "../../components/ui/button";
+import { Switch } from "../../components/ui/switch";
 
 interface ServiceCategory {
 	id: number;
@@ -31,14 +32,22 @@ interface ServiceCategoryFilter extends FilterOption {
 interface FilterComponentProps {
 	distance: FilterOption;
 	serviceCat: ServiceCategoryFilter;
+	availability: FilterOption; // New availability filter for time-based filtering
+	reservations: FilterOption; // New reservations filter for events that accept reservations
 	closeFilter: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
-	({ distance, serviceCat, closeFilter }, ref) => {
+	(
+		{ distance, serviceCat, availability, reservations, closeFilter },
+		ref
+	) => {
 		return (
 			<Fragment>
-				{(distance.show || serviceCat.show) && (
+				{(distance.show ||
+					serviceCat.show ||
+					availability.show ||
+					reservations.show) && (
 					<div
 						className="border border-[#cbd4dc] rounded-sm p-5 mt-2.5 text-xs"
 						ref={ref}
@@ -149,8 +158,85 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 									</div>
 								)}
 							</div>
-							<div className="w-full sm:flex-1 min-w-0"></div>
-							<div className="w-full sm:flex-1 min-w-0"></div>
+							<div className="w-full sm:flex-1 min-w-0">
+								{availability.show && (
+									<div className="space-y-2">
+										<Label htmlFor="availability">
+											{localization.by_availability}
+										</Label>
+										{/* Availability filter dropdown - filters events by time periods */}
+										<Select
+											defaultValue={
+												availability.defaultValue
+											}
+											onValueChange={value => {
+												availability.onChangeHandler({
+													target: { value },
+												});
+											}}
+										>
+											<SelectTrigger className="w-full">
+												<SelectValue placeholder="All" />
+											</SelectTrigger>
+											<SelectContent className="bg-white">
+												<SelectItem value="All">
+													All
+												</SelectItem>
+												<SelectItem value="today">
+													Today
+												</SelectItem>
+												<SelectItem value="tomorrow">
+													Tomorrow
+												</SelectItem>
+												<SelectItem value="this_week">
+													This Week
+												</SelectItem>
+												<SelectItem value="next_2_weeks">
+													Next 2 Weeks
+												</SelectItem>
+												<SelectItem value="this_month">
+													This Month
+												</SelectItem>
+												<SelectItem value="next_month">
+													Next Month
+												</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
+								)}
+							</div>
+							<div className="w-full sm:flex-1 min-w-0">
+								{reservations.show && (
+									<div className="space-y-2">
+										<div className="flex items-center space-x-2">
+											<Switch
+												id="reservations"
+												checked={
+													reservations.defaultValue ===
+													"true"
+												}
+												onCheckedChange={(
+													checked: boolean
+												) => {
+													reservations.onChangeHandler(
+														{
+															target: {
+																value: checked.toString(),
+															},
+														}
+													);
+												}}
+											/>
+											<Label
+												htmlFor="reservations"
+												className="text-sm"
+											>
+												{localization.only_reservations}
+											</Label>
+										</div>
+									</div>
+								)}
+							</div>
 						</div>
 					</div>
 				)}

@@ -5,6 +5,8 @@ export interface SearchFormData {
   zip_code?: string;
   distance?: string;
   serviceCat?: string;
+  availability?: string;
+  reservations?: string;
   street?: string;
   lat?: string;
   long?: string;

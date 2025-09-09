@@ -137,7 +137,7 @@ const LoginPage: React.FC = () => {
 				</h1>
 
 				{/* Main Card */}
-				<div className="bg-white rounded-lg shadow-md p-6">
+				<div className="bg-white rounded-lg  p-6">
 					{/* Tab Navigation */}
 					{currentTab !== "confirm" && (
 						<div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">

@@ -10,6 +10,12 @@ import {
 	fetchUserAttributes,
 } from "aws-amplify/auth";
 import { AuthContextType } from "./types/authentication.types";
+import { getSecretHash } from "../../Utils/CognitoUtils";
+import {
+	customSignUp,
+	customConfirmSignUp,
+	customSignIn,
+} from "../../Utils/AWSCognitoService";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -50,29 +56,139 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
-			const result = await signIn({
-				username: email,
-				password,
-			});
+
+			// Check if client secret is configured
+			const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
+
+			let result;
+
+			if (clientSecret) {
+				// Use custom sign in with SECRET_HASH for clients with secrets
+
+				const customResult = await customSignIn({
+					email,
+					password,
+				});
+
+				// Convert custom result to match Amplify format
+				result = {
+					isSignedIn: customResult.isSignedIn,
+					signInDetails: {
+						isSignedIn: customResult.isSignedIn,
+						accessToken: customResult.accessToken,
+					},
+				};
+			} else {
+				// Use standard Amplify sign in for clients without secrets
+				result = await signIn({
+					username: email,
+					password,
+				});
+			}
 
 			if (result.isSignedIn) {
-				// Get user attributes to fetch name
+				// Get user name from multiple sources
 				let userName = email; // fallback to email
-				try {
-					const userAttributes = await fetchUserAttributes();
-					userName =
-						userAttributes.name || userAttributes.email || email;
-				} catch (userError) {
-					console.warn("Could not fetch user attributes:", userError);
+
+				// First, try to get name from stored userName (most reliable for confirmed users)
+				const userNameKey = `userName_${email}`;
+				const storedUserName = localStorage.getItem(userNameKey);
+				if (storedUserName && storedUserName.trim() !== "") {
+					userName = storedUserName;
+				} else {
+					// Fallback to pending user data (for unconfirmed users)
+					const pendingUser = localStorage.getItem("pendingUser");
+					if (pendingUser) {
+						try {
+							const pendingData = JSON.parse(pendingUser);
+							if (
+								pendingData.name &&
+								pendingData.name.trim() !== ""
+							) {
+								userName = pendingData.name;
+							}
+						} catch (parseError) {
+							console.warn(
+								"Could not parse pending user data:",
+								parseError
+							);
+						}
+					}
 				}
 
-				// Store user data
+				// If we still don't have a proper name, try fetchUserAttributes
+				if (userName === email) {
+					try {
+						const userAttributes = await fetchUserAttributes();
+						// Use the name attribute if it exists and is not empty
+						if (
+							userAttributes.name &&
+							userAttributes.name.trim() !== ""
+						) {
+							userName = userAttributes.name;
+						}
+					} catch (userError) {
+						console.warn(
+							"Could not fetch user attributes:",
+							userError
+						);
+					}
+				}
+
+				// Try to extract name from JWT token as another fallback
+				if (userName === email) {
+					try {
+						const accessToken =
+							(result as any).signInDetails?.accessToken ||
+							(result as any).signInDetails?.signInDetails
+								?.accessToken ||
+							(result as any).accessToken;
+
+						if (accessToken) {
+							// Decode JWT token to get user info
+							const tokenParts = accessToken.split(".");
+							if (tokenParts.length === 3) {
+								const payload = JSON.parse(atob(tokenParts[1]));
+								// Check if there's a name in the token
+								if (
+									payload.name &&
+									payload.name.trim() !== ""
+								) {
+									userName = payload.name;
+								}
+							}
+						}
+					} catch (jwtError) {
+						console.warn("Could not decode JWT token:", jwtError);
+					}
+				}
+
+				// Final fallback to email prefix
+				if (userName === email) {
+					userName = email.split("@")[0];
+				}
+
+				// Extract access token from nested structure
+				const accessToken =
+					(result as any).signInDetails?.accessToken ||
+					(result as any).signInDetails?.signInDetails?.accessToken ||
+					(result as any).accessToken;
+
+				// Create flattened signInDetails object
+				const signInDetails = {
+					isSignedIn: result.isSignedIn || true, // Ensure it's always true if we reach this point
+					accessToken: accessToken,
+				};
+
+				// Store user data with flattened structure
 				const userData = {
 					email,
 					name: userName,
 					isSignedIn: true,
-					signInDetails: result,
+					accessToken: accessToken,
+					signInDetails: signInDetails,
 				};
+
 				setUser(userData);
 				localStorage.setItem("cognitoUser", JSON.stringify(userData));
 				localStorage.setItem("isLoggedIn", "true");
@@ -92,21 +208,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
-			const result = await signUp({
-				username: email,
-				password,
-				options: {
-					userAttributes: {
-						email,
-						name,
+
+			// Check if client secret is configured
+			const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
+
+			let result;
+
+			if (clientSecret) {
+				// Use custom signup with SECRET_HASH for clients with secrets
+				const customResult = await customSignUp({
+					username: email,
+					password,
+					email,
+					name,
+				});
+
+				// Convert custom result to match Amplify format
+				result = {
+					userId: customResult.userId,
+					username: customResult.username,
+					isSignUpComplete: customResult.isPendingConfirmation,
+				};
+			} else {
+				// Use standard Amplify signup for clients without secrets
+				result = await signUp({
+					username: email,
+					password,
+					options: {
+						userAttributes: {
+							email,
+							name,
+						},
 					},
-				},
-			});
+				});
+			}
 
 			// Store pending user data
 			const pendingUser = {
 				email,
 				name,
+				username: (result as any).username || email, // Use generated username or fallback to email
 				isPendingConfirmation: true,
 				userId: result.userId,
 			};
@@ -136,10 +277,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
-			await confirmSignUp({
-				username: email,
-				confirmationCode: code,
-			});
+
+			// Check if client secret is configured
+			const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
+
+			if (clientSecret) {
+				// Use custom confirm signup with SECRET_HASH for clients with secrets
+				// Get the stored username from pending user data
+				const pendingUserData = localStorage.getItem("pendingUser");
+				let username = email; // fallback to email
+
+				if (pendingUserData) {
+					try {
+						const pendingUser = JSON.parse(pendingUserData);
+						username = pendingUser.username || email;
+					} catch (parseError) {
+						console.warn(
+							"Could not parse pending user data:",
+							parseError
+						);
+					}
+				}
+
+				await customConfirmSignUp({
+					username: username,
+					confirmationCode: code,
+				});
+			} else {
+				// Use standard Amplify confirm signup for clients without secrets
+				const confirmOptions: any = {
+					username: email,
+					confirmationCode: code,
+				};
+
+				await confirmSignUp(confirmOptions);
+			}
 
 			// Get pending user data to retrieve name
 			const pendingUserData = localStorage.getItem("pendingUser");
@@ -167,6 +339,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			setUser(userData);
 			localStorage.setItem("cognitoUser", JSON.stringify(userData));
 			localStorage.setItem("isLoggedIn", "true");
+
+			// Store the name for future sign-ins before clearing pending data (user-specific)
+			if (userData.name && userData.name !== userData.email) {
+				const userNameKey = `userName_${userData.email}`;
+				localStorage.setItem(userNameKey, userData.name);
+			}
 
 			// Clear pending user data
 			localStorage.removeItem("pendingUser");
@@ -196,7 +374,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const handleResetPassword = async (email: string): Promise<void> => {
 		try {
 			setIsLoading(true);
-			await resetPassword({ username: email });
+
+			// Generate SECRET_HASH if client secret is configured
+			const secretHash = getSecretHash(email);
+
+			const resetOptions: any = { username: email };
+
+			// Add SECRET_HASH if available
+			if (secretHash) {
+				resetOptions.options = {
+					clientMetadata: {
+						SECRET_HASH: secretHash,
+					},
+				};
+			}
+
+			await resetPassword(resetOptions);
 		} catch (error: any) {
 			console.error("Reset password error:", error);
 			throw new Error(error.message || "Failed to reset password");
@@ -212,11 +405,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
-			await confirmResetPassword({
+
+			// Generate SECRET_HASH if client secret is configured
+			const secretHash = getSecretHash(email);
+
+			const confirmResetOptions: any = {
 				username: email,
 				confirmationCode: code,
 				newPassword,
-			});
+			};
+
+			// Add SECRET_HASH if available
+			if (secretHash) {
+				confirmResetOptions.options = {
+					clientMetadata: {
+						SECRET_HASH: secretHash,
+					},
+				};
+			}
+
+			await confirmResetPassword(confirmResetOptions);
 		} catch (error: any) {
 			console.error("Confirm reset password error:", error);
 			throw new Error(
@@ -232,7 +440,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
-			await resendSignUpCode({ username: email });
+
+			// Generate SECRET_HASH if client secret is configured
+			const secretHash = getSecretHash(email);
+
+			const resendOptions: any = { username: email };
+
+			// Add SECRET_HASH if available
+			if (secretHash) {
+				resendOptions.options = {
+					clientMetadata: {
+						SECRET_HASH: secretHash,
+					},
+				};
+			}
+
+			await resendSignUpCode(resendOptions);
 		} catch (error: any) {
 			console.error("Resend confirmation code error:", error);
 			throw new Error(

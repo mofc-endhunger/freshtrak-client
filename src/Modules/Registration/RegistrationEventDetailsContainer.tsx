@@ -57,6 +57,14 @@ const RegistrationEventDetailsContainer: React.FC<
 		}
 	};
 
+	useEffect(() => {
+		const cognitoUser = localStorage.getItem("cognitoUser");
+		const isLoggedIn = localStorage.getItem("isLoggedIn");
+		if (cognitoUser && isLoggedIn === "true") {
+			setshowAuthenticationModal(false);
+		}
+	}, [showAuthenticationModal]);
+
 	const fetchUserToken = async (): Promise<void> => {
 		setLoading(true);
 		const { GUEST_AUTH, GUEST_USER } = API_URL;

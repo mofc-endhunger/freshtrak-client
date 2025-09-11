@@ -114,7 +114,8 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 			setIsLoggedIn(false);
 			localStorage.setItem("isLoggedIn", "false");
 			localStorage.removeItem("userToken");
-			localStorage.removeItem("tokenExpiresAt");
+			localStorage.removeItem("guestId");
+			localStorage.removeItem("guestType");
 			localStorage.removeItem("search_zip");
 			// Redirect to landing page after logout
 			navigate("/");

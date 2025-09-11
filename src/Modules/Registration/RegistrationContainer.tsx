@@ -150,13 +150,60 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			}
 
 			// Handle user authentication and profile
-			if (!token) {
-				setShowAuthModal(true);
-			} else if (!user && userProfile) {
+			// Check for both guest authentication (userToken) and Cognito authentication
+			const cognitoUser = localStorage.getItem("cognitoUser");
+			let isCognitoSignedIn = false;
+			if (cognitoUser) {
 				try {
-					setUser(sanitizeUser(JSON.parse(userProfile)));
+					const cognitoUserData = JSON.parse(cognitoUser);
+					isCognitoSignedIn = cognitoUserData.isSignedIn === true;
 				} catch (error) {
-					console.error("Error parsing userProfile:", error);
+					console.warn("Could not parse cognitoUser:", error);
+				}
+			}
+
+			const isUserAuthenticated =
+				token || (cognitoUser && isCognitoSignedIn);
+
+			if (!isUserAuthenticated) {
+				setShowAuthModal(true);
+			} else if (!user) {
+				// Handle user data for both guest and Cognito users
+				if (userProfile) {
+					// Guest user - use existing userProfile
+					try {
+						setUser(sanitizeUser(JSON.parse(userProfile)));
+					} catch (error) {
+						console.error("Error parsing userProfile:", error);
+					}
+				} else if (cognitoUser && isCognitoSignedIn) {
+					// Cognito user - create user object from cognitoUser data
+					try {
+						const cognitoUserData = JSON.parse(cognitoUser);
+						const cognitoUserObj = {
+							first_name:
+								cognitoUserData.name?.split(" ")[0] || "",
+							last_name:
+								cognitoUserData.name
+									?.split(" ")
+									.slice(1)
+									.join(" ") || "",
+							email: cognitoUserData.email || "",
+							phone_number: "",
+							address: "",
+							city: "",
+							state: "",
+							zip_code: "",
+							adult_count: 1,
+							senior_count: 0,
+							child_count: 0,
+							permission_to_text: false,
+							permission_to_email: true,
+						};
+						setUser(sanitizeUser(cognitoUserObj));
+					} catch (error) {
+						console.error("Error parsing cognitoUser:", error);
+					}
 				}
 			}
 		}

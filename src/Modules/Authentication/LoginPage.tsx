@@ -35,21 +35,33 @@ const LoginPage: React.FC = () => {
 		try {
 			const { GUEST_AUTH, GUEST_USER } = API_URL;
 
-			// Get guest token from API
-			const resp = await axios.post(GUEST_AUTH);
-			const token = resp.data.token;
-			const expires_at = resp.data.expires_at;
+			// Clear Cognito authentication data when logging in as guest
+			localStorage.removeItem("cognitoUser");
 
-			// Store token in localStorage
+			// Get guest authentication
+			const resp = await axios.post(GUEST_AUTH);
+			const { guestId, token, type } = resp.data;
+
+			// Store guest authentication data
 			localStorage.setItem("userToken", token);
-			localStorage.setItem("tokenExpiresAt", expires_at);
+			localStorage.setItem("guestId", guestId);
+			localStorage.setItem("guestType", type);
 			localStorage.setItem("isLoggedIn", "true");
 
 			// Fetch user profile
 			const userResp = await axios.get(GUEST_USER, {
 				headers: { Authorization: `Bearer ${token}` },
 			});
-			localStorage.setItem("userProfile", JSON.stringify(userResp.data));
+			const { id, role } = userResp.data;
+
+			// Store user profile with new structure
+			const userProfile = {
+				id,
+				role,
+				guestId,
+				type,
+			};
+			localStorage.setItem("userProfile", JSON.stringify(userProfile));
 
 			// Track guest login event with Google Tag Manager
 			const gtmEvent: GTMEvent = {

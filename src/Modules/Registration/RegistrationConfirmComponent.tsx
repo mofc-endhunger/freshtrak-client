@@ -56,7 +56,8 @@ const RegistrationConfirmComponent: React.FC<
 	const cognitoUser = localStorage.getItem("cognitoUser");
 	if (!isLoggedIn || !JSON.parse(isLoggedIn)) {
 		localStorage.removeItem("userToken");
-		localStorage.removeItem("tokenExpiresAt");
+		localStorage.removeItem("guestId");
+		localStorage.removeItem("guestType");
 		localStorage.removeItem("search_zip");
 	}
 

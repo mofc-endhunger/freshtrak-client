@@ -39,7 +39,7 @@ export interface NavigationItem {
 }
 
 // Page type for background color logic
-export type PageType = 'main' | 'search' | 'other';
+export type PageType = 'main' | 'search' | 'login' | 'other';
 
 // Background color state interface
 export interface BackgroundColorState {

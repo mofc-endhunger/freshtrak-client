@@ -57,7 +57,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 
 	/**
 	 * Determines the current page type for background color logic
-	 * @returns {PageType} The type of page (main, search, or other)
+	 * @returns {PageType} The type of page (main, search, login, or other)
 	 */
 	const getPageType = (): PageType => {
 		const { pathname } = location;
@@ -70,6 +70,11 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		// Search results page
 		if (pathname.startsWith("/events/list")) {
 			return "search";
+		}
+
+		// Login page
+		if (pathname === "/login") {
+			return "login" as PageType;
 		}
 
 		// All other pages
@@ -86,8 +91,12 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		pageType: PageType,
 		isScrolled: boolean
 	): boolean => {
-		// Main page and search results: transparent initially, background on scroll
-		if (pageType === "main" || pageType === "search") {
+		// Main page, search results, and login page: transparent initially, background on scroll
+		if (
+			pageType === "main" ||
+			pageType === "search" ||
+			pageType === "login"
+		) {
 			return isScrolled;
 		}
 

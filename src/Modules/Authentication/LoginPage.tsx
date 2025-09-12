@@ -5,6 +5,8 @@ import axios from "axios";
 import SignInFormComponent from "./SignInFormComponent";
 import SignUpFormComponent from "./SignUpFormComponent";
 import ConfirmSignUpFormComponent from "./ConfirmSignUpFormComponent";
+import ResetPasswordFormComponent from "./ResetPasswordFormComponent";
+import ConfirmResetPasswordFormComponent from "./ConfirmResetPasswordFormComponent";
 import LoadingSpinner from "../General/LoadingSpinner";
 import { Button } from "../../components/ui/button";
 import { AuthModalTab, GTMEvent } from "./types/authentication.types";
@@ -24,6 +26,7 @@ const LoginPage: React.FC = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [currentTab, setCurrentTab] = useState<AuthModalTab>("signin");
 	const [pendingEmail, setPendingEmail] = useState<string>("");
+	const [resetEmail, setResetEmail] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const navigate = useNavigate();
 
@@ -117,6 +120,24 @@ const LoginPage: React.FC = () => {
 	};
 
 	/**
+	 * Handles successful password reset initiation
+	 */
+	const handleResetPasswordSuccess = (email: string): void => {
+		setResetEmail(email);
+		setCurrentTab("confirmReset");
+		setErrorMessage("");
+	};
+
+	/**
+	 * Handles successful password reset confirmation
+	 */
+	const handleConfirmResetPasswordSuccess = (): void => {
+		setErrorMessage("");
+		// Go back to sign-in tab instead of redirecting
+		setCurrentTab("signin");
+	};
+
+	/**
 	 * Resets error message when switching tabs
 	 */
 	const switchTab = (tab: AuthModalTab): void => {
@@ -201,6 +222,7 @@ const LoginPage: React.FC = () => {
 									onSuccess={handleAuthSuccess}
 									onError={handleAuthError}
 									onSwitchToSignUp={() => switchTab("signup")}
+									onForgotPassword={() => switchTab("reset")}
 								/>
 							)}
 
@@ -220,34 +242,55 @@ const LoginPage: React.FC = () => {
 									onBackToSignUp={() => switchTab("signup")}
 								/>
 							)}
+
+							{currentTab === "reset" && (
+								<ResetPasswordFormComponent
+									onSuccess={handleResetPasswordSuccess}
+									onError={handleAuthError}
+									onBackToSignIn={() => switchTab("signin")}
+								/>
+							)}
+
+							{currentTab === "confirmReset" && (
+								<ConfirmResetPasswordFormComponent
+									email={resetEmail}
+									onSuccess={
+										handleConfirmResetPasswordSuccess
+									}
+									onError={handleAuthError}
+									onBackToReset={() => switchTab("reset")}
+								/>
+							)}
 						</>
 					)}
 
 					{/* Guest Login Option */}
-					{currentTab !== "confirm" && (
-						<div className="mt-6 pt-4 border-t border-gray-200">
-							<div className="text-center">
-								<p className="text-sm text-gray-600 mb-3">
-									Or continue as a guest
-								</p>
-								<Button
-									variant="outline"
-									onClick={onGuestLogin}
-									disabled={isLoading}
-									className="w-full"
-								>
-									{isLoading ? (
-										<div className="flex items-center justify-center space-x-2">
-											<div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-											<span>Processing...</span>
-										</div>
-									) : (
-										"Continue as Guest"
-									)}
-								</Button>
+					{currentTab !== "confirm" &&
+						currentTab !== "reset" &&
+						currentTab !== "confirmReset" && (
+							<div className="mt-6 pt-4 border-t border-gray-200">
+								<div className="text-center">
+									<p className="text-sm text-gray-600 mb-3">
+										Or continue as a guest
+									</p>
+									<Button
+										variant="outline"
+										onClick={onGuestLogin}
+										disabled={isLoading}
+										className="w-full"
+									>
+										{isLoading ? (
+											<div className="flex items-center justify-center space-x-2">
+												<div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+												<span>Processing...</span>
+											</div>
+										) : (
+											"Continue as Guest"
+										)}
+									</Button>
+								</div>
 							</div>
-						</div>
-					)}
+						)}
 				</div>
 
 				{/* Back to Home Link */}

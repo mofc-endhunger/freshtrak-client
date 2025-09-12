@@ -4,6 +4,8 @@ import TagManager from "react-gtm-module";
 import SignInFormComponent from "./SignInFormComponent";
 import SignUpFormComponent from "./SignUpFormComponent";
 import ConfirmSignUpFormComponent from "./ConfirmSignUpFormComponent";
+import ResetPasswordFormComponent from "./ResetPasswordFormComponent";
+import ConfirmResetPasswordFormComponent from "./ConfirmResetPasswordFormComponent";
 import LoadingSpinner from "../General/LoadingSpinner";
 import {
 	ExtendedAuthenticationModalProps,
@@ -51,6 +53,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [currentTab, setCurrentTab] = useState<AuthModalTab>(initialTab);
 	const [pendingEmail, setPendingEmail] = useState<string>("");
+	const [resetEmail, setResetEmail] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const navigate = useNavigate();
 
@@ -117,6 +120,24 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	};
 
 	/**
+	 * Handles successful password reset initiation
+	 */
+	const handleResetPasswordSuccess = (email: string): void => {
+		setResetEmail(email);
+		setCurrentTab("confirmReset");
+		setErrorMessage("");
+	};
+
+	/**
+	 * Handles successful password reset confirmation
+	 */
+	const handleConfirmResetPasswordSuccess = (): void => {
+		setErrorMessage("");
+		// Go back to sign-in tab instead of closing modal
+		setCurrentTab("signin");
+	};
+
+	/**
 	 * Handles successful confirmation - close modal and redirect
 	 */
 	const handleConfirmSuccess = (): void => {
@@ -149,6 +170,10 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 				return "Create Account";
 			case "confirm":
 				return "Confirm Account";
+			case "reset":
+				return "Reset Password";
+			case "confirmReset":
+				return "Confirm New Password";
 			case "loading":
 				return "Processing...";
 			default:
@@ -222,6 +247,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 									onSuccess={handleAuthSuccess}
 									onError={handleAuthError}
 									onSwitchToSignUp={() => switchTab("signup")}
+									onForgotPassword={() => switchTab("reset")}
 								/>
 							)}
 
@@ -239,6 +265,25 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 									onSuccess={handleConfirmSuccess}
 									onError={handleAuthError}
 									onBackToSignUp={() => switchTab("signup")}
+								/>
+							)}
+
+							{currentTab === "reset" && (
+								<ResetPasswordFormComponent
+									onSuccess={handleResetPasswordSuccess}
+									onError={handleAuthError}
+									onBackToSignIn={() => switchTab("signin")}
+								/>
+							)}
+
+							{currentTab === "confirmReset" && (
+								<ConfirmResetPasswordFormComponent
+									email={resetEmail}
+									onSuccess={
+										handleConfirmResetPasswordSuccess
+									}
+									onError={handleAuthError}
+									onBackToReset={() => switchTab("reset")}
 								/>
 							)}
 

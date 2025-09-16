@@ -25,6 +25,12 @@ interface FilterOption {
 	onChangeHandler: (event: { target: { value: string } }) => void;
 }
 
+interface ReservationsFilterOption {
+	show: boolean;
+	defaultValue: boolean;
+	onChangeHandler: (event: { target: { value: boolean } }) => void;
+}
+
 interface ServiceCategoryFilter extends FilterOption {
 	data: ServiceCategory[];
 }
@@ -33,7 +39,7 @@ interface FilterComponentProps {
 	distance: FilterOption;
 	serviceCat: ServiceCategoryFilter;
 	availability: FilterOption; // New availability filter for time-based filtering
-	reservations: FilterOption; // New reservations filter for events that accept reservations
+	reservations: ReservationsFilterOption; // New reservations filter for events that accept reservations
 	closeFilter: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -212,8 +218,7 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 											<Switch
 												id="reservations"
 												checked={
-													reservations.defaultValue ===
-													"true"
+													reservations.defaultValue
 												}
 												onCheckedChange={(
 													checked: boolean
@@ -221,7 +226,7 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 													reservations.onChangeHandler(
 														{
 															target: {
-																value: checked.toString(),
+																value: checked,
 															},
 														}
 													);

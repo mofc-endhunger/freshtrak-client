@@ -74,14 +74,14 @@ export const filterEventsByAvailability = (
 /**
  * Filters events by reservations acceptance
  * @param {Object} eventsByDate - Events grouped by date (from EventHandler)
- * @param {string} reservationsFilter - The reservations filter to apply ("true" or "false")
+ * @param {boolean} reservationsFilter - The reservations filter to apply (true to show only events that accept reservations, false to show all)
  * @returns {Object} Filtered events grouped by date
  */
 export const filterEventsByReservations = (
 	eventsByDate,
 	reservationsFilter
 ) => {
-	if (!eventsByDate || reservationsFilter === "false") {
+	if (!eventsByDate || !reservationsFilter) {
 		return eventsByDate;
 	}
 

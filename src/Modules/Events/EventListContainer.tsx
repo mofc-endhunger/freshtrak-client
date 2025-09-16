@@ -18,14 +18,14 @@ interface EventListContainerProps {
 	zipCode: string;
 	agencyData: Agency[];
 	availabilityFilter?: string;
-	reservationsFilter?: string;
+	reservationsFilter?: boolean;
 }
 
 const EventListContainer: React.FC<EventListContainerProps> = ({
 	zipCode,
 	agencyData,
 	availabilityFilter = "All",
-	reservationsFilter = "false",
+	reservationsFilter = false,
 }) => {
 	const EventList: React.FC = () => {
 		const agencyDataSorted = EventHandler(agencyData);

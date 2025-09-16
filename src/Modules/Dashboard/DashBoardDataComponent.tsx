@@ -12,7 +12,7 @@ type SearchFormData = {
 	distance: string;
 	serviceCat: string;
 	availability: string;
-	reservations: string;
+	reservations: boolean;
 	street?: string;
 	lat?: string;
 	long?: string;
@@ -66,8 +66,8 @@ const DashBoardDataComponent: React.FC<DashBoardDataComponentProps> = () => {
 		if (availability && availability !== "All") {
 			queryParams.set("availability", availability);
 		}
-		if (reservations && reservations !== "false") {
-			queryParams.set("reservations", reservations);
+		if (reservations) {
+			queryParams.set("reservations", "true");
 		}
 
 		if (queryParams.toString()) {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import SearchComponent from "../General/SearchComponent";
+import SearchComponent, { SearchFormData } from "../General/SearchComponent";
 import ResourceListComponent from "./ResourceListComponent";
 import EventListContainer from "./EventListContainer";
 import { API_URL } from "../../Utils/Urls";
@@ -26,14 +26,6 @@ interface FoodBankData {
 	[key: string]: any;
 }
 
-interface SearchFormData {
-	zip_code: string;
-	distance: string;
-	serviceCat: string;
-	availability: string;
-	reservations: string;
-}
-
 const EventContainer: React.FC = () => {
 	const {
 		zipCode = "",
@@ -48,7 +40,7 @@ const EventContainer: React.FC = () => {
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
 	const availability = searchParams.get("availability") || "All";
-	const reservations = searchParams.get("reservations") || "false";
+	const reservations = searchParams.get("reservations") === "true";
 
 	const [foodBankResponse, setFoodBankResponse] = useState<boolean>(false);
 	const [foodBankData, setFoodBankData] = useState<FoodBankData>({
@@ -166,8 +158,8 @@ const EventContainer: React.FC = () => {
 		if (availability && availability !== "All") {
 			queryParams.set("availability", availability);
 		}
-		if (reservations && reservations !== "false") {
-			queryParams.set("reservations", reservations);
+		if (reservations) {
+			queryParams.set("reservations", "true");
 		}
 
 		if (queryParams.toString()) {

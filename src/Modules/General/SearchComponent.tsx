@@ -24,12 +24,12 @@ interface ServiceCategory {
 	service_category_name: string;
 }
 
-interface SearchFormData {
+export interface SearchFormData {
 	zip_code: string;
 	distance: string;
 	serviceCat: string;
 	availability: string;
-	reservations: string;
+	reservations: boolean;
 	street?: string;
 	lat?: string;
 	long?: string;
@@ -58,7 +58,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 		const [distance, setDistance] = useState<string>(range);
 		const [serviceCat, setServiceCat] = useState<string>("");
 		const [availability, setAvailability] = useState<string>("All");
-		const [reservations, setReservations] = useState<string>("false");
+		const [reservations, setReservations] = useState<boolean>(false);
 		const [showFilter, setShowFilter] = useState<boolean>(
 			z_code !== undefined
 		);
@@ -157,7 +157,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 														DEFAULT_DISTANCE.toString(),
 													serviceCat: "",
 													availability: "All",
-													reservations: "false",
+													reservations: false,
 												});
 											} else {
 												setShowFilter(false);
@@ -217,7 +217,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 									distance: "",
 									serviceCat: "",
 									availability: "All",
-									reservations: "false",
+									reservations: false,
 								});
 							}}
 							distance={{
@@ -273,7 +273,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 								show: showDistance,
 								defaultValue: reservations,
 								onChangeHandler: (e: {
-									target: { value: string };
+									target: { value: boolean };
 								}) => {
 									setReservations(e.target.value);
 									onSubmitHandler({

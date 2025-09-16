@@ -88,6 +88,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 			if (result.isSignedIn) {
 				// Get user name from multiple sources
+				// Clear guest authentication data when logging in with Cognito
+				localStorage.removeItem("userToken");
+				localStorage.removeItem("guestId");
+				localStorage.removeItem("guestType");
+				localStorage.removeItem("userProfile");
+
+				// Get user attributes to fetch name
 				let userName = email; // fallback to email
 
 				// First, try to get name from stored userName (most reliable for confirmed users)
@@ -329,6 +336,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				}
 			}
 
+			// Clear guest authentication data when confirming Cognito sign-up
+			localStorage.removeItem("userToken");
+			localStorage.removeItem("guestId");
+			localStorage.removeItem("guestType");
+			localStorage.removeItem("userProfile");
+
 			// Store confirmed user data
 			const userData = {
 				email,
@@ -361,7 +374,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			setIsLoading(true);
 			await signOut();
 			setUser(null);
+
+			// Clear all authentication data
 			localStorage.removeItem("cognitoUser");
+			localStorage.removeItem("userToken");
+			localStorage.removeItem("guestId");
+			localStorage.removeItem("guestType");
+			localStorage.removeItem("userProfile");
 			localStorage.removeItem("isLoggedIn");
 		} catch (error: any) {
 			console.error("Sign out error:", error);

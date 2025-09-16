@@ -110,9 +110,9 @@ let localization = new LocalizedStrings({
 		by_distance: "a distancia",
 		by_service_catogory: "por categoría de servicio",
 		by_availability: "por disponibilidad",
-		only_reservations: "Solo Reservaciones",
+		only_reservations: "Solo Reservas",
 		show_only_reservations:
-			"Mostrar solo eventos que aceptan reservaciones",
+			"Mostrar solo eventos que aceptan reservas",
 		register: "Regístrate ahora.",
 		save_time: "Ahorrar tiempo.",
 		stay_safe: "Mantente segura",

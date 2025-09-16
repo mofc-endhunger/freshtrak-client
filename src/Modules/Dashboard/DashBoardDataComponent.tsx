@@ -1,22 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import SearchComponent from "../General/SearchComponent";
+import SearchComponent, { SearchFormData } from "../General/SearchComponent";
 import DashboardCreateAccountComponent from "./DashboardCreateAccountComponent";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import { DashBoardDataComponentProps } from "./types/dashboard.types";
-
-// Import the SearchFormData type from SearchComponent to avoid conflicts
-type SearchFormData = {
-	zip_code: string;
-	distance: string;
-	serviceCat: string;
-	availability: string;
-	reservations: boolean;
-	street?: string;
-	lat?: string;
-	long?: string;
-};
 
 /**
  * DashBoardDataComponent - Handles search functionality and main content display

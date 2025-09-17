@@ -3,9 +3,9 @@
  */
 
 export const BASE_URL = process.env.REACT_APP_PANTRY_FINDER_API;
-const REGISTRATION_URL = process.env.REACT_APP_REGISTRATION_API;
+//const REGISTRATION_URL = process.env.REACT_APP_REGISTRATION_API;
 //TODO: set this to localhost:3000/ for development on local
-//const REGISTRATION_URL = "http://localhost:3000/";
+const REGISTRATION_URL = "http://localhost:3000/";
 export const API_URL = {
 	EVENTS_LIST: BASE_URL + "api/agencies",
 	FOODBANK_LIST: BASE_URL + "api/foodbanks",
@@ -17,6 +17,10 @@ export const API_URL = {
 	CREATE_RESERVATION: `${REGISTRATION_URL}api/reservations`,
 	TWILIO_SMS: `${REGISTRATION_URL}twilio/sms`,
 	SEND_EMAIL: `${REGISTRATION_URL}twilio/email`,
+	// Household endpoints
+	HOUSEHOLDS: `${REGISTRATION_URL}households`,
+	HOUSEHOLD_MEMBERS: householdId =>
+		`${REGISTRATION_URL}households/${householdId}/members`,
 };
 
 export const RENDER_URL = {

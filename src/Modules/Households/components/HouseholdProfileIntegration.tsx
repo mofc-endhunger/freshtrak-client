@@ -21,7 +21,6 @@ import {
 	Plus,
 	CheckCircle,
 	AlertCircle,
-	ArrowRight,
 	Calendar,
 	MapPin,
 } from "lucide-react";
@@ -45,13 +44,13 @@ interface HouseholdStatus {
 export const HouseholdProfileIntegration: React.FC<
 	HouseholdProfileIntegrationProps
 > = ({ onNavigateToHousehold, className = "" }) => {
-	const { user } = useAuth();
 	const {
 		hasCompletedSetup,
 		getHouseholdId,
 		getSignUpState,
 		shouldShowPrompt,
 	} = useHouseholdSignUpIntegration();
+	const { user } = useAuth();
 
 	const [showSetupWizard, setShowSetupWizard] = useState(false);
 	const [householdStatus, setHouseholdStatus] = useState<HouseholdStatus>({
@@ -165,7 +164,7 @@ export const HouseholdProfileIntegration: React.FC<
 	return (
 		<div className={`space-y-6 ${className}`}>
 			{/* Household Completion Prompt */}
-			{shouldShowPrompt() && (
+			{user?.email && shouldShowPrompt(user.email) && (
 				<HouseholdCompletionPrompt
 					onSetup={handleSetupHousehold}
 					onDismiss={handlePromptDismiss}
@@ -343,6 +342,7 @@ export const useHouseholdProfileIntegration = () => {
 		getSignUpState,
 		shouldShowPrompt,
 	} = useHouseholdSignUpIntegration();
+	const { user } = useAuth();
 
 	const getProfileStatus = (): HouseholdStatus => {
 		const isComplete = hasCompletedSetup();
@@ -374,7 +374,9 @@ export const useHouseholdProfileIntegration = () => {
 	};
 
 	const needsHouseholdSetup = (): boolean => {
-		return !hasCompletedSetup() && shouldShowPrompt();
+		return (
+			!hasCompletedSetup() && user?.email && shouldShowPrompt(user.email)
+		);
 	};
 
 	const canManageHousehold = (): boolean => {
@@ -385,6 +387,6 @@ export const useHouseholdProfileIntegration = () => {
 		getProfileStatus,
 		needsHouseholdSetup,
 		canManageHousehold,
-		shouldShowPrompt: shouldShowPrompt(),
+		shouldShowPrompt: user?.email ? shouldShowPrompt(user.email) : false,
 	};
 };

@@ -22,12 +22,20 @@ import {
   BulkMemberOperation,
   BulkOperationResponse,
 } from '../Modules/Households/types';
+import {
+  retryWithBackoff,
+  createErrorContext,
+  logError,
+  DEFAULT_RETRY_CONFIG,
+} from '../Modules/Households/utils/errorHandling';
 
 /**
  * Configuration for the Households API service
  */
 const API_CONFIG: HouseholdApiConfig = {
-  baseUrl: process.env.REACT_APP_PANTRY_FINDER_API || '',
+  //baseUrl: process.env.REACT_APP_PANTRY_FINDER_API || '',
+  //TODO: change this to the actual API URL
+  baseUrl: 'http://localhost:3000',
   endpoints: {
     createHousehold: '/households',
     getHousehold: '/households',
@@ -93,33 +101,55 @@ class SimpleCache {
  * Error handling utilities
  */
 class ApiErrorHandler {
-  static createError(error: any): HouseholdApiErrorDetails {
+  static createError(error: any, context?: any): HouseholdApiErrorDetails {
+    const errorContext = createErrorContext('api_request', context);
+
     if (error.response) {
       // Server responded with error status
       const status = error.response.status;
       const message = error.response.data?.message || error.message || 'API request failed';
 
-      return {
+      const errorDetails = {
         type: this.getErrorType(status),
         message,
         code: error.response.data?.code,
         details: error.response.data,
         retryable: status >= 500 || status === 429,
       };
+
+      // Log the error
+      logError(new Error(message), errorContext, {
+        statusCode: status,
+        responseData: error.response.data,
+      });
+
+      return errorDetails;
     } else if (error.request) {
       // Network error
-      return {
-        type: 'NETWORK_ERROR',
+      const errorDetails = {
+        type: 'NETWORK_ERROR' as HouseholdApiError,
         message: 'Network error - please check your connection',
         retryable: true,
       };
+
+      // Log the error
+      logError(new Error(errorDetails.message), errorContext, {
+        requestError: true,
+      });
+
+      return errorDetails;
     } else {
       // Other error
-      return {
-        type: 'UNKNOWN_ERROR',
+      const errorDetails = {
+        type: 'UNKNOWN_ERROR' as HouseholdApiError,
         message: error.message || 'An unexpected error occurred',
         retryable: false,
       };
+
+      // Log the error
+      logError(error, errorContext);
+
+      return errorDetails;
     }
   }
 
@@ -183,9 +213,15 @@ export class HouseholdsApiService {
     this.axiosInstance.interceptors.request.use(
       (config) => {
         const token = this.getAuthToken();
+        console.log('🔍 HouseholdsApiService - Request interceptor - token:', token);
+        console.log('🔍 HouseholdsApiService - Request URL:', config.url);
+
         if (token) {
           config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${token}`;
+          console.log('✅ HouseholdsApiService - Authorization header set:', config.headers.Authorization);
+        } else {
+          console.warn('⚠️ HouseholdsApiService - No token available, request will be unauthenticated');
         }
         return config;
       },
@@ -213,10 +249,20 @@ export class HouseholdsApiService {
   private getAuthToken(): string | null {
     try {
       const cognitoUser = localStorage.getItem('cognitoUser');
+      console.log('🔍 HouseholdsApiService - Raw cognitoUser from localStorage:', cognitoUser);
+
       if (cognitoUser) {
         const userData = JSON.parse(cognitoUser);
+        console.log('🔍 HouseholdsApiService - Parsed userData:', userData);
+        console.log('🔍 HouseholdsApiService - accessToken:', userData.accessToken);
+
+        if (!userData.accessToken) {
+          console.warn('⚠️ HouseholdsApiService - No accessToken found in userData:', userData);
+        }
+
         return userData.accessToken || null;
       }
+      console.log('❌ HouseholdsApiService - No cognitoUser found in localStorage');
       return null;
     } catch (error) {
       console.warn('Failed to get auth token:', error);
@@ -271,9 +317,17 @@ export class HouseholdsApiService {
    * Create a new household
    */
   async createHousehold(data: CreateHouseholdRequest): Promise<HouseholdResponse> {
+    const context = createErrorContext('create_household');
+
     const requestFn = () => this.axiosInstance.post(API_CONFIG.endpoints.createHousehold, data);
-    const response = await this.retryRequest(requestFn);
-    return response.data;
+
+    try {
+      const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
+      return response.data;
+    } catch (error) {
+      const errorDetails = ApiErrorHandler.createError(error, context);
+      throw new Error(errorDetails.message);
+    }
   }
 
   /**

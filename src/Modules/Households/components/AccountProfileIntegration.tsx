@@ -320,13 +320,15 @@ export const AccountProfileIntegration: React.FC<
 			</Card>
 
 			{/* Household Completion Prompt */}
-			{showCompletionPrompts && shouldShowPrompt() && (
-				<HouseholdCompletionPrompt
-					onSetup={handleSetupHousehold}
-					onDismiss={handlePromptDismiss}
-					variant="banner"
-				/>
-			)}
+			{showCompletionPrompts &&
+				user?.email &&
+				shouldShowPrompt(user.email) && (
+					<HouseholdCompletionPrompt
+						onSetup={handleSetupHousehold}
+						onDismiss={handlePromptDismiss}
+						variant="banner"
+					/>
+				)}
 
 			{/* Profile Sections */}
 			{showHouseholdSection && (
@@ -589,7 +591,9 @@ export const useAccountProfileIntegration = () => {
 	};
 
 	const needsHouseholdSetup = (): boolean => {
-		return !hasCompletedSetup() && shouldShowPrompt();
+		return (
+			!hasCompletedSetup() && user?.email && shouldShowPrompt(user.email)
+		);
 	};
 
 	const canManageHousehold = (): boolean => {
@@ -615,7 +619,7 @@ export const useAccountProfileIntegration = () => {
 		navigateToHouseholdManagement,
 		navigateToHouseholdSetup,
 		navigateToProfile,
-		shouldShowPrompt: shouldShowPrompt(),
+		shouldShowPrompt: user?.email ? shouldShowPrompt(user.email) : false,
 		user,
 	};
 };

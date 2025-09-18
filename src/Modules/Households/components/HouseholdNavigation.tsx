@@ -19,8 +19,6 @@ import {
 	Users,
 	Settings,
 	User,
-	ArrowLeft,
-	ArrowRight,
 	ChevronRight,
 	MapPin,
 	Calendar,
@@ -167,8 +165,8 @@ export const HouseholdNavigation: React.FC<HouseholdNavigationProps> = ({
 }) => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { user, isAuthenticated } = useAuth();
-	const { hasCompletedSetup, getHouseholdId, shouldShowPrompt } =
+	const { isAuthenticated, user } = useAuth();
+	const { hasCompletedSetup, shouldShowPrompt } =
 		useHouseholdSignUpIntegration();
 
 	const handleNavigation = (path: string) => {
@@ -208,7 +206,9 @@ export const HouseholdNavigation: React.FC<HouseholdNavigationProps> = ({
 	): string | undefined => {
 		switch (item.id) {
 			case "household_setup":
-				return shouldShowPrompt() ? "New" : undefined;
+				return user?.email && shouldShowPrompt(user.email)
+					? "New"
+					: undefined;
 			case "household_manage":
 				return hasCompletedSetup() ? "Active" : undefined;
 			default:
@@ -221,7 +221,9 @@ export const HouseholdNavigation: React.FC<HouseholdNavigationProps> = ({
 	): "default" | "secondary" | "destructive" | "outline" => {
 		switch (item.id) {
 			case "household_setup":
-				return shouldShowPrompt() ? "destructive" : "outline";
+				return user?.email && shouldShowPrompt(user.email)
+					? "destructive"
+					: "outline";
 			case "household_manage":
 				return hasCompletedSetup() ? "default" : "outline";
 			default:
@@ -416,7 +418,7 @@ export const HouseholdNavigation: React.FC<HouseholdNavigationProps> = ({
 export const useHouseholdNavigation = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, user } = useAuth();
 	const { hasCompletedSetup, shouldShowPrompt } =
 		useHouseholdSignUpIntegration();
 
@@ -465,7 +467,7 @@ export const useHouseholdNavigation = () => {
 	};
 
 	const shouldShowHouseholdSetup = (): boolean => {
-		return isAuthenticated && shouldShowPrompt();
+		return isAuthenticated && user?.email && shouldShowPrompt(user.email);
 	};
 
 	return {

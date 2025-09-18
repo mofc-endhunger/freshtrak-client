@@ -48,6 +48,10 @@ const PrivacyComponent = lazy(() =>
 );
 const TermsComponent = lazy(() => import("../Modules/Policies/TermsComponent"));
 const LoginPage = lazy(() => import("../Modules/Authentication/LoginPage"));
+const HouseholdContainer = lazy(() =>
+	import("../Modules/Households/HouseholdContainer")
+);
+const AccountPage = lazy(() => import("../Modules/Account/AccountPage"));
 
 const AppRoutes = () => {
 	React.useEffect(() => {}, []);
@@ -73,6 +77,15 @@ const AppRoutes = () => {
 						/>
 						{/* Flag to turn off/on Home Page Container for Loggedin user feature */}
 						<Route path="/user-home" element={<HomeContainer />} />
+
+						{/* Household Management */}
+						<Route
+							path="/households"
+							element={<HouseholdContainer />}
+						/>
+
+						{/* Account Management */}
+						<Route path="/account" element={<AccountPage />} />
 
 						{/* Out of Scope */}
 						{/* <Route

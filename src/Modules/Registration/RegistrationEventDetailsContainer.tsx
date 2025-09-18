@@ -216,7 +216,7 @@ const RegistrationEventDetailsContainer: React.FC<
 				<AuthenticationModalComponent
 					show={showAuthenticationModal}
 					setshow={setshowAuthenticationModal}
-					onLogin={getUserToken}
+					onLogin={fetchUserToken}
 				/>
 			)}
 

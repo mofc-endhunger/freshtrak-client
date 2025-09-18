@@ -6,8 +6,9 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
-import { X, Home, Users, Calendar, Bell } from "lucide-react";
+import { X, Home, Users, Bell } from "lucide-react";
 import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegration";
+import { useAuth } from "../../Authentication/AuthContext";
 
 interface HouseholdCompletionPromptProps {
 	onSetup: () => void;
@@ -67,15 +68,16 @@ export const HouseholdCompletionPrompt: React.FC<
 > = ({ onSetup, onDismiss, className = "", variant = "banner" }) => {
 	const { shouldShowPrompt, markPromptShown } =
 		useHouseholdSignUpIntegration();
+	const { user } = useAuth();
 	const [isVisible, setIsVisible] = useState(false);
 	const [promptConfig] = useState(PROMPT_VARIANTS[variant]);
 
 	// Check if we should show the prompt
 	useEffect(() => {
-		if (shouldShowPrompt()) {
+		if (user?.email && shouldShowPrompt(user.email)) {
 			setIsVisible(true);
 		}
-	}, [shouldShowPrompt]);
+	}, [shouldShowPrompt, user]);
 
 	const handleDismiss = () => {
 		markPromptShown();
@@ -263,6 +265,7 @@ export const HouseholdCompletionPrompt: React.FC<
 export const useHouseholdCompletionPrompts = () => {
 	const { shouldShowPrompt, getSignUpState } =
 		useHouseholdSignUpIntegration();
+	const { user } = useAuth();
 
 	const getPromptFrequency = (): "immediate" | "delayed" | "periodic" => {
 		const state = getSignUpState();
@@ -277,19 +280,27 @@ export const useHouseholdCompletionPrompts = () => {
 	};
 
 	const shouldShowBannerPrompt = (): boolean => {
-		return shouldShowPrompt() && getPromptFrequency() === "immediate";
+		return user?.email
+			? shouldShowPrompt(user.email) &&
+					getPromptFrequency() === "immediate"
+			: false;
 	};
 
 	const shouldShowCardPrompt = (): boolean => {
-		return shouldShowPrompt() && getPromptFrequency() === "delayed";
+		return user?.email
+			? shouldShowPrompt(user.email) && getPromptFrequency() === "delayed"
+			: false;
 	};
 
 	const shouldShowToastPrompt = (): boolean => {
-		return shouldShowPrompt() && getPromptFrequency() === "periodic";
+		return user?.email
+			? shouldShowPrompt(user.email) &&
+					getPromptFrequency() === "periodic"
+			: false;
 	};
 
 	return {
-		shouldShowPrompt: shouldShowPrompt(),
+		shouldShowPrompt: user?.email ? shouldShowPrompt(user.email) : false,
 		getPromptFrequency,
 		shouldShowBannerPrompt: shouldShowBannerPrompt(),
 		shouldShowCardPrompt: shouldShowCardPrompt(),

@@ -12,17 +12,20 @@ export interface HouseholdSignUpState {
   completionStatus: 'pending' | 'completed' | 'skipped';
   householdId: number | null;
   lastPromptDate: Date | null;
+  isNewUser: boolean; // Track if this is a new user who just completed email confirmation
+  userId: string | null; // Track which user this state belongs to
 }
 
 export interface HouseholdSignUpActions {
-  offerHouseholdSetup: () => Promise<void>;
+  offerHouseholdSetup: (userEmail: string) => Promise<void>;
   createHousehold: (data: CreateHouseholdApiRequest) => Promise<HouseholdResponse>;
   skipHouseholdSetup: () => Promise<void>;
   deferHouseholdSetup: () => Promise<void>;
   getSignUpState: () => HouseholdSignUpState;
   updateSignUpState: (state: Partial<HouseholdSignUpState>) => void;
-  shouldShowPrompt: () => boolean;
+  shouldShowPrompt: (currentUserEmail: string) => boolean;
   markPromptShown: () => void;
+  isNewUserSignUp: (userEmail: string) => boolean;
 }
 
 /**
@@ -39,12 +42,14 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
   /**
    * Offer household setup after email confirmation
    */
-  async offerHouseholdSetup(): Promise<void> {
+  async offerHouseholdSetup(userEmail: string): Promise<void> {
     try {
-      // Update state to show that we've offered setup
+      // Update state to show that we've offered setup for this specific user
       this.updateSignUpState({
         hasOfferedSetup: true,
         completionStatus: 'pending',
+        isNewUser: true,
+        userId: userEmail,
       });
 
       // Store in localStorage for persistence
@@ -129,6 +134,8 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
           completionStatus: parsed.completionStatus || 'pending',
           householdId: parsed.householdId || null,
           lastPromptDate: parsed.lastPromptDate ? new Date(parsed.lastPromptDate) : null,
+          isNewUser: parsed.isNewUser || false,
+          userId: parsed.userId || null,
         };
       }
     } catch (error) {
@@ -142,6 +149,8 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
       completionStatus: 'pending',
       householdId: null,
       lastPromptDate: null,
+      isNewUser: false,
+      userId: null,
     };
   }
 
@@ -161,8 +170,13 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
   /**
    * Check if we should show a completion prompt
    */
-  shouldShowPrompt(): boolean {
+  shouldShowPrompt(currentUserEmail: string): boolean {
     const state = this.getSignUpState();
+
+    // Don't show if this is a different user (user switched accounts)
+    if (state.userId && state.userId !== currentUserEmail) {
+      return false;
+    }
 
     // Don't show if already completed or permanently skipped
     if (state.completionStatus === 'completed' || state.userChoice === 'skip') {
@@ -171,6 +185,11 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
 
     // Don't show if we haven't offered setup yet
     if (!state.hasOfferedSetup) {
+      return false;
+    }
+
+    // Only show for new users who just completed email confirmation
+    if (!state.isNewUser) {
       return false;
     }
 
@@ -231,6 +250,60 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
     const state = this.getSignUpState();
     return state.householdId;
   }
+
+  /**
+   * Check if this is a new user sign-up (just completed email confirmation)
+   */
+  isNewUserSignUp(userEmail: string): boolean {
+    try {
+      console.log("🔍 Checking isNewUserSignUp for userEmail:", userEmail);
+
+      // Check if there's a new user signup flag in localStorage
+      const newUserFlag = localStorage.getItem('new_user_signup');
+      console.log("🔍 New user flag in localStorage:", newUserFlag);
+
+      if (newUserFlag) {
+        const flagData = JSON.parse(newUserFlag);
+        console.log("🔍 Parsed flag data:", flagData);
+
+        // Check if the flag is recent (within last 5 minutes) and completed
+        const isRecent = (Date.now() - flagData.timestamp) < (5 * 60 * 1000); // 5 minutes
+        console.log("🔍 Is recent:", isRecent, "Time diff:", (Date.now() - flagData.timestamp) / 1000, "seconds");
+
+        if (isRecent && flagData.completed) {
+          console.log("✅ Found recent new user signup flag - clearing and returning true");
+          // Clear the flag since we're processing it
+          localStorage.removeItem('new_user_signup');
+          return true;
+        } else {
+          console.log("❌ Flag not recent or not completed");
+        }
+      } else {
+        console.log("❌ No new user flag found in localStorage");
+      }
+
+      // Check if this is an existing user signing in (not a new signup)
+      // If there's old household state but no new user flag, this is likely a sign-in
+      const state = this.getSignUpState();
+      console.log("🔍 Fallback state check:", state);
+
+      // If user has old state but no new user flag, they're signing in (not signing up)
+      if (state.hasOfferedSetup && !newUserFlag) {
+        console.log("🔍 User has old household state but no new user flag - this is a sign-in, not sign-up");
+        // Clear old state for this user since they're signing in fresh
+        this.clearSignUpState();
+        return false;
+      }
+
+      const fallbackResult = state.isNewUser && state.userId === userEmail && !state.hasOfferedSetup;
+      console.log("🔍 Fallback result:", fallbackResult);
+
+      return fallbackResult;
+    } catch (error) {
+      console.error('Error checking new user signup:', error);
+      return false;
+    }
+  }
 }
 
 /**
@@ -243,12 +316,13 @@ export const useHouseholdSignUpIntegration = () => {
   return {
     // State
     getSignUpState: () => integrationService.getSignUpState(),
-    shouldShowPrompt: () => integrationService.shouldShowPrompt(),
+    shouldShowPrompt: (userEmail: string) => integrationService.shouldShowPrompt(userEmail),
     hasCompletedSetup: () => integrationService.hasCompletedSetup(),
     getHouseholdId: () => integrationService.getHouseholdId(),
+    isNewUserSignUp: (userEmail: string) => integrationService.isNewUserSignUp(userEmail),
 
     // Actions
-    offerHouseholdSetup: () => integrationService.offerHouseholdSetup(),
+    offerHouseholdSetup: (userEmail: string) => integrationService.offerHouseholdSetup(userEmail),
     createHousehold: (data: CreateHouseholdApiRequest) => integrationService.createHousehold(data),
     skipHouseholdSetup: () => integrationService.skipHouseholdSetup(),
     deferHouseholdSetup: () => integrationService.deferHouseholdSetup(),

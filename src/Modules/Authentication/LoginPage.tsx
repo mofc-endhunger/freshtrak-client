@@ -111,11 +111,37 @@ const LoginPage: React.FC = () => {
 	};
 
 	/**
-	 * Handles successful confirmation - redirect to home
+	 * Handles successful confirmation - redirect to home or household setup
 	 */
 	const handleConfirmSuccess = (): void => {
+		console.log("🎉 handleConfirmSuccess called!");
 		setErrorMessage("");
+
+		// Mark this user as a new user who just completed email confirmation
+		// This will trigger the household setup offer in HouseholdSignUpWrapper
+		if (pendingEmail) {
+			const flagData = {
+				email: pendingEmail,
+				timestamp: Date.now(),
+				completed: true,
+			};
+
+			console.log("✅ Setting new user signup flag:", flagData);
+			console.log("✅ Pending email:", pendingEmail);
+
+			// Store a flag to indicate this is a new user sign-up
+			localStorage.setItem("new_user_signup", JSON.stringify(flagData));
+
+			// Verify it was stored
+			const stored = localStorage.getItem("new_user_signup");
+			console.log("✅ Verified flag stored:", stored);
+		} else {
+			console.log("❌ No pending email - cannot set new user flag");
+			console.log("❌ Pending email value:", pendingEmail);
+		}
+
 		// Redirect to home page after successful confirmation
+		// Note: Household setup will be offered via HouseholdSignUpWrapper
 		navigate("/");
 	};
 

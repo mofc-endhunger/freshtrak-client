@@ -3,7 +3,7 @@
  * Main dashboard for displaying and managing household information
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "../../components/ui/button";
 import {
 	Card,
@@ -22,18 +22,24 @@ import {
 	Edit,
 	Plus,
 	Calendar,
-	AlertCircle,
 	CheckCircle,
 	Clock,
 	RefreshCw,
 } from "lucide-react";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import { Household } from "./types/household.types";
-import { useAuth } from "../Authentication/AuthContext";
+import { Household, HouseholdMember } from "./types/household.types";
 import { useHouseholdSignUpIntegration } from "./services/HouseholdSignUpIntegration";
 import { calculateAge } from "./utils/householdUtils";
+import { HouseholdInfoManager } from "./components/HouseholdInfoManager";
+import { LanguagePreferenceManager } from "./components/LanguagePreferenceManager";
 
 interface HouseholdDashboardProps {
+	household: Household;
+	members: HouseholdMember[];
+	onEditMember?: (member: HouseholdMember) => void;
+	onMemberStatusChange?: (member: HouseholdMember) => Promise<void>;
+	onHouseholdUpdate?: (householdData: any) => Promise<void>;
+	onError?: (error: string) => void;
 	className?: string;
 	onEditHousehold?: () => void;
 	onAddMember?: () => void;
@@ -50,13 +56,17 @@ interface DashboardStats {
 }
 
 export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
+	household: propHousehold,
+	members: propMembers,
+	onEditMember,
+	onMemberStatusChange,
+	onHouseholdUpdate,
+	onError,
 	className = "",
 	onEditHousehold,
 	onAddMember,
 	onManageMembers,
 }) => {
-	const { getHouseholdId } = useHouseholdSignUpIntegration();
-	const [household, setHousehold] = useState<Household | null>(null);
 	const [stats, setStats] = useState<DashboardStats>({
 		totalMembers: 0,
 		activeMembers: 0,
@@ -64,88 +74,47 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 		adultsCount: 0,
 		seniorsCount: 0,
 	});
-	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [isEditingHouseholdInfo, setIsEditingHouseholdInfo] = useState(false);
+	const [isEditingLanguagePreferences, setIsEditingLanguagePreferences] =
+		useState(false);
 
-	const householdsApiService = new HouseholdsApiService();
-
-	// Load household data
+	// Use props data and calculate stats
 	useEffect(() => {
-		const loadHouseholdData = async () => {
-			try {
-				setIsLoading(true);
-				setError(null);
+		if (propHousehold && propMembers) {
+			// Calculate stats from props
+			const activeMembers = propMembers.filter(
+				member => member.status === "active"
+			);
+			const childrenCount = activeMembers.filter(member => {
+				const ageCalculation = calculateAge(member.date_of_birth);
+				return ageCalculation.years < 18;
+			}).length;
+			const seniorsCount = activeMembers.filter(member => {
+				const ageCalculation = calculateAge(member.date_of_birth);
+				return ageCalculation.years >= 60;
+			}).length;
+			const adultsCount =
+				activeMembers.length - childrenCount - seniorsCount;
 
-				const householdId = getHouseholdId();
-				if (!householdId) {
-					setError(
-						"No household found. Please set up your household first."
-					);
-					return;
-				}
-
-				// Fetch household data
-				const householdResponse =
-					await householdsApiService.getHousehold(householdId);
-				const householdData = householdResponse.data;
-				setHousehold(householdData);
-
-				// Fetch household members
-				const membersResponse =
-					await householdsApiService.getHouseholdMembers(householdId);
-				const members = membersResponse.data;
-
-				// Calculate stats
-				const activeMembers = members.filter(
-					member => member.status === "active"
-				);
-				const childrenCount = activeMembers.filter(member => {
-					const ageCalculation = calculateAge(member.date_of_birth);
-					return ageCalculation.years < 18;
-				}).length;
-				const seniorsCount = activeMembers.filter(member => {
-					const ageCalculation = calculateAge(member.date_of_birth);
-					return ageCalculation.years >= 60;
-				}).length;
-				const adultsCount =
-					activeMembers.length - childrenCount - seniorsCount;
-
-				setStats({
-					totalMembers: members.length,
-					activeMembers: activeMembers.length,
-					childrenCount,
-					adultsCount,
-					seniorsCount,
-					lastUpdated: new Date().toISOString(),
-				});
-			} catch (err) {
-				console.error("Error loading household data:", err);
-				setError("Failed to load household data. Please try again.");
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		loadHouseholdData();
-	}, [getHouseholdId, householdsApiService]);
+			setStats({
+				totalMembers: propMembers.length,
+				activeMembers: activeMembers.length,
+				childrenCount,
+				adultsCount,
+				seniorsCount,
+				lastUpdated: new Date().toISOString(),
+			});
+		}
+	}, [propHousehold, propMembers]);
 
 	const handleRefresh = async () => {
 		setIsRefreshing(true);
 		try {
-			// Reload household data
-			const householdId = getHouseholdId();
-			if (householdId) {
-				const householdResponse =
-					await householdsApiService.getHousehold(householdId);
-				setHousehold(householdResponse.data);
-
-				const membersResponse =
-					await householdsApiService.getHouseholdMembers(householdId);
-				const members = membersResponse.data;
-
-				// Recalculate stats
-				const activeMembers = members.filter(
+			// Refresh is handled by parent component
+			// Just recalculate stats from current props
+			if (propHousehold && propMembers) {
+				const activeMembers = propMembers.filter(
 					member => member.status === "active"
 				);
 				const childrenCount = activeMembers.filter(member => {
@@ -160,7 +129,7 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 					activeMembers.length - childrenCount - seniorsCount;
 
 				setStats({
-					totalMembers: members.length,
+					totalMembers: propMembers.length,
 					activeMembers: activeMembers.length,
 					childrenCount,
 					adultsCount,
@@ -170,7 +139,9 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 			}
 		} catch (err) {
 			console.error("Error refreshing household data:", err);
-			setError("Failed to refresh data. Please try again.");
+			onError?.(
+				err instanceof Error ? err.message : "Failed to refresh data"
+			);
 		} finally {
 			setIsRefreshing(false);
 		}
@@ -194,56 +165,62 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 		return date.toLocaleDateString() + " at " + date.toLocaleTimeString();
 	};
 
-	const getStatusColor = (status: string): string => {
-		switch (status) {
-			case "active":
-				return "bg-green-100 text-green-800 border-green-200";
-			case "inactive":
-				return "bg-gray-100 text-gray-800 border-gray-200";
-			default:
-				return "bg-yellow-100 text-yellow-800 border-yellow-200";
+	// Event handlers
+
+	const handleEditHouseholdInfo = () => {
+		setIsEditingHouseholdInfo(true);
+	};
+
+	const handleCancelEditHouseholdInfo = () => {
+		setIsEditingHouseholdInfo(false);
+	};
+
+	const handleUpdateHouseholdInfo = async (updatedHousehold: Household) => {
+		try {
+			await onHouseholdUpdate?.(updatedHousehold);
+			setIsEditingHouseholdInfo(false);
+		} catch (error) {
+			onError?.(
+				error instanceof Error
+					? error.message
+					: "Failed to update household"
+			);
 		}
 	};
 
-	if (isLoading) {
-		return (
-			<div
-				className={`flex items-center justify-center min-h-screen ${className}`}
-			>
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-32 w-32 border-b-2 border-highlight mx-auto mb-4"></div>
-					<p className="text-gray-600">
-						Loading household information...
-					</p>
-				</div>
-			</div>
-		);
-	}
+	const handleEditLanguagePreferences = () => {
+		setIsEditingLanguagePreferences(true);
+	};
 
-	if (error) {
-		return (
-			<div
-				className={`flex items-center justify-center min-h-screen ${className}`}
-			>
-				<div className="text-center max-w-md">
-					<AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-					<h2 className="text-xl font-semibold text-gray-900 mb-2">
-						Error Loading Household
-					</h2>
-					<p className="text-gray-600 mb-4">{error}</p>
-					<Button
-						onClick={handleRefresh}
-						className="bg-highlight text-white hover:bg-highlight-dark"
-					>
-						<RefreshCw className="w-4 h-4 mr-2" />
-						Try Again
-					</Button>
-				</div>
-			</div>
-		);
-	}
+	const handleCancelEditLanguagePreferences = () => {
+		setIsEditingLanguagePreferences(false);
+	};
 
-	if (!household) {
+	const handleUpdateLanguagePreferences = async (data: any) => {
+		try {
+			// Update household language preferences
+			if (propHousehold) {
+				// Update household preferred language
+				const updatedHousehold = {
+					...propHousehold,
+					preferred_language: data.household_preferred_language,
+				};
+				await onHouseholdUpdate?.(updatedHousehold);
+				setIsEditingLanguagePreferences(false);
+			}
+		} catch (error) {
+			console.error("Error updating language preferences:", error);
+			onError?.(
+				error instanceof Error
+					? error.message
+					: "Failed to update language preferences"
+			);
+		}
+	};
+
+	// Loading and error states are handled by parent component
+
+	if (!propHousehold) {
 		return (
 			<div
 				className={`flex items-center justify-center min-h-screen ${className}`}
@@ -266,6 +243,31 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 					</Button>
 				</div>
 			</div>
+		);
+	}
+
+	// If editing household info, show the HouseholdInfoManager
+	if (isEditingHouseholdInfo) {
+		return (
+			<HouseholdInfoManager
+				household={propHousehold}
+				onUpdate={handleUpdateHouseholdInfo}
+				onCancel={handleCancelEditHouseholdInfo}
+				className={className}
+			/>
+		);
+	}
+
+	// If editing language preferences, show the LanguagePreferenceManager
+	if (isEditingLanguagePreferences) {
+		return (
+			<LanguagePreferenceManager
+				household={propHousehold}
+				members={propMembers}
+				onUpdate={handleUpdateLanguagePreferences}
+				onCancel={handleCancelEditLanguagePreferences}
+				className={className}
+			/>
 		);
 	}
 
@@ -301,13 +303,13 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 							Refresh
 						</Button>
 						<Button
-							onClick={onEditHousehold}
+							onClick={handleEditHouseholdInfo}
 							variant="outline"
 							size="sm"
 							className="bg-white/10 border-white/20 text-white hover:bg-white/20"
 						>
 							<Edit className="w-4 h-4 mr-2" />
-							Edit
+							Edit Info
 						</Button>
 					</div>
 				</div>
@@ -409,7 +411,7 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 										Address
 									</p>
 									<p className="text-sm text-gray-600">
-										{formatAddress(household)}
+										{formatAddress(propHousehold)}
 									</p>
 								</div>
 							</div>
@@ -432,12 +434,12 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 										Preferred Language
 									</p>
 									<p className="text-sm text-gray-600 capitalize">
-										{household.preferred_language}
+										{propHousehold.preferred_language}
 									</p>
 								</div>
 							</div>
 							<Button
-								onClick={onEditHousehold}
+								onClick={handleEditLanguagePreferences}
 								variant="outline"
 								size="sm"
 							>
@@ -455,17 +457,17 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 										Primary Contact
 									</p>
 									<p className="text-sm text-gray-600">
-										{household.primary_first_name}{" "}
-										{household.primary_last_name}
+										{propHousehold.primary_first_name}{" "}
+										{propHousehold.primary_last_name}
 									</p>
-									{household.primary_email && (
+									{propHousehold.primary_email && (
 										<p className="text-sm text-gray-500">
-											{household.primary_email}
+											{propHousehold.primary_email}
 										</p>
 									)}
-									{household.primary_phone && (
+									{propHousehold.primary_phone && (
 										<p className="text-sm text-gray-500">
-											{household.primary_phone}
+											{propHousehold.primary_phone}
 										</p>
 									)}
 								</div>
@@ -479,7 +481,7 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 							</Button>
 						</div>
 
-						{household.notes && (
+						{propHousehold.notes && (
 							<>
 								<Separator />
 								<div>
@@ -487,7 +489,7 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
 										Notes
 									</p>
 									<p className="text-sm text-gray-600">
-										{household.notes}
+										{propHousehold.notes}
 									</p>
 								</div>
 							</>
@@ -593,13 +595,12 @@ export const HouseholdDashboard: React.FC<HouseholdDashboardProps> = ({
  * Provides utilities for loading and managing household information
  */
 export const useHouseholdDashboard = () => {
-	const { user } = useAuth();
 	const { getHouseholdId } = useHouseholdSignUpIntegration();
 	const [household, setHousehold] = useState<Household | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const householdsApiService = new HouseholdsApiService();
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
 	const loadHousehold = async (
 		householdId: number

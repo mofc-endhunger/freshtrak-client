@@ -24,10 +24,12 @@ import {
 } from "../../components/ui/select";
 import { Textarea } from "../../components/ui/textarea";
 import { Badge } from "../../components/ui/badge";
+import { Checkbox } from "../../components/ui/checkbox";
 import {
 	User,
 	Edit,
 	Phone,
+	Mail,
 	MapPin,
 	Save,
 	X,
@@ -47,8 +49,10 @@ import { useHouseholdSignUpIntegration } from "./services/HouseholdSignUpIntegra
 
 interface EditMemberFormProps {
 	member: HouseholdMember;
-	onSuccess?: (member: HouseholdMember) => void;
+	householdId: number;
+	onSave: (memberData: UpdateMemberApiRequest) => Promise<void>;
 	onCancel?: () => void;
+	onSuccess?: (member: HouseholdMember) => void;
 	onDelete?: (memberId: number) => void;
 	className?: string;
 }
@@ -71,6 +75,8 @@ interface FormData {
 	zip_code?: string;
 	status: "active" | "inactive";
 	is_freshtrak_user: boolean;
+	preferred_contact_method?: "phone" | "email" | "both";
+	use_household_address?: boolean;
 	notes?: string;
 }
 
@@ -156,6 +162,8 @@ const US_STATES = [
 
 export const EditMemberForm: React.FC<EditMemberFormProps> = ({
 	member,
+	householdId,
+	onSave,
 	onSuccess,
 	onCancel,
 	onDelete,
@@ -264,13 +272,6 @@ export const EditMemberForm: React.FC<EditMemberFormProps> = ({
 			setIsSubmitting(true);
 			setSubmitError(null);
 
-			const householdId = getHouseholdId();
-			if (!householdId) {
-				throw new Error(
-					"No household found. Please set up your household first."
-				);
-			}
-
 			// Prepare API request data
 			const requestData: UpdateMemberApiRequest = {
 				first_name: data.first_name,
@@ -293,15 +294,11 @@ export const EditMemberForm: React.FC<EditMemberFormProps> = ({
 				notes: data.notes || undefined,
 			};
 
-			// Update member via API
-			const response = await householdsApiService.updateHouseholdMember(
-				householdId,
-				member.id,
-				requestData
-			);
+			// Use the onSave prop to handle the API call
+			await onSave(requestData);
 
 			// Success
-			onSuccess?.(response.data);
+			onSuccess?.(member); // Pass the original member since we don't have the updated one
 		} catch (err) {
 			console.error("Error updating member:", err);
 			setSubmitError(
@@ -611,6 +608,47 @@ export const EditMemberForm: React.FC<EditMemberFormProps> = ({
 								)}
 							</div>
 						</div>
+
+						<div>
+							<Label htmlFor="preferred_contact_method">
+								Preferred Contact Method
+							</Label>
+							<Select
+								value={
+									watch("preferred_contact_method") || "both"
+								}
+								onValueChange={value =>
+									setValue(
+										"preferred_contact_method",
+										value as any
+									)
+								}
+							>
+								<SelectTrigger>
+									<SelectValue placeholder="Select contact method" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="both">
+										<div className="flex items-center space-x-2">
+											<User className="w-4 h-4" />
+											<span>Phone & Email</span>
+										</div>
+									</SelectItem>
+									<SelectItem value="phone">
+										<div className="flex items-center space-x-2">
+											<Phone className="w-4 h-4" />
+											<span>Phone Only</span>
+										</div>
+									</SelectItem>
+									<SelectItem value="email">
+										<div className="flex items-center space-x-2">
+											<Mail className="w-4 h-4" />
+											<span>Email Only</span>
+										</div>
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
 					</div>
 
 					{/* Address Information */}
@@ -620,84 +658,103 @@ export const EditMemberForm: React.FC<EditMemberFormProps> = ({
 							<span>Address Information (Optional)</span>
 						</h3>
 
-						<div className="space-y-4">
-							<div>
-								<Label htmlFor="address_line_1">
-									Street Address
-								</Label>
-								<Input
-									id="address_line_1"
-									{...register("address_line_1")}
-									placeholder="123 Main Street"
-								/>
-							</div>
-
-							<div>
-								<Label htmlFor="address_line_2">
-									Apartment, Suite, etc.
-								</Label>
-								<Input
-									id="address_line_2"
-									{...register("address_line_2")}
-									placeholder="Apt 4B"
-								/>
-							</div>
-
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-								<div>
-									<Label htmlFor="city">City</Label>
-									<Input
-										id="city"
-										{...register("city")}
-										placeholder="New York"
-									/>
-								</div>
-
-								<div>
-									<Label htmlFor="state">State</Label>
-									<Select
-										value={watchedValues.state || ""}
-										onValueChange={value =>
-											setValue("state", value)
-										}
-									>
-										<SelectTrigger>
-											<SelectValue placeholder="Select state" />
-										</SelectTrigger>
-										<SelectContent>
-											{US_STATES.map(state => (
-												<SelectItem
-													key={state}
-													value={state}
-												>
-													{state}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-								</div>
-
-								<div>
-									<Label htmlFor="zip_code">ZIP Code</Label>
-									<Input
-										id="zip_code"
-										{...register("zip_code", {
-											pattern: {
-												value: /^\d{5}(-\d{4})?$/,
-												message:
-													"Please enter a valid ZIP code",
-											},
-										})}
-										placeholder="10001"
-									/>
-									{errors.zip_code && (
-										<p className="text-sm text-red-600 mt-1">
-											{errors.zip_code.message}
-										</p>
-									)}
-								</div>
-							</div>
+						<div className="flex items-center space-x-2">
+							<Checkbox
+								id="use_household_address"
+								checked={
+									watch("use_household_address") || false
+								}
+								onCheckedChange={checked =>
+									setValue("use_household_address", !!checked)
+								}
+							/>
+							<Label htmlFor="use_household_address">
+								Use household address
+							</Label>
 						</div>
+
+						{!watch("use_household_address") && (
+							<div className="space-y-4">
+								<div>
+									<Label htmlFor="address_line_1">
+										Street Address
+									</Label>
+									<Input
+										id="address_line_1"
+										{...register("address_line_1")}
+										placeholder="123 Main Street"
+									/>
+								</div>
+
+								<div>
+									<Label htmlFor="address_line_2">
+										Apartment, Suite, etc.
+									</Label>
+									<Input
+										id="address_line_2"
+										{...register("address_line_2")}
+										placeholder="Apt 4B"
+									/>
+								</div>
+
+								<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+									<div>
+										<Label htmlFor="city">City</Label>
+										<Input
+											id="city"
+											{...register("city")}
+											placeholder="New York"
+										/>
+									</div>
+
+									<div>
+										<Label htmlFor="state">State</Label>
+										<Select
+											value={watchedValues.state || ""}
+											onValueChange={value =>
+												setValue("state", value)
+											}
+										>
+											<SelectTrigger>
+												<SelectValue placeholder="Select state" />
+											</SelectTrigger>
+											<SelectContent>
+												{US_STATES.map(state => (
+													<SelectItem
+														key={state}
+														value={state}
+													>
+														{state}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</div>
+
+									<div>
+										<Label htmlFor="zip_code">
+											ZIP Code
+										</Label>
+										<Input
+											id="zip_code"
+											{...register("zip_code", {
+												pattern: {
+													value: /^\d{5}(-\d{4})?$/,
+													message:
+														"Please enter a valid ZIP code",
+												},
+											})}
+											placeholder="10001"
+										/>
+										{errors.zip_code && (
+											<p className="text-sm text-red-600 mt-1">
+												{errors.zip_code.message}
+											</p>
+										)}
+									</div>
+								</div>
+							</div>
+						)}
 					</div>
 
 					{/* Status and Settings */}
@@ -866,45 +923,4 @@ export const EditMemberForm: React.FC<EditMemberFormProps> = ({
 			</CardContent>
 		</Card>
 	);
-};
-
-/**
- * Hook for managing edit member form
- * Provides utilities for form validation and submission
- */
-export const useEditMemberForm = () => {
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-
-	const validateForm = (data: FormData): string[] => {
-		const errors: string[] = [];
-
-		if (!data.first_name?.trim()) {
-			errors.push("First name is required");
-		}
-
-		if (!data.last_name?.trim()) {
-			errors.push("Last name is required");
-		}
-
-		if (!data.date_of_birth) {
-			errors.push("Date of birth is required");
-		}
-
-		return errors;
-	};
-
-	const clearError = () => {
-		setError(null);
-	};
-
-	return {
-		isSubmitting,
-		isDeleting,
-		error,
-		setError,
-		clearError,
-		validateForm,
-	};
 };

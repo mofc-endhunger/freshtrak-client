@@ -43,6 +43,7 @@ export interface HouseholdMember {
   date_of_birth?: string;
   status: 'active' | 'inactive';
   is_freshtrak_user: boolean;
+  preferred_language?: string;
   notes?: string;
   is_active: boolean;
   created_at: string;
@@ -128,6 +129,7 @@ export interface CreateMemberRequest {
   date_of_birth: string;
   status?: 'active' | 'inactive';
   is_freshtrak_user?: boolean;
+  preferred_language?: string;
   notes?: string;
 }
 
@@ -150,6 +152,7 @@ export interface UpdateMemberRequest {
   date_of_birth?: string;
   status?: 'active' | 'inactive';
   is_freshtrak_user?: boolean;
+  preferred_language?: string;
   notes?: string;
   is_active?: boolean;
 }

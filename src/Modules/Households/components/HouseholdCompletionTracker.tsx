@@ -113,12 +113,8 @@ export const HouseholdCompletionTracker: React.FC<
 	HouseholdCompletionTrackerProps
 > = ({ onSetupHousehold, onManageHousehold, className = "" }) => {
 	const { user } = useAuth();
-	const {
-		hasCompletedSetup,
-		getHouseholdId,
-		getSignUpState,
-		shouldShowPrompt,
-	} = useHouseholdSignUpIntegration();
+	const { hasCompletedSetup, getHouseholdId, getSignUpState } =
+		useHouseholdSignUpIntegration();
 
 	const [milestones, setMilestones] = useState<CompletionMilestone[]>(
 		COMPLETION_MILESTONES
@@ -132,7 +128,6 @@ export const HouseholdCompletionTracker: React.FC<
 	// Update milestone completion status
 	useEffect(() => {
 		const updateMilestoneStatus = () => {
-			const signUpState = getSignUpState();
 			const isHouseholdComplete = hasCompletedSetup();
 			const hasHousehold = !!getHouseholdId();
 
@@ -482,15 +477,10 @@ export const HouseholdCompletionTracker: React.FC<
  */
 export const useHouseholdCompletionTracker = () => {
 	const { user } = useAuth();
-	const {
-		hasCompletedSetup,
-		getHouseholdId,
-		getSignUpState,
-		shouldShowPrompt,
-	} = useHouseholdSignUpIntegration();
+	const { hasCompletedSetup, getHouseholdId, shouldShowPrompt } =
+		useHouseholdSignUpIntegration();
 
 	const getCompletionStats = (): CompletionStats => {
-		const signUpState = getSignUpState();
 		const isHouseholdComplete = hasCompletedSetup();
 		const hasHousehold = !!getHouseholdId();
 
@@ -523,7 +513,9 @@ export const useHouseholdCompletionTracker = () => {
 	};
 
 	const needsHouseholdSetup = (): boolean => {
-		return !hasCompletedSetup() && shouldShowPrompt();
+		return (
+			!hasCompletedSetup() && user?.email && shouldShowPrompt(user.email)
+		);
 	};
 
 	const canManageHousehold = (): boolean => {
@@ -534,7 +526,7 @@ export const useHouseholdCompletionTracker = () => {
 		getCompletionStats,
 		needsHouseholdSetup,
 		canManageHousehold,
-		shouldShowPrompt: shouldShowPrompt(),
+		shouldShowPrompt: user?.email ? shouldShowPrompt(user.email) : false,
 		milestones: COMPLETION_MILESTONES,
 	};
 };

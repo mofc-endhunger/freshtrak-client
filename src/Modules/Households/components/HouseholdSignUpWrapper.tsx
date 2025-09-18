@@ -34,29 +34,47 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 		createHousehold,
 		skipHouseholdSetup,
 		deferHouseholdSetup,
+		isNewUserSignUp,
 	} = useHouseholdSignUpIntegration();
 
 	// Check if we should show household setup offer
 	useEffect(() => {
 		const checkHouseholdSetup = async () => {
-			if (isAuthenticated && user) {
-				// Check if user just completed email confirmation
-				const signUpState = getSignUpState();
+			console.log("🔍 Checking household setup:", {
+				isAuthenticated,
+				userEmail: user?.email,
+				userObject: user,
+				userKeys: user ? Object.keys(user) : null,
+			});
 
-				// If user is authenticated but hasn't been offered household setup yet
-				if (!signUpState.hasOfferedSetup) {
+			if (isAuthenticated && user && user.email) {
+				// Only show household setup offer for new users who just completed email confirmation
+				// This prevents showing the prompt to existing users who are signing in
+				const isNewUser = isNewUserSignUp(user.email);
+				console.log("🔍 Is new user signup:", isNewUser);
+
+				if (isNewUser) {
+					console.log(
+						"✅ Showing household setup offer for new user"
+					);
 					try {
-						await offerHouseholdSetup();
+						await offerHouseholdSetup(user.email);
 						setShowHouseholdOffer(true);
 					} catch (error) {
 						console.error("Error offering household setup:", error);
 					}
+				} else {
+					console.log(
+						"❌ Not showing household setup offer - not a new user"
+					);
 				}
+			} else {
+				console.log("❌ Not authenticated or no user ID");
 			}
 		};
 
 		checkHouseholdSetup();
-	}, [isAuthenticated, user, getSignUpState, offerHouseholdSetup]);
+	}, [isAuthenticated, user, isNewUserSignUp, offerHouseholdSetup]);
 
 	// Handle household setup now
 	const handleSetupNow = async () => {
@@ -168,7 +186,7 @@ export const useHouseholdSignUpState = () => {
 		user,
 
 		// Computed values
-		shouldShowPrompt: shouldShowPrompt(),
+		shouldShowPrompt: user?.email ? shouldShowPrompt(user.email) : false,
 		hasCompletedSetup: hasCompletedSetup(),
 
 		// Actions
@@ -188,9 +206,10 @@ export const HouseholdCompletionPrompt: React.FC<{
 }> = ({ onSetup, onDismiss, className = "" }) => {
 	const { shouldShowPrompt, markPromptShown } =
 		useHouseholdSignUpIntegration();
+	const { user } = useAuth();
 
 	// Only show if we should prompt
-	if (!shouldShowPrompt()) {
+	if (!user?.email || !shouldShowPrompt(user.email)) {
 		return null;
 	}
 

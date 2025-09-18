@@ -17,6 +17,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "../../components/ui/dialog";
+import UserAccountButton from "./components/UserAccountButton";
 
 import { RENDER_URL } from "../../Utils/Urls";
 import {
@@ -51,7 +52,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const dispatch = useDispatch();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { isAuthenticated, signOut, user } = useAuth();
+	const { isAuthenticated } = useAuth();
 
 	const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
 
@@ -114,31 +115,13 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		dispatch(setCurrentLanguage(data.value));
 	};
 
-	/**
-	 * Handles user logout
-	 */
-	const logOut = async (): Promise<void> => {
-		try {
-			await signOut();
-			setIsLoggedIn(false);
-			localStorage.setItem("isLoggedIn", "false");
-			localStorage.removeItem("userToken");
-			localStorage.removeItem("guestId");
-			localStorage.removeItem("guestType");
-			localStorage.removeItem("search_zip");
-			// Redirect to landing page after logout
-			navigate("/");
-		} catch (error) {
-			console.error("Logout error:", error);
-		}
-	};
-
 	useEffect(() => {
-		// Check authentication status - use both Cognito auth and localStorage
-		const localStorageLoggedIn = localStorage.getItem("isLoggedIn");
-		const isCognitoAuthenticated = isAuthenticated;
+		// Check authentication status - simply check for cognitoUser
+		const cognitoUser = localStorage.getItem("cognitoUser");
 
-		if (localStorageLoggedIn === "true" || isCognitoAuthenticated) {
+		// Only set isLoggedIn to true for Cognito users
+		// Guest users and untracked users should see the login button
+		if (cognitoUser) {
 			setIsLoggedIn(true);
 		} else {
 			setIsLoggedIn(false);
@@ -203,11 +186,18 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 					boxShadow: shouldShowBackgroundColor
 						? "0 4px 8px #b9b9b9"
 						: "",
+					overflow: "visible",
 				}}
 				id="mainNav"
 			>
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex items-center justify-between h-16 relative">
+				<div
+					className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+					style={{ overflow: "visible" }}
+				>
+					<div
+						className="flex items-center justify-between h-16 relative"
+						style={{ overflow: "visible" }}
+					>
 						{/* Logo - centered on desktop, left-aligned on mobile */}
 						<div className="md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
 							<Link
@@ -238,25 +228,8 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 										</Button>
 									) : (
 										<>
-											{/* Show user name and logout only for authenticated users (not guests) */}
-											{user?.name &&
-												user?.name !== user?.email && (
-													<span className="text-white font-medium text-xs md:text-sm">
-														{user.name}
-													</span>
-												)}
-											{/* Only show logout button for authenticated users, not guests */}
-											{user?.name &&
-												user?.name !== user?.email && (
-													<Button
-														type="button"
-														variant="ghost"
-														className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
-														onClick={logOut}
-													>
-														LOG OUT
-													</Button>
-												)}
+											{/* Show user account button for all authenticated users */}
+											<UserAccountButton />
 										</>
 									)}
 								</>

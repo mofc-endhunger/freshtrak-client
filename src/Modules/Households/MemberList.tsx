@@ -40,9 +40,12 @@ import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { useHouseholdSignUpIntegration } from "./services/HouseholdSignUpIntegration";
 
 interface MemberListProps {
+	householdId: number;
 	onAddMember?: () => void;
 	onEditMember?: (member: HouseholdMember) => void;
 	onViewMemberDetails?: (member: HouseholdMember) => void;
+	onMemberStatusChange?: (member: HouseholdMember) => void;
+	onError?: (error: string) => void;
 	className?: string;
 }
 
@@ -58,9 +61,12 @@ interface SortOptions {
 }
 
 export const MemberList: React.FC<MemberListProps> = ({
+	householdId,
 	onAddMember,
 	onEditMember,
 	onViewMemberDetails,
+	onMemberStatusChange,
+	onError,
 	className = "",
 }) => {
 	const { getHouseholdId } = useHouseholdSignUpIntegration();
@@ -579,11 +585,15 @@ export const MemberList: React.FC<MemberListProps> = ({
 							<MemberCard
 								key={member.id}
 								member={member}
+								householdId={householdId}
 								variant={
 									viewMode === "grid" ? "default" : "compact"
 								}
 								onEdit={onEditMember}
 								onViewDetails={onViewMemberDetails}
+								onStatusChange={onMemberStatusChange}
+								onError={onError}
+								showStatusManagement={true}
 							/>
 						))}
 					</div>

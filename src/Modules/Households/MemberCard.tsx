@@ -25,14 +25,19 @@ import {
 	formatDateOfBirth,
 	formatPhoneNumber,
 } from "./utils/householdUtils";
+import { MemberStatusManager } from "./components/MemberStatusManager";
 
 interface MemberCardProps {
 	member: HouseholdMember;
+	householdId: number;
 	onEdit?: (member: HouseholdMember) => void;
 	onViewDetails?: (member: HouseholdMember) => void;
+	onStatusChange?: (member: HouseholdMember) => void;
+	onError?: (error: string) => void;
 	className?: string;
 	variant?: "default" | "compact" | "detailed";
 	showActions?: boolean;
+	showStatusManagement?: boolean;
 }
 
 interface MemberStatus {
@@ -50,11 +55,15 @@ interface AgeGroup {
 
 export const MemberCard: React.FC<MemberCardProps> = ({
 	member,
+	householdId,
 	onEdit,
 	onViewDetails,
+	onStatusChange,
+	onError,
 	className = "",
 	variant = "default",
 	showActions = true,
+	showStatusManagement = true,
 }) => {
 	const getAgeGroup = (age: number): AgeGroup => {
 		if (age < 18) {
@@ -159,15 +168,29 @@ export const MemberCard: React.FC<MemberCardProps> = ({
 
 					{/* Actions */}
 					{showActions && (
-						<div className="flex space-x-1">
-							<Button
-								onClick={() => onEdit?.(member)}
-								variant="outline"
-								size="sm"
-								className="h-8 w-8 p-0"
-							>
-								<Edit className="w-4 h-4" />
-							</Button>
+						<div className="flex flex-col space-y-1">
+							{/* Status Management */}
+							{showStatusManagement && (
+								<MemberStatusManager
+									member={member}
+									householdId={householdId}
+									onStatusChange={onStatusChange}
+									onError={onError}
+									variant="dropdown"
+								/>
+							)}
+
+							{/* Action Buttons */}
+							<div className="flex space-x-1">
+								<Button
+									onClick={() => onEdit?.(member)}
+									variant="outline"
+									size="sm"
+									className="h-8 w-8 p-0"
+								>
+									<Edit className="w-4 h-4" />
+								</Button>
+							</div>
 						</div>
 					)}
 				</div>
@@ -259,22 +282,36 @@ export const MemberCard: React.FC<MemberCardProps> = ({
 
 					{/* Actions */}
 					{showActions && (
-						<div className="flex space-x-2">
-							<Button
-								onClick={() => onEdit?.(member)}
-								variant="outline"
-								size="sm"
-							>
-								<Edit className="w-4 h-4 mr-2" />
-								Edit
-							</Button>
-							<Button
-								onClick={() => onViewDetails?.(member)}
-								variant="outline"
-								size="sm"
-							>
-								<MoreVertical className="w-4 h-4" />
-							</Button>
+						<div className="flex flex-col space-y-2">
+							{/* Status Management */}
+							{showStatusManagement && (
+								<MemberStatusManager
+									member={member}
+									householdId={householdId}
+									onStatusChange={onStatusChange}
+									onError={onError}
+									variant="dropdown"
+								/>
+							)}
+
+							{/* Action Buttons */}
+							<div className="flex space-x-2">
+								<Button
+									onClick={() => onEdit?.(member)}
+									variant="outline"
+									size="sm"
+								>
+									<Edit className="w-4 h-4 mr-2" />
+									Edit
+								</Button>
+								<Button
+									onClick={() => onViewDetails?.(member)}
+									variant="outline"
+									size="sm"
+								>
+									<MoreVertical className="w-4 h-4" />
+								</Button>
+							</div>
 						</div>
 					)}
 				</div>

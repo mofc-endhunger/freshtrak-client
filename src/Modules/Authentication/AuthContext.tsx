@@ -176,10 +176,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				}
 
 				// Extract access token from nested structure
+				console.log("🔍 AuthContext - Sign-in result:", result);
+				console.log(
+					"🔍 AuthContext - Sign-in result keys:",
+					Object.keys(result)
+				);
+
 				const accessToken =
 					(result as any).signInDetails?.accessToken ||
 					(result as any).signInDetails?.signInDetails?.accessToken ||
 					(result as any).accessToken;
+
+				console.log(
+					"🔍 AuthContext - Extracted accessToken:",
+					accessToken
+				);
+				console.log(
+					"🔍 AuthContext - signInDetails from result:",
+					(result as any).signInDetails
+				);
 
 				// Create flattened signInDetails object
 				const signInDetails = {
@@ -196,9 +211,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					signInDetails: signInDetails,
 				};
 
+				console.log("🔍 AuthContext - Storing userData:", userData);
+
 				setUser(userData);
 				localStorage.setItem("cognitoUser", JSON.stringify(userData));
 				localStorage.setItem("isLoggedIn", "true");
+
+				// Set userToken for registration system compatibility
+				if (accessToken) {
+					localStorage.setItem("userToken", accessToken);
+					console.log(
+						"✅ AuthContext - Set userToken for registration system:",
+						accessToken
+					);
+				} else {
+					console.warn(
+						"⚠️ AuthContext - No accessToken available to set userToken"
+					);
+				}
+
+				// Clear any old household signup state since this is a sign-in (not sign-up)
+				console.log(
+					"🧹 Clearing old household signup state for sign-in user"
+				);
+				localStorage.removeItem("household_signup_state");
 			}
 		} catch (error: any) {
 			console.error("Sign in error:", error);
@@ -337,7 +373,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			}
 
 			// Clear guest authentication data when confirming Cognito sign-up
-			localStorage.removeItem("userToken");
+			// Note: We don't remove userToken here as it might be needed for registration
 			localStorage.removeItem("guestId");
 			localStorage.removeItem("guestType");
 			localStorage.removeItem("userProfile");

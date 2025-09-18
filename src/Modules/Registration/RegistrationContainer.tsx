@@ -140,6 +140,21 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	useEffect(() => {
 		const token = localStorage.getItem("userToken");
 		const userProfile = localStorage.getItem("userProfile");
+		const cognitoUser = localStorage.getItem("cognitoUser");
+
+		console.log(
+			"🔍 RegistrationContainer - userToken from localStorage:",
+			token
+		);
+		console.log(
+			"🔍 RegistrationContainer - userProfile from localStorage:",
+			userProfile
+		);
+		console.log(
+			"🔍 RegistrationContainer - cognitoUser from localStorage:",
+			cognitoUser
+		);
+
 		setUserToken(token || undefined);
 
 		// Only proceed if we're not in an error state
@@ -381,6 +396,19 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		const { GUEST_USER, CREATE_RESERVATION } = API_URL;
 		let updatedUser = user;
 		try {
+			console.log(
+				"🔍 RegistrationContainer - userToken being used:",
+				userToken
+			);
+			console.log(
+				"🔍 RegistrationContainer - userToken type:",
+				typeof userToken
+			);
+			console.log(
+				"🔍 RegistrationContainer - Authorization header:",
+				`Bearer ${userToken}`
+			);
+
 			const userResp = await axios.post<
 				ApiResponse<RegistrationFormData>
 			>(

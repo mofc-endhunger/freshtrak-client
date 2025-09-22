@@ -24,10 +24,12 @@ interface ServiceCategory {
 	service_category_name: string;
 }
 
-interface SearchFormData {
+export interface SearchFormData {
 	zip_code: string;
 	distance: string;
 	serviceCat: string;
+	availability: string;
+	reservations: boolean;
 	street?: string;
 	lat?: string;
 	long?: string;
@@ -55,6 +57,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 		const [zipCode, setZipCode] = useState<string>(z_code);
 		const [distance, setDistance] = useState<string>(range);
 		const [serviceCat, setServiceCat] = useState<string>("");
+		const [availability, setAvailability] = useState<string>("All");
+		const [reservations, setReservations] = useState<boolean>(false);
 		const [showFilter, setShowFilter] = useState<boolean>(
 			z_code !== undefined
 		);
@@ -152,6 +156,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 													distance:
 														DEFAULT_DISTANCE.toString(),
 													serviceCat: "",
+													availability: "All",
+													reservations: false,
 												});
 											} else {
 												setShowFilter(false);
@@ -210,6 +216,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 									zip_code: zipCode,
 									distance: "",
 									serviceCat: "",
+									availability: "All",
+									reservations: false,
 								});
 							}}
 							distance={{
@@ -223,6 +231,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 										zip_code: zipCode,
 										distance: e.target.value,
 										serviceCat: serviceCat,
+										availability: availability,
+										reservations: reservations,
 									});
 								},
 							}}
@@ -238,6 +248,40 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 										zip_code: zipCode,
 										distance: distance,
 										serviceCat: e.target.value,
+										availability: availability,
+										reservations: reservations,
+									});
+								},
+							}}
+							availability={{
+								show: showDistance,
+								defaultValue: availability,
+								onChangeHandler: (e: {
+									target: { value: string };
+								}) => {
+									setAvailability(e.target.value);
+									onSubmitHandler({
+										zip_code: zipCode,
+										distance: distance,
+										serviceCat: serviceCat,
+										availability: e.target.value,
+										reservations: reservations,
+									});
+								},
+							}}
+							reservations={{
+								show: showDistance,
+								defaultValue: reservations,
+								onChangeHandler: (e: {
+									target: { value: boolean };
+								}) => {
+									setReservations(e.target.value);
+									onSubmitHandler({
+										zip_code: zipCode,
+										distance: distance,
+										serviceCat: serviceCat,
+										availability: availability,
+										reservations: e.target.value,
 									});
 								},
 							}}

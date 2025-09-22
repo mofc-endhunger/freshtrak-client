@@ -1,6 +1,8 @@
 import React from "react";
 import AppRoutes from "./Core/Routes";
 import { useSelector } from "react-redux";
+import { AuthProvider } from "./Modules/Authentication/AuthContext";
+import "./amplify-config";
 
 // import "./Assets/scss/main.scss";
 // import "./Assets/css/style.css";
@@ -11,7 +13,9 @@ const App = () => {
 	return (
 		<div className="App">
 			<div className="main-wrapper">
-				<AppRoutes language={language} />
+				<AuthProvider>
+					<AppRoutes language={language} />
+				</AuthProvider>
 			</div>
 		</div>
 	);

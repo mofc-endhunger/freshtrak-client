@@ -47,6 +47,7 @@ const PrivacyComponent = lazy(() =>
 	import("../Modules/Policies/PrivacyComponent")
 );
 const TermsComponent = lazy(() => import("../Modules/Policies/TermsComponent"));
+const LoginPage = lazy(() => import("../Modules/Authentication/LoginPage"));
 
 const AppRoutes = () => {
 	React.useEffect(() => {}, []);
@@ -61,6 +62,7 @@ const AppRoutes = () => {
 							path={RENDER_URL.ROOT_URL}
 							element={<DashBoardContainer />}
 						/>
+						<Route path="/login" element={<LoginPage />} />
 						<Route
 							path={RENDER_URL.EVENT_LIST_URL}
 							element={<EventContainer />}
@@ -70,10 +72,7 @@ const AppRoutes = () => {
 							element={<FamilyContainer />}
 						/>
 						{/* Flag to turn off/on Home Page Container for Loggedin user feature */}
-						<Route
-							path={RENDER_URL.HOME_URL}
-							element={<HomeContainer />}
-						/>
+						<Route path="/user-home" element={<HomeContainer />} />
 
 						{/* Out of Scope */}
 						{/* <Route

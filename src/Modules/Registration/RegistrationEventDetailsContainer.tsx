@@ -38,6 +38,34 @@ const RegistrationEventDetailsContainer: React.FC<
 		}
 	});
 
+	// Check authentication on component mount and hide modal if user is authenticated
+	useEffect(() => {
+		const cognitoUser = localStorage.getItem("cognitoUser");
+		const localUserToken = localStorage.getItem("userToken");
+		const guestId = localStorage.getItem("guestId");
+		const userProfile = localStorage.getItem("userProfile");
+
+		// Parse cognitoUser to check isSignedIn property
+		let isCognitoSignedIn = false;
+		if (cognitoUser) {
+			try {
+				const cognitoUserData = JSON.parse(cognitoUser);
+				isCognitoSignedIn = cognitoUserData.isSignedIn === true;
+			} catch (error) {
+				console.warn("Could not parse cognitoUser:", error);
+			}
+		}
+
+		const isUserAuthenticated =
+			(cognitoUser && isCognitoSignedIn) ||
+			(localUserToken && guestId && userProfile);
+
+		// If user is authenticated, hide the auth modal
+		if (isUserAuthenticated) {
+			setshowAuthenticationModal(false);
+		}
+	}, [showAuthenticationModal]);
+
 	const getEvent = async (): Promise<void> => {
 		try {
 			const resp = await axios.get<EventApiResponse>(
@@ -61,18 +89,34 @@ const RegistrationEventDetailsContainer: React.FC<
 		setLoading(true);
 		const { GUEST_AUTH, GUEST_USER } = API_URL;
 		try {
-			let token, expires_at;
+			// Clear Cognito authentication data when logging in as guest
+			localStorage.removeItem("cognitoUser");
+			localStorage.removeItem("isLoggedIn");
+
+			// Get guest authentication
 			const resp = await axios.post(GUEST_AUTH);
-			token = resp.data.token;
-			expires_at = resp.data.expires_at;
+			const { guestId, token, type } = resp.data;
+
+			// Store guest authentication data
 			localStorage.setItem("userToken", token);
-			localStorage.setItem("tokenExpiresAt", expires_at);
+			localStorage.setItem("guestId", guestId);
+			localStorage.setItem("guestType", type);
+			localStorage.setItem("isLoggedIn", "true");
 
 			// Fetch user profile
 			const userResp = await axios.get(GUEST_USER, {
 				headers: { Authorization: `Bearer ${token}` },
 			});
-			localStorage.setItem("userProfile", JSON.stringify(userResp.data));
+			const { id, role } = userResp.data;
+
+			// Store user profile with new structure
+			const userProfile = {
+				id,
+				role,
+				guestId,
+				type,
+			};
+			localStorage.setItem("userProfile", JSON.stringify(userProfile));
 
 			setLoading(false);
 			setshowAuthenticationModal(false);
@@ -91,20 +135,33 @@ const RegistrationEventDetailsContainer: React.FC<
 	};
 
 	const getUserToken = (): void => {
-		const localUserToken = localStorage.getItem("userToken");
-		const tokenExpiresAt = localStorage.getItem("tokenExpiresAt");
+		// Check if user is authenticated with Cognito
+		const cognitoUser = localStorage.getItem("cognitoUser");
 
+		// Check if user is authenticated as guest
+		const localUserToken = localStorage.getItem("userToken");
+		const guestId = localStorage.getItem("guestId");
+		const userProfile = localStorage.getItem("userProfile");
+
+		// Parse cognitoUser to check isSignedIn property
+		let isCognitoSignedIn = false;
+		if (cognitoUser) {
+			try {
+				const cognitoUserData = JSON.parse(cognitoUser);
+				isCognitoSignedIn = cognitoUserData.isSignedIn === true;
+			} catch (error) {
+				console.warn("Could not parse cognitoUser:", error);
+			}
+		}
+
+		// If user is authenticated with either Cognito or guest, proceed to registration
 		if (
-			!tokenExpiresAt ||
-			new Date(tokenExpiresAt) < new Date() ||
-			!localUserToken ||
-			localUserToken === "undefined"
+			(cognitoUser && isCognitoSignedIn) ||
+			(localUserToken && guestId && userProfile)
 		) {
-			showAuthenticationModal
-				? fetchUserToken()
-				: setshowAuthenticationModal(true);
-		} else {
 			setshowAuthenticationModal(false);
+
+			// Navigate to registration form
 			if (selectedEvent && selectedEvent.id) {
 				navigate(
 					`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`
@@ -112,17 +169,49 @@ const RegistrationEventDetailsContainer: React.FC<
 			} else {
 				setPageError(true);
 			}
+			return;
 		}
+
+		// If no authentication found, show authentication modal
+		showAuthenticationModal
+			? fetchUserToken()
+			: setshowAuthenticationModal(true);
 	};
+
+	// Check if user is authenticated to determine if auth modal should show
+	const cognitoUser = localStorage.getItem("cognitoUser");
+	const localUserToken = localStorage.getItem("userToken");
+	const guestId = localStorage.getItem("guestId");
+	const userProfile = localStorage.getItem("userProfile");
+
+	// Parse cognitoUser to check isSignedIn property
+	let isCognitoSignedIn = false;
+	if (cognitoUser) {
+		try {
+			const cognitoUserData = JSON.parse(cognitoUser);
+			isCognitoSignedIn = cognitoUserData.isSignedIn === true;
+		} catch (error) {
+			console.warn("Could not parse cognitoUser:", error);
+		}
+	}
+
+	const isUserAuthenticated =
+		(cognitoUser && isCognitoSignedIn) ||
+		(localUserToken && guestId && userProfile);
 
 	return (
 		<Fragment>
 			{isLoading && <SpinnerComponent />}
-			<AuthenticationModalComponent
-				show={showAuthenticationModal}
-				setshow={setshowAuthenticationModal}
-				onLogin={getUserToken}
-			/>
+
+			{/* Only show auth modal if user is not authenticated AND modal should show */}
+			{!isUserAuthenticated && showAuthenticationModal && (
+				<AuthenticationModalComponent
+					show={showAuthenticationModal}
+					setshow={setshowAuthenticationModal}
+					onLogin={getUserToken}
+				/>
+			)}
+
 			{!isLoading && isSuccessful && (
 				<div className="mt-4">
 					<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 register-confirmation">

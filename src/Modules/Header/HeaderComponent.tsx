@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Fragment } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -7,6 +7,7 @@ import mainLogo from "../../Assets/img/logo.png";
 import localization from "../Localization/LocalizationComponent";
 import { setCurrentLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
+import { useAuth } from "../Authentication/AuthContext";
 import { Button } from "../../components/ui/button";
 import {
 	Dialog,
@@ -49,17 +50,19 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const [showMobileMenu, setMobileMenu] = useState<boolean>(false);
 	const dispatch = useDispatch();
 	const location = useLocation();
+	const navigate = useNavigate();
+	const { isAuthenticated, signOut, user } = useAuth();
 
 	const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
 
 	/**
 	 * Determines the current page type for background color logic
-	 * @returns {PageType} The type of page (main, search, or other)
+	 * @returns {PageType} The type of page (main, search, login, or other)
 	 */
 	const getPageType = (): PageType => {
 		const { pathname } = location;
 
-		// Main page
+		// Main page (dashboard)
 		if (pathname === RENDER_URL.ROOT_URL) {
 			return "main";
 		}
@@ -67,6 +70,11 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		// Search results page
 		if (pathname.startsWith("/events/list")) {
 			return "search";
+		}
+
+		// Login page
+		if (pathname === "/login") {
+			return "login" as PageType;
 		}
 
 		// All other pages
@@ -83,8 +91,12 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		pageType: PageType,
 		isScrolled: boolean
 	): boolean => {
-		// Main page and search results: transparent initially, background on scroll
-		if (pageType === "main" || pageType === "search") {
+		// Main page, search results, and login page: transparent initially, background on scroll
+		if (
+			pageType === "main" ||
+			pageType === "search" ||
+			pageType === "login"
+		) {
 			return isScrolled;
 		}
 
@@ -105,21 +117,31 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	/**
 	 * Handles user logout
 	 */
-	const logOut = (): void => {
-		localStorage.setItem("isLoggedIn", "false");
-		setIsLoggedIn(false);
-		localStorage.removeItem("userToken");
-		localStorage.removeItem("tokenExpiresAt");
-		localStorage.removeItem("search_zip");
+	const logOut = async (): Promise<void> => {
+		try {
+			await signOut();
+			setIsLoggedIn(false);
+			localStorage.setItem("isLoggedIn", "false");
+			localStorage.removeItem("userToken");
+			localStorage.removeItem("guestId");
+			localStorage.removeItem("guestType");
+			localStorage.removeItem("search_zip");
+			// Redirect to landing page after logout
+			navigate("/");
+		} catch (error) {
+			console.error("Logout error:", error);
+		}
 	};
 
 	useEffect(() => {
-		// Check authentication status
+		// Check authentication status - use both Cognito auth and localStorage
 		const localStorageLoggedIn = localStorage.getItem("isLoggedIn");
-		if (localStorageLoggedIn === null || localStorageLoggedIn === "false") {
-			setIsLoggedIn(false);
-		} else {
+		const isCognitoAuthenticated = isAuthenticated;
+
+		if (localStorageLoggedIn === "true" || isCognitoAuthenticated) {
 			setIsLoggedIn(true);
+		} else {
+			setIsLoggedIn(false);
 		}
 
 		// Handle scroll events for background color logic
@@ -134,7 +156,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		return () => {
 			window.removeEventListener("scroll", handleScroll);
 		};
-	}, []);
+	}, [isAuthenticated]);
 
 	// Get current page type and background state
 	const pageType = getPageType();
@@ -143,6 +165,9 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		pageType,
 		isScrolled
 	);
+
+	// Check if we're on the login page
+	const isLoginPage = location.pathname === "/login";
 
 	// Mobile menu sections
 	const mobileMenuSections: MobileMenuSection[] = [
@@ -198,17 +223,44 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 						</div>
 
 						<div className="flex items-center space-x-2 md:space-x-4 ml-auto w-full justify-end">
-							{isLoggedIn && (
-								<Button
-									type="button"
-									variant="ghost"
-									className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
-									onClick={logOut}
-								>
-									LOG OUT
-								</Button>
-							)}
 							<CountryListComponent change={change} />
+							{/* Show authentication buttons on all pages except login page */}
+							{!isLoginPage && (
+								<>
+									{!isLoggedIn ? (
+										<Button
+											type="button"
+											variant="ghost"
+											className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
+											onClick={() => navigate("/login")}
+										>
+											LOG IN
+										</Button>
+									) : (
+										<>
+											{/* Show user name and logout only for authenticated users (not guests) */}
+											{user?.name &&
+												user?.name !== user?.email && (
+													<span className="text-white font-medium text-xs md:text-sm">
+														{user.name}
+													</span>
+												)}
+											{/* Only show logout button for authenticated users, not guests */}
+											{user?.name &&
+												user?.name !== user?.email && (
+													<Button
+														type="button"
+														variant="ghost"
+														className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
+														onClick={logOut}
+													>
+														LOG OUT
+													</Button>
+												)}
+										</>
+									)}
+								</>
+							)}
 
 							{/* Mobile menu trigger */}
 							<Dialog

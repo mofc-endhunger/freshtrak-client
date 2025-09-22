@@ -1,76 +1,70 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TagManager from "react-gtm-module";
+import axios from "axios";
 import SignInFormComponent from "./SignInFormComponent";
 import SignUpFormComponent from "./SignUpFormComponent";
 import ConfirmSignUpFormComponent from "./ConfirmSignUpFormComponent";
 import ResetPasswordFormComponent from "./ResetPasswordFormComponent";
 import ConfirmResetPasswordFormComponent from "./ConfirmResetPasswordFormComponent";
 import LoadingSpinner from "../General/LoadingSpinner";
-import {
-	ExtendedAuthenticationModalProps,
-	AuthModalTab,
-	GTMEvent,
-} from "./types/authentication.types";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
+import { AuthModalTab, GTMEvent } from "./types/authentication.types";
+import { API_URL } from "../../Utils/Urls";
 
 /**
- * AuthenticationModal - Main authentication interface component
+ * LoginPage - Full-page login interface with authentication forms
  *
- * This component provides a modal-based authentication interface with signin, signup,
- * and guest login functionality. It manages loading states, handles authentication flow,
- * and integrates with Google Tag Manager for analytics tracking.
+ * This component provides a dedicated login page with inline authentication forms
+ * for signin, signup, and guest login functionality. It features responsive design
+ * and integrates with AWS Cognito and guest authentication APIs.
  *
  * @component
- * @param {ExtendedAuthenticationModalProps} props - Component props
- * @returns {JSX.Element} The authentication modal with multiple authentication options
- *
- * @example
- * ```tsx
- * <AuthenticationModal
- *   show={isModalOpen}
- *   setshow={setIsModalOpen}
- *   onLogin={handleLogin}
- *   initialTab="signin"
- *   showGuestLogin={true}
- * />
- * ```
+ * @returns {JSX.Element} The login page with authentication forms
  */
-const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
-	show,
-	setshow,
-	onLogin,
-	initialTab = "signin",
-	showGuestLogin = true,
-}) => {
+const LoginPage: React.FC = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [currentTab, setCurrentTab] = useState<AuthModalTab>(initialTab);
+	const [currentTab, setCurrentTab] = useState<AuthModalTab>("signin");
 	const [pendingEmail, setPendingEmail] = useState<string>("");
 	const [resetEmail, setResetEmail] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const navigate = useNavigate();
 
 	/**
-	 * Handles guest login process
+	 * Handles guest login process using API
 	 */
 	const onGuestLogin = async (): Promise<void> => {
-		setCurrentTab("loading");
 		setIsLoading(true);
 		try {
-			localStorage.setItem("isLoggedIn", "false");
+			const { GUEST_AUTH, GUEST_USER } = API_URL;
 
-			// Handle both async and sync onLogin functions
-			const result = onLogin();
-			if (result instanceof Promise) {
-				await result;
-			}
+			// Clear Cognito authentication data when logging in as guest
+			localStorage.removeItem("cognitoUser");
+
+			// Get guest authentication
+			const resp = await axios.post(GUEST_AUTH);
+			const { guestId, token, type } = resp.data;
+
+			// Store guest authentication data
+			localStorage.setItem("userToken", token);
+			localStorage.setItem("guestId", guestId);
+			localStorage.setItem("guestType", type);
+			localStorage.setItem("isLoggedIn", "true");
+
+			// Fetch user profile
+			const userResp = await axios.get(GUEST_USER, {
+				headers: { Authorization: `Bearer ${token}` },
+			});
+			const { id, role } = userResp.data;
+
+			// Store user profile with new structure
+			const userProfile = {
+				id,
+				role,
+				guestId,
+				type,
+			};
+			localStorage.setItem("userProfile", JSON.stringify(userProfile));
 
 			// Track guest login event with Google Tag Manager
 			const gtmEvent: GTMEvent = {
@@ -80,10 +74,12 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 			TagManager.dataLayer({
 				dataLayer: gtmEvent,
 			});
+
+			// Redirect to home page after guest login
+			navigate("/");
 		} catch (error) {
 			console.error("Guest login error:", error);
 			handleAuthError("Failed to login as guest. Please try again.");
-			setCurrentTab("signin"); // Go back to signin tab on error
 		} finally {
 			setIsLoading(false);
 		}
@@ -94,13 +90,8 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	 */
 	const handleAuthSuccess = (): void => {
 		setErrorMessage("");
-		setshow(false);
-		// Call onLogin callback if provided, otherwise redirect
-		if (onLogin) {
-			onLogin();
-		} else {
-			navigate("/");
-		}
+		// Redirect to home page after successful authentication
+		navigate("/");
 	};
 
 	/**
@@ -120,6 +111,15 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	};
 
 	/**
+	 * Handles successful confirmation - redirect to home
+	 */
+	const handleConfirmSuccess = (): void => {
+		setErrorMessage("");
+		// Redirect to home page after successful confirmation
+		navigate("/");
+	};
+
+	/**
 	 * Handles successful password reset initiation
 	 */
 	const handleResetPasswordSuccess = (email: string): void => {
@@ -133,22 +133,8 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	 */
 	const handleConfirmResetPasswordSuccess = (): void => {
 		setErrorMessage("");
-		// Go back to sign-in tab instead of closing modal
+		// Go back to sign-in tab instead of redirecting
 		setCurrentTab("signin");
-	};
-
-	/**
-	 * Handles successful confirmation - close modal and redirect
-	 */
-	const handleConfirmSuccess = (): void => {
-		setErrorMessage("");
-		setshow(false);
-		// Call onLogin callback if provided, otherwise redirect
-		if (onLogin) {
-			onLogin();
-		} else {
-			navigate("/");
-		}
 	};
 
 	/**
@@ -160,9 +146,9 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	};
 
 	/**
-	 * Gets the modal title based on current tab
+	 * Gets the form title based on current tab
 	 */
-	const getModalTitle = (): string => {
+	const getFormTitle = (): string => {
 		switch (currentTab) {
 			case "signin":
 				return "Sign In";
@@ -170,34 +156,23 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 				return "Create Account";
 			case "confirm":
 				return "Confirm Account";
-			case "reset":
-				return "Reset Password";
-			case "confirmReset":
-				return "Confirm New Password";
-			case "loading":
-				return "Processing...";
 			default:
 				return "Authentication";
 		}
 	};
 
 	return (
-		<Dialog
-			key={show ? "open" : "closed"}
-			open={show}
-			onOpenChange={setshow}
-		>
-			<DialogContent className="sm:max-w-md bg-white border border-gray-200 text-gray-900">
-				<DialogHeader className="border-b border-gray-200">
-					<DialogTitle className="text-center w-full py-2 text-gray-900">
-						{getModalTitle()}
-					</DialogTitle>
-					<DialogDescription></DialogDescription>
-				</DialogHeader>
+		<div className="min-h-screen bg-gray-50 flex items-start justify-center p-4">
+			<div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+				{/* title */}
+				<h1 className="text-2xl font-bold mb-6 text-center">
+					{getFormTitle()}
+				</h1>
 
-				<div className="p-6">
+				{/* Main Card */}
+				<div className="bg-white rounded-lg shadow-md p-6">
 					{/* Tab Navigation */}
-					{currentTab !== "confirm" && currentTab !== "loading" && (
+					{currentTab !== "confirm" && (
 						<div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
 							<Button
 								variant={
@@ -286,22 +261,13 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 									onBackToReset={() => switchTab("reset")}
 								/>
 							)}
-
-							{currentTab === "loading" && (
-								<div className="w-full flex flex-col items-center justify-center py-8">
-									<LoadingSpinner size="large" />
-									<p className="mt-4 text-gray-600 text-center">
-										Processing your request...
-									</p>
-								</div>
-							)}
 						</>
 					)}
 
 					{/* Guest Login Option */}
-					{showGuestLogin &&
-						currentTab !== "confirm" &&
-						currentTab !== "loading" && (
+					{currentTab !== "confirm" &&
+						currentTab !== "reset" &&
+						currentTab !== "confirmReset" && (
 							<div className="mt-6 pt-4 border-t border-gray-200">
 								<div className="text-center">
 									<p className="text-sm text-gray-600 mb-3">
@@ -310,17 +276,36 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 									<Button
 										variant="outline"
 										onClick={onGuestLogin}
+										disabled={isLoading}
 										className="w-full"
 									>
-										Continue as Guest
+										{isLoading ? (
+											<div className="flex items-center justify-center space-x-2">
+												<div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+												<span>Processing...</span>
+											</div>
+										) : (
+											"Continue as Guest"
+										)}
 									</Button>
 								</div>
 							</div>
 						)}
 				</div>
-			</DialogContent>
-		</Dialog>
+
+				{/* Back to Home Link */}
+				<div className="text-center mt-6">
+					<Button
+						variant="ghost"
+						onClick={() => navigate("/")}
+						className="text-gray-600 hover:text-gray-900"
+					>
+						← Back to Home
+					</Button>
+				</div>
+			</div>
+		</div>
 	);
 };
 
-export default AuthenticationModal;
+export default LoginPage;

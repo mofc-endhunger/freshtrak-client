@@ -5,7 +5,7 @@ import { API_URL, RENDER_URL, BASE_URL } from "../../Utils/Urls";
 import axios from "axios";
 import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
 import { setCurrentUser, selectUser } from "../../Store/userSlice";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { formatDateDayAndDate } from "../../Utils/DateFormat";
 import { Link } from "react-router-dom";
 import { EventFormat } from "../../Utils/EventHandler";
@@ -14,6 +14,14 @@ import EventCardComponent from "../Events/EventCardComponent";
 import QRCode from "react-qr-code";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "../../components/ui/dialog";
+import localization from "../Localization/LocalizationComponent";
 
 // Type imports from registration.types.ts
 import {
@@ -28,25 +36,28 @@ const RegistrationConfirmComponent: React.FC<
 	RegistrationConfirmProps
 > = props => {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const currentUser = useSelector(selectUser) as RegistrationFormData | null;
 	const user_data = location.state?.user || currentUser || {};
 
 	const dispatch = useDispatch();
 	const event = useSelector(selectEvent) as Event;
-	let HOME_OR_ROOT_URL = RENDER_URL.HOME_URL;
 	const event_slot_id = location.state?.eventTimeStamp?.event_slot_id;
 	const [userToken, setUserToken] = useState<string | undefined>(undefined);
 	const [isError, setIsError] = useState<boolean>(false);
 	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
 	const [pageError, setPageError] = useState<boolean>(false);
 	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
+	const [showGuestSigninModal, setShowGuestSigninModal] =
+		useState<boolean>(false);
 	const eventDateId = sessionStorage.getItem("registeredEventDateID");
 
 	const isLoggedIn = localStorage.getItem("isLoggedIn");
+	const cognitoUser = localStorage.getItem("cognitoUser");
 	if (!isLoggedIn || !JSON.parse(isLoggedIn)) {
-		HOME_OR_ROOT_URL = RENDER_URL.ROOT_URL;
 		localStorage.removeItem("userToken");
-		localStorage.removeItem("tokenExpiresAt");
+		localStorage.removeItem("guestId");
+		localStorage.removeItem("guestType");
 		localStorage.removeItem("search_zip");
 	}
 
@@ -122,6 +133,15 @@ const RegistrationConfirmComponent: React.FC<
 		user,
 		userToken,
 	]);
+
+	// Show guest signin modal for guest users
+	useEffect(() => {
+		if (!cognitoUser) {
+			setTimeout(() => {
+				setShowGuestSigninModal(true);
+			}, 3000);
+		}
+	}, [cognitoUser]);
 
 	function fetchBusinesses(): void {
 		const token = localStorage.getItem("userToken");
@@ -231,7 +251,8 @@ const RegistrationConfirmComponent: React.FC<
 								</h5>
 							)}
 						<p className="mb-5">{event.eventDetails}</p>
-						<Link to={HOME_OR_ROOT_URL}>
+
+						<Link to={RENDER_URL.ROOT_URL}>
 							<div className="flex justify-center mt-4">
 								<Button
 									type="submit"
@@ -245,6 +266,35 @@ const RegistrationConfirmComponent: React.FC<
 					</section>
 				</div>
 			)}
+
+			{/* Guest Sign-in Modal */}
+			<Dialog
+				open={showGuestSigninModal}
+				onOpenChange={setShowGuestSigninModal}
+			>
+				<DialogContent className="sm:max-w-md bg-white border border-gray-200 text-gray-900">
+					<DialogHeader>
+						<DialogTitle className="text-center text-gray-900">
+							Create Account
+						</DialogTitle>
+						<DialogDescription className="text-center text-gray-600">
+							{localization.guest_signin_prompt}
+						</DialogDescription>
+					</DialogHeader>
+					<div className="flex flex-col space-y-3 mt-4">
+						<Button
+							onClick={() => {
+								setShowGuestSigninModal(false);
+								navigate("/login");
+							}}
+							variant="default"
+							className="w-full"
+						>
+							{localization.guest_signin_button}
+						</Button>
+					</div>
+				</DialogContent>
+			</Dialog>
 		</Fragment>
 	);
 };

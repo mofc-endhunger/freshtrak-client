@@ -1,0 +1,463 @@
+// Date Validation Utility Functions with TypeScript Types
+
+import moment from 'moment';
+
+// Types for date validation
+export interface DateValidationResult {
+  isValid: boolean;
+  error?: string;
+  formattedDate?: string;
+  age?: number;
+}
+
+export interface DateValidationOptions {
+  minAge?: number;
+  maxAge?: number;
+  minDate?: Date;
+  maxDate?: Date;
+  format?: string;
+  allowFuture?: boolean;
+  allowPast?: boolean;
+}
+
+export interface DateFormatOptions {
+  inputFormat: string;
+  outputFormat: string;
+  placeholder?: string;
+  separator?: string;
+}
+
+// Date validation constants
+export const DATE_CONSTANTS = {
+  MAX_AGE: 123,
+  MIN_AGE: 0,
+  DEFAULT_FORMAT: 'MM / DD / YYYY',
+  SERVER_FORMAT: 'YYYY-MM-DD',
+  DISPLAY_FORMAT: 'MM/DD/YYYY',
+  SEPARATOR: ' / ',
+} as const;
+
+// Age validation constants
+export const AGE_CONSTANTS = {
+  SENIOR: 60,
+  ADULT: 18,
+  CHILD: 0,
+  INFANT: 2,
+} as const;
+
+/**
+ * Validates if a string represents a valid date
+ */
+export const isValidDate = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): boolean => {
+  if (!dateString || typeof dateString !== 'string') {
+    return false;
+  }
+
+  const momentDate = moment(dateString, format, true);
+  return momentDate.isValid();
+};
+
+/**
+ * Validates date of birth with age restrictions
+ */
+export const isValidDateOfBirth = (
+  dateString: string,
+  options: DateValidationOptions = {}
+): DateValidationResult => {
+  const {
+    minAge = DATE_CONSTANTS.MIN_AGE,
+    maxAge = DATE_CONSTANTS.MAX_AGE,
+    minDate,
+    maxDate,
+    format = DATE_CONSTANTS.DEFAULT_FORMAT,
+    allowFuture = false,
+    allowPast = true,
+  } = options;
+
+  // Check if date string is valid
+  if (!isValidDate(dateString, format)) {
+    return {
+      isValid: false,
+      error: 'Invalid date format. Please use MM / DD / YYYY',
+    };
+  }
+
+  const momentDate = moment(dateString, format);
+  const now = moment();
+
+  // Check if date is in the future (if not allowed)
+  if (!allowFuture && momentDate.isAfter(now)) {
+    return {
+      isValid: false,
+      error: 'Date of birth cannot be in the future',
+    };
+  }
+
+  // Check if date is in the past (if not allowed)
+  if (!allowPast && momentDate.isBefore(now)) {
+    return {
+      isValid: false,
+      error: 'Date must be in the future',
+    };
+  }
+
+  // Calculate age
+  const age = now.diff(momentDate, 'years');
+
+  // Check minimum age
+  if (age < minAge) {
+    return {
+      isValid: false,
+      error: `Age must be at least ${minAge} years old`,
+    };
+  }
+
+  // Check maximum age
+  if (age > maxAge) {
+    return {
+      isValid: false,
+      error: `Age cannot exceed ${maxAge} years`,
+    };
+  }
+
+  // Check custom date range
+  if (minDate && momentDate.isBefore(moment(minDate))) {
+    return {
+      isValid: false,
+      error: `Date cannot be before ${moment(minDate).format(format)}`,
+    };
+  }
+
+  if (maxDate && momentDate.isAfter(moment(maxDate))) {
+    return {
+      isValid: false,
+      error: `Date cannot be after ${moment(maxDate).format(format)}`,
+    };
+  }
+
+  return {
+    isValid: true,
+    age,
+    formattedDate: momentDate.format(format),
+  };
+};
+
+/**
+ * Formats date input as user types (MM / DD / YYYY format)
+ */
+export const formatDateInput = (input: string): string => {
+  if (!input || typeof input !== 'string') {
+    return '';
+  }
+
+  // Remove all non-digits
+  const digits = input.replace(/\D/g, '');
+
+  // Limit to 8 digits (MMDDYYYY)
+  const limitedDigits = digits.slice(0, 8);
+
+  // Format as MM / DD / YYYY
+  let formatted = '';
+  for (let i = 0; i < limitedDigits.length; i++) {
+    if (i === 2 || i === 4) {
+      formatted += ' / ';
+    }
+    formatted += limitedDigits[i];
+  }
+
+  return formatted;
+};
+
+/**
+ * Validates and formats date input with proper validation
+ */
+export const validateAndFormatDateInput = (
+  input: string,
+  options: DateValidationOptions = {}
+): DateValidationResult => {
+  const formattedInput = formatDateInput(input);
+
+  // Check if input is complete (MM / DD / YYYY)
+  if (formattedInput.length < 10) {
+    return {
+      isValid: false,
+      formattedDate: formattedInput,
+    };
+  }
+
+  return isValidDateOfBirth(formattedInput, options);
+};
+
+/**
+ * Calculates age from date of birth
+ */
+export const calculateAge = (dateOfBirth: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): number => {
+  if (!isValidDate(dateOfBirth, format)) {
+    return 0;
+  }
+
+  const birthDate = moment(dateOfBirth, format);
+  const now = moment();
+
+  return now.diff(birthDate, 'years');
+};
+
+/**
+ * Determines age category based on age
+ */
+export const getAgeCategory = (age: number): 'senior' | 'adult' | 'child' | 'infant' => {
+  if (age >= AGE_CONSTANTS.SENIOR) {
+    return 'senior';
+  } else if (age >= AGE_CONSTANTS.ADULT) {
+    return 'adult';
+  } else if (age >= AGE_CONSTANTS.INFANT) {
+    return 'child';
+  } else {
+    return 'infant';
+  }
+};
+
+/**
+ * Validates date range (start date before end date)
+ */
+export const isValidDateRange = (
+  startDate: string,
+  endDate: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT
+): DateValidationResult => {
+  if (!isValidDate(startDate, format) || !isValidDate(endDate, format)) {
+    return {
+      isValid: false,
+      error: 'Invalid date format',
+    };
+  }
+
+  const start = moment(startDate, format);
+  const end = moment(endDate, format);
+
+  if (start.isAfter(end)) {
+    return {
+      isValid: false,
+      error: 'Start date must be before end date',
+    };
+  }
+
+  return {
+    isValid: true,
+    formattedDate: `${start.format(format)} - ${end.format(format)}`,
+  };
+};
+
+/**
+ * Converts date to server format (YYYY-MM-DD)
+ */
+export const formatDateForServer = (dateString: string, inputFormat: string = DATE_CONSTANTS.DEFAULT_FORMAT): string => {
+  if (!isValidDate(dateString, inputFormat)) {
+    return '';
+  }
+
+  const momentDate = moment(dateString, inputFormat);
+  return momentDate.format(DATE_CONSTANTS.SERVER_FORMAT);
+};
+
+/**
+ * Converts server date to display format
+ */
+export const formatDateForDisplay = (serverDate: string, outputFormat: string = DATE_CONSTANTS.DISPLAY_FORMAT): string => {
+  if (!serverDate) {
+    return '';
+  }
+
+  const momentDate = moment(serverDate, DATE_CONSTANTS.SERVER_FORMAT);
+  if (!momentDate.isValid()) {
+    return '';
+  }
+
+  return momentDate.format(outputFormat);
+};
+
+/**
+ * Validates event date (must be in the future)
+ */
+export const isValidEventDate = (eventDate: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): DateValidationResult => {
+  if (!isValidDate(eventDate, format)) {
+    return {
+      isValid: false,
+      error: 'Invalid event date format',
+    };
+  }
+
+  const eventMoment = moment(eventDate, format);
+  const now = moment();
+
+  if (eventMoment.isBefore(now, 'day')) {
+    return {
+      isValid: false,
+      error: 'Event date must be in the future',
+    };
+  }
+
+  return {
+    isValid: true,
+    formattedDate: eventMoment.format(format),
+  };
+};
+
+/**
+ * Validates time format (HH:MM AM/PM)
+ */
+export const isValidTimeFormat = (timeString: string): boolean => {
+  if (!timeString || typeof timeString !== 'string') {
+    return false;
+  }
+
+  const timeRegex = /^(0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM|am|pm)$/;
+  return timeRegex.test(timeString);
+};
+
+/**
+ * Validates time range (start time before end time)
+ */
+export const isValidTimeRange = (startTime: string, endTime: string): DateValidationResult => {
+  if (!isValidTimeFormat(startTime) || !isValidTimeFormat(endTime)) {
+    return {
+      isValid: false,
+      error: 'Invalid time format. Use HH:MM AM/PM',
+    };
+  }
+
+  const start = moment(startTime, 'hh:mm A');
+  const end = moment(endTime, 'hh:mm A');
+
+  if (start.isSameOrAfter(end)) {
+    return {
+      isValid: false,
+      error: 'Start time must be before end time',
+    };
+  }
+
+  return {
+    isValid: true,
+    formattedDate: `${start.format('hh:mm A')} - ${end.format('hh:mm A')}`,
+  };
+};
+
+/**
+ * Gets relative time description (e.g., "2 days ago", "in 3 hours")
+ */
+export const getRelativeTime = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): string => {
+  if (!isValidDate(dateString, format)) {
+    return '';
+  }
+
+  const date = moment(dateString, format);
+  return date.fromNow();
+};
+
+/**
+ * Checks if date is today
+ */
+export const isToday = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): boolean => {
+  if (!isValidDate(dateString, format)) {
+    return false;
+  }
+
+  const date = moment(dateString, format);
+  return date.isSame(moment(), 'day');
+};
+
+/**
+ * Checks if date is in the past
+ */
+export const isPastDate = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): boolean => {
+  if (!isValidDate(dateString, format)) {
+    return false;
+  }
+
+  const date = moment(dateString, format);
+  return date.isBefore(moment(), 'day');
+};
+
+/**
+ * Checks if date is in the future
+ */
+export const isFutureDate = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): boolean => {
+  if (!isValidDate(dateString, format)) {
+    return false;
+  }
+
+  const date = moment(dateString, format);
+  return date.isAfter(moment(), 'day');
+};
+
+/**
+ * Gets the number of days between two dates
+ */
+export const getDaysBetween = (
+  startDate: string,
+  endDate: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT
+): number => {
+  if (!isValidDate(startDate, format) || !isValidDate(endDate, format)) {
+    return 0;
+  }
+
+  const start = moment(startDate, format);
+  const end = moment(endDate, format);
+
+  return end.diff(start, 'days');
+};
+
+/**
+ * Validates date input with custom validation rules
+ */
+export const validateDateWithRules = (
+  dateString: string,
+  rules: {
+    required?: boolean;
+    minAge?: number;
+    maxAge?: number;
+    minDate?: string;
+    maxDate?: string;
+    format?: string;
+    allowFuture?: boolean;
+    allowPast?: boolean;
+  } = {}
+): DateValidationResult => {
+  const {
+    required = true,
+    minAge,
+    maxAge,
+    minDate,
+    maxDate,
+    format = DATE_CONSTANTS.DEFAULT_FORMAT,
+    allowFuture = false,
+    allowPast = true,
+  } = rules;
+
+  // Check if required
+  if (required && (!dateString || dateString.trim() === '')) {
+    return {
+      isValid: false,
+      error: 'Date is required',
+    };
+  }
+
+  // If not required and empty, return valid
+  if (!required && (!dateString || dateString.trim() === '')) {
+    return {
+      isValid: true,
+    };
+  }
+
+  // Validate date format and content
+  return isValidDateOfBirth(dateString, {
+    minAge,
+    maxAge,
+    minDate: minDate ? moment(minDate, format).toDate() : undefined,
+    maxDate: maxDate ? moment(maxDate, format).toDate() : undefined,
+    format,
+    allowFuture,
+    allowPast,
+  });
+};

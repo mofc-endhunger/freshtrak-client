@@ -2,11 +2,12 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import ReactGA from "react-ga";
 import TagManager from "react-gtm-module";
-import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App";
-import store from "./Store/store";
+import store, { persistor } from "./Store/store";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 import "leaflet/dist/leaflet.css";
+import "./index.css";
 
 const GA_ID = process.env.REACT_APP_GA_ID;
 if (GA_ID) {
@@ -25,6 +26,8 @@ const root = createRoot(container);
 
 root.render(
 	<Provider store={store}>
-		<App />
+		<PersistGate loading={null} persistor={persistor}>
+			<App />
+		</PersistGate>
 	</Provider>
 );

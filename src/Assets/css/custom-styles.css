@@ -1,0 +1,298 @@
+/* Custom Styles for FreshTrak - Complex components that need custom CSS */
+
+/* Mobile Menu Animations */
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.mobile-menu {
+	position: fixed;
+	left: 0;
+	top: 0;
+	height: 100%;
+	background: url(../img/mobile-menu-bg.svg) no-repeat #28ce85;
+	background-size: cover;
+	width: 100%;
+	z-index: 1049;
+	-webkit-animation-duration: 0.5s;
+	animation-duration: 0.5s;
+	-webkit-animation-fill-mode: both;
+	animation-fill-mode: both;
+	color: #ffffff;
+	padding: 2rem;
+	overflow: auto;
+}
+
+.mobile-menu.fadeIn {
+	-webkit-animation-name: fadeIn;
+	animation-name: fadeIn;
+}
+
+.mobile-menu .mobile-close {
+	position: absolute;
+	right: 1.2rem;
+	top: 1.2rem;
+	background: none;
+	border: none;
+}
+
+.mobile-menu .menu-item-title {
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	font-weight: 600;
+	letter-spacing: 1.5px;
+}
+
+.mobile-menu ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.mobile-menu ul li {
+	margin: 0.6rem 0;
+}
+
+.mobile-menu ul li a {
+	color: inherit;
+	font-size: 1.2rem;
+	font-weight: 600;
+}
+
+.mobile-menu hr {
+	border-top: 2px solid #ffffff;
+	width: 100%;
+}
+
+.mobile-menu .sign-in-button {
+	font-size: 0.9rem;
+	color: #ffffff;
+	cursor: pointer;
+	font-weight: 700;
+	background: none;
+	border: none;
+	padding: 0;
+	text-transform: uppercase;
+}
+
+.mobile-menu .sign-in-button:focus {
+	outline: none;
+}
+
+.mobile-menu .nav-link {
+	color: inherit;
+	padding: 0;
+}
+
+.mobile-menu .dropdown-toggle::after {
+	display: none;
+}
+
+/* Header Background */
+.header {
+	background: #28ce85 url(../img/banner-bg.png) no-repeat center center;
+	height: 400px;
+}
+
+@media (max-width: 575px) {
+	.header {
+		height: 300px;
+		background-size: cover;
+	}
+}
+
+@media (min-width: 576px) {
+	.header {
+		height: 400px;
+	}
+}
+
+/* QR Code Styles */
+.qrcode {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	display: flex;
+	align-content: center;
+	justify-content: center;
+}
+
+.qr-flex {
+	display: flex;
+	justify-content: center;
+}
+
+.qr-flex * {
+	align-items: flex-start;
+}
+
+.qr-code {
+	margin-left: 15px;
+}
+
+/* Loading Spinner Heights */
+.loading-spinner-height {
+	height: 10em;
+	width: 10em;
+}
+
+.loading-spinner-small {
+	height: 5em;
+	width: 5em;
+}
+
+/* Facebook Login Button */
+.kep-login-facebook {
+	width: 100%;
+	border-radius: 8px;
+}
+
+/* Validation Error */
+.validationError {
+	font-size: 0.7rem;
+	position: absolute;
+	color: #ff0000;
+}
+
+/* Timeline Steps */
+li.timeline-steps__step.active::after {
+	top: -5px !important;
+	height: 1.2rem !important;
+	width: 1.2rem !important;
+}
+
+/* Registration Form */
+.registration-form .content-wrapper {
+	margin: 0 auto !important;
+}
+
+/* Registration Confirmation Card */
+.reg-confirm-card {
+	margin-top: 15px;
+}
+
+/* Center Aligned */
+.center-aligned {
+	text-align: center;
+}
+
+/* Font Size Utility */
+.font-size-point-85rem {
+	font-size: 0.85rem;
+	font-family: "Varela Round", sans-serif;
+}
+
+/* Advance Search Results */
+.advance-search-results {
+	border: 1px solid #cbd4dc;
+	border-radius: 0.25rem;
+}
+
+/* Filter Close */
+.filter-close {
+	background: #392947;
+}
+
+/* Modal Dialog Light */
+.modal-dialog.light .modal-content {
+	background: #ffffff;
+	color: #000000;
+}
+
+.modal-dialog.light .modal-content .modal-title {
+	color: #495057;
+}
+
+.modal-dialog.light .modal-content .close {
+	color: #495057;
+}
+
+/* Link Styles */
+a.link {
+	text-decoration: underline;
+	color: #007bff;
+	cursor: pointer;
+	padding-left: 20px;
+}
+
+/* Responsive Utilities */
+@media (max-width: 575px) {
+	.mobile-text-left {
+		text-align: left !important;
+		margin-bottom: 1rem !important;
+	}
+
+	h2,
+	.h2 {
+		font-size: 1.3rem;
+	}
+
+	.mobile-flex {
+		display: flex;
+		text-align: left;
+	}
+
+	.mobile-flex .item-icon {
+		margin-right: 10px;
+		width: 40px;
+		height: 40px;
+	}
+
+	.pt-150 {
+		padding-top: 50px;
+	}
+
+	.pb-150 {
+		padding-bottom: 50px;
+	}
+
+	.pt-100 {
+		padding-top: 50px;
+	}
+
+	.pb-100 {
+		padding-bottom: 50px;
+	}
+}
+
+/* Info Banner Responsive */
+@media (max-width: 575px) {
+	.info-banner .mobile-view {
+		display: block;
+	}
+
+	.info-banner .desktop-view {
+		display: none;
+	}
+}
+
+@media (min-width: 576px) {
+	.info-banner .mobile-view {
+		display: none;
+	}
+
+	.info-banner .desktop-view {
+		display: block;
+		margin: 0 auto;
+	}
+}
+
+/* Color Utilities */
+.color-green {
+	color: #28ce85;
+}
+
+/* Custom List */
+.custom-list {
+	margin: 1rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.custom-list li {
+	margin-bottom: 0.5rem;
+}

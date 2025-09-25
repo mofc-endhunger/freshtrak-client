@@ -1,13 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import custom styles for complex components */
+@import url('./Assets/css/custom-styles.css');
+
+/* Base styles */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #ffffff;
+  color: #616161;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Global typography styles */
+section h2 {
+  color: #392947;
+}
+
+.relative {
+  position: relative;
+}
+
+/* Typography utilities that can be replaced with Tailwind */
+.big-title {
+  font-size: 3.75rem;
+  font-weight: 700;
+  color: #392947;
+  letter-spacing: -0.025em;
+}
+
+.med-title {
+  font-size: 1.5rem;
+}
+
+.medium-title {
+  font-size: 1.125rem;
+}
+
+.small-title {
+  font-size: 0.875rem;
+}
+
+.caption-text {
+  font-family: 'Varela Round', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.caption-text .link-wrap {
+  word-break: break-word;
+}
+
+/* Spacing utilities that can be replaced with Tailwind */
+.pt-200 {
+  padding-top: 200px;
+}
+.pt-150 {
+  padding-top: 150px;
+}
+.pb-150 {
+  padding-bottom: 150px;
+}
+.pt-100 {
+  padding-top: 100px;
+}
+.pb-100 {
+  padding-bottom: 100px;
+}
+.pt-50 {
+  padding-top: 50px;
+}
+.pb-50 {
+  padding-bottom: 50px;
+}
+.mt-60 {
+  margin-top: 60px;
+}
+.mt-100 {
+  margin-top: 100px;
+}
+
+/* Navigation styles that can be replaced with Tailwind */
+.navbar-toggler .navbar-toggler-icon {
+  background-image: none !important;
+}
+
+.navbar-toggler:focus {
+  outline: none;
+}
+
+/* Header background migrated to Tailwind CSS in HeaderContainer component */
+
+/* QR Code styles */
+.qrcode {
+  margin-top: 0.625rem;
+  margin-bottom: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Color utilities */
+.color-green {
+  color: #28ce85;
+}
+
+/* Custom list styles */
+.custom-list {
+  list-style: none;
+  padding: 0;
+}
+
+.custom-list li {
+  margin-bottom: 0.5rem;
 }

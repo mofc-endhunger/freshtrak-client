@@ -8,6 +8,7 @@ import axios from "axios";
 import { mockFoodBank } from "../../../Testing";
 
 jest.mock("axios");
+jest.mock("@radix-ui/react-use-size");
 
 const initialState = {
 	addressSearch: { zipCode: "12345" },

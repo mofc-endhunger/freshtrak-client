@@ -1,0 +1,525 @@
+import React, {
+	Fragment,
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+} from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import TagManager from "react-gtm-module";
+import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
+import { selectUser } from "../../Store/userSlice";
+import SpinnerComponent from "../General/SpinnerComponent";
+import ErrorComponent from "../General/ErrorComponent";
+import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
+import axios from "axios";
+import RegistrationComponent from "./RegistrationComponent";
+import { EventFormat } from "../../Utils/EventHandler";
+import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
+import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
+import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
+
+// Type imports from registration.types.ts
+import {
+	RegistrationContainerProps,
+	RegistrationFormData,
+	Event,
+	ApiResponse,
+} from "./types/registration.types";
+
+// Utility to sanitize user object
+function sanitizeUser(user: any): RegistrationFormData {
+	if (!user || typeof user !== "object") return { ...defaultUser };
+	return {
+		first_name: user.first_name || "",
+		middle_name: user.middle_name || "",
+		last_name: user.last_name || "",
+		suffix: user.suffix || "",
+		date_of_birth: user.date_of_birth || "",
+		gender: user.gender || "",
+		address_line_1: user.address_line_1 || "",
+		address_line_2: user.address_line_2 || "",
+		city: user.city || "",
+		state: user.state || "",
+		zip_code: user.zip_code || "",
+		phone: user.phone || "",
+		permission_to_text: user.permission_to_text || false,
+		email: user.email || "",
+		permission_to_email: user.permission_to_email || false,
+		seniors_in_household: user.seniors_in_household || 0,
+		adults_in_household: user.adults_in_household || 0,
+		children_in_household: user.children_in_household || 0,
+		license_plate: user.license_plate || "",
+		identification_code: user.identification_code || "",
+		id: user.id,
+		user_type: user.user_type,
+		created_at: user.created_at,
+		updated_at: user.updated_at,
+		credential_id: user.credential_id,
+		user_detail_id: user.user_detail_id,
+	};
+}
+
+const defaultUser: RegistrationFormData = {
+	first_name: "",
+	middle_name: "",
+	last_name: "",
+	suffix: "",
+	date_of_birth: "",
+	gender: "",
+	address_line_1: "",
+	address_line_2: "",
+	city: "",
+	state: "",
+	zip_code: "",
+	phone: "",
+	permission_to_text: false,
+	email: "",
+	permission_to_email: false,
+	seniors_in_household: 0,
+	adults_in_household: 0,
+	children_in_household: 0,
+
+	identification_code: "",
+};
+
+/**
+ * RegistrationContainer - Main container component for user registration flow
+ * Handles authentication, event fetching, user registration, and navigation
+ */
+const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const location = useLocation();
+	const { eventDateId, eventSlotId } = useParams();
+	const [isLoading, setLoading] = useState<boolean>(false);
+	const [userToken, setUserToken] = useState<string | undefined>(undefined);
+	const [isError, setIsError] = useState<boolean>(false);
+	const [pageError, setPageError] = useState<boolean>(false);
+	const [errors, setErrors] = useState<string[]>([]);
+	const [disabled, setDisabled] = useState<boolean>(false);
+	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
+
+	const event = useSelector(selectEvent);
+	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
+
+	const currentUser = useSelector(selectUser);
+	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
+	const CLIENT_URL = process.env.REACT_APP_CLIENT_URL;
+
+	const getEvent = useCallback(async (): Promise<void> => {
+		try {
+			setLoading(true);
+			const resp = await axios.get<{ data: Event; errors?: string[] }>(
+				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
+			);
+			const { data } = resp;
+			if (data && data.data) {
+				const eventData = EventFormat(data.data, eventDateId);
+				dispatch(setCurrentEvent(eventData));
+				setSelectedEvent(eventData);
+				setLoading(false);
+			} else {
+				setPageError(true);
+				setErrors(data.errors || []);
+				setLoading(false);
+			}
+		} catch (e: any) {
+			console.error(e);
+			setIsError(true);
+			setLoading(false);
+			if (e.response) {
+				setPageError(true);
+				setErrors(e.response.data);
+			}
+		}
+	}, [eventDateId, dispatch]);
+
+	useEffect(() => {
+		const token = localStorage.getItem("userToken");
+		const userProfile = localStorage.getItem("userProfile");
+		setUserToken(token || undefined);
+
+		// Only proceed if we're not in an error state
+		if (!isError && !pageError) {
+			// Check if we need to fetch event data
+			if (!selectedEvent || Object.keys(selectedEvent).length === 0) {
+				getEvent();
+			}
+
+			// Handle user authentication and profile
+			// Check for both guest authentication (userToken) and Cognito authentication
+			const cognitoUser = localStorage.getItem("cognitoUser");
+			let isCognitoSignedIn = false;
+			if (cognitoUser) {
+				try {
+					const cognitoUserData = JSON.parse(cognitoUser);
+					isCognitoSignedIn = cognitoUserData.isSignedIn === true;
+				} catch (error) {
+					console.warn("Could not parse cognitoUser:", error);
+				}
+			}
+
+			const isUserAuthenticated =
+				token || (cognitoUser && isCognitoSignedIn);
+
+			if (!isUserAuthenticated) {
+				setShowAuthModal(true);
+			} else if (!user) {
+				// Handle user data for both guest and Cognito users
+				if (userProfile) {
+					// Guest user - use existing userProfile
+					try {
+						setUser(sanitizeUser(JSON.parse(userProfile)));
+					} catch (error) {
+						console.error("Error parsing userProfile:", error);
+					}
+				} else if (cognitoUser && isCognitoSignedIn) {
+					// Cognito user - create user object from cognitoUser data
+					try {
+						const cognitoUserData = JSON.parse(cognitoUser);
+						const cognitoUserObj = {
+							first_name:
+								cognitoUserData.name?.split(" ")[0] || "",
+							last_name:
+								cognitoUserData.name
+									?.split(" ")
+									.slice(1)
+									.join(" ") || "",
+							email: cognitoUserData.email || "",
+							phone_number: "",
+							address: "",
+							city: "",
+							state: "",
+							zip_code: "",
+							adult_count: 1,
+							senior_count: 0,
+							child_count: 0,
+							permission_to_text: false,
+							permission_to_email: true,
+						};
+						setUser(sanitizeUser(cognitoUserObj));
+					} catch (error) {
+						console.error("Error parsing cognitoUser:", error);
+					}
+				}
+			}
+		}
+
+		// Only redirect if user is still not set after 2 seconds (increased from 1)
+		if (!showAuthModal && !user && !isLoading) {
+			if (redirectTimeout.current) clearTimeout(redirectTimeout.current);
+			redirectTimeout.current = setTimeout(() => {
+				if (!user) {
+					setErrors([
+						"Unable to load user profile. Please try again or contact support.",
+					]);
+					setPageError(true);
+				}
+			}, 2000);
+		} else {
+			if (redirectTimeout.current) clearTimeout(redirectTimeout.current);
+		}
+	}, [
+		isError,
+		pageError,
+		selectedEvent,
+		user,
+		userToken,
+		showAuthModal,
+		isLoading,
+		eventDateId,
+		navigate,
+		getEvent,
+	]);
+
+	const handleAuthLogin = (): void => {
+		const token = localStorage.getItem("userToken");
+		const userProfile = localStorage.getItem("userProfile");
+		if (token && userProfile) {
+			setUserToken(token || undefined);
+			try {
+				setUser(sanitizeUser(JSON.parse(userProfile)));
+			} catch (error) {
+				console.error("Error parsing userProfile:", error);
+			}
+			setShowAuthModal(false);
+		}
+	};
+
+	const getReservationText = (): string => {
+		return location.state
+			? `at ${event.agencyName} on ${location.state.event_date} from ${location.state.event_slot.start_time} - ${location.state.event_slot.end_time}. For more information, including a reservation QR code,`
+			: "";
+	};
+
+	const getCodeURL = (identification_code: string): string => {
+		return `Your QRCode for the Reservation ${CLIENT_URL}qrcode/${identification_code}/${eventDateId}${
+			eventSlotId ? "/" + eventSlotId : ""
+		}`;
+	};
+
+	const formatErrorMessage = (message: string): string => {
+		// Make error messages more user-friendly
+		const errorMappings: Record<string, string> = {
+			"is at capacity":
+				"This time slot is at capacity. Please select a different time.",
+			"is required": "This field is required.",
+			"is invalid": "This field contains invalid data.",
+			"not found": "The requested resource was not found.",
+			"already exists": "This record already exists.",
+			"permission denied":
+				"You do not have permission to perform this action.",
+			unauthorized: "Please log in to continue.",
+			forbidden: "Access denied.",
+			"not available": "This option is not available.",
+			expired: "This session has expired. Please log in again.",
+			"invalid token": "Your session has expired. Please log in again.",
+			"network error":
+				"Network error. Please check your connection and try again.",
+			timeout: "Request timed out. Please try again.",
+			"server error": "Server error. Please try again later.",
+		};
+
+		// Check for exact matches first
+		if (errorMappings[message.toLowerCase()]) {
+			return errorMappings[message.toLowerCase()];
+		}
+
+		// Check for partial matches
+		for (const [key, value] of Object.entries(errorMappings)) {
+			if (message.toLowerCase().includes(key)) {
+				return value;
+			}
+		}
+
+		// Return the original message if no mapping found
+		return message;
+	};
+
+	const notify = (msg: any, error: string): void => {
+		let formatted_msg = "Something Went Wrong";
+
+		// Extract error messages from different possible fields
+		if (msg && typeof msg === "object") {
+			// Check for specific error fields
+			const errorFields = [
+				"user_id",
+				"event_date_id",
+				"event_slot_id",
+				"reservation",
+			];
+			for (const field of errorFields) {
+				if (
+					msg[field] &&
+					Array.isArray(msg[field]) &&
+					msg[field].length > 0
+				) {
+					formatted_msg = formatErrorMessage(msg[field][0]);
+					break;
+				}
+			}
+
+			// If no specific field found, try to get the first error message from any field
+			if (formatted_msg === "Something Went Wrong") {
+				const firstError = Object.values(msg).find(
+					(value): value is string[] =>
+						Array.isArray(value) && value.length > 0
+				);
+				if (firstError && firstError.length > 0) {
+					formatted_msg = formatErrorMessage(firstError[0]);
+				}
+			}
+		}
+
+		showToast(formatted_msg, error);
+	};
+	const send_sms = async (user: RegistrationFormData): Promise<void> => {
+		const { TWILIO_SMS } = API_URL;
+		let to_phone_number = user["phone"];
+		let identification_code = user["identification_code"];
+		if (identification_code) {
+			let message = `You have successfully registered for an event, ${getReservationText()} Your confirmation code is ${identification_code.toUpperCase()}.
+    ${getCodeURL(identification_code)}`;
+			let search_zip = localStorage.getItem("search_zip");
+			if (search_zip) {
+				setLoading(true);
+				let foodBankUri = API_URL.FOODBANK_LIST;
+				try {
+					const resp = await axios.get(foodBankUri, {
+						params: { zip_code: search_zip },
+					});
+					const { data } = resp;
+					let from_phone_number =
+						data.foodbanks[0].twilio_phone_number;
+					try {
+						await axios.post(TWILIO_SMS, {
+							from_phone_number,
+							to_phone_number,
+							message,
+						});
+					} catch (e) {
+						console.log(e);
+					}
+					setLoading(false);
+				} catch (err) {
+					setLoading(false);
+				}
+			}
+		}
+	};
+
+	const register = async (
+		user: RegistrationFormData,
+		event: Event
+	): Promise<void> => {
+		setDisabled(!disabled);
+		const event_date_id = parseInt(eventDateId || "0", 10);
+		const event_slot_id = parseInt(eventSlotId || "0", 10);
+		const { GUEST_USER, CREATE_RESERVATION } = API_URL;
+		let updatedUser = user;
+		try {
+			const userResp = await axios.post<
+				ApiResponse<RegistrationFormData>
+			>(
+				GUEST_USER,
+				{ user },
+				{
+					headers: { Authorization: `Bearer ${userToken}` },
+				}
+			);
+			// Use the response data, which should include identification_code
+			updatedUser = userResp.data.data || user;
+		} catch (e: any) {
+			console.error("User creation error:", e);
+			// If user creation fails, we should still try to create the reservation
+			// but log the error for debugging
+		}
+		try {
+			await axios.post<ApiResponse<any>>(
+				CREATE_RESERVATION,
+				{
+					reservation: eventSlotId
+						? { event_date_id, event_slot_id }
+						: { event_date_id },
+				},
+				{ headers: { Authorization: `Bearer ${userToken}` } }
+			);
+			TagManager.dataLayer({
+				dataLayer: {
+					event: "reservation",
+				},
+			});
+			if (updatedUser["permission_to_text"]) {
+				send_sms(updatedUser);
+			}
+			if (updatedUser["permission_to_email"]) {
+				sendRegistrationConfirmationEmail(
+					updatedUser,
+					selectedEvent,
+					location
+				);
+			}
+			if (eventDateId) {
+				sessionStorage.setItem("registeredEventDateID", eventDateId);
+			}
+			navigate(RENDER_URL.REGISTRATION_CONFIRM_URL, {
+				state: {
+					user: updatedUser,
+					eventDateId: eventDateId,
+					eventTimeStamp: {
+						start_time: location.state?.event_slot?.start_time,
+						end_time: location.state?.event_slot?.end_time,
+						event_slot_id: event_slot_id,
+					},
+				},
+			});
+		} catch (e: any) {
+			console.error("Registration error:", e);
+
+			// Handle different types of errors
+			if (e.response && e.response.data) {
+				// API error with response data
+				notify(e.response.data, "error");
+			} else if (e.request) {
+				// Network error (no response received)
+				notify(
+					{
+						network_error: [
+							"Network error. Please check your connection and try again.",
+						],
+					},
+					"error"
+				);
+			} else {
+				// Other errors (like axios configuration errors)
+				notify(
+					{
+						general_error: [
+							"Something went wrong. Please try again.",
+						],
+					},
+					"error"
+				);
+			}
+
+			setTimeout(() => window.scrollTo(0, 0));
+			setDisabled(disabled);
+			setErrors(e);
+			throw e; // Re-throw the error so it can be caught by the calling component
+		}
+	};
+
+	if (pageError) {
+		// Format errors to match ErrorComponent interface
+		const formattedErrors = {
+			message: Array.isArray(errors)
+				? errors.join(", ")
+				: "An error occurred while loading the page.",
+			status: "error",
+		};
+		return <ErrorComponent error={formattedErrors} />;
+	}
+
+	if (showAuthModal) {
+		return (
+			<AuthenticationModalComponent
+				show={showAuthModal}
+				setshow={setShowAuthModal}
+				onLogin={handleAuthLogin}
+			/>
+		);
+	}
+
+	// Show spinner while loading or if user/event data is not ready
+	if (
+		isLoading ||
+		!user ||
+		typeof user !== "object" ||
+		!selectedEvent ||
+		Object.keys(selectedEvent).length === 0
+	) {
+		return <SpinnerComponent />;
+	}
+
+	return (
+		<Fragment>
+			{isLoading && <SpinnerComponent />}
+			<Fragment>
+				<NotifyToast />
+				<RegistrationComponent
+					user={user && typeof user === "object" ? user : defaultUser}
+					onRegister={(data: RegistrationFormData) =>
+						register(data, selectedEvent)
+					}
+					event={selectedEvent}
+					disabled={disabled}
+				/>
+			</Fragment>
+		</Fragment>
+	);
+};
+
+export default RegistrationContainer;

@@ -65,7 +65,13 @@
     "build:beta": "REACT_APP_ENV=beta yarn build",
     "build:production": "REACT_APP_ENV=production yarn build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:shell": "docker-compose exec freshtrak-client sh",
+    "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up"
   },
   "eslintConfig": {
     "extends": "react-app"

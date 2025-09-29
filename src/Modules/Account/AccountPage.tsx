@@ -17,12 +17,10 @@ import {
 	Calendar,
 	Home,
 	Users,
-	Settings,
 	ArrowLeft,
 	CheckCircle,
 	AlertCircle,
 } from "lucide-react";
-import { useHouseholdSignUpIntegration } from "../Households/services/HouseholdSignUpIntegration";
 import { HouseholdCompletionPrompt } from "../Households/components/HouseholdCompletionPrompt";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { LoadingCard } from "../Households/components/LoadingSpinner";
@@ -43,13 +41,10 @@ import localization from "../Localization/LocalizationComponent";
 const AccountPage: React.FC = () => {
 	const navigate = useNavigate();
 	const { user, isAuthenticated } = useAuth();
-	const { shouldShowPrompt, hasCompletedSetup, markPromptShown } =
-		useHouseholdSignUpIntegration();
 
 	const [showHouseholdPrompt, setShowHouseholdPrompt] = useState(false);
 	//eslint-disable-next-line
 	const [householdData, setHouseholdData] = useState<any>(null);
-	const [showFamilyMembersPopup, setShowFamilyMembersPopup] = useState(false);
 	//eslint-disable-next-line
 	const [isLoadingHousehold, setIsLoadingHousehold] = useState(false);
 	const [showSkippedSetupPrompt, setShowSkippedSetupPrompt] = useState(false);
@@ -65,17 +60,6 @@ const AccountPage: React.FC = () => {
 		}
 	}, [isAuthenticated, user, navigate]);
 
-	// Check if we should show household completion prompt
-	useEffect(() => {
-		if (
-			user?.email &&
-			shouldShowPrompt(user.email) &&
-			!hasCompletedSetup()
-		) {
-			setShowHouseholdPrompt(true);
-		}
-	}, [user?.email, shouldShowPrompt, hasCompletedSetup]);
-
 	// Fetch household data and check for multiple family members
 	useEffect(() => {
 		const fetchHouseholdData = async () => {
@@ -84,18 +68,9 @@ const AccountPage: React.FC = () => {
 			setIsLoadingHousehold(true);
 			try {
 				// Step 1: Get user information including household_id
-				console.log("📤 GET /users/me - Fetching user information");
 				const userInfo = await householdsApiService.getUsersMe();
 
-				if (!userInfo.household_id) {
-					console.log("❌ No household_id found in user info");
-					return;
-				}
-
 				// Step 2: Get household information using household_id
-				console.log(
-					`📤 GET /households/${userInfo.household_id} - Fetching household information`
-				);
 				const householdInfo =
 					await householdsApiService.getHouseholdByIdNew(
 						userInfo.household_id
@@ -103,13 +78,28 @@ const AccountPage: React.FC = () => {
 
 				setHouseholdData(householdInfo);
 
-				// Check if user has multiple family members (more than 1 member)
-				const memberCount = householdInfo?.members?.length || 0;
-				if (memberCount > 1) {
-					setShowFamilyMembersPopup(true);
+				// Save household_id to localStorage for later use
+				if (householdInfo?.id) {
+					localStorage.setItem(
+						"householdId",
+						householdInfo.id.toString()
+					);
+				}
+
+				// Check if household data is incomplete (minimal data suggests setup was skipped)
+				const hasMinimalData =
+					!householdInfo?.address_line_1 ||
+					!householdInfo?.city ||
+					!householdInfo?.state ||
+					!householdInfo?.zip_code;
+
+				if (hasMinimalData) {
+					setShowSkippedSetupPrompt(true);
 				}
 			} catch (error) {
 				console.error("Error fetching household data:", error);
+				// If API call fails, assume user needs household setup
+				setShowHouseholdPrompt(true);
 			} finally {
 				setIsLoadingHousehold(false);
 			}
@@ -120,27 +110,20 @@ const AccountPage: React.FC = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [user?.email]);
 
-	// Check if user skipped setup wizard
-	useEffect(() => {
-		const skippedSetup = localStorage.getItem("household_signup_state");
-		const hasHousehold = localStorage.getItem("household");
-
-		if (
-			JSON.parse(skippedSetup || "{}").userChoice === "later" &&
-			!JSON.parse(hasHousehold || "{}").household_id
-		) {
-			setShowSkippedSetupPrompt(true);
-		}
-	}, [user?.email]);
+	/**
+	 * Navigate to household setup wizard (full page)
+	 * This is for users who need to complete or update their household setup
+	 */
+	const navigateToHouseholdSetup = (): void => {
+		navigate("/households/setup?from=account");
+	};
 
 	/**
-	 * Centralized function to navigate to household setup wizard from Account Settings
-	 * This ensures consistent behavior and proper cancel redirect
+	 * Navigate to household dashboard for management
+	 * This is for users who already have a household and want to manage it
 	 */
-	const navigateToHouseholdSetup = (step?: string): void => {
-		const baseUrl = "/households/setup?from=account";
-		const url = step ? `${baseUrl}&step=${step}` : baseUrl;
-		navigate(url);
+	const navigateToHouseholdDashboard = (): void => {
+		navigate("/households");
 	};
 
 	/**
@@ -149,35 +132,6 @@ const AccountPage: React.FC = () => {
 	const handleHouseholdSetup = (): void => {
 		setShowHouseholdPrompt(false);
 		navigateToHouseholdSetup();
-	};
-
-	/**
-	 * Handle family members popup actions
-	 */
-	const handleFamilyMembersNext = (): void => {
-		setShowFamilyMembersPopup(false);
-		// Navigate to setup wizard for adding family member details
-		navigateToHouseholdSetup("family_details");
-	};
-
-	const handleFamilyMembersSkip = (): void => {
-		setShowFamilyMembersPopup(false);
-		// User chose to skip adding family member details
-	};
-
-	/**
-	 * Handle dismissing household prompt
-	 */
-	const handlePromptDismiss = (): void => {
-		setShowHouseholdPrompt(false);
-		markPromptShown();
-	};
-
-	/**
-	 * Handle household management
-	 */
-	const handleManageHousehold = (): void => {
-		navigate("/households");
 	};
 
 	/**
@@ -232,14 +186,16 @@ const AccountPage: React.FC = () => {
 			<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 				{/* Header */}
 				<div className="mb-8">
-					<Button
-						variant="ghost"
-						onClick={() => navigate("/")}
-						className="mb-4 text-gray-600 hover:text-gray-900"
-					>
-						<ArrowLeft className="mr-2 h-4 w-4" />
-						Back to Home
-					</Button>
+					<div className="flex items-center justify-between mb-4">
+						<Button
+							variant="ghost"
+							onClick={() => navigate("/")}
+							className="text-gray-600 hover:text-gray-900"
+						>
+							<ArrowLeft className="mr-2 h-4 w-4" />
+							Back to Home
+						</Button>
+					</div>
 
 					<h1 className="text-3xl font-bold text-gray-900">
 						Account Settings
@@ -259,7 +215,7 @@ const AccountPage: React.FC = () => {
 					<div className="mb-8">
 						<HouseholdCompletionPrompt
 							onSetup={handleHouseholdSetup}
-							onDismiss={handlePromptDismiss}
+							onDismiss={() => setShowHouseholdPrompt(false)}
 							variant="card"
 						/>
 					</div>
@@ -315,56 +271,14 @@ const AccountPage: React.FC = () => {
 					</div>
 				)}
 
-				{/* Family Members Popup */}
-				{showFamilyMembersPopup && (
-					<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-						<div className="bg-white rounded-lg p-8 max-w-md mx-4">
-							<div className="text-center">
-								<div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-									<CheckCircle className="w-8 h-8 text-green-600" />
-								</div>
-								<h3 className="text-2xl font-bold text-gray-900 mb-2">
-									Awesome!
-								</h3>
-								<p className="text-gray-600 mb-6">
-									We've noticed you've added several family
-									members to your household. Would you like to
-									add more detailed information to their
-									profiles?
-								</p>
-								<p className="text-sm text-gray-500 mb-6">
-									The following information is required by law
-									in the State of Ohio to receive service, but
-									it will also help us get to know you better.
-								</p>
-								<div className="flex flex-col space-y-3">
-									<Button
-										onClick={handleFamilyMembersNext}
-										className="w-full bg-green-600 hover:bg-green-700 text-white"
-									>
-										Next
-									</Button>
-									<Button
-										onClick={handleFamilyMembersSkip}
-										variant="ghost"
-										className="w-full text-gray-600 hover:text-gray-900"
-									>
-										Skip
-									</Button>
-								</div>
-							</div>
-						</div>
-					</div>
-				)}
-
 				<LoadingCard
 					isLoading={isLoadingHousehold}
 					operation={localization.account_loading_message}
 					className="w-full"
 				>
-					<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+					<div className="grid grid-cols-1 gap-8">
 						{/* Profile Information */}
-						<div className="lg:col-span-2">
+						<div className="space-y-8">
 							<Card>
 								<CardHeader>
 									<CardTitle className="flex items-center">
@@ -451,92 +365,106 @@ const AccountPage: React.FC = () => {
 									</div>
 								</CardContent>
 							</Card>
-						</div>
-
-						{/* Quick Actions */}
-						<div className="space-y-6">
-							{/* Household Management */}
-							<Card>
-								<CardHeader>
-									<CardTitle className="flex items-center">
-										<Users className="mr-2 h-5 w-5" />
-										Household
-									</CardTitle>
-									<CardDescription>
-										Manage your household information
-									</CardDescription>
-								</CardHeader>
-								<CardContent className="space-y-4">
-									{hasCompletedSetup() ? (
-										<>
-											<div className="flex items-center space-x-2 text-green-600">
-												<CheckCircle className="h-4 w-4" />
-												<span className="text-sm font-medium">
-													Household Setup Complete
-												</span>
+							{/* Household Members */}
+							{householdData?.members &&
+								householdData.members.length > 0 && (
+									<Card>
+										<CardHeader>
+											<div className="flex items-center justify-between">
+												<div>
+													<CardTitle className="flex items-center">
+														<Users className="mr-2 h-5 w-5" />
+														Household Members
+													</CardTitle>
+													<CardDescription>
+														Family members in your
+														household
+													</CardDescription>
+												</div>
+												<Button
+													onClick={() =>
+														navigateToHouseholdDashboard()
+													}
+													variant="outline"
+													size="sm"
+												>
+													<Home className="mr-2 h-4 w-4" />
+													Manage Household
+												</Button>
 											</div>
-											<Button
-												onClick={handleManageHousehold}
-												className="w-full"
-												variant="outline"
-											>
-												Manage Household
-											</Button>
-										</>
-									) : (
-										<>
-											<div className="flex items-center space-x-2 text-amber-600">
-												<AlertCircle className="h-4 w-4" />
-												<span className="text-sm font-medium">
-													Setup Required
-												</span>
-											</div>
-											<Button
-												onClick={handleHouseholdSetup}
-												className="w-full"
-											>
-												Set Up Household
-											</Button>
-										</>
-									)}
-								</CardContent>
-							</Card>
-
-							{/* Account Settings */}
-							<Card>
-								<CardHeader>
-									<CardTitle className="flex items-center">
-										<Settings className="mr-2 h-5 w-5" />
-										Settings
-									</CardTitle>
-									<CardDescription>
-										Account preferences and settings
-									</CardDescription>
-								</CardHeader>
-								<CardContent className="space-y-4">
-									<Button
-										variant="outline"
-										className="w-full"
-										disabled
-									>
-										Change Password
-									</Button>
-									<Button
-										variant="outline"
-										className="w-full"
-										disabled
-									>
-										Notification Settings
-									</Button>
-									<Button
-										variant="outline"
-										className="w-full"
-										disabled
-									>
-										Privacy Settings
-									</Button>
-								</CardContent>
-							</Card>
+										</CardHeader>
+										<CardContent className="space-y-4">
+											{householdData.members
+												.sort((a: any, b: any) => {
+													// Sort head of household first
+													if (
+														a.is_head_of_household ===
+															1 &&
+														b.is_head_of_household !==
+															1
+													)
+														return -1;
+													if (
+														a.is_head_of_household !==
+															1 &&
+														b.is_head_of_household ===
+															1
+													)
+														return 1;
+													return 0;
+												})
+												.map(
+													(
+														member: any,
+														index: number
+													) => (
+														<Card
+															key={member.id}
+															className={`${
+																member.is_head_of_household ===
+																1
+																	? "border-l-4 border-l-blue-500"
+																	: ""
+															}`}
+														>
+															<CardContent>
+																<div className="flex items-center justify-between">
+																	<div>
+																		<h4 className="font-semibold text-gray-900">
+																			{
+																				member.first_name
+																			}{" "}
+																			{
+																				member.last_name
+																			}
+																			{member.is_head_of_household ===
+																				1 && (
+																				<span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+																					Head
+																					of
+																					Household
+																				</span>
+																			)}
+																		</h4>
+																		{member.date_of_birth &&
+																			member.date_of_birth !==
+																				"1900-01-01" && (
+																				<p className="text-sm text-gray-600">
+																					Born:{" "}
+																					{new Date(
+																						member.date_of_birth
+																					).toLocaleDateString()}
+																				</p>
+																			)}
+																	</div>
+																</div>
+															</CardContent>
+														</Card>
+													)
+												)}
+										</CardContent>
+									</Card>
+								)}
 						</div>
 					</div>
 				</LoadingCard>

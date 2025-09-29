@@ -250,13 +250,17 @@ export class HouseholdCacheService {
 
   /**
    * Get household members with caching
+   * Note: Members are included in the household response, so we extract them from there
    */
   async getHouseholdMembers(householdId: number): Promise<HouseholdMember[]> {
     const key = `members:${householdId}`;
 
     return this.get(
       key,
-      () => this.apiService.getMembers(householdId).then(response => response.data),
+      async () => {
+        const householdResponse = await this.apiService.getHousehold(householdId);
+        return householdResponse.data.members || [];
+      },
       5 * 60 * 1000 // 5 minutes TTL
     );
   }
@@ -300,118 +304,32 @@ export class HouseholdCacheService {
 
   /**
    * Add member with optimistic update
+   * Note: This method is not implemented as the current API doesn't support individual member operations.
+   * Members are managed through the household update process.
    */
   async addMember(householdId: number, data: any): Promise<HouseholdMember> {
-    const membersKey = `members:${householdId}`;
-
-    // Optimistic update - add temporary member
-    const tempMember: HouseholdMember = {
-      id: Date.now(), // Temporary ID
-      household_id: householdId,
-      is_primary: false,
-      first_name: data.first_name,
-      last_name: data.last_name,
-      middle_name: data.middle_name,
-      suffix: data.suffix,
-      gender: data.gender,
-      race: data.race,
-      ethnicity: data.ethnicity,
-      phone: data.phone,
-      email: data.email,
-      address_line_1: data.address_line_1,
-      address_line_2: data.address_line_2,
-      city: data.city,
-      state: data.state,
-      zip_code: data.zip_code,
-      date_of_birth: data.date_of_birth,
-      status: data.status || 'active',
-      is_freshtrak_user: data.is_freshtrak_user || false,
-      preferred_language: data.preferred_language,
-      notes: data.notes,
-      is_active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    this.update(membersKey, (members: HouseholdMember[]) => [...members, tempMember]);
-
-    try {
-      const response = await this.apiService.addMember(householdId, data);
-      const newMember = response.data;
-
-      // Update cache with actual response
-      this.update(membersKey, (members: HouseholdMember[]) =>
-        members.map(member =>
-          member.id === tempMember.id ? newMember : member
-        )
-      );
-
-      return newMember;
-    } catch (error) {
-      // Revert optimistic update on error
-      this.update(membersKey, (members: HouseholdMember[]) =>
-        members.filter(member => member.id !== tempMember.id)
-      );
-      throw error;
-    }
+    // TODO: Implement when API supports individual member operations
+    throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
   }
 
   /**
    * Update member with optimistic update
+   * Note: This method is not implemented as the current API doesn't support individual member operations.
+   * Members are managed through the household update process.
    */
   async updateMember(householdId: number, memberId: number, data: any): Promise<HouseholdMember> {
-    const membersKey = `members:${householdId}`;
-
-    // Optimistic update
-    this.update(membersKey, (members: HouseholdMember[]) =>
-      members.map(member =>
-        member.id === memberId
-          ? { ...member, ...data, updated_at: new Date().toISOString() }
-          : member
-      )
-    );
-
-    try {
-      const response = await this.apiService.updateMember(householdId, memberId, data);
-      const updatedMember = response.data;
-
-      // Update cache with actual response
-      this.update(membersKey, (members: HouseholdMember[]) =>
-        members.map(member =>
-          member.id === memberId ? updatedMember : member
-        )
-      );
-
-      return updatedMember;
-    } catch (error) {
-      // Revert optimistic update on error
-      this.invalidate(membersKey);
-      throw error;
-    }
+    // TODO: Implement when API supports individual member operations
+    throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
   }
 
   /**
    * Delete member with optimistic update
+   * Note: This method is not implemented as the current API doesn't support individual member operations.
+   * Members are managed through the household update process.
    */
   async deleteMember(householdId: number, memberId: number): Promise<void> {
-    const membersKey = `members:${householdId}`;
-
-    // Optimistic update - mark as inactive
-    this.update(membersKey, (members: HouseholdMember[]) =>
-      members.map(member =>
-        member.id === memberId
-          ? { ...member, status: 'inactive' as const, is_active: false, updated_at: new Date().toISOString() }
-          : member
-      )
-    );
-
-    try {
-      await this.apiService.deactivateMember(householdId, memberId);
-    } catch (error) {
-      // Revert optimistic update on error
-      this.invalidate(membersKey);
-      throw error;
-    }
+    // TODO: Implement when API supports individual member operations
+    throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
   }
 
   /**

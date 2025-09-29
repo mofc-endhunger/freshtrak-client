@@ -650,11 +650,9 @@ export const useAddressContactManager = () => {
 	): Promise<void> => {
 		setIsLoading(true);
 		try {
-			const householdsApiService = new HouseholdsApiService();
-			await householdsApiService.updateMember(
-				householdId,
-				memberId,
-				data
+			// TODO: Implement when API supports individual member operations
+			throw new Error(
+				"Individual member operations are not supported by the current API. Use household update instead."
 			);
 		} finally {
 			setIsLoading(false);

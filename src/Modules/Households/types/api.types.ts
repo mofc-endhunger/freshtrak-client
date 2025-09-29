@@ -39,10 +39,6 @@ export interface HouseholdApiEndpoints {
   getUsersMe: string;
   getHouseholdById: (id: number) => string;
   updateHousehold: (id: number) => string;
-  getMembers: (householdId: number) => string;
-  addMember: (householdId: number) => string;
-  updateMember: (householdId: number, memberId: number) => string;
-  deactivateMember: (householdId: number, memberId: number) => string;
 }
 
 // API Service configuration

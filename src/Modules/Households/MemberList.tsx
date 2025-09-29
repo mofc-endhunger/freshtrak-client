@@ -3,7 +3,7 @@
  * Displays all household members with filtering, sorting, and management options
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "../../components/ui/button";
 import {
 	Card,
@@ -89,7 +89,7 @@ export const MemberList: React.FC<MemberListProps> = ({
 		direction: "asc",
 	});
 
-	const householdsApiService = new HouseholdsApiService();
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
 	// Load members data
 	useEffect(() => {
@@ -106,10 +106,10 @@ export const MemberList: React.FC<MemberListProps> = ({
 					return;
 				}
 
-				const response = await householdsApiService.getHouseholdMembers(
+				const response = await householdsApiService.getHousehold(
 					householdId
 				);
-				const membersData = response.data;
+				const membersData = response.data.members || [];
 				setMembers(membersData);
 				setFilteredMembers(membersData);
 			} catch (err) {
@@ -121,9 +121,7 @@ export const MemberList: React.FC<MemberListProps> = ({
 		};
 
 		loadMembers();
-		//TODO: check useEffect dependencies and make sure they are correct
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [getHouseholdId]);
+	}, [getHouseholdId, householdsApiService]);
 
 	// Apply filters and search
 	useEffect(() => {
@@ -219,10 +217,10 @@ export const MemberList: React.FC<MemberListProps> = ({
 		try {
 			const householdId = getHouseholdId();
 			if (householdId) {
-				const response = await householdsApiService.getHouseholdMembers(
+				const response = await householdsApiService.getHousehold(
 					householdId
 				);
-				const membersData = response.data;
+				const membersData = response.data.members || [];
 				setMembers(membersData);
 			}
 		} catch (err) {

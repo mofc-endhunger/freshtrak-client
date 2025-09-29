@@ -83,6 +83,21 @@ const HouseholdRegistrationComponent: React.FC<
 
 	const continueHandler = (values: Partial<RegistrationFormData>): void => {
 		setFormValues({ ...formValues, ...values });
+
+		// Check if we're moving from step 2 (member count) and user has additional family members
+		if (formStep === 2) {
+			const hasAdditionalMembers =
+				(values.adults_in_household || 0) > 1 ||
+				(values.children_in_household || 0) > 0 ||
+				(values.seniors_in_household || 0) > 0;
+			if (hasAdditionalMembers) {
+				// User has additional family members, but we'll skip the family member completion for now
+				// and proceed to the next step (contact information)
+				setFormStep(formStep + 1);
+				return;
+			}
+		}
+
 		setFormStep(formStep + 1);
 	};
 
@@ -176,6 +191,33 @@ const HouseholdRegistrationComponent: React.FC<
 						getValues={getValues}
 					/>
 				);
+			case 4:
+				return (
+					<div className="space-y-6">
+						<div className="text-center">
+							<h3 className="text-lg font-semibold text-gray-900 mb-2">
+								Additional Family Members
+							</h3>
+							<p className="text-gray-600">
+								Provide details for additional family members
+								(optional)
+							</p>
+						</div>
+
+						<div className="space-y-4">
+							{/* This will be implemented to collect member details */}
+							<div className="text-center text-gray-500 py-8">
+								<p>
+									Member details collection will be
+									implemented here
+								</p>
+								<p className="text-sm">
+									You can skip this step for now
+								</p>
+							</div>
+						</div>
+					</div>
+				);
 			default:
 				return <div>Invalid step</div>;
 		}
@@ -215,7 +257,7 @@ const HouseholdRegistrationComponent: React.FC<
 								<div>{formStep > 0 && previousButton()}</div>
 								<div className="flex space-x-4">
 									{cancelButton()}
-									{formStep < 3 && (
+									{formStep < 4 && (
 										<Button
 											type="button"
 											onClick={() => {
@@ -229,7 +271,7 @@ const HouseholdRegistrationComponent: React.FC<
 											Continue
 										</Button>
 									)}
-									{formStep === 3 && (
+									{formStep === 4 && (
 										<Button
 											type="submit"
 											disabled={isSubmitting}

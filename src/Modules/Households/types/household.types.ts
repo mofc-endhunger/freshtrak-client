@@ -48,6 +48,7 @@ export interface HouseholdMember {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  head_of_household: boolean;
 }
 
 // Derived household counts
@@ -121,6 +122,7 @@ export interface UpdateHouseholdRequest {
   zip_code?: string;
   preferred_language?: string;
   notes?: string;
+  members?: CreateMemberRequest[];
 }
 
 // Member creation request

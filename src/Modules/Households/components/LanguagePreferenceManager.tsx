@@ -556,19 +556,10 @@ export const useLanguagePreferenceManager = () => {
 
 			// Update individual member language preferences if not using household language
 			if (!data.use_household_language_for_all) {
-				const memberUpdates = Object.entries(
-					data.member_language_overrides || {}
+				// TODO: Implement when API supports individual member operations
+				throw new Error(
+					"Individual member language preferences are not supported by the current API. Use household language setting instead."
 				);
-
-				for (const [memberId, languageCode] of memberUpdates) {
-					await householdsApiService.updateMember(
-						householdId,
-						parseInt(memberId),
-						{
-							preferred_language: languageCode,
-						}
-					);
-				}
 			}
 		} finally {
 			setIsLoading(false);

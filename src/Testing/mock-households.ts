@@ -36,6 +36,7 @@ export const mockHouseholdMembers: HouseholdMember[] = [
     is_active: true,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-01-15T10:00:00Z',
+    head_of_household: true,
   },
   {
     id: 2,
@@ -52,6 +53,7 @@ export const mockHouseholdMembers: HouseholdMember[] = [
     is_active: true,
     created_at: '2024-01-15T10:05:00Z',
     updated_at: '2024-01-15T10:05:00Z',
+    head_of_household: false,
   },
   {
     id: 3,
@@ -68,6 +70,7 @@ export const mockHouseholdMembers: HouseholdMember[] = [
     is_active: true,
     created_at: '2024-01-15T10:10:00Z',
     updated_at: '2024-01-15T10:10:00Z',
+    head_of_household: false,
   },
   {
     id: 4,
@@ -82,6 +85,7 @@ export const mockHouseholdMembers: HouseholdMember[] = [
     is_active: true,
     created_at: '2024-01-15T10:15:00Z',
     updated_at: '2024-01-15T10:15:00Z',
+    head_of_household: false,
   },
 ];
 
@@ -203,6 +207,7 @@ export const mockHouseholds: Household[] = [
         is_active: true,
         created_at: '2024-01-20T14:30:00Z',
         updated_at: '2024-01-20T14:30:00Z',
+        head_of_household: true,
       },
     ],
     counts: {
@@ -304,6 +309,7 @@ export const mockDiverseMember: HouseholdMember = {
   is_active: true,
   created_at: '2024-01-25T11:00:00Z',
   updated_at: '2024-01-25T11:00:00Z',
+  head_of_household: false,
 };
 
 /**
@@ -338,6 +344,7 @@ export const mockLargeHousehold: Household = {
       is_active: true,
       created_at: '2024-01-30T08:00:00Z',
       updated_at: '2024-01-30T08:00:00Z',
+      head_of_household: true,
     },
     {
       id: 8,
@@ -354,6 +361,7 @@ export const mockLargeHousehold: Household = {
       is_active: true,
       created_at: '2024-01-30T08:05:00Z',
       updated_at: '2024-01-30T08:05:00Z',
+      head_of_household: false,
     },
     {
       id: 9,
@@ -368,6 +376,7 @@ export const mockLargeHousehold: Household = {
       is_active: true,
       created_at: '2024-01-30T08:10:00Z',
       updated_at: '2024-01-30T08:10:00Z',
+      head_of_household: false,
     },
     {
       id: 10,
@@ -382,6 +391,7 @@ export const mockLargeHousehold: Household = {
       is_active: true,
       created_at: '2024-01-30T08:15:00Z',
       updated_at: '2024-01-30T08:15:00Z',
+      head_of_household: false,
     },
     {
       id: 11,
@@ -396,6 +406,7 @@ export const mockLargeHousehold: Household = {
       is_active: true,
       created_at: '2024-01-30T08:20:00Z',
       updated_at: '2024-01-30T08:20:00Z',
+      head_of_household: false,
     },
   ],
   counts: {

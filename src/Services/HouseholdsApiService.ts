@@ -9,18 +9,10 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import {
   CreateHouseholdRequest,
   UpdateHouseholdRequest,
-  CreateMemberRequest,
-  UpdateMemberRequest,
   HouseholdResponse,
-  MemberResponse,
-  MemberListResponse,
   HouseholdApiConfig,
   HouseholdApiError,
   HouseholdApiErrorDetails,
-  PaginationParams,
-  MemberFilterOptions,
-  BulkMemberOperation,
-  BulkOperationResponse,
 } from '../Modules/Households/types';
 import {
   retryWithBackoff,
@@ -44,11 +36,7 @@ const API_CONFIG: HouseholdApiConfig = {
     createHousehold: '/api/users',
     getUsersMe: '/api/users/me',
     getHouseholdById: (id: number) => `/api/households/${id}`,
-    updateHousehold: (id: number) => `/households/${id}`,
-    getMembers: (householdId: number) => `/households/${householdId}/members`,
-    addMember: (householdId: number) => `/households/${householdId}/members`,
-    updateMember: (householdId: number, memberId: number) => `/households/${householdId}/members/${memberId}`,
-    deactivateMember: (householdId: number, memberId: number) => `/households/${householdId}/members/${memberId}`,
+    updateHousehold: (id: number) => `/api/households/${id}`,
   },
   timeout: 30000, // 30 seconds
   retryAttempts: 3,
@@ -501,145 +489,6 @@ export class HouseholdsApiService {
     const response = await this.retryRequest(requestFn);
 
     // Clear cache after update
-    this.cache.delete(CACHE_CONFIG.keys.household);
-
-    return response.data;
-  }
-
-  // ==================== MEMBER OPERATIONS ====================
-
-  /**
-   * Get household members
-   */
-  async getMembers(
-    householdId: number,
-    options?: PaginationParams & MemberFilterOptions
-  ): Promise<MemberListResponse> {
-    // Check cache first
-    const cachedData = this.cache.get(CACHE_CONFIG.keys.members);
-    if (cachedData && !options) {
-      return cachedData;
-    }
-
-    const params = new URLSearchParams();
-    if (options) {
-      if (options.page) params.append('page', options.page.toString());
-      if (options.limit) params.append('limit', options.limit.toString());
-      if (options.sortBy) params.append('sortBy', options.sortBy);
-      if (options.sortOrder) params.append('sortOrder', options.sortOrder);
-      if (options.status) params.append('status', options.status);
-      if (options.memberType) params.append('memberType', options.memberType);
-      if (options.searchTerm) params.append('search', options.searchTerm);
-    }
-
-    const url = `${API_CONFIG.endpoints.getMembers(householdId)}${params.toString() ? `?${params.toString()}` : ''}`;
-    const requestFn = () => this.axiosInstance.get(url);
-    const response = await this.retryRequest(requestFn);
-    return response.data;
-  }
-
-  /**
-   * Get household members (alias for getMembers)
-   */
-  async getHouseholdMembers(householdId: number): Promise<MemberListResponse> {
-    return this.getMembers(householdId);
-  }
-
-  /**
-   * Add a new household member
-   */
-  async addMember(householdId: number, data: CreateMemberRequest): Promise<MemberResponse> {
-    const requestFn = () => this.axiosInstance.post(API_CONFIG.endpoints.addMember(householdId), data);
-    const response = await this.retryRequest(requestFn);
-
-    // Clear cache after adding member
-    this.cache.delete(CACHE_CONFIG.keys.members);
-    this.cache.delete(CACHE_CONFIG.keys.household);
-
-    return response.data;
-  }
-
-  /**
-   * Create household member (alias for addMember)
-   */
-  async createHouseholdMember(householdId: number, data: CreateMemberRequest): Promise<MemberResponse> {
-    return this.addMember(householdId, data);
-  }
-
-  /**
-   * Update household member
-   */
-  async updateMember(
-    householdId: number,
-    memberId: number,
-    data: UpdateMemberRequest
-  ): Promise<MemberResponse> {
-    const requestFn = () => this.axiosInstance.patch(
-      API_CONFIG.endpoints.updateMember(householdId, memberId),
-      data
-    );
-    const response = await this.retryRequest(requestFn);
-
-    // Clear cache after update
-    this.cache.delete(CACHE_CONFIG.keys.members);
-    this.cache.delete(CACHE_CONFIG.keys.household);
-    this.cache.delete(CACHE_CONFIG.keys.member(memberId));
-
-    return response.data;
-  }
-
-  /**
-   * Update household member (alias for updateMember)
-   */
-  async updateHouseholdMember(
-    householdId: number,
-    memberId: number,
-    data: UpdateMemberRequest
-  ): Promise<MemberResponse> {
-    return this.updateMember(householdId, memberId, data);
-  }
-
-  /**
-   * Deactivate household member (soft delete)
-   */
-  async deactivateMember(householdId: number, memberId: number): Promise<MemberResponse> {
-    const requestFn = () => this.axiosInstance.delete(
-      API_CONFIG.endpoints.deactivateMember(householdId, memberId)
-    );
-    const response = await this.retryRequest(requestFn);
-
-    // Clear cache after deactivation
-    this.cache.delete(CACHE_CONFIG.keys.members);
-    this.cache.delete(CACHE_CONFIG.keys.household);
-    this.cache.delete(CACHE_CONFIG.keys.member(memberId));
-
-    return response.data;
-  }
-
-  /**
-   * Delete household member (alias for deactivateMember)
-   */
-  async deleteHouseholdMember(householdId: number, memberId: number): Promise<MemberResponse> {
-    return this.deactivateMember(householdId, memberId);
-  }
-
-  // ==================== BULK OPERATIONS ====================
-
-  /**
-   * Perform bulk operations on multiple members
-   */
-  async bulkMemberOperation(
-    householdId: number,
-    operation: BulkMemberOperation
-  ): Promise<BulkOperationResponse> {
-    const requestFn = () => this.axiosInstance.post(
-      `${API_CONFIG.endpoints.getMembers(householdId)}/bulk`,
-      operation
-    );
-    const response = await this.retryRequest(requestFn);
-
-    // Clear cache after bulk operation
-    this.cache.delete(CACHE_CONFIG.keys.members);
     this.cache.delete(CACHE_CONFIG.keys.household);
 
     return response.data;

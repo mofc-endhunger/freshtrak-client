@@ -96,31 +96,10 @@ export const MemberStatusManager: React.FC<MemberStatusManagerProps> = ({
 
 		setIsLoading(true);
 		try {
-			let updatedMember: HouseholdMember;
-
-			if (pendingAction.action === "deactivate") {
-				// Use the existing deactivateMember API method
-				const response = await householdsApiService.deactivateMember(
-					householdId,
-					member.id
-				);
-				updatedMember = response.data;
-			} else {
-				// For activation, we'll use updateMember with status change
-				const response = await householdsApiService.updateMember(
-					householdId,
-					member.id,
-					{
-						status: "active",
-					}
-				);
-				updatedMember = response.data;
-			}
-
-			// Call the callback with the updated member
-			onStatusChange?.(updatedMember);
-			setIsDialogOpen(false);
-			setPendingAction(null);
+			// TODO: Implement when API supports individual member operations
+			throw new Error(
+				"Individual member status changes are not supported by the current API. Use household update instead."
+			);
 		} catch (error) {
 			console.error("Error changing member status:", error);
 			onError?.(
@@ -299,24 +278,10 @@ export const useMemberStatusManager = () => {
 	): Promise<HouseholdMember> => {
 		setIsLoading(true);
 		try {
-			const householdsApiService = new HouseholdsApiService();
-
-			if (newStatus === "inactive") {
-				const response = await householdsApiService.deactivateMember(
-					householdId,
-					memberId
-				);
-				return response.data;
-			} else {
-				const response = await householdsApiService.updateMember(
-					householdId,
-					memberId,
-					{
-						status: "active",
-					}
-				);
-				return response.data;
-			}
+			// TODO: Implement when API supports individual member operations
+			throw new Error(
+				"Individual member status changes are not supported by the current API. Use household update instead."
+			);
 		} finally {
 			setIsLoading(false);
 		}

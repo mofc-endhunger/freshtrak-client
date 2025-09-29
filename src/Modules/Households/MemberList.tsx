@@ -121,6 +121,8 @@ export const MemberList: React.FC<MemberListProps> = ({
 		};
 
 		loadMembers();
+		//TODO: check useEffect dependencies and make sure they are correct
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [getHouseholdId]);
 
 	// Apply filters and search

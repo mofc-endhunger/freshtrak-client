@@ -3,7 +3,7 @@
 // Core household data structure
 export interface Household {
   id: number;
-  primary_user_id: number;
+  primary_user_id?: number;
   primary_first_name: string;
   primary_last_name: string;
   primary_email?: string;
@@ -97,6 +97,19 @@ export interface CreateHouseholdRequest {
   primary_phone?: string;
   primary_email?: string;
   primary_date_of_birth: string;
+  // Demographics fields
+  primary_gender?: string;
+  primary_race?: string;
+  primary_ethnicity?: string;
+  // Household size fields
+  adult_count?: number;
+  child_count?: number;
+  senior_count?: number;
+  // Additional fields for new API
+  phone?: string;
+  date_of_birth?: string;
+  permission_to_email?: boolean;
+  children_in_household?: number;
 }
 
 // Household update request

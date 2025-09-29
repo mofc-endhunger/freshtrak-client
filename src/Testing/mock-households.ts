@@ -12,10 +12,7 @@ import {
   UpdateHouseholdRequest,
   CreateMemberRequest,
   UpdateMemberRequest,
-  MemberStatus,
   MemberGender,
-  MemberRace,
-  MemberEthnicity,
   LanguagePreference,
 } from '../Modules/Households/types';
 

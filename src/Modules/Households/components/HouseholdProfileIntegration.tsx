@@ -102,7 +102,7 @@ export const HouseholdProfileIntegration: React.FC<
 		setShowSetupWizard(true);
 	};
 
-	const handleWizardComplete = (householdId: number) => {
+	const handleWizardComplete = (householdData: any) => {
 		setShowSetupWizard(false);
 		// Refresh status
 		window.location.reload();

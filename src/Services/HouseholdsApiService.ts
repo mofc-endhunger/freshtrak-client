@@ -28,6 +28,10 @@ import {
   logError,
   DEFAULT_RETRY_CONFIG,
 } from '../Modules/Households/utils/errorHandling';
+import {
+  mockHousehold,
+  mockHouseholdResponse,
+} from '../Testing/mock-households';
 
 /**
  * Configuration for the Households API service
@@ -37,9 +41,9 @@ const API_CONFIG: HouseholdApiConfig = {
   //TODO: change this to the actual API URL
   baseUrl: 'http://localhost:3000',
   endpoints: {
-    createHousehold: '/households',
-    getHousehold: '/households',
-    getHouseholdById: (id: number) => `/households/${id}`,
+    createHousehold: '/api/users',
+    getUsersMe: '/api/users/me',
+    getHouseholdById: (id: number) => `/api/households/${id}`,
     updateHousehold: (id: number) => `/households/${id}`,
     getMembers: (householdId: number) => `/households/${householdId}/members`,
     addMember: (householdId: number) => `/households/${householdId}/members`,
@@ -50,6 +54,9 @@ const API_CONFIG: HouseholdApiConfig = {
   retryAttempts: 3,
   retryDelay: 1000, // 1 second
 };
+
+// Enable mock mode when API is not available
+const USE_MOCK_DATA = false; // Disabled for now - will show wizard instead
 
 /**
  * Cache configuration for household data
@@ -213,13 +220,10 @@ export class HouseholdsApiService {
     this.axiosInstance.interceptors.request.use(
       (config) => {
         const token = this.getAuthToken();
-        console.log('🔍 HouseholdsApiService - Request interceptor - token:', token);
-        console.log('🔍 HouseholdsApiService - Request URL:', config.url);
 
         if (token) {
           config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${token}`;
-          console.log('✅ HouseholdsApiService - Authorization header set:', config.headers.Authorization);
         } else {
           console.warn('⚠️ HouseholdsApiService - No token available, request will be unauthenticated');
         }
@@ -249,12 +253,9 @@ export class HouseholdsApiService {
   private getAuthToken(): string | null {
     try {
       const cognitoUser = localStorage.getItem('cognitoUser');
-      console.log('🔍 HouseholdsApiService - Raw cognitoUser from localStorage:', cognitoUser);
 
       if (cognitoUser) {
         const userData = JSON.parse(cognitoUser);
-        console.log('🔍 HouseholdsApiService - Parsed userData:', userData);
-        console.log('🔍 HouseholdsApiService - accessToken:', userData.accessToken);
 
         if (!userData.accessToken) {
           console.warn('⚠️ HouseholdsApiService - No accessToken found in userData:', userData);
@@ -262,7 +263,6 @@ export class HouseholdsApiService {
 
         return userData.accessToken || null;
       }
-      console.log('❌ HouseholdsApiService - No cognitoUser found in localStorage');
       return null;
     } catch (error) {
       console.warn('Failed to get auth token:', error);
@@ -303,7 +303,6 @@ export class HouseholdsApiService {
       return await requestFn();
     } catch (error: any) {
       if (attempt < API_CONFIG.retryAttempts && error.retryable) {
-        console.log(`Retrying request (attempt ${attempt + 1}/${API_CONFIG.retryAttempts})`);
         await new Promise(resolve => setTimeout(resolve, API_CONFIG.retryDelay * attempt));
         return this.retryRequest(requestFn, attempt + 1);
       }
@@ -319,33 +318,116 @@ export class HouseholdsApiService {
   async createHousehold(data: CreateHouseholdRequest): Promise<HouseholdResponse> {
     const context = createErrorContext('create_household');
 
-    const requestFn = () => this.axiosInstance.post(API_CONFIG.endpoints.createHousehold, data);
+    // Use mock data if API is not available
+    if (USE_MOCK_DATA) {
+      console.log('🔧 Using mock data for createHousehold');
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Create a mock response with the provided data
+      const mockResponse: HouseholdResponse = {
+        data: {
+          ...mockHousehold,
+          id: Math.floor(Math.random() * 1000) + 1, // Generate random ID
+          primary_first_name: data.primary_first_name || 'User',
+          primary_last_name: data.primary_last_name || '',
+          address_line_1: data.address_line_1 || '',
+          address_line_2: data.address_line_2 || '',
+          city: data.city || '',
+          state: data.state || '',
+          zip_code: data.zip_code || '',
+          preferred_language: data.preferred_language || 'en',
+          notes: data.notes || '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          members: [],
+          counts: { children: 0, adults: 1, seniors: 0, total: 1 },
+        },
+        message: 'Household created successfully (mock)',
+        success: true,
+        timestamp: new Date().toISOString(),
+      };
+
+      return mockResponse;
+    }
+
+    // Map the data to the new API format
+    const apiData = {
+      first_name: data.primary_first_name || '',
+      last_name: data.primary_last_name || '',
+      phone: data.phone || null,
+      address_line_1: data.address_line_1 || null,
+      city: data.city || null,
+      state: data.state || null,
+      zip_code: data.zip_code || null,
+      date_of_birth: data.date_of_birth || null,
+      permission_to_email: data.permission_to_email !== undefined ? data.permission_to_email : null,
+      children_in_household: data.children_in_household !== undefined ? data.children_in_household : null,
+    };
+
+    const requestFn = () => this.axiosInstance.post(API_CONFIG.endpoints.createHousehold, apiData);
 
     try {
+      console.log('📤 POST /users - Request data:', JSON.stringify(apiData, null, 2));
       const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
-      return response.data;
+
+      console.log('📥 POST /users - Response data:', JSON.stringify(response.data, null, 2));
+
+      // Map the response to match the expected HouseholdResponse format
+      const apiResponse = response.data;
+      const userResponse = apiResponse.user;
+      const householdResponse: HouseholdResponse = {
+        data: {
+          id: parseInt(apiResponse.household_id) || 0,
+          primary_user_id: parseInt(userResponse.id) || 0,
+          primary_first_name: userResponse.first_name || '',
+          primary_last_name: userResponse.last_name || '',
+          address_line_1: userResponse.address_line_1 || '',
+          address_line_2: userResponse.address_line_2 || '',
+          city: userResponse.city || '',
+          state: userResponse.state || '',
+          zip_code: userResponse.zip_code || '',
+          preferred_language: 'en',
+          notes: '',
+          created_at: userResponse.created_at || new Date().toISOString(),
+          updated_at: userResponse.updated_at || new Date().toISOString(),
+          members: [],
+          counts: { children: userResponse.children_in_household || 0, adults: 1, seniors: 0, total: 1 },
+        },
+        message: 'User created successfully',
+        success: true,
+        timestamp: new Date().toISOString(),
+      };
+
+      return householdResponse;
     } catch (error) {
       const errorDetails = ApiErrorHandler.createError(error, context);
-      throw new Error(errorDetails.message);
+      const errorMessage = errorDetails?.message || 'Failed to create user';
+      throw new Error(errorMessage);
     }
   }
 
   /**
-   * Get the current user's household
+   * Get household by ID
    */
-  async getHousehold(householdId?: number): Promise<HouseholdResponse> {
-    // If householdId is provided, use getHouseholdById
-    if (householdId) {
-      return this.getHouseholdById(householdId);
+  async getHousehold(householdId: number): Promise<HouseholdResponse> {
+    // Use mock data if API is not available
+    if (USE_MOCK_DATA) {
+      console.log('🔧 Using mock data for getHousehold');
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return mockHouseholdResponse;
     }
 
     // Check cache first
-    const cachedData = this.cache.get(CACHE_CONFIG.keys.household);
+    const cacheKey = `${CACHE_CONFIG.keys.household}_${householdId}`;
+    const cachedData = this.cache.get(cacheKey);
     if (cachedData) {
       return cachedData;
     }
 
-    const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getHousehold);
+    const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getHouseholdById(householdId));
     const response = await this.retryRequest(requestFn);
     return response.data;
   }
@@ -354,9 +436,61 @@ export class HouseholdsApiService {
    * Get household by ID
    */
   async getHouseholdById(id: number): Promise<HouseholdResponse> {
+    // Use mock data if API is not available
+    if (USE_MOCK_DATA) {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      return {
+        ...mockHouseholdResponse,
+        data: {
+          ...mockHouseholdResponse.data,
+          id: id,
+        },
+      };
+    }
+
     const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getHouseholdById(id));
     const response = await this.retryRequest(requestFn);
     return response.data;
+  }
+
+  /**
+   * Get current user information
+   */
+  async getUsersMe(): Promise<any> {
+    const context = createErrorContext('getUsersMe', {});
+
+    try {
+      const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getUsersMe);
+      const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
+
+      console.log('📥 GET /users/me - Response data:', JSON.stringify(response.data, null, 2));
+      return response.data;
+    } catch (error) {
+      const errorDetails = ApiErrorHandler.createError(error, context);
+      const errorMessage = errorDetails?.message || 'Failed to get user information';
+      throw new Error(errorMessage);
+    }
+  }
+
+  /**
+   * Get household by ID (new API format)
+   */
+  async getHouseholdByIdNew(householdId: number): Promise<any> {
+    const context = createErrorContext('getHouseholdByIdNew', { householdId });
+
+    try {
+      const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getHouseholdById(householdId));
+      const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
+
+      console.log('📥 GET /households/{id} - Response data:', JSON.stringify(response.data, null, 2));
+      return response.data;
+    } catch (error) {
+      const errorDetails = ApiErrorHandler.createError(error, context);
+      const errorMessage = errorDetails?.message || 'Failed to get household information';
+      throw new Error(errorMessage);
+    }
   }
 
   /**

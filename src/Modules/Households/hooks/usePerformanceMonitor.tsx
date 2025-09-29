@@ -3,7 +3,7 @@
  * Monitors component performance, API calls, and user interactions
  */
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 
 interface PerformanceMetrics {
 	componentRenderTime: number;
@@ -53,7 +53,10 @@ export const usePerformanceMonitor = (
 	componentName: string,
 	config: Partial<PerformanceConfig> = {}
 ) => {
-	const mergedConfig = { ...defaultConfig, ...config };
+	const mergedConfig = useMemo(
+		() => ({ ...defaultConfig, ...config }),
+		[config]
+	);
 	const renderStartTime = useRef<number>(0);
 	const [metrics, setMetrics] = useState<PerformanceMetrics>({
 		componentRenderTime: 0,
@@ -384,20 +387,19 @@ const sendToAnalytics = (event: string, data: any) => {
 export const useApiPerformanceMonitor = (
 	config: Partial<PerformanceConfig> = {}
 ) => {
-	const mergedConfig = { ...defaultConfig, ...config };
-
 	const monitorApiCall = useCallback(
 		async <T,>(
 			apiCall: () => Promise<T>,
 			url: string,
 			method: string = "GET"
 		): Promise<T> => {
+			const mergedConfig = { ...defaultConfig, ...config };
+
 			if (!mergedConfig.enableMonitoring) {
 				return apiCall();
 			}
 
 			const startTime = performance.now();
-			const timestamp = Date.now();
 
 			try {
 				const result = await apiCall();
@@ -453,7 +455,7 @@ export const useApiPerformanceMonitor = (
 				throw error;
 			}
 		},
-		[mergedConfig]
+		[config]
 	);
 
 	return { monitorApiCall };

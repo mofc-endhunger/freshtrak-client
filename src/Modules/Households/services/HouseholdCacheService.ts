@@ -220,7 +220,6 @@ export class HouseholdCacheService {
 
     if (cleaned > 0) {
       this.stats.size = this.cache.size;
-      console.log(`Cleaned up ${cleaned} expired cache entries`);
     }
   }
 
@@ -237,10 +236,10 @@ export class HouseholdCacheService {
   // ==================== HOUSEHOLD-SPECIFIC METHODS ====================
 
   /**
-   * Get household with caching
+   * Get household by ID with caching
    */
-  async getHousehold(householdId?: number): Promise<Household> {
-    const key = householdId ? `household:${householdId}` : 'household:current';
+  async getHousehold(householdId: number): Promise<Household> {
+    const key = `household:${householdId}`;
 
     return this.get(
       key,

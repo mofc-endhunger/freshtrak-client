@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../Authentication/AuthContext";
 import { HouseholdSetupOffer } from "./HouseholdSetupOffer";
 import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegration";
-import { CreateHouseholdApiRequest } from "../types/api.types";
+import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 
 interface HouseholdSignUpWrapperProps {
 	children: React.ReactNode;
@@ -28,48 +28,28 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	const [showHouseholdOffer, setShowHouseholdOffer] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
 
-	const {
-		getSignUpState,
-		offerHouseholdSetup,
-		createHousehold,
-		skipHouseholdSetup,
-		deferHouseholdSetup,
-		isNewUserSignUp,
-	} = useHouseholdSignUpIntegration();
+	const { offerHouseholdSetup, deferHouseholdSetup, isNewUserSignUp } =
+		useHouseholdSignUpIntegration();
+
+	// Initialize API service
+	const householdsApiService = new HouseholdsApiService();
 
 	// Check if we should show household setup offer
 	useEffect(() => {
 		const checkHouseholdSetup = async () => {
-			console.log("🔍 Checking household setup:", {
-				isAuthenticated,
-				userEmail: user?.email,
-				userObject: user,
-				userKeys: user ? Object.keys(user) : null,
-			});
-
 			if (isAuthenticated && user && user.email) {
 				// Only show household setup offer for new users who just completed email confirmation
 				// This prevents showing the prompt to existing users who are signing in
 				const isNewUser = isNewUserSignUp(user.email);
-				console.log("🔍 Is new user signup:", isNewUser);
 
 				if (isNewUser) {
-					console.log(
-						"✅ Showing household setup offer for new user"
-					);
 					try {
 						await offerHouseholdSetup(user.email);
 						setShowHouseholdOffer(true);
 					} catch (error) {
 						console.error("Error offering household setup:", error);
 					}
-				} else {
-					console.log(
-						"❌ Not showing household setup offer - not a new user"
-					);
 				}
-			} else {
-				console.log("❌ Not authenticated or no user ID");
 			}
 		};
 
@@ -80,46 +60,12 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	const handleSetupNow = async () => {
 		setIsProcessing(true);
 		try {
-			// For now, create a basic household with user info
-			// In a real implementation, this would show a household setup form
-			const householdData: CreateHouseholdApiRequest = {
-				address_line_1: "", // Will be filled by user
-				city: "",
-				state: "",
-				zip_code: "",
-				preferred_language: "en", // Default to English
-				primary_first_name: user?.name || "",
-				primary_last_name: "",
-				primary_date_of_birth: "",
-			};
-
-			await createHousehold(householdData);
-			setShowHouseholdOffer(false);
-
-			// Redirect to household setup form or dashboard
+			// Just redirect to setup wizard - no API calls here
+			// The POST will happen when user completes the wizard
 			window.location.href = "/households/setup";
 		} catch (error) {
-			console.error("Error creating household:", error);
-			onSignUpError?.("Failed to create household. Please try again.");
-		} finally {
-			setIsProcessing(false);
-		}
-	};
-
-	// Handle skip household setup
-	const handleSkip = async () => {
-		setIsProcessing(true);
-		try {
-			await skipHouseholdSetup();
-			setShowHouseholdOffer(false);
-
-			// Redirect to dashboard
-			window.location.href = "/dashboard";
-		} catch (error) {
-			console.error("Error skipping household setup:", error);
-			onSignUpError?.(
-				"Failed to skip household setup. Please try again."
-			);
+			console.error("Error redirecting to setup:", error);
+			onSignUpError?.("Failed to redirect to setup. Please try again.");
 		} finally {
 			setIsProcessing(false);
 		}
@@ -129,16 +75,58 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	const handleSetupLater = async () => {
 		setIsProcessing(true);
 		try {
+			// Create minimal user record with just basic info from Cognito
+			const minimalUserData = {
+				// Required fields for CreateHouseholdRequest
+				primary_first_name: user?.name?.split(" ")[0] || "User",
+				primary_last_name:
+					user?.name?.split(" ").slice(1).join(" ") || "",
+				primary_date_of_birth: "",
+				preferred_language: "en",
+				address_line_1: "",
+				city: "",
+				state: "",
+				zip_code: "",
+				// Additional fields for new API (use undefined for optional fields)
+				first_name: user?.name?.split(" ")[0] || "User",
+				last_name: user?.name?.split(" ").slice(1).join(" ") || "",
+				phone: undefined,
+				date_of_birth: undefined,
+				permission_to_email: undefined,
+				children_in_household: undefined,
+			};
+
+			console.log(
+				"📤 POST /users (setup later) - Request data:",
+				JSON.stringify(minimalUserData, null, 2)
+			);
+
+			// Create user via POST API call
+			const response = await householdsApiService.createHousehold(
+				minimalUserData
+			);
+
+			console.log(
+				"📥 POST /users (setup later) - Response data:",
+				JSON.stringify(response.data, null, 2)
+			);
+
+			// Store user ID and household ID in localStorage
+			const householdStorage = {
+				userId: response.data.primary_user_id,
+				household_id: response.data.id,
+			};
+			localStorage.setItem("household", JSON.stringify(householdStorage));
+
+			// Defer household setup (set flags)
 			await deferHouseholdSetup();
 			setShowHouseholdOffer(false);
 
 			// Redirect to dashboard
 			window.location.href = "/dashboard";
 		} catch (error) {
-			console.error("Error deferring household setup:", error);
-			onSignUpError?.(
-				"Failed to defer household setup. Please try again."
-			);
+			console.error("Error creating user (setup later):", error);
+			onSignUpError?.("Failed to create user record. Please try again.");
 		} finally {
 			setIsProcessing(false);
 		}
@@ -149,7 +137,6 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 		return (
 			<HouseholdSetupOffer
 				onSetupNow={handleSetupNow}
-				onSkip={handleSkip}
 				onSetupLater={handleSetupLater}
 				isLoading={isProcessing}
 			/>

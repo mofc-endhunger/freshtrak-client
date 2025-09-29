@@ -3,7 +3,8 @@
  * Multi-step wizard for creating and configuring household information
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { Button } from "../../../components/ui/button";
 import {
@@ -22,7 +23,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../../components/ui/select";
-import { Textarea } from "../../../components/ui/textarea";
 import {
 	CheckCircle,
 	Home,
@@ -31,13 +31,13 @@ import {
 	Globe,
 	ArrowLeft,
 	ArrowRight,
+	User,
 } from "lucide-react";
 import { CreateHouseholdApiRequest } from "../types/api.types";
-import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegration";
 import { useAuth } from "../../Authentication/AuthContext";
 
 interface HouseholdSetupWizardProps {
-	onComplete: (householdId: number) => void;
+	onComplete: (householdData: CreateHouseholdApiRequest) => void;
 	onCancel: () => void;
 	initialData?: Partial<CreateHouseholdApiRequest>;
 }
@@ -53,29 +53,36 @@ interface WizardStep {
 const WIZARD_STEPS: WizardStep[] = [
 	{
 		id: "address",
-		title: "Address Information",
+		title: "Where do you live?",
 		description: "Enter your household address",
 		icon: <MapPin className="w-5 h-5" />,
 		completed: false,
 	},
 	{
-		id: "primary",
-		title: "Primary Contact",
-		description: "Your contact information",
+		id: "household_size",
+		title: "How many people live in this household?",
+		description: "Not including yourself",
 		icon: <Users className="w-5 h-5" />,
 		completed: false,
 	},
 	{
-		id: "preferences",
-		title: "Preferences",
-		description: "Language and communication preferences",
+		id: "personal_info",
+		title: "Tell us about you",
+		description: "First and last name, middle name, suffix",
+		icon: <User className="w-5 h-5" />,
+		completed: false,
+	},
+	{
+		id: "demographics",
+		title: "Demographics",
+		description: "Date of birth, race, and other information",
 		icon: <Globe className="w-5 h-5" />,
 		completed: false,
 	},
 	{
-		id: "review",
-		title: "Review & Create",
-		description: "Review your information and create household",
+		id: "contact",
+		title: "Contact Information",
+		description: "Your contact information",
 		icon: <CheckCircle className="w-5 h-5" />,
 		completed: false,
 	},
@@ -87,17 +94,16 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 	initialData,
 }) => {
 	const { user } = useAuth();
-	const { createHousehold } = useHouseholdSignUpIntegration();
+	const [searchParams] = useSearchParams();
 	const [currentStep, setCurrentStep] = useState(0);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [steps, setSteps] = useState(WIZARD_STEPS);
 
 	const {
 		register,
 		handleSubmit,
 		watch,
 		setValue,
-		formState: { errors, isValid },
+		formState: { errors },
 	} = useForm<CreateHouseholdApiRequest>({
 		defaultValues: {
 			address_line_1: initialData?.address_line_1 || "",
@@ -112,15 +118,23 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 			primary_phone: initialData?.primary_phone || "",
 			primary_email: initialData?.primary_email || user?.email || "",
 			primary_date_of_birth: initialData?.primary_date_of_birth || "",
+			// Household size fields
+			adult_count: initialData?.adult_count || 1,
+			child_count: initialData?.child_count || 0,
+			senior_count: initialData?.senior_count || 0,
+			// Demographics fields
+			primary_gender: initialData?.primary_gender || "",
+			primary_race: initialData?.primary_race || "",
+			primary_ethnicity: initialData?.primary_ethnicity || "",
 		},
 		mode: "onChange",
 	});
 
 	const watchedValues = watch();
 
-	// Update step completion status
-	useEffect(() => {
-		const updatedSteps = steps.map((step, index) => {
+	// Compute step completion status on each render instead of storing in state
+	const steps = useMemo(() => {
+		return WIZARD_STEPS.map(step => {
 			let completed = false;
 
 			switch (step.id) {
@@ -132,26 +146,43 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 						watchedValues.zip_code
 					);
 					break;
-				case "primary":
+				case "household_size":
+					completed = !!(
+						watchedValues.adult_count !== undefined &&
+						watchedValues.child_count !== undefined &&
+						watchedValues.senior_count !== undefined
+					);
+					break;
+				case "personal_info":
 					completed = !!(
 						watchedValues.primary_first_name &&
 						watchedValues.primary_last_name &&
 						watchedValues.primary_date_of_birth
 					);
 					break;
-				case "preferences":
+				case "demographics":
 					completed = !!watchedValues.preferred_language;
 					break;
-				case "review":
-					completed = isValid;
+				case "contact":
+					completed = !!(
+						watchedValues.primary_phone &&
+						watchedValues.primary_email
+					);
 					break;
 			}
 
 			return { ...step, completed };
 		});
+	}, [watchedValues]);
 
-		setSteps(updatedSteps);
-	}, [watchedValues, isValid, steps]);
+	// Handle URL parameters for step navigation
+	useEffect(() => {
+		const stepParam = searchParams.get("step");
+		if (stepParam === "family_details") {
+			// Start from family details step (step 3 - demographics)
+			setCurrentStep(3);
+		}
+	}, [searchParams]);
 
 	const nextStep = () => {
 		if (currentStep < steps.length - 1) {
@@ -168,10 +199,11 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 	const onSubmit = async (data: CreateHouseholdApiRequest) => {
 		setIsSubmitting(true);
 		try {
-			const response = await createHousehold(data);
-			onComplete(response.data.id);
+			// Pass the household data to the parent component
+			// The parent will handle the API call
+			onComplete(data);
 		} catch (error) {
-			console.error("Error creating household:", error);
+			console.error("Error preparing household data:", error);
 			// Handle error - could show toast notification
 		} finally {
 			setIsSubmitting(false);
@@ -266,9 +298,124 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 					</div>
 				);
 
-			case "primary":
+			case "household_size":
+				return (
+					<div className="space-y-6">
+						<div className="text-center">
+							<p className="text-gray-600 mb-6">
+								How many people live in this household? (Not
+								including yourself)
+							</p>
+						</div>
+
+						<div className="grid grid-cols-3 gap-6">
+							<div className="text-center">
+								<Label
+									htmlFor="adult_count"
+									className="text-lg font-medium"
+								>
+									Adults (18-64)
+								</Label>
+								<Input
+									id="adult_count"
+									type="number"
+									min="0"
+									max="20"
+									{...register("adult_count", {
+										required: "Adult count is required",
+										min: {
+											value: 0,
+											message: "Must be 0 or more",
+										},
+									})}
+									className="text-center text-2xl font-bold mt-2"
+								/>
+								{errors.adult_count && (
+									<p className="text-sm text-red-600 mt-1">
+										{errors.adult_count.message}
+									</p>
+								)}
+							</div>
+
+							<div className="text-center">
+								<Label
+									htmlFor="child_count"
+									className="text-lg font-medium"
+								>
+									Children (0-17)
+								</Label>
+								<Input
+									id="child_count"
+									type="number"
+									min="0"
+									max="20"
+									{...register("child_count", {
+										required: "Child count is required",
+										min: {
+											value: 0,
+											message: "Must be 0 or more",
+										},
+									})}
+									className="text-center text-2xl font-bold mt-2"
+								/>
+								{errors.child_count && (
+									<p className="text-sm text-red-600 mt-1">
+										{errors.child_count.message}
+									</p>
+								)}
+							</div>
+
+							<div className="text-center">
+								<Label
+									htmlFor="senior_count"
+									className="text-lg font-medium"
+								>
+									Seniors (65+)
+								</Label>
+								<Input
+									id="senior_count"
+									type="number"
+									min="0"
+									max="20"
+									{...register("senior_count", {
+										required: "Senior count is required",
+										min: {
+											value: 0,
+											message: "Must be 0 or more",
+										},
+									})}
+									className="text-center text-2xl font-bold mt-2"
+								/>
+								{errors.senior_count && (
+									<p className="text-sm text-red-600 mt-1">
+										{errors.senior_count.message}
+									</p>
+								)}
+							</div>
+						</div>
+
+						<div className="text-center mt-6 p-4 bg-blue-50 rounded-lg">
+							<p className="text-sm text-blue-800">
+								<strong>Total Household Size:</strong>{" "}
+								{(Number(watchedValues.adult_count) || 0) +
+									(Number(watchedValues.child_count) || 0) +
+									(Number(watchedValues.senior_count) || 0) +
+									1}{" "}
+								people (including yourself)
+							</p>
+						</div>
+					</div>
+				);
+
+			case "personal_info":
 				return (
 					<div className="space-y-4">
+						<div className="text-center mb-6">
+							<p className="text-gray-600">
+								Tell us about yourself
+							</p>
+						</div>
+
 						<div className="grid grid-cols-2 gap-4">
 							<div>
 								<Label htmlFor="primary_first_name">
@@ -308,26 +455,6 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 						</div>
 
 						<div>
-							<Label htmlFor="primary_email">Email Address</Label>
-							<Input
-								id="primary_email"
-								type="email"
-								{...register("primary_email")}
-								placeholder="john@example.com"
-							/>
-						</div>
-
-						<div>
-							<Label htmlFor="primary_phone">Phone Number</Label>
-							<Input
-								id="primary_phone"
-								type="tel"
-								{...register("primary_phone")}
-								placeholder="(555) 123-4567"
-							/>
-						</div>
-
-						<div>
 							<Label htmlFor="primary_date_of_birth">
 								Date of Birth *
 							</Label>
@@ -347,9 +474,156 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 					</div>
 				);
 
-			case "preferences":
+			case "demographics":
 				return (
 					<div className="space-y-4">
+						<div className="text-center mb-6">
+							<p className="text-gray-600">
+								Additional demographic information
+							</p>
+						</div>
+
+						<div className="grid grid-cols-2 gap-4">
+							<div>
+								<Label htmlFor="primary_gender">Gender</Label>
+								<Select
+									value={watchedValues.primary_gender}
+									onValueChange={value =>
+										setValue("primary_gender", value)
+									}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder="Select gender" />
+									</SelectTrigger>
+									<SelectContent className="bg-white border border-gray-300">
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="male"
+										>
+											Male
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="female"
+										>
+											Female
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="other"
+										>
+											Other
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="prefer_not_to_say"
+										>
+											Prefer not to say
+										</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+
+							<div>
+								<Label htmlFor="primary_race">Race</Label>
+								<Select
+									value={watchedValues.primary_race}
+									onValueChange={value =>
+										setValue("primary_race", value)
+									}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder="Select race" />
+									</SelectTrigger>
+									<SelectContent className="bg-white border border-gray-300">
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="american_indian"
+										>
+											American Indian or Alaska Native
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="asian"
+										>
+											Asian
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="black"
+										>
+											Black or African American
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="hispanic"
+										>
+											Hispanic or Latino
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="native_hawaiian"
+										>
+											Native Hawaiian or Other Pacific
+											Islander
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="white"
+										>
+											White
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="other"
+										>
+											Other
+										</SelectItem>
+										<SelectItem
+											className="hover:bg-gray-500 hover:text-white"
+											value="prefer_not_to_say"
+										>
+											Prefer not to say
+										</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+						</div>
+
+						<div>
+							<Label htmlFor="primary_ethnicity">Ethnicity</Label>
+							<Select
+								value={watchedValues.primary_ethnicity}
+								onValueChange={value =>
+									setValue("primary_ethnicity", value)
+								}
+							>
+								<SelectTrigger>
+									<SelectValue placeholder="Select ethnicity" />
+								</SelectTrigger>
+								<SelectContent className="bg-white border border-gray-300">
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="hispanic"
+									>
+										Hispanic or Latino
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="non_hispanic"
+									>
+										Not Hispanic or Latino
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="prefer_not_to_say"
+									>
+										Prefer not to say
+									</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
 						<div>
 							<Label htmlFor="preferred_language">
 								Preferred Language *
@@ -363,33 +637,128 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 								<SelectTrigger>
 									<SelectValue placeholder="Select language" />
 								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="en">English</SelectItem>
-									<SelectItem value="es">Spanish</SelectItem>
-									<SelectItem value="fr">French</SelectItem>
-									<SelectItem value="de">German</SelectItem>
-									<SelectItem value="it">Italian</SelectItem>
-									<SelectItem value="pt">
+								<SelectContent className="bg-white border border-gray-300">
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="en"
+									>
+										English
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="es"
+									>
+										Spanish
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="fr"
+									>
+										French
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="de"
+									>
+										German
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="it"
+									>
+										Italian
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="pt"
+									>
 										Portuguese
 									</SelectItem>
-									<SelectItem value="zh">Chinese</SelectItem>
-									<SelectItem value="ja">Japanese</SelectItem>
-									<SelectItem value="ko">Korean</SelectItem>
-									<SelectItem value="ar">Arabic</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="zh"
+									>
+										Chinese
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="ja"
+									>
+										Japanese
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="ko"
+									>
+										Korean
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="ar"
+									>
+										Arabic
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="hi"
+									>
+										Hindi
+									</SelectItem>
+									<SelectItem
+										className="hover:bg-gray-500 hover:text-white"
+										value="other"
+									>
+										Other
+									</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
+					</div>
+				);
+
+			case "contact":
+				return (
+					<div className="space-y-4">
+						<div className="text-center mb-6">
+							<p className="text-gray-600">Contact information</p>
+						</div>
 
 						<div>
-							<Label htmlFor="notes">
-								Additional Notes (Optional)
+							<Label htmlFor="primary_email">
+								Email Address *
 							</Label>
-							<Textarea
-								id="notes"
-								{...register("notes")}
-								placeholder="Any additional information about your household..."
-								rows={3}
+							<Input
+								id="primary_email"
+								type="email"
+								{...register("primary_email", {
+									required: "Email is required",
+								})}
+								placeholder="john@example.com"
 							/>
+							{errors.primary_email && (
+								<p className="text-sm text-red-600 mt-1">
+									{errors.primary_email.message}
+								</p>
+							)}
+						</div>
+
+						<div>
+							<Label htmlFor="primary_phone">
+								Phone Number *
+							</Label>
+							<Input
+								id="primary_phone"
+								type="tel"
+								{...register("primary_phone", {
+									required: "Phone number is required",
+								})}
+								placeholder="(555) 123-4567"
+							/>
+							{errors.primary_phone && (
+								<p className="text-sm text-red-600 mt-1">
+									{errors.primary_phone.message}
+								</p>
+							)}
 						</div>
 					</div>
 				);

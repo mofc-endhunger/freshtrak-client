@@ -256,47 +256,35 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
    */
   isNewUserSignUp(userEmail: string): boolean {
     try {
-      console.log("🔍 Checking isNewUserSignUp for userEmail:", userEmail);
 
       // Check if there's a new user signup flag in localStorage
       const newUserFlag = localStorage.getItem('new_user_signup');
-      console.log("🔍 New user flag in localStorage:", newUserFlag);
 
       if (newUserFlag) {
         const flagData = JSON.parse(newUserFlag);
-        console.log("🔍 Parsed flag data:", flagData);
 
         // Check if the flag is recent (within last 5 minutes) and completed
         const isRecent = (Date.now() - flagData.timestamp) < (5 * 60 * 1000); // 5 minutes
-        console.log("🔍 Is recent:", isRecent, "Time diff:", (Date.now() - flagData.timestamp) / 1000, "seconds");
 
         if (isRecent && flagData.completed) {
-          console.log("✅ Found recent new user signup flag - clearing and returning true");
           // Clear the flag since we're processing it
           localStorage.removeItem('new_user_signup');
           return true;
-        } else {
-          console.log("❌ Flag not recent or not completed");
         }
-      } else {
-        console.log("❌ No new user flag found in localStorage");
       }
 
       // Check if this is an existing user signing in (not a new signup)
       // If there's old household state but no new user flag, this is likely a sign-in
       const state = this.getSignUpState();
-      console.log("🔍 Fallback state check:", state);
 
       // If user has old state but no new user flag, they're signing in (not signing up)
       if (state.hasOfferedSetup && !newUserFlag) {
-        console.log("🔍 User has old household state but no new user flag - this is a sign-in, not sign-up");
         // Clear old state for this user since they're signing in fresh
         this.clearSignUpState();
         return false;
       }
 
       const fallbackResult = state.isNewUser && state.userId === userEmail && !state.hasOfferedSetup;
-      console.log("🔍 Fallback result:", fallbackResult);
 
       return fallbackResult;
     } catch (error) {

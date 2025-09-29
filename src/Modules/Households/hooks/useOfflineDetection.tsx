@@ -35,7 +35,6 @@ export const useOfflineDetection = (): UseOfflineDetectionReturn => {
 	});
 
 	const actionQueueRef = useRef<Array<() => Promise<any>>>([]);
-	const reconnectIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 	// Update offline state when network status changes
 	useEffect(() => {
@@ -76,6 +75,8 @@ export const useOfflineDetection = (): UseOfflineDetectionReturn => {
 		) {
 			retryQueuedActions();
 		}
+		//TODO: check useEffect dependencies and make sure they are correct
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [offlineState.isOffline, offlineState.wasOffline]);
 
 	const handleOfflineAction = useCallback(

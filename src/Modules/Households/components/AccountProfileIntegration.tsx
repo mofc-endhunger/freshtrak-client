@@ -173,7 +173,7 @@ export const AccountProfileIntegration: React.FC<
 		setShowSetupWizard(true);
 	};
 
-	const handleWizardComplete = (householdId: number) => {
+	const handleWizardComplete = (householdData: any) => {
 		setShowSetupWizard(false);
 		// Navigate to household management
 		navigate(NAVIGATION_CONFIG.householdManagementPath);

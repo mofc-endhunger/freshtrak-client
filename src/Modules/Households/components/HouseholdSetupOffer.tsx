@@ -16,7 +16,6 @@ import { CheckCircle, Home, Users, MapPin, Globe } from "lucide-react";
 
 interface HouseholdSetupOfferProps {
 	onSetupNow: () => void;
-	onSkip: () => void;
 	onSetupLater: () => void;
 	isLoading?: boolean;
 }
@@ -27,7 +26,6 @@ interface HouseholdSetupOfferProps {
  */
 export const HouseholdSetupOffer: React.FC<HouseholdSetupOfferProps> = ({
 	onSetupNow,
-	onSkip,
 	onSetupLater,
 	isLoading = false,
 }) => {
@@ -37,15 +35,6 @@ export const HouseholdSetupOffer: React.FC<HouseholdSetupOfferProps> = ({
 		setIsProcessing(true);
 		try {
 			await onSetupNow();
-		} finally {
-			setIsProcessing(false);
-		}
-	};
-
-	const handleSkip = async () => {
-		setIsProcessing(true);
-		try {
-			await onSkip();
 		} finally {
 			setIsProcessing(false);
 		}
@@ -162,14 +151,6 @@ export const HouseholdSetupOffer: React.FC<HouseholdSetupOfferProps> = ({
 							className="flex-1 min-h-12"
 						>
 							Set Up Later
-						</Button>
-						<Button
-							onClick={handleSkip}
-							disabled={isLoading || isProcessing}
-							variant="ghost"
-							className="flex-1 min-h-12 text-gray-600 hover:text-gray-800"
-						>
-							Skip for Now
 						</Button>
 					</div>
 				</div>

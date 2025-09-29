@@ -9,13 +9,14 @@
  */
 
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../Authentication/AuthContext";
 import { HouseholdDashboard } from "./HouseholdDashboard";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { Household, HouseholdMember } from "./types/household.types";
 import { AddMemberForm } from "./AddMemberForm";
 import { EditMemberForm } from "./EditMemberForm";
-import { HouseholdSetupWizard } from "./components/HouseholdSetupWizard";
+import HouseholdRegistrationComponent from "./components/HouseholdRegistrationComponent";
 import { AuthGuard } from "./components/AuthGuard";
 import { Button } from "../../components/ui/button";
 import {
@@ -35,6 +36,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 	className = "",
 }) => {
 	const { user, isAuthenticated } = useAuth();
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const [household, setHousehold] = useState<Household | null>(null);
 	const [members, setMembers] = useState<HouseholdMember[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -55,13 +58,31 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				return;
 			}
 
+			// Check if this is a new user who should see the setup wizard
+			const shouldShowSetupWizard = localStorage.getItem(
+				"shouldShowSetupWizard"
+			);
+			if (shouldShowSetupWizard === "true") {
+				setShowSetupWizard(true);
+				setIsLoading(false);
+				return;
+			}
+
 			try {
 				setIsLoading(true);
 				setError(null);
 
+				// Get household ID from localStorage
+				const householdId = localStorage.getItem("householdId");
+				if (!householdId) {
+					throw new Error("No household ID found");
+				}
+
 				// Get household data
 				const householdResponse =
-					await householdsApiService.getHousehold();
+					await householdsApiService.getHousehold(
+						parseInt(householdId)
+					);
 				setHousehold(householdResponse.data);
 
 				// Get members data
@@ -167,17 +188,86 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 		setShowSetupWizard(true);
 	};
 
-	// Handle setup wizard completion
-	const handleSetupComplete = async (householdData: any) => {
+	// Handle registration completion
+	const handleSetupComplete = async (registrationData: any) => {
 		try {
+			setIsLoading(true);
+			setError(null);
+
+			// Map registration data to the expected format
+			const householdData = {
+				primary_first_name: registrationData.first_name,
+				primary_last_name: registrationData.last_name,
+				phone: registrationData.phone,
+				address_line_1: registrationData.address_line_1,
+				address_line_2: registrationData.address_line_2,
+				city: registrationData.city,
+				state: registrationData.state,
+				zip_code: registrationData.zip_code,
+				date_of_birth: registrationData.date_of_birth,
+				permission_to_email: registrationData.permission_to_email,
+				children_in_household: registrationData.children_in_household,
+				preferred_language: "en",
+				primary_date_of_birth: registrationData.date_of_birth,
+			};
+
+			// Create user via POST API call
 			const response = await householdsApiService.createHousehold(
 				householdData
 			);
+
+			// Store user ID and household ID in localStorage
+			const householdStorage = {
+				userId: response.data.primary_user_id,
+				household_id: response.data.id,
+			};
+			localStorage.setItem("household", JSON.stringify(householdStorage));
+
+			// Set household data
 			setHousehold(response.data);
 			setShowSetupWizard(false);
+
+			// Clear the setup wizard flag
+			localStorage.removeItem("shouldShowSetupWizard");
+
+			// Redirect based on where user came from
+			if (searchParams.get("from") === "account") {
+				navigate("/account");
+			} else {
+				navigate("/");
+			}
 		} catch (error: any) {
-			console.error("Error creating household:", error);
-			setError(error.message || "Failed to create household");
+			console.error("Error creating user:", error);
+			setError(error.message || "Failed to create user");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	// Handle skipping setup wizard
+	const handleSkipSetup = async (): Promise<void> => {
+		try {
+			setIsLoading(true);
+			setError(null);
+
+			// Mark that user skipped setup
+			localStorage.setItem("skippedSetupWizard", "true");
+
+			// Clear the setup wizard flag
+			localStorage.removeItem("shouldShowSetupWizard");
+
+			// Redirect based on where user came from
+			const fromAccount = searchParams.get("from") === "account";
+			if (fromAccount) {
+				navigate("/account");
+			} else {
+				navigate("/");
+			}
+		} catch (error: any) {
+			console.error("Error skipping setup:", error);
+			setError(error.message || "Failed to skip setup");
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -231,25 +321,40 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<Button
-							onClick={handleSetupHousehold}
-							className="w-full bg-highlight text-white hover:bg-highlight-dark"
-						>
-							<Plus className="w-4 h-4 mr-2" />
-							Set Up Household
-						</Button>
+						<div className="space-y-3">
+							<Button
+								onClick={handleSetupHousehold}
+								className="w-full bg-highlight text-white hover:bg-highlight-dark"
+							>
+								<Plus className="w-4 h-4 mr-2" />
+								Set Up Household
+							</Button>
+							<Button
+								onClick={handleSkipSetup}
+								variant="ghost"
+								className="w-full text-gray-600 hover:text-gray-900"
+							>
+								Skip for Now
+							</Button>
+						</div>
 					</CardContent>
 				</Card>
 			</div>
 		);
 	}
 
-	// Show setup wizard
+	// Show registration component
 	if (showSetupWizard) {
 		return (
-			<HouseholdSetupWizard
+			<HouseholdRegistrationComponent
 				onComplete={handleSetupComplete}
-				onCancel={() => setShowSetupWizard(false)}
+				onCancel={() => {
+					setShowSetupWizard(false);
+					// If user came from Account Settings, redirect back there
+					if (searchParams.get("from") === "account") {
+						navigate("/account");
+					}
+				}}
 			/>
 		);
 	}

@@ -36,7 +36,7 @@ export interface UpdateMemberApiRequest extends UpdateMemberRequest { }
 // API Endpoint configuration
 export interface HouseholdApiEndpoints {
   createHousehold: string;
-  getHousehold: string;
+  getUsersMe: string;
   getHouseholdById: (id: number) => string;
   updateHousehold: (id: number) => string;
   getMembers: (householdId: number) => string;
@@ -115,7 +115,7 @@ export interface BulkOperationResponse {
 export interface HouseholdApiService {
   // Household operations
   createHousehold(data: CreateHouseholdApiRequest): Promise<HouseholdResponse>;
-  getHousehold(): Promise<HouseholdResponse>;
+  getHousehold(householdId: number): Promise<HouseholdResponse>;
   getHouseholdById(id: number): Promise<HouseholdResponse>;
   updateHousehold(id: number, data: UpdateHouseholdApiRequest): Promise<HouseholdResponse>;
 

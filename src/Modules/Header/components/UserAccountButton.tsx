@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createPortal } from "react-dom";
 import { useAuth } from "../../Authentication/AuthContext";
-import { Button } from "../../../components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -10,7 +8,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
-import { User, Settings, LogOut, Home } from "lucide-react";
+import { Settings, LogOut, Home } from "lucide-react";
 
 /**
  * UserAccountButton - Displays user initials in a rounded button with dropdown menu

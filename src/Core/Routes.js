@@ -83,6 +83,10 @@ const AppRoutes = () => {
 							path="/households"
 							element={<HouseholdContainer />}
 						/>
+						<Route
+							path="/households/setup"
+							element={<HouseholdContainer />}
+						/>
 
 						{/* Account Management */}
 						<Route path="/account" element={<AccountPage />} />

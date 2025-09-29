@@ -77,6 +77,7 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"Sign in or create an account to save time in the future",
 		guest_signin_button: "Sign In / Create Account",
+		account_loading_message: "Please wait while we retrieve your data",
 	},
 
 	spa: {
@@ -155,6 +156,8 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"Inicia sesión o crea una cuenta para ahorrar tiempo en el futuro",
 		guest_signin_button: "Iniciar Sesión / Crear Cuenta",
+		account_loading_message:
+			"Por favor espere mientras recuperamos sus datos",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -232,6 +235,7 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"Gali ama samee akoon si aad waqti u badbaadiso mustaqbalka",
 		guest_signin_button: "Gali / Samee Akoon",
+		account_loading_message: "Fadlan sug inta aan ku soo celinno xogtaada",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -310,6 +314,8 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"Войдите в систему или создайте аккаунт, чтобы сэкономить время в будущем",
 		guest_signin_button: "Войти / Создать Аккаунт",
+		account_loading_message:
+			"Пожалуйста, подождите, пока мы получим ваши данные",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",

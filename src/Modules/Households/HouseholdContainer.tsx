@@ -12,6 +12,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../Authentication/AuthContext";
 import { HouseholdDashboard } from "./HouseholdDashboard";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
+import { ApiHouseholdMember } from "./types/api.types";
 import { Household } from "./types/household.types";
 import HouseholdRegistrationComponent from "./components/HouseholdRegistrationComponent";
 import { AuthGuard } from "./components/AuthGuard";
@@ -47,9 +48,64 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 			const isSetupRoute =
 				window.location.pathname === "/households/setup";
 			if (isSetupRoute) {
-				setShowSetupWizard(true);
-				setIsLoading(false);
-				return;
+				// Check if user came from account page (update existing) or initial setup (create new)
+				const fromAccount = searchParams.get("from") === "account";
+
+				if (fromAccount) {
+					// User came from account page, show setup wizard for updates
+					setShowSetupWizard(true);
+					setIsLoading(false);
+					return;
+				} else {
+					// User came from email confirmation, need to create household first
+					try {
+						// Create initial household with basic info
+						const initialHouseholdData = {
+							primary_first_name: user.name?.split(" ")[0] || "",
+							primary_last_name:
+								user.name?.split(" ").slice(1).join(" ") || "",
+							primary_email: user.email || "",
+							address_line_1: "",
+							address_line_2: "",
+							city: "",
+							state: "",
+							zip_code: "",
+							primary_date_of_birth: "",
+							permission_to_email: true,
+							preferred_language: "en",
+							adult_count: 0,
+							child_count: 0,
+							senior_count: 0,
+						};
+
+						console.log("Creating initial household...");
+						const response =
+							await householdsApiService.createHousehold(
+								initialHouseholdData
+							);
+
+						// Store household ID
+						localStorage.setItem(
+							"householdId",
+							response.data.id.toString()
+						);
+
+						// Now show setup wizard for additional details
+						setShowSetupWizard(true);
+						console.log(
+							"Initial household created, showing setup wizard"
+						);
+					} catch (error: any) {
+						console.error(
+							"Error creating initial household:",
+							error
+						);
+						setError(error.message || "Failed to create household");
+					} finally {
+						setIsLoading(false);
+					}
+					return;
+				}
 			}
 
 			try {
@@ -84,9 +140,20 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 		if (!household?.id) return;
 
 		try {
+			// Get current household data from /users/me to ensure we have complete object
+			const currentHouseholdData =
+				await householdsApiService.getUsersMe();
+
+			// Merge current data with updates
+			const updateData = {
+				...currentHouseholdData,
+				...householdData,
+				updated_at: new Date().toISOString(),
+			};
+
 			const response = await householdsApiService.updateHousehold(
 				household.id,
-				householdData
+				updateData
 			);
 			setHousehold(response.data);
 		} catch (error: any) {
@@ -101,90 +168,146 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 			setIsLoading(true);
 			setError(null);
 
-			// Check if user came from account page (update) or initial setup (create)
-			const fromAccount = searchParams.get("from") === "account";
+			// Always update existing household (household was created when setup wizard was shown)
+			const currentHouseholdData =
+				await householdsApiService.getUsersMe();
 
-			if (fromAccount) {
-				// User came from account page, update existing household
-				const existingHouseholdId = localStorage.getItem("householdId");
-				if (!existingHouseholdId) {
-					throw new Error("No household ID found for update");
-				}
-				const updateData = {
-					address_line_1: registrationData.address_line_1,
-					address_line_2: registrationData.address_line_2,
-					city: registrationData.city,
-					state: registrationData.state,
-					zip_code: registrationData.zip_code,
-					preferred_language: "en",
-					notes: "",
-					members: registrationData.members || [],
-				};
+			// Update only the fields that were changed, keeping the rest from current data
+			const updateData = {
+				...currentHouseholdData,
+				address_line_1: registrationData.address_line_1 || null,
+				address_line_2: registrationData.address_line_2 || null,
+				city: registrationData.city || null,
+				state: registrationData.state || null,
+				zip_code: registrationData.zip_code || null,
+				phone: registrationData.phone || null,
+				email: registrationData.email || null,
+				members: (() => {
+					// Start with existing members from /users/me
+					const existingMembers = currentHouseholdData.members || [];
 
-				// Remove undefined values
-				Object.keys(updateData).forEach(key => {
-					if (
-						updateData[key as keyof typeof updateData] === undefined
-					) {
-						delete updateData[key as keyof typeof updateData];
+					// Update existing members and ensure proper data types, filter out deleted members
+					const updatedMembers = existingMembers
+						.filter(
+							member =>
+								!registrationData.deleted_member_ids?.includes(
+									member.id
+								)
+						)
+						.map(member => ({
+							...member,
+							gender_id: member.gender_id
+								? Number(member.gender_id)
+								: null,
+							suffix_id: member.suffix_id
+								? Number(member.suffix_id)
+								: null,
+						}));
+
+					if (updatedMembers.length > 0) {
+						// Update primary member details
+						updatedMembers[0] = {
+							...updatedMembers[0],
+							first_name:
+								registrationData.first_name ||
+								updatedMembers[0].first_name,
+							last_name:
+								registrationData.last_name ||
+								updatedMembers[0].last_name,
+							middle_name:
+								registrationData.middle_name ||
+								updatedMembers[0].middle_name,
+							date_of_birth:
+								registrationData.date_of_birth ||
+								updatedMembers[0].date_of_birth,
+							updated_at: new Date().toISOString(),
+						};
 					}
-				});
 
-				await householdsApiService.updateHousehold(
-					parseInt(existingHouseholdId),
-					updateData
-				);
+					// Add new family members from setup wizard
+					const newMembers = registrationData.family_members || [];
+					const formattedNewMembers = newMembers.map(
+						(member: any) => ({
+							id: null, // New members get null ID
+							household_id: currentHouseholdData.id,
+							user_id: null, // New members don't have user_id
+							number: null,
+							first_name: member.first_name,
+							middle_name: member.middle_name || null,
+							last_name: member.last_name,
+							date_of_birth: member.date_of_birth,
+							is_head_of_household: 0,
+							is_active: 1,
+							added_by: currentHouseholdData.added_by.toString(),
+							gender_id: member.gender_id
+								? Number(member.gender_id)
+								: null,
+							suffix_id: member.suffix_id || null,
+							created_at: null,
+							updated_at: new Date().toISOString(),
+						})
+					);
 
-				// Redirect back to account page
-				navigate("/account");
-			} else {
-				// User came from initial setup, create new household
-				const householdData = {
-					primary_first_name: registrationData.first_name,
-					primary_last_name: registrationData.last_name,
-					phone: registrationData.phone,
-					address_line_1: registrationData.address_line_1,
-					address_line_2: registrationData.address_line_2,
-					city: registrationData.city,
-					state: registrationData.state,
-					zip_code: registrationData.zip_code,
-					date_of_birth: registrationData.date_of_birth,
-					permission_to_email: registrationData.permission_to_email,
-					children_in_household:
-						registrationData.children_in_household,
-					preferred_language: "en",
-					primary_date_of_birth: registrationData.date_of_birth,
-				};
+					return [...updatedMembers, ...formattedNewMembers];
+				})(),
+				counts: (() => {
+					// Calculate counts based on actual members
+					const allMembers = (() => {
+						const existingMembers =
+							currentHouseholdData.members || [];
+						const updatedMembers = [...existingMembers];
+						if (updatedMembers.length > 0) {
+							updatedMembers[0] = {
+								...updatedMembers[0],
+								first_name:
+									registrationData.first_name ||
+									updatedMembers[0].first_name,
+								last_name:
+									registrationData.last_name ||
+									updatedMembers[0].last_name,
+								middle_name:
+									registrationData.middle_name ||
+									updatedMembers[0].middle_name,
+								date_of_birth:
+									registrationData.date_of_birth ||
+									updatedMembers[0].date_of_birth,
+								updated_at: new Date().toISOString(),
+							};
+						}
+						const newMembers =
+							registrationData.family_members || [];
+						return [...updatedMembers, ...newMembers];
+					})();
 
-				// Create user via POST API call
-				const response = await householdsApiService.createHousehold(
-					householdData
-				);
+					// Use provided counts if available, otherwise calculate from members
+					if (registrationData.household_counts) {
+						return registrationData.household_counts;
+					}
 
-				// Store household ID and user ID
-				const householdStorage = {
-					userId: response.data.primary_user_id,
-					household_id: response.data.id,
-				};
-				localStorage.setItem(
-					"household",
-					JSON.stringify(householdStorage)
-				);
-				localStorage.setItem(
-					"householdId",
-					response.data.id.toString()
-				);
+					// Calculate counts from step 3 data as fallback
+					return {
+						seniors:
+							Number(registrationData.seniors_in_household) || 0,
+						adults:
+							Number(registrationData.adults_in_household) || 0,
+						children:
+							Number(registrationData.children_in_household) || 0,
+						total: allMembers.length,
+					};
+				})(),
+				updated_at: new Date().toISOString(),
+			};
 
-				// Set household data
-				setHousehold(response.data);
-				setShowSetupWizard(false);
+			await householdsApiService.updateHousehold(
+				currentHouseholdData.added_by,
+				updateData
+			);
 
-				// Redirect to home page
-				navigate("/");
-			}
+			// Redirect back to account page
+			navigate("/account");
 		} catch (error: any) {
-			console.error("Error completing setup:", error);
-			setError(error.message || "Failed to complete setup");
+			console.error("Error updating household:", error);
+			setError(error.message || "Failed to update household");
 		} finally {
 			setIsLoading(false);
 		}

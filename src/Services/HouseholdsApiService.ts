@@ -13,6 +13,7 @@ import {
   HouseholdApiConfig,
   HouseholdApiError,
   HouseholdApiErrorDetails,
+  UsersMeResponse,
 } from '../Modules/Households/types';
 import {
   retryWithBackoff,
@@ -36,7 +37,7 @@ const API_CONFIG: HouseholdApiConfig = {
     createHousehold: '/api/users',
     getUsersMe: '/api/users/me',
     getHouseholdById: (id: number) => `/api/households/${id}`,
-    updateHousehold: (id: number) => `/api/households/${id}`,
+    updateHousehold: (id: number) => `/api/users/${id}`,
   },
   timeout: 30000, // 30 seconds
   retryAttempts: 3,
@@ -446,7 +447,11 @@ export class HouseholdsApiService {
   /**
    * Get current user information
    */
-  async getUsersMe(): Promise<any> {
+  /**
+   * Get current user information including household data
+   * Returns complete household information from /users/me endpoint
+   */
+  async getUsersMe(): Promise<UsersMeResponse> {
     const context = createErrorContext('getUsersMe', {});
 
     try {

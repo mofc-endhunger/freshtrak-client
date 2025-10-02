@@ -139,15 +139,33 @@ export const mockCreateHouseholdRequest: CreateHouseholdRequest = {
 };
 
 /**
- * Mock household update request
+ * Mock household update request - matches complete /users/me response structure
  */
 export const mockUpdateHouseholdRequest: UpdateHouseholdRequest = {
+  id: 1,
+  number: 0,
+  name: "Mock Household",
+  identification_code: "1234567890-123",
+  added_by: 123456,
+  last_updated_by: 123456,
+  deleted_by: null,
+  deleted_on: null,
+  members: [],
+  created_at: "2024-01-15T10:00:00Z",
+  updated_at: new Date().toISOString(),
+  counts: {
+    seniors: 1,
+    adults: 2,
+    children: 0,
+    total: 3,
+  },
   address_line_1: '456 Oak Ave',
+  address_line_2: null,
   city: 'Columbus',
   state: 'OH',
   zip_code: '43005',
-  preferred_language: 'es' as LanguagePreference,
-  notes: 'Updated household information',
+  phone: '555-123-4567',
+  email: 'mock@example.com',
 };
 
 /**

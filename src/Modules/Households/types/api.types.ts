@@ -19,6 +19,53 @@ export interface ApiErrorResponse {
   timestamp: string;
 }
 
+// New /users/me API response structure
+export interface UsersMeResponse {
+  id: number;
+  number: number;
+  name: string;
+  identification_code: string;
+  added_by: number;
+  last_updated_by: number;
+  deleted_by: number | null;
+  deleted_on: string | null;
+  members: ApiHouseholdMember[];
+  created_at: string | null;
+  updated_at: string;
+  counts: {
+    seniors: number;
+    adults: number;
+    children: number;
+    total: number;
+  };
+  address_line_1: string | null;
+  address_line_2: string | null;
+  city: string | null;
+  state: string | null;
+  zip_code: string | null;
+  phone: string | null;
+  email: string | null;
+}
+
+// API member structure (matches actual API response)
+export interface ApiHouseholdMember {
+  id: number;
+  household_id: number;
+  user_id: string | null;
+  number: number | null;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  date_of_birth: string;
+  is_head_of_household: number;
+  is_active: number;
+  added_by: string;
+  gender_id: number | null;
+  suffix_id: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
 // Household API responses
 export interface HouseholdResponse extends ApiResponse<Household> { }
 export interface HouseholdListResponse extends ApiResponse<Household[]> { }

@@ -1,5 +1,7 @@
 // Households Module TypeScript Interfaces
 
+import { ApiHouseholdMember } from './api.types';
+
 // Core household data structure
 export interface Household {
   id: number;
@@ -113,16 +115,32 @@ export interface CreateHouseholdRequest {
   children_in_household?: number;
 }
 
-// Household update request
+// Household update request - matches complete /users/me response structure
 export interface UpdateHouseholdRequest {
-  address_line_1?: string;
-  address_line_2?: string;
-  city?: string;
-  state?: string;
-  zip_code?: string;
-  preferred_language?: string;
-  notes?: string;
-  members?: CreateMemberRequest[];
+  id: number;
+  number: number;
+  name: string;
+  identification_code: string;
+  added_by: number;
+  last_updated_by: number;
+  deleted_by: number | null;
+  deleted_on: string | null;
+  members: ApiHouseholdMember[];
+  created_at: string | null;
+  updated_at: string;
+  counts: {
+    seniors: number;
+    adults: number;
+    children: number;
+    total: number;
+  };
+  address_line_1: string | null;
+  address_line_2: string | null;
+  city: string | null;
+  state: string | null;
+  zip_code: string | null;
+  phone: string | null;
+  email: string | null;
 }
 
 // Member creation request

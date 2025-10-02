@@ -17,10 +17,10 @@ import {
 } from '../types';
 
 /**
- * Calculate age from date of birth
+ * Calculate age from date of birth (timezone-safe)
  */
 export const calculateAge = (dateOfBirth: string | undefined): AgeCalculation => {
-  if (!dateOfBirth) {
+  if (!dateOfBirth || dateOfBirth === "1900-01-01") {
     return {
       years: 0,
       months: 0,
@@ -29,35 +29,60 @@ export const calculateAge = (dateOfBirth: string | undefined): AgeCalculation =>
     };
   }
 
-  const birthDate = new Date(dateOfBirth);
-  const today = new Date();
+  try {
+    // Parse date components directly to avoid timezone issues
+    const [year, month, day] = dateOfBirth.split('-').map(Number);
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+      return {
+        years: 0,
+        months: 0,
+        days: 0,
+        totalDays: 0,
+      };
+    }
 
-  let years = today.getFullYear() - birthDate.getFullYear();
-  let months = today.getMonth() - birthDate.getMonth();
-  let days = today.getDate() - birthDate.getDate();
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1; // getMonth() returns 0-11
+    const currentDay = today.getDate();
 
-  // Adjust for negative days
-  if (days < 0) {
-    months--;
-    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-    days += lastMonth.getDate();
+    let years = currentYear - year;
+    let months = currentMonth - month;
+    let days = currentDay - day;
+
+    // Adjust for negative days
+    if (days < 0) {
+      months--;
+      // Get days in previous month
+      const prevMonth = new Date(currentYear, currentMonth - 1, 0);
+      days += prevMonth.getDate();
+    }
+
+    // Adjust for negative months
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    // Calculate total days using the same timezone-safe approach
+    const birthDate = new Date(year, month - 1, day); // month is 0-indexed
+    const totalDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    return {
+      years,
+      months,
+      days,
+      totalDays,
+    };
+  } catch (error) {
+    console.warn("Age calculation failed:", error);
+    return {
+      years: 0,
+      months: 0,
+      days: 0,
+      totalDays: 0,
+    };
   }
-
-  // Adjust for negative months
-  if (months < 0) {
-    years--;
-    months += 12;
-  }
-
-  // Calculate total days
-  const totalDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24));
-
-  return {
-    years,
-    months,
-    days,
-    totalDays,
-  };
 };
 
 /**
@@ -336,6 +361,34 @@ export const getGenderDisplayName = (gender: MemberGender): string => {
   };
 
   return genderNames[gender] || gender;
+};
+
+/**
+ * Convert gender_id to MemberGender string
+ */
+export const getGenderFromId = (genderId: number): MemberGender => {
+  const genderMap: Record<number, MemberGender> = {
+    1: 'male',
+    2: 'female',
+    3: 'other',
+    4: 'prefer_not_to_say',
+  };
+
+  return genderMap[genderId] || 'prefer_not_to_say';
+};
+
+/**
+ * Convert MemberGender string to gender_id
+ */
+export const getGenderId = (gender: MemberGender): number => {
+  const genderIdMap: Record<MemberGender, number> = {
+    male: 1,
+    female: 2,
+    other: 3,
+    prefer_not_to_say: 4,
+  };
+
+  return genderIdMap[gender] || 4;
 };
 
 /**

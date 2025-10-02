@@ -14,18 +14,26 @@ import PrimaryInfoFormComponent from "../../Family/PrimaryInfoFormComponent";
 import AddressComponent from "../../Family/AddressComponent";
 import ContactInformationComponent from "../../Family/ContactInformationComponent";
 import MemberCountFormComponent from "../../Family/MemberCountFormComponent";
+import FamilyMemberDetailsStep from "./FamilyMemberDetailsStep";
 import LoadingSpinner from "../../General/LoadingSpinner";
 import { Button } from "../../../components/ui/button";
+import { getGenderId } from "../utils/householdUtils";
+import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
+import { ApiHouseholdMember } from "../types/api.types";
 
 // Utility imports
 import { formatDateForServer } from "../../../Utils/DateFormat";
 import localization from "../../Localization/LocalizationComponent";
 
 // Third-party library imports
-import "@one-platform/opc-timeline";
+// import "@one-platform/opc-timeline"; // Temporarily disabled due to offsetWidth error
 
 // Type imports
-import { RegistrationFormData } from "../../Registration/types/registration.types";
+import {
+	RegistrationFormData,
+	HouseholdCounts,
+} from "../../Registration/types/registration.types";
+import { HouseholdMember } from "../types/household.types";
 
 interface HouseholdRegistrationComponentProps {
 	onComplete: (data: RegistrationFormData) => void;
@@ -53,24 +61,137 @@ const HouseholdRegistrationComponent: React.FC<
 		{}
 	);
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+	const [familyMembers, setFamilyMembers] = useState<HouseholdMember[]>([]);
+	const [householdCounts, setHouseholdCounts] =
+		useState<HouseholdCounts | null>(null);
+	const [hasAdditionalMembers, setHasAdditionalMembers] =
+		useState<boolean>(false);
+	const [isLoadingUserData, setIsLoadingUserData] = useState<boolean>(true);
+	const [deletedMemberIds, setDeletedMemberIds] = useState<number[]>([]);
+	const [currentHouseholdMembers, setCurrentHouseholdMembers] = useState<
+		ApiHouseholdMember[]
+	>([]);
 
-	const configureTimeLine = (): void => {
-		const timeline = document.querySelector("#timeline") as HTMLElement & {
-			steps?: string[];
+	// Utility function to convert date from yyyy-mm-dd to mm/dd/yyyy
+	const convertDateFormat = (dateString: string): string => {
+		if (!dateString || dateString === "1900-01-01") {
+			return "";
+		}
+
+		try {
+			// Parse date components directly to avoid timezone issues
+			const [year, month, day] = dateString.split("-").map(Number);
+			if (isNaN(year) || isNaN(month) || isNaN(day)) {
+				return "";
+			}
+
+			// Validate date components
+			if (
+				year < 1900 ||
+				year > 2100 ||
+				month < 1 ||
+				month > 12 ||
+				day < 1 ||
+				day > 31
+			) {
+				return "";
+			}
+
+			const monthStr = String(month).padStart(2, "0");
+			const dayStr = String(day).padStart(2, "0");
+			const yearStr = String(year);
+
+			return `${monthStr}/${dayStr}/${yearStr}`;
+		} catch (error) {
+			console.warn("Date conversion failed:", error);
+			return "";
+		}
+	};
+
+	// Pre-populate form with primary member data from /users/me
+	useEffect(() => {
+		const fetchUserData = async () => {
+			try {
+				const householdsApiService = new HouseholdsApiService();
+				const userData = await householdsApiService.getUsersMe();
+
+				// Pre-populate primary member data
+				if (userData.members && userData.members.length > 0) {
+					setCurrentHouseholdMembers(userData.members);
+					const primaryMember = userData.members[0];
+					setValue("first_name", primaryMember.first_name || "");
+					setValue("last_name", primaryMember.last_name || "");
+					setValue("middle_name", primaryMember.middle_name || "");
+					setValue(
+						"date_of_birth",
+						convertDateFormat(primaryMember.date_of_birth || "")
+					);
+					setValue("phone", userData.phone || "");
+					setValue("email", userData.email || "");
+					setValue("address_line_1", userData.address_line_1 || "");
+					setValue("address_line_2", userData.address_line_2 || "");
+					setValue("city", userData.city || "");
+					setValue("state", userData.state || "");
+					setValue("zip_code", userData.zip_code || "");
+				}
+			} catch (error) {
+				console.error("Error fetching user data:", error);
+			} finally {
+				setIsLoadingUserData(false);
+			}
 		};
-		if (timeline) {
-			timeline.steps = [
-				"Your Details",
-				"Your Address Details",
-				"Your Family Details",
-				"Contact Information",
-			];
+
+		fetchUserData();
+	}, [setValue]);
+
+	// Timeline configuration temporarily disabled due to offsetWidth error
+	/*
+	const configureTimeLine = (): void => {
+		try {
+			const timeline = document.querySelector(
+				"#timeline"
+			) as HTMLElement & {
+				steps?: string[];
+			};
+			if (timeline && timeline.steps !== undefined) {
+				const steps = [
+					"Your Details",
+					"Your Address Details",
+					"Your Family Details",
+					"Contact Information",
+				];
+
+				// Add family member details step if there are additional members
+				if (hasAdditionalMembers) {
+					steps.splice(3, 0, "Family Member Details");
+				}
+
+				timeline.steps = steps;
+				setTimelineReady(true);
+			}
+		} catch (error) {
+			console.warn("Timeline configuration failed:", error);
 		}
 	};
 
 	useEffect(() => {
 		configureTimeLine();
+	}, [hasAdditionalMembers]);
 
+	useEffect(() => {
+		configureTimeLine();
+	}, [formStep]);
+
+	// Initialize timeline after component mount
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			configureTimeLine();
+		}, 100);
+		return () => clearTimeout(timer);
+	}, []);
+	*/
+
+	useEffect(() => {
 		// Pre-populate form with auth user data if available
 		if (authUser) {
 			const nameParts = authUser.name?.split(" ") || [];
@@ -81,28 +202,88 @@ const HouseholdRegistrationComponent: React.FC<
 		}
 	}, [authUser, setValue]);
 
+	// Handle member deletion
+	const handleDeleteMember = (memberId: number): void => {
+		setDeletedMemberIds(prev => [...prev, memberId]);
+	};
+
+	// Get filtered members (excluding deleted ones)
+	const getFilteredMembers = (): ApiHouseholdMember[] => {
+		return currentHouseholdMembers.filter(
+			member => !deletedMemberIds.includes(member.id)
+		);
+	};
+
 	const continueHandler = (values: Partial<RegistrationFormData>): void => {
 		setFormValues({ ...formValues, ...values });
 
 		// Check if we're moving from step 2 (member count) and user has additional family members
 		if (formStep === 2) {
+			const seniorCount = values.seniors_in_household || 0;
+			const adultCount = values.adults_in_household || 0;
+			const childCount = values.children_in_household || 0;
+
 			const hasAdditionalMembers =
-				(values.adults_in_household || 0) > 1 ||
-				(values.children_in_household || 0) > 0 ||
-				(values.seniors_in_household || 0) > 0;
+				seniorCount > 0 || adultCount > 0 || childCount > 0;
+			setHasAdditionalMembers(hasAdditionalMembers);
+
 			if (hasAdditionalMembers) {
-				// User has additional family members, but we'll skip the family member completion for now
-				// and proceed to the next step (contact information)
-				setFormStep(formStep + 1);
+				// User has additional family members, add family member details step
+				setFormStep(4); // Skip to step 4 (family member details)
+				return;
+			} else {
+				// No additional members, go to contact information (step 3)
+				setFormStep(3);
 				return;
 			}
 		}
 
+		// Handle step 3 (contact information) - go to step 5 (final step)
+		if (formStep === 3) {
+			setFormStep(5);
+			return;
+		}
+
+		// Default behavior for other steps
 		setFormStep(formStep + 1);
 	};
 
 	const previousHandler = (): void => {
+		// Handle navigation from family member details step (step 4)
+		if (formStep === 4) {
+			// Go back to member count step (step 2)
+			setFormStep(2);
+			return;
+		}
+
+		// Handle navigation from contact information step (step 5)
+		if (formStep === 5) {
+			// If we have additional members, go back to family member details (step 4)
+			// Otherwise go back to member count step (step 2)
+			if (hasAdditionalMembers) {
+				setFormStep(4);
+			} else {
+				setFormStep(2);
+			}
+			return;
+		}
+
+		// Default behavior for other steps
 		setFormStep(formStep - 1);
+	};
+
+	const handleFamilyMembersComplete = (
+		members: HouseholdMember[],
+		counts: HouseholdCounts
+	): void => {
+		setFamilyMembers(members);
+		setHouseholdCounts(counts);
+		setFormStep(5); // Move to contact information step
+	};
+
+	const handleFamilyMembersSkip = (counts: HouseholdCounts): void => {
+		setHouseholdCounts(counts);
+		setFormStep(5); // Move to contact information step
 	};
 
 	const previousButton = (): JSX.Element => {
@@ -139,6 +320,29 @@ const HouseholdRegistrationComponent: React.FC<
 				data.date_of_birth = formatDateForServer(data.date_of_birth);
 			}
 
+			// Add family members and counts to the data
+			if (familyMembers.length > 0) {
+				data.family_members = familyMembers.map(member => ({
+					first_name: member.first_name,
+					last_name: member.last_name,
+					middle_name: member.middle_name,
+					gender_id: getGenderId(
+						member.gender || "prefer_not_to_say"
+					),
+					date_of_birth: member.date_of_birth || "",
+					suffix_id: member.suffix
+						? getSuffixId(member.suffix)
+						: undefined,
+				}));
+			}
+
+			if (householdCounts) {
+				data.household_counts = householdCounts;
+			}
+
+			// Add deleted member IDs
+			data.deleted_member_ids = deletedMemberIds;
+
 			// Call the completion handler with the collected data
 			onComplete(data);
 		} catch (error) {
@@ -146,6 +350,17 @@ const HouseholdRegistrationComponent: React.FC<
 		} finally {
 			setIsSubmitting(false);
 		}
+	};
+
+	const getSuffixId = (suffix: string): number => {
+		const suffixMap: { [key: string]: number } = {
+			"Jr.": 1,
+			"Sr.": 2,
+			II: 3,
+			III: 4,
+			IV: 5,
+		};
+		return suffixMap[suffix] || 0;
 	};
 
 	const renderFormStep = (): JSX.Element => {
@@ -160,6 +375,7 @@ const HouseholdRegistrationComponent: React.FC<
 						getValues={getValues}
 						trigger={trigger}
 						setValue={setValue}
+						isHouseholdSetup
 					/>
 				);
 			case 1:
@@ -173,13 +389,80 @@ const HouseholdRegistrationComponent: React.FC<
 				);
 			case 2:
 				return (
-					<MemberCountFormComponent
-						register={register}
-						errors={errors}
-						watch={watchField}
-						setValue={setValue}
-						event={{}}
-					/>
+					<div className="space-y-6">
+						{/* Current Household Members */}
+						{currentHouseholdMembers.length > 1 && (
+							<div className="bg-gray-50 p-4 rounded-lg">
+								<h3 className="text-lg font-semibold text-gray-900 mb-4">
+									Current Household Members
+								</h3>
+								<div className="space-y-2">
+									{getFilteredMembers().map(
+										(member, index) => (
+											<div
+												key={member.id}
+												className="flex items-center justify-between bg-white p-3 rounded border"
+											>
+												<div className="flex items-center space-x-3">
+													<div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+														{index + 1}
+													</div>
+													<div>
+														<p className="font-medium text-gray-900">
+															{member.first_name}{" "}
+															{member.last_name}
+															{member.is_head_of_household ===
+																1 && (
+																<span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+																	Head of
+																	Household
+																</span>
+															)}
+														</p>
+														{member.date_of_birth &&
+															member.date_of_birth !==
+																"1900-01-01" && (
+																<p className="text-sm text-gray-600">
+																	Born:{" "}
+																	{new Date(
+																		member.date_of_birth
+																	).toLocaleDateString()}
+																</p>
+															)}
+													</div>
+												</div>
+												{member.is_head_of_household !==
+													1 && (
+													<Button
+														type="button"
+														variant="outline"
+														size="sm"
+														onClick={() =>
+															handleDeleteMember(
+																member.id
+															)
+														}
+														className="text-red-600 hover:text-red-700 hover:bg-red-50"
+													>
+														Remove
+													</Button>
+												)}
+											</div>
+										)
+									)}
+								</div>
+							</div>
+						)}
+
+						{/* Member Count Form */}
+						<MemberCountFormComponent
+							register={register}
+							errors={errors}
+							watch={watchField}
+							setValue={setValue}
+							event={{}}
+						/>
+					</div>
 				);
 			case 3:
 				return (
@@ -192,38 +475,160 @@ const HouseholdRegistrationComponent: React.FC<
 					/>
 				);
 			case 4:
-				return (
-					<div className="space-y-6">
-						<div className="text-center">
-							<h3 className="text-lg font-semibold text-gray-900 mb-2">
-								Additional Family Members
-							</h3>
-							<p className="text-gray-600">
-								Provide details for additional family members
-								(optional)
-							</p>
-						</div>
+				// Generate mock members based on counts for the FamilyMemberCompletionForm
+				const mockMembers: HouseholdMember[] = [];
+				let memberId = 1;
 
-						<div className="space-y-4">
-							{/* This will be implemented to collect member details */}
-							<div className="text-center text-gray-500 py-8">
-								<p>
-									Member details collection will be
-									implemented here
-								</p>
-								<p className="text-sm">
-									You can skip this step for now
-								</p>
-							</div>
-						</div>
-					</div>
+				// Add children
+				for (
+					let i = 0;
+					i < (formValues.children_in_household || 0);
+					i++
+				) {
+					mockMembers.push({
+						id: memberId++,
+						household_id: 0,
+						is_primary: false,
+						first_name: "",
+						last_name: "",
+						middle_name: "",
+						suffix: "",
+						gender: undefined,
+						race: undefined,
+						ethnicity: undefined,
+						phone: "",
+						email: "",
+						address_line_1: "",
+						address_line_2: "",
+						city: "",
+						state: "",
+						zip_code: "",
+						date_of_birth: "",
+						status: "active",
+						is_freshtrak_user: false,
+						preferred_language: "en",
+						notes: "",
+						is_active: true,
+						created_at: new Date().toISOString(),
+						updated_at: new Date().toISOString(),
+						head_of_household: false,
+					});
+				}
+
+				// Add adults
+				for (
+					let i = 0;
+					i < (formValues.adults_in_household || 0);
+					i++
+				) {
+					mockMembers.push({
+						id: memberId++,
+						household_id: 0,
+						is_primary: false,
+						first_name: "",
+						last_name: "",
+						middle_name: "",
+						suffix: "",
+						gender: undefined,
+						race: undefined,
+						ethnicity: undefined,
+						phone: "",
+						email: "",
+						address_line_1: "",
+						address_line_2: "",
+						city: "",
+						state: "",
+						zip_code: "",
+						date_of_birth: "",
+						status: "active",
+						is_freshtrak_user: false,
+						preferred_language: "en",
+						notes: "",
+						is_active: true,
+						created_at: new Date().toISOString(),
+						updated_at: new Date().toISOString(),
+						head_of_household: false,
+					});
+				}
+
+				// Add seniors
+				for (
+					let i = 0;
+					i < (formValues.seniors_in_household || 0);
+					i++
+				) {
+					mockMembers.push({
+						id: memberId++,
+						household_id: 0,
+						is_primary: false,
+						first_name: "",
+						last_name: "",
+						middle_name: "",
+						suffix: "",
+						gender: undefined,
+						race: undefined,
+						ethnicity: undefined,
+						phone: "",
+						email: "",
+						address_line_1: "",
+						address_line_2: "",
+						city: "",
+						state: "",
+						zip_code: "",
+						date_of_birth: "",
+						status: "active",
+						is_freshtrak_user: false,
+						preferred_language: "en",
+						notes: "",
+						is_active: true,
+						created_at: new Date().toISOString(),
+						updated_at: new Date().toISOString(),
+						head_of_household: false,
+					});
+				}
+
+				// Create original counts from step 3 data
+				const originalCounts = {
+					seniors: Number(formValues.seniors_in_household) || 0,
+					adults: Number(formValues.adults_in_household) || 0,
+					children: Number(formValues.children_in_household) || 0,
+					total:
+						Number(formValues.seniors_in_household) ||
+						0 + Number(formValues.adults_in_household) ||
+						0 + Number(formValues.children_in_household) ||
+						0,
+				};
+
+				return (
+					<FamilyMemberDetailsStep
+						members={mockMembers}
+						householdId={0} // Temporary ID
+						originalCounts={originalCounts}
+						onComplete={(membersData, counts) => {
+							handleFamilyMembersComplete(membersData, counts);
+						}}
+						onSkip={counts => {
+							handleFamilyMembersSkip(counts);
+						}}
+						onCancel={previousHandler}
+					/>
+				);
+			case 5:
+				return (
+					<ContactInformationComponent
+						register={register}
+						errors={errors}
+						watch={watchField}
+						setValue={setValue}
+						getValues={getValues}
+					/>
 				);
 			default:
 				return <div>Invalid step</div>;
 		}
 	};
 
-	if (isSubmitting) {
+	if (isSubmitting || isLoadingUserData) {
 		return <LoadingSpinner />;
 	}
 
@@ -242,9 +647,58 @@ const HouseholdRegistrationComponent: React.FC<
 						</p>
 					</div>
 
-					{/* Timeline */}
+					{/* Custom Progress Timeline */}
 					<div className="mb-8">
-						<opc-timeline id="timeline"></opc-timeline>
+						<div className="flex justify-center items-center space-x-2 py-4">
+							{(() => {
+								const steps = [
+									"Your Details",
+									"Your Address Details",
+									"Your Family Details",
+									"Contact Information",
+								];
+
+								// Add family member details step if there are additional members
+								if (hasAdditionalMembers) {
+									steps.splice(3, 0, "Family Member Details");
+								}
+
+								return steps.map((step, index) => (
+									<div
+										key={index}
+										className="flex items-center"
+									>
+										<div
+											className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+												index <= formStep
+													? "bg-blue-600 text-white"
+													: "bg-gray-200 text-gray-500"
+											}`}
+										>
+											{index + 1}
+										</div>
+										<span
+											className={`ml-2 text-sm font-medium ${
+												index <= formStep
+													? "text-blue-600"
+													: "text-gray-400"
+											}`}
+										>
+											{step}
+										</span>
+										{index < steps.length - 1 && (
+											<div
+												className={`w-8 h-0.5 mx-2 ${
+													index < formStep
+														? "bg-blue-600"
+														: "bg-gray-200"
+												}`}
+											/>
+										)}
+									</div>
+								));
+							})()}
+						</div>
 					</div>
 
 					{/* Form */}
@@ -254,10 +708,14 @@ const HouseholdRegistrationComponent: React.FC<
 
 							{/* Navigation buttons - Previous, Continue/Complete, and Cancel */}
 							<div className="flex justify-between mt-8">
-								<div>{formStep > 0 && previousButton()}</div>
+								<div>
+									{formStep > 0 &&
+										formStep !== 4 &&
+										previousButton()}
+								</div>
 								<div className="flex space-x-4">
 									{cancelButton()}
-									{formStep < 4 && (
+									{formStep < 5 && formStep !== 4 && (
 										<Button
 											type="button"
 											onClick={() => {
@@ -271,7 +729,7 @@ const HouseholdRegistrationComponent: React.FC<
 											Continue
 										</Button>
 									)}
-									{formStep === 4 && (
+									{formStep === 5 && (
 										<Button
 											type="submit"
 											disabled={isSubmitting}

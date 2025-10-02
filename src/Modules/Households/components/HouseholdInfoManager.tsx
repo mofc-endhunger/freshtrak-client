@@ -175,15 +175,19 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				throw new Error("Household ID not found");
 			}
 
-			// Prepare update data
+			// Get current household data from /users/me to ensure we have complete object
+			const currentHouseholdData =
+				await householdsApiService.getUsersMe();
+
+			// Prepare update data - merge current data with address updates
 			const updateData = {
-				address_line_1: data.address_line_1,
-				address_line_2: data.address_line_2 || undefined,
-				city: data.city,
-				state: data.state,
-				zip_code: data.zip_code,
-				preferred_language: data.preferred_language,
-				notes: data.notes || undefined,
+				...currentHouseholdData,
+				address_line_1: data.address_line_1 || null,
+				address_line_2: data.address_line_2 || null,
+				city: data.city || null,
+				state: data.state || null,
+				zip_code: data.zip_code || null,
+				updated_at: new Date().toISOString(),
 			};
 
 			// Optimistic update

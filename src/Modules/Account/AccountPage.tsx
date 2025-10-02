@@ -24,6 +24,8 @@ import {
 import { HouseholdCompletionPrompt } from "../Households/components/HouseholdCompletionPrompt";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { LoadingCard } from "../Households/components/LoadingSpinner";
+import { UsersMeResponse } from "../Households/types/api.types";
+import { calculateAge } from "../Households/utils/householdUtils";
 import localization from "../Localization/LocalizationComponent";
 
 /**
@@ -43,9 +45,9 @@ const AccountPage: React.FC = () => {
 	const { user, isAuthenticated } = useAuth();
 
 	const [showHouseholdPrompt, setShowHouseholdPrompt] = useState(false);
-	//eslint-disable-next-line
-	const [householdData, setHouseholdData] = useState<any>(null);
-	//eslint-disable-next-line
+	const [householdData, setHouseholdData] = useState<UsersMeResponse | null>(
+		null
+	);
 	const [isLoadingHousehold, setIsLoadingHousehold] = useState(false);
 	const [showSkippedSetupPrompt, setShowSkippedSetupPrompt] = useState(false);
 
@@ -67,31 +69,21 @@ const AccountPage: React.FC = () => {
 
 			setIsLoadingHousehold(true);
 			try {
-				// Step 1: Get user information including household_id
+				// Get complete household information from /users/me endpoint
 				const userInfo = await householdsApiService.getUsersMe();
-
-				// Step 2: Get household information using household_id
-				const householdInfo =
-					await householdsApiService.getHouseholdByIdNew(
-						userInfo.household_id
-					);
-
-				setHouseholdData(householdInfo);
+				setHouseholdData(userInfo);
 
 				// Save household_id to localStorage for later use
-				if (householdInfo?.id) {
-					localStorage.setItem(
-						"householdId",
-						householdInfo.id.toString()
-					);
+				if (userInfo?.id) {
+					localStorage.setItem("householdId", userInfo.id.toString());
 				}
 
 				// Check if household data is incomplete (minimal data suggests setup was skipped)
 				const hasMinimalData =
-					!householdInfo?.address_line_1 ||
-					!householdInfo?.city ||
-					!householdInfo?.state ||
-					!householdInfo?.zip_code;
+					!userInfo?.address_line_1 ||
+					!userInfo?.city ||
+					!userInfo?.state ||
+					!userInfo?.zip_code;
 
 				if (hasMinimalData) {
 					setShowSkippedSetupPrompt(true);
@@ -119,11 +111,11 @@ const AccountPage: React.FC = () => {
 	};
 
 	/**
-	 * Navigate to household dashboard for management
-	 * This is for users who already have a household and want to manage it
+	 * Navigate to household setup wizard for updating household
+	 * This is for users who already have a household and want to update it
 	 */
 	const navigateToHouseholdDashboard = (): void => {
-		navigate("/households");
+		navigate("/households/setup?from=account");
 	};
 
 	/**
@@ -200,11 +192,13 @@ const AccountPage: React.FC = () => {
 					<h1 className="text-3xl font-bold text-gray-900">
 						Account Settings
 					</h1>
-					{householdData?.name && (
-						<h2 className="text-xl font-semibold text-highlight mt-2">
-							{householdData.name}
-						</h2>
-					)}
+					{householdData?.members &&
+						householdData.members.length > 0 && (
+							<h2 className="text-xl font-semibold text-highlight mt-2">
+								{householdData.members[0].first_name}{" "}
+								{householdData.members[0].last_name}
+							</h2>
+						)}
 					<p className="text-gray-600 mt-2">
 						Manage your account information and household details
 					</p>
@@ -297,13 +291,25 @@ const AccountPage: React.FC = () => {
 										</div>
 										<div>
 											<h3 className="text-lg font-semibold text-gray-900">
-												{user.name &&
-												user.name !== user.email
-													? user.name
-													: "User"}
+												{householdData?.members &&
+													householdData.members
+														.length > 0 && (
+														<>
+															{
+																householdData
+																	.members[0]
+																	.first_name
+															}{" "}
+															{
+																householdData
+																	.members[0]
+																	.last_name
+															}
+														</>
+													)}
 											</h3>
 											<p className="text-gray-600">
-												{user.email}
+												{householdData?.email}
 											</p>
 											<Badge
 												variant="secondary"
@@ -327,7 +333,7 @@ const AccountPage: React.FC = () => {
 														Email
 													</p>
 													<p className="text-sm text-gray-600">
-														{user.email}
+														{householdData?.email}
 													</p>
 												</div>
 											</div>
@@ -365,6 +371,108 @@ const AccountPage: React.FC = () => {
 									</div>
 								</CardContent>
 							</Card>
+
+							{/* Address Information */}
+							{householdData && (
+								<Card>
+									<CardHeader>
+										<CardTitle className="flex items-center">
+											<Home className="mr-2 h-5 w-5" />
+											Address Information
+										</CardTitle>
+										<CardDescription>
+											Your household address and contact
+											details
+										</CardDescription>
+									</CardHeader>
+									<CardContent>
+										{householdData.address_line_1 ||
+										householdData.city ||
+										householdData.state ||
+										householdData.zip_code ||
+										householdData.phone ||
+										householdData.email ? (
+											<div className="space-y-2">
+												{householdData.address_line_1 && (
+													<div className="flex items-center">
+														<span className="text-sm font-medium text-gray-700 w-24">
+															Address:
+														</span>
+														<span className="text-sm text-gray-900">
+															{
+																householdData.address_line_1
+															}
+															{householdData.address_line_2 &&
+																`, ${householdData.address_line_2}`}
+														</span>
+													</div>
+												)}
+												{(householdData.city ||
+													householdData.state ||
+													householdData.zip_code) && (
+													<div className="flex items-center">
+														<span className="text-sm font-medium text-gray-700 w-24">
+															Location:
+														</span>
+														<span className="text-sm text-gray-900">
+															{[
+																householdData.city,
+																householdData.state,
+																householdData.zip_code,
+															]
+																.filter(Boolean)
+																.join(", ")}
+														</span>
+													</div>
+												)}
+												{householdData.phone && (
+													<div className="flex items-center">
+														<span className="text-sm font-medium text-gray-700 w-24">
+															Phone:
+														</span>
+														<span className="text-sm text-gray-900">
+															{
+																householdData.phone
+															}
+														</span>
+													</div>
+												)}
+												{householdData.email && (
+													<div className="flex items-center">
+														<span className="text-sm font-medium text-gray-700 w-24">
+															Email:
+														</span>
+														<span className="text-sm text-gray-900">
+															{
+																householdData.email
+															}
+														</span>
+													</div>
+												)}
+											</div>
+										) : (
+											<div className="text-center py-4">
+												<AlertCircle className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+												<p className="text-sm text-gray-500 mb-3">
+													No address information
+													available
+												</p>
+												<Button
+													onClick={() =>
+														navigateToHouseholdSetup()
+													}
+													variant="outline"
+													size="sm"
+												>
+													<Home className="mr-2 h-4 w-4" />
+													Add Address Information
+												</Button>
+											</div>
+										)}
+									</CardContent>
+								</Card>
+							)}
+
 							{/* Household Members */}
 							{householdData?.members &&
 								householdData.members.length > 0 && (
@@ -389,7 +497,7 @@ const AccountPage: React.FC = () => {
 													size="sm"
 												>
 													<Home className="mr-2 h-4 w-4" />
-													Manage Household
+													Update Household
 												</Button>
 											</div>
 										</CardHeader>
@@ -428,35 +536,130 @@ const AccountPage: React.FC = () => {
 															}`}
 														>
 															<CardContent>
-																<div className="flex items-center justify-between">
-																	<div>
-																		<h4 className="font-semibold text-gray-900">
-																			{
-																				member.first_name
-																			}{" "}
-																			{
-																				member.last_name
-																			}
-																			{member.is_head_of_household ===
-																				1 && (
-																				<span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-																					Head
-																					of
-																					Household
+																<div className="space-y-3">
+																	{/* Member Name and Status */}
+																	<div className="flex items-center justify-between">
+																		<div>
+																			<h4 className="font-semibold text-gray-900">
+																				{
+																					member.first_name
+																				}
+																				{member.middle_name &&
+																					` ${member.middle_name}`}
+																				{` ${member.last_name}`}
+																				{member.suffix &&
+																					` ${member.suffix}`}
+																				{member.is_head_of_household ===
+																					1 && (
+																					<span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+																						Head
+																						of
+																						Household
+																					</span>
+																				)}
+																			</h4>
+																			{member.status ===
+																				"inactive" && (
+																				<span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+																					Inactive
 																				</span>
 																			)}
-																		</h4>
+																		</div>
+																	</div>
+
+																	{/* Member Details */}
+																	<div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
 																		{member.date_of_birth &&
 																			member.date_of_birth !==
 																				"1900-01-01" && (
-																				<p className="text-sm text-gray-600">
-																					Born:{" "}
-																					{new Date(
-																						member.date_of_birth
-																					).toLocaleDateString()}
-																				</p>
+																				<div className="flex items-center">
+																					<span className="text-gray-600 w-20">
+																						Age:
+																					</span>
+																					<span className="text-gray-900">
+																						{
+																							calculateAge(
+																								member.date_of_birth
+																							)
+																								.years
+																						}
+																					</span>
+																				</div>
 																			)}
+																		{member.gender && (
+																			<div className="flex items-center">
+																				<span className="text-gray-600 w-20">
+																					Gender:
+																				</span>
+																				<span className="text-gray-900 capitalize">
+																					{
+																						member.gender
+																					}
+																				</span>
+																			</div>
+																		)}
+																		{member.phone && (
+																			<div className="flex items-center">
+																				<span className="text-gray-600 w-20">
+																					Phone:
+																				</span>
+																				<span className="text-gray-900">
+																					{
+																						member.phone
+																					}
+																				</span>
+																			</div>
+																		)}
+																		{member.email && (
+																			<div className="flex items-center">
+																				<span className="text-gray-600 w-20">
+																					Email:
+																				</span>
+																				<span className="text-gray-900">
+																					{
+																						member.email
+																					}
+																				</span>
+																			</div>
+																		)}
+																		{member.preferred_language && (
+																			<div className="flex items-center">
+																				<span className="text-gray-600 w-20">
+																					Language:
+																				</span>
+																				<span className="text-gray-900 capitalize">
+																					{
+																						member.preferred_language
+																					}
+																				</span>
+																			</div>
+																		)}
+																		{member.is_freshtrak_user && (
+																			<div className="flex items-center">
+																				<span className="text-gray-600 w-20">
+																					Status:
+																				</span>
+																				<span className="text-green-600 font-medium">
+																					FreshTrak
+																					User
+																				</span>
+																			</div>
+																		)}
 																	</div>
+
+																	{/* Notes */}
+																	{member.notes && (
+																		<div className="text-sm">
+																			<span className="text-gray-600">
+																				Notes:{" "}
+																			</span>
+																			<span className="text-gray-900">
+																				{
+																					member.notes
+																				}
+																			</span>
+																		</div>
+																	)}
 																</div>
 															</CardContent>
 														</Card>

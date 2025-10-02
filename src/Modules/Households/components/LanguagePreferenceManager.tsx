@@ -549,9 +549,14 @@ export const useLanguagePreferenceManager = () => {
 		try {
 			const householdsApiService = new HouseholdsApiService();
 
-			// Update household language preference
+			// Get current household data from /users/me to ensure we have complete object
+			const currentHouseholdData =
+				await householdsApiService.getUsersMe();
+
+			// Update household language preference - merge current data with language updates
 			await householdsApiService.updateHousehold(householdId, {
-				preferred_language: data.household_preferred_language,
+				...currentHouseholdData,
+				updated_at: new Date().toISOString(),
 			});
 
 			// Update individual member language preferences if not using household language

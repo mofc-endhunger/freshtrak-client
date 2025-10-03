@@ -308,7 +308,8 @@ export class HouseholdCacheService {
    * Members are managed through the household update process.
    */
   async addMember(householdId: number, data: any): Promise<HouseholdMember> {
-    // TODO: Implement when API supports individual member operations
+    // NOTE: Individual member operations are not supported by the current API
+    // This feature requires backend API support for per-member CRUD operations
     throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
   }
 
@@ -318,7 +319,8 @@ export class HouseholdCacheService {
    * Members are managed through the household update process.
    */
   async updateMember(householdId: number, memberId: number, data: any): Promise<HouseholdMember> {
-    // TODO: Implement when API supports individual member operations
+    // NOTE: Individual member operations are not supported by the current API
+    // This feature requires backend API support for per-member CRUD operations
     throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
   }
 
@@ -328,7 +330,8 @@ export class HouseholdCacheService {
    * Members are managed through the household update process.
    */
   async deleteMember(householdId: number, memberId: number): Promise<void> {
-    // TODO: Implement when API supports individual member operations
+    // NOTE: Individual member operations are not supported by the current API
+    // This feature requires backend API support for per-member CRUD operations
     throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
   }
 

@@ -98,9 +98,7 @@ const AccountPage: React.FC = () => {
 		};
 
 		fetchHouseholdData();
-		//TODO: check the dependency array
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user?.email]);
+	}, [user?.email, householdsApiService]);
 
 	/**
 	 * Navigate to household setup wizard (full page)

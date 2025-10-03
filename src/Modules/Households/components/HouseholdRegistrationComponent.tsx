@@ -5,7 +5,7 @@
  * for household setup instead of event registration.
  */
 
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../Authentication/AuthContext";
 
@@ -24,9 +24,6 @@ import { ApiHouseholdMember } from "../types/api.types";
 // Utility imports
 import { formatDateForServer } from "../../../Utils/DateFormat";
 import localization from "../../Localization/LocalizationComponent";
-
-// Third-party library imports
-// import "@one-platform/opc-timeline"; // Temporarily disabled due to offsetWidth error
 
 // Type imports
 import {
@@ -53,6 +50,9 @@ const HouseholdRegistrationComponent: React.FC<
 		watch,
 		setValue,
 	} = useForm<RegistrationFormData>({ mode: "onChange" });
+
+	// Memoized API service instance
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
 	// Create a wrapper function for watch to match child component expectations
 	const watchField = watch;
@@ -103,7 +103,6 @@ const HouseholdRegistrationComponent: React.FC<
 
 			return `${monthStr}/${dayStr}/${yearStr}`;
 		} catch (error) {
-			console.warn("Date conversion failed:", error);
 			return "";
 		}
 	};
@@ -112,7 +111,6 @@ const HouseholdRegistrationComponent: React.FC<
 	useEffect(() => {
 		const fetchUserData = async () => {
 			try {
-				const householdsApiService = new HouseholdsApiService();
 				const userData = await householdsApiService.getUsersMe();
 
 				// Pre-populate primary member data
@@ -142,54 +140,7 @@ const HouseholdRegistrationComponent: React.FC<
 		};
 
 		fetchUserData();
-	}, [setValue]);
-
-	// Timeline configuration temporarily disabled due to offsetWidth error
-	/*
-	const configureTimeLine = (): void => {
-		try {
-			const timeline = document.querySelector(
-				"#timeline"
-			) as HTMLElement & {
-				steps?: string[];
-			};
-			if (timeline && timeline.steps !== undefined) {
-				const steps = [
-					"Your Details",
-					"Your Address Details",
-					"Your Family Details",
-					"Contact Information",
-				];
-
-				// Add family member details step if there are additional members
-				if (hasAdditionalMembers) {
-					steps.splice(3, 0, "Family Member Details");
-				}
-
-				timeline.steps = steps;
-				setTimelineReady(true);
-			}
-		} catch (error) {
-			console.warn("Timeline configuration failed:", error);
-		}
-	};
-
-	useEffect(() => {
-		configureTimeLine();
-	}, [hasAdditionalMembers]);
-
-	useEffect(() => {
-		configureTimeLine();
-	}, [formStep]);
-
-	// Initialize timeline after component mount
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			configureTimeLine();
-		}, 100);
-		return () => clearTimeout(timer);
-	}, []);
-	*/
+	}, [setValue, householdsApiService]);
 
 	useEffect(() => {
 		// Pre-populate form with auth user data if available

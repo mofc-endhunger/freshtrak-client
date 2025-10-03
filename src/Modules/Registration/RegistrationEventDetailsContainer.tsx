@@ -103,12 +103,12 @@ const RegistrationEventDetailsContainer: React.FC<
 
 			// Get guest authentication
 			const resp = await axios.post(GUEST_AUTH);
-			const { guestId, token, type } = resp.data;
+			const { user_id, token, expires_at } = resp.data;
 
 			// Store guest authentication data
 			localStorage.setItem("userToken", token);
-			localStorage.setItem("guestId", guestId);
-			localStorage.setItem("guestType", type);
+			localStorage.setItem("user_id", user_id);
+			localStorage.setItem("expires_at", expires_at);
 			localStorage.setItem("isLoggedIn", "true");
 
 			// Fetch user profile
@@ -121,8 +121,8 @@ const RegistrationEventDetailsContainer: React.FC<
 			const userProfile = {
 				id,
 				role,
-				guestId,
-				type,
+				user_id,
+				expires_at,
 			};
 			localStorage.setItem("userProfile", JSON.stringify(userProfile));
 

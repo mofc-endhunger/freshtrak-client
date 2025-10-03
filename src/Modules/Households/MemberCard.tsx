@@ -399,17 +399,14 @@ export const MemberCard: React.FC<MemberCardProps> = ({
 export const useMemberCard = () => {
 	const handleEditMember = (member: HouseholdMember) => {
 		// Navigate to edit member form or open edit modal
-		console.log("Edit member:", member);
 	};
 
 	const handleViewMemberDetails = (member: HouseholdMember) => {
 		// Navigate to member details page or open details modal
-		console.log("View member details:", member);
 	};
 
 	const handleDeleteMember = (member: HouseholdMember) => {
 		// Show confirmation dialog and delete member
-		console.log("Delete member:", member);
 	};
 
 	return {

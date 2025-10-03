@@ -31,7 +31,6 @@ import {
 	Clock,
 } from "lucide-react";
 import { HouseholdMember } from "../types/household.types";
-import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 
 interface MemberStatusManagerProps {
 	member: HouseholdMember;
@@ -65,8 +64,6 @@ export const MemberStatusManager: React.FC<MemberStatusManagerProps> = ({
 	const [pendingAction, setPendingAction] =
 		useState<StatusChangeAction | null>(null);
 
-	const householdsApiService = new HouseholdsApiService();
-
 	const getStatusChangeAction = (): StatusChangeAction => {
 		if (member.status === "active") {
 			return {
@@ -96,7 +93,8 @@ export const MemberStatusManager: React.FC<MemberStatusManagerProps> = ({
 
 		setIsLoading(true);
 		try {
-			// TODO: Implement when API supports individual member operations
+			// NOTE: Individual member status changes are not supported by the current API
+			// This feature requires backend API support for per-member status operations
 			throw new Error(
 				"Individual member status changes are not supported by the current API. Use household update instead."
 			);
@@ -278,7 +276,8 @@ export const useMemberStatusManager = () => {
 	): Promise<HouseholdMember> => {
 		setIsLoading(true);
 		try {
-			// TODO: Implement when API supports individual member operations
+			// NOTE: Individual member status changes are not supported by the current API
+			// This feature requires backend API support for per-member status operations
 			throw new Error(
 				"Individual member status changes are not supported by the current API. Use household update instead."
 			);

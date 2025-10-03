@@ -3,7 +3,7 @@
  * Manages household address, language preference, and notes editing
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -97,7 +97,8 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-	const householdsApiService = new HouseholdsApiService();
+	// Memoized API service instance
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 	const { getHouseholdId } = useHouseholdSignUpIntegration();
 
 	const {

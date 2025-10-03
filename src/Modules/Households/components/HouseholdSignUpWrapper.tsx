@@ -3,7 +3,7 @@
  * Integrates household setup with the existing sign-up process
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../../Authentication/AuthContext";
 import { HouseholdSetupOffer } from "./HouseholdSetupOffer";
 import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegration";
@@ -31,8 +31,8 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	const { offerHouseholdSetup, deferHouseholdSetup, isNewUserSignUp } =
 		useHouseholdSignUpIntegration();
 
-	// Initialize API service
-	const householdsApiService = new HouseholdsApiService();
+	// Memoized API service instance
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
 	// Check if we should show household setup offer
 	useEffect(() => {
@@ -96,19 +96,9 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 				children_in_household: undefined,
 			};
 
-			console.log(
-				"📤 POST /users (setup later) - Request data:",
-				JSON.stringify(minimalUserData, null, 2)
-			);
-
 			// Create user via POST API call
 			const response = await householdsApiService.createHousehold(
 				minimalUserData
-			);
-
-			console.log(
-				"📥 POST /users (setup later) - Response data:",
-				JSON.stringify(response.data, null, 2)
 			);
 
 			// Store user ID and household ID in localStorage

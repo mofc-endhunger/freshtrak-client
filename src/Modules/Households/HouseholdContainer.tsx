@@ -12,7 +12,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../Authentication/AuthContext";
 import { HouseholdDashboard } from "./HouseholdDashboard";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import { ApiHouseholdMember } from "./types/api.types";
 import { Household } from "./types/household.types";
 import HouseholdRegistrationComponent from "./components/HouseholdRegistrationComponent";
 import { AuthGuard } from "./components/AuthGuard";
@@ -78,7 +77,6 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							senior_count: 0,
 						};
 
-						console.log("Creating initial household...");
 						const response =
 							await householdsApiService.createHousehold(
 								initialHouseholdData
@@ -92,9 +90,6 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 
 						// Now show setup wizard for additional details
 						setShowSetupWizard(true);
-						console.log(
-							"Initial household created, showing setup wizard"
-						);
 					} catch (error: any) {
 						console.error(
 							"Error creating initial household:",
@@ -133,7 +128,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 		};
 
 		loadHouseholdData();
-	}, [isAuthenticated, user, householdsApiService]);
+	}, [isAuthenticated, user, householdsApiService, searchParams]);
 
 	// Handle household update
 	const handleHouseholdUpdate = async (householdData: any) => {

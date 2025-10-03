@@ -3,7 +3,7 @@
  * Manages language preferences for households and individual members
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../../../components/ui/button";
 import {
@@ -541,14 +541,15 @@ export const LanguagePreferenceManager: React.FC<
 export const useLanguagePreferenceManager = () => {
 	const [isLoading, setIsLoading] = useState(false);
 
+	// Memoized API service instance
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
+
 	const updateLanguagePreferences = async (
 		householdId: number,
 		data: LanguagePreferenceData
 	): Promise<void> => {
 		setIsLoading(true);
 		try {
-			const householdsApiService = new HouseholdsApiService();
-
 			// Get current household data from /users/me to ensure we have complete object
 			const currentHouseholdData =
 				await householdsApiService.getUsersMe();
@@ -561,7 +562,8 @@ export const useLanguagePreferenceManager = () => {
 
 			// Update individual member language preferences if not using household language
 			if (!data.use_household_language_for_all) {
-				// TODO: Implement when API supports individual member operations
+				// NOTE: Individual member language preferences are not supported by the current API
+				// This feature requires backend API support for per-member language settings
 				throw new Error(
 					"Individual member language preferences are not supported by the current API. Use household language setting instead."
 				);

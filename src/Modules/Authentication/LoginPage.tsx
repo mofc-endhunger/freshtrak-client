@@ -43,12 +43,11 @@ const LoginPage: React.FC = () => {
 
 			// Get guest authentication
 			const resp = await axios.post(GUEST_AUTH);
-			const { guestId, token, type } = resp.data;
+			const { user_id, token, expires_at } = resp.data;
 
 			// Store guest authentication data
 			localStorage.setItem("userToken", token);
-			localStorage.setItem("guestId", guestId);
-			localStorage.setItem("guestType", type);
+			localStorage.setItem("userId", user_id);
 			localStorage.setItem("isLoggedIn", "true");
 
 			// Fetch user profile
@@ -61,8 +60,8 @@ const LoginPage: React.FC = () => {
 			const userProfile = {
 				id,
 				role,
-				guestId,
-				type,
+				guestId: user_id,
+				type: expires_at,
 			};
 			localStorage.setItem("userProfile", JSON.stringify(userProfile));
 

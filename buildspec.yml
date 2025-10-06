@@ -1,11 +1,29 @@
 version: 0.2
+
 phases:
-    install:
-        runtime-versions:
-            nodejs: 20
-        commands:
-            - npm install -g yarn
-    build:
-        commands:
-            - echo "Starting ${BUILD_PHASE} deploy using node $(node --version), yarn $(yarn --version)"
-            - ./deploy.sh $BUILD_PHASE
+  install:
+    runtime-versions:
+      nodejs: 20
+    on-failure: ABORT
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY
+  build:
+    on-failure: ABORT
+    commands:
+      - docker build -t $IMAGE:$CODEBUILD_BUILD_NUMBER --target $TARGET .
+      - docker tag $IMAGE:$CODEBUILD_BUILD_NUMBER $REPOSITORY/$IMAGE:$IMAGE_TAG
+      - docker tag $IMAGE:$CODEBUILD_BUILD_NUMBER $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER
+  post_build:
+    on-failure: ABORT
+    commands:
+      - docker push $REPOSITORY/$IMAGE:$IMAGE_TAG
+      - docker push $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER
+      - printf '[{"name":"app","imageUri":"%s"}]' $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER > imagedefinitions.json
+      - printf '[{"imageUri":"%s"}]' $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER > imageDetail.json
+
+artifacts:
+  files:
+    - ./imagedefinitions.json
+    - ./imageDetail.json

@@ -1,4 +1,4 @@
-FROM nginx:alpine
+FROM nginx:alpine as production
 
 # Create a simple index.html with "hello world"
 RUN echo '<html><body><h1>Hello World</h1></body></html>' > /usr/share/nginx/html/index.html

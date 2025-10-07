@@ -1,71 +1,10 @@
-# Base stage for all environments
-FROM node:20-alpine AS base
+FROM nginx:alpine
 
-WORKDIR /app
+# Create a simple index.html with "hello world"
+RUN echo '<html><body><h1>Hello World</h1></body></html>' > /usr/share/nginx/html/index.html
 
-# Copy package files
-COPY package*.json ./
-
-# Development stage
-FROM base AS development
-
-# Install git (needed for some npm packages)
-RUN apk add --no-cache git
-
-# Install all dependencies (including devDependencies)
-RUN npm ci
-
-# Copy application code
-COPY . .
-
-# Expose port
-EXPOSE 3000
-
-# Start in development mode with hot reload
-CMD ["npm", "start"]
-
-# Builder stage for production
-FROM base AS builder
-
-# Install git (needed for some npm packages)
-RUN apk add --no-cache git
-
-# Install all dependencies (needed for build)
-RUN npm ci
-
-# Copy application code
-COPY . .
-
-# Build the application
-RUN npm run build:production
-
-# Production stage
-FROM nginx:alpine AS production
-
-WORKDIR /usr/share/nginx/html
-
-# Remove default nginx static assets
-RUN rm -rf ./*
-
-# Copy built application from builder stage
-COPY --from=builder /app/build .
-
-# Copy nginx configuration for SPA routing
-RUN echo 'server { \
-    listen 80; \
-    location / { \
-        root /usr/share/nginx/html; \
-        index index.html; \
-        try_files $uri $uri/ /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
-
-# Expose port
+# Expose port 80
 EXPOSE 80
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

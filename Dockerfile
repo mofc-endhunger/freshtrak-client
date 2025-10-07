@@ -8,21 +8,21 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
 # Create custom nginx config for ECS ALB health checks
-RUN echo 'server { \n\
-    listen 80; \n\
-    server_name _; \n\
-    \n\
-    location / { \n\
-        root /usr/share/nginx/html; \n\
-        index index.html; \n\
-    } \n\
-    \n\
-    location /health { \n\
-        access_log off; \n\
-        return 200 "OK"; \n\
-        add_header Content-Type text/plain; \n\
-    } \n\
-}' > /etc/nginx/conf.d/default.conf
+RUN printf 'server {\n' > /etc/nginx/conf.d/default.conf && \
+    printf '    listen 80;\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '    server_name _;\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '    location / {\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '        root /usr/share/nginx/html;\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '        index index.html;\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '    }\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '    location /health {\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '        access_log off;\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '        return 200 "OK";\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '        add_header Content-Type text/plain;\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '    }\n' >> /etc/nginx/conf.d/default.conf && \
+    printf '}\n' >> /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80

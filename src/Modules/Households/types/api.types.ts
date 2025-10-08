@@ -30,8 +30,7 @@ export interface UsersMeResponse {
   deleted_by: number | null;
   deleted_on: string | null;
   members: ApiHouseholdMember[];
-  created_at: string | null;
-  updated_at: string;
+  updated_at: string; // API still returns this field
   counts: {
     seniors: number;
     adults: number;
@@ -62,8 +61,6 @@ export interface ApiHouseholdMember {
   added_by: string;
   gender_id: number | null;
   suffix_id: number | null;
-  created_at: string | null;
-  updated_at: string | null;
 }
 
 // Household API responses

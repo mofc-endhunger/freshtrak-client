@@ -192,10 +192,6 @@ export const MemberList: React.FC<MemberListProps> = ({
 					aValue = a.status;
 					bValue = b.status;
 					break;
-				case "created_at":
-					aValue = new Date(a.created_at);
-					bValue = new Date(b.created_at);
-					break;
 				default:
 					return 0;
 			}

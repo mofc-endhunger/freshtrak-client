@@ -181,14 +181,16 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				await householdsApiService.getUsersMe();
 
 			// Prepare update data - merge current data with address updates
+			// Exclude updated_at from the request
+			const { updated_at, ...currentDataWithoutTimestamp } =
+				currentHouseholdData;
 			const updateData = {
-				...currentHouseholdData,
+				...currentDataWithoutTimestamp,
 				address_line_1: data.address_line_1 || null,
 				address_line_2: data.address_line_2 || null,
 				city: data.city || null,
 				state: data.state || null,
 				zip_code: data.zip_code || null,
-				updated_at: new Date().toISOString(),
 			};
 
 			// Optimistic update

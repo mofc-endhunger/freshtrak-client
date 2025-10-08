@@ -34,8 +34,6 @@ export const mockHouseholdMembers: HouseholdMember[] = [
     status: 'active',
     is_freshtrak_user: true,
     is_active: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
     head_of_household: true,
   },
   {
@@ -51,8 +49,6 @@ export const mockHouseholdMembers: HouseholdMember[] = [
     status: 'active',
     is_freshtrak_user: false,
     is_active: true,
-    created_at: '2024-01-15T10:05:00Z',
-    updated_at: '2024-01-15T10:05:00Z',
     head_of_household: false,
   },
   {
@@ -68,8 +64,6 @@ export const mockHouseholdMembers: HouseholdMember[] = [
     status: 'active',
     is_freshtrak_user: false,
     is_active: true,
-    created_at: '2024-01-15T10:10:00Z',
-    updated_at: '2024-01-15T10:10:00Z',
     head_of_household: false,
   },
   {
@@ -83,8 +77,6 @@ export const mockHouseholdMembers: HouseholdMember[] = [
     status: 'active',
     is_freshtrak_user: false,
     is_active: true,
-    created_at: '2024-01-15T10:15:00Z',
-    updated_at: '2024-01-15T10:15:00Z',
     head_of_household: false,
   },
 ];
@@ -114,8 +106,6 @@ export const mockHousehold: Household = {
   zip_code: '43026',
   preferred_language: 'en' as LanguagePreference,
   notes: 'Family of four living in Hilliard',
-  created_at: '2024-01-15T10:00:00Z',
-  updated_at: '2024-01-15T10:00:00Z',
   members: mockHouseholdMembers,
   counts: mockHouseholdCounts,
 };
@@ -151,8 +141,6 @@ export const mockUpdateHouseholdRequest: UpdateHouseholdRequest = {
   deleted_by: null,
   deleted_on: null,
   members: [],
-  created_at: "2024-01-15T10:00:00Z",
-  updated_at: new Date().toISOString(),
   counts: {
     seniors: 1,
     adults: 2,
@@ -207,8 +195,6 @@ export const mockHouseholds: Household[] = [
     zip_code: '43017',
     preferred_language: 'es' as LanguagePreference,
     notes: 'Spanish-speaking household',
-    created_at: '2024-01-20T14:30:00Z',
-    updated_at: '2024-01-20T14:30:00Z',
     members: [
       {
         id: 5,
@@ -223,8 +209,6 @@ export const mockHouseholds: Household[] = [
         status: 'active',
         is_freshtrak_user: true,
         is_active: true,
-        created_at: '2024-01-20T14:30:00Z',
-        updated_at: '2024-01-20T14:30:00Z',
         head_of_household: true,
       },
     ],
@@ -305,8 +289,6 @@ export const mockIncompleteHousehold: Partial<Household> = {
   zip_code: '43001',
   // Missing preferred_language
   // Missing members
-  created_at: '2024-01-25T09:00:00Z',
-  updated_at: '2024-01-25T09:00:00Z',
 };
 
 /**
@@ -325,8 +307,6 @@ export const mockDiverseMember: HouseholdMember = {
   status: 'active',
   is_freshtrak_user: false,
   is_active: true,
-  created_at: '2024-01-25T11:00:00Z',
-  updated_at: '2024-01-25T11:00:00Z',
   head_of_household: false,
 };
 
@@ -344,8 +324,6 @@ export const mockLargeHousehold: Household = {
   zip_code: '43081',
   preferred_language: 'en' as LanguagePreference,
   notes: 'Large family household',
-  created_at: '2024-01-30T08:00:00Z',
-  updated_at: '2024-01-30T08:00:00Z',
   members: [
     {
       id: 7,
@@ -360,8 +338,6 @@ export const mockLargeHousehold: Household = {
       status: 'active',
       is_freshtrak_user: true,
       is_active: true,
-      created_at: '2024-01-30T08:00:00Z',
-      updated_at: '2024-01-30T08:00:00Z',
       head_of_household: true,
     },
     {
@@ -377,8 +353,6 @@ export const mockLargeHousehold: Household = {
       status: 'active',
       is_freshtrak_user: false,
       is_active: true,
-      created_at: '2024-01-30T08:05:00Z',
-      updated_at: '2024-01-30T08:05:00Z',
       head_of_household: false,
     },
     {
@@ -392,8 +366,6 @@ export const mockLargeHousehold: Household = {
       status: 'active',
       is_freshtrak_user: false,
       is_active: true,
-      created_at: '2024-01-30T08:10:00Z',
-      updated_at: '2024-01-30T08:10:00Z',
       head_of_household: false,
     },
     {
@@ -407,8 +379,6 @@ export const mockLargeHousehold: Household = {
       status: 'active',
       is_freshtrak_user: false,
       is_active: true,
-      created_at: '2024-01-30T08:15:00Z',
-      updated_at: '2024-01-30T08:15:00Z',
       head_of_household: false,
     },
     {
@@ -422,8 +392,6 @@ export const mockLargeHousehold: Household = {
       status: 'active',
       is_freshtrak_user: false,
       is_active: true,
-      created_at: '2024-01-30T08:20:00Z',
-      updated_at: '2024-01-30T08:20:00Z',
       head_of_household: false,
     },
   ],

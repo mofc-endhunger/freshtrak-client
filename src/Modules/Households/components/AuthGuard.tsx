@@ -1,12 +1,14 @@
 /**
  * Authentication Guard Component for Protected Routes
  * Protects account page and household creation/update routes from unauthorized access
- * Redirects to /login when Cognito access token is invalidated
+ * Automatically logs out users with expired tokens and redirects to /login
+ * Ensures complete cleanup of authentication state for security
  */
 
 import React, { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Authentication/AuthContext";
+import { validateToken } from "../../../Utils/TokenUtils";
 
 interface AuthGuardProps {
 	children: ReactNode;
@@ -27,9 +29,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 	showLoading = true,
 }) => {
 	const navigate = useNavigate();
-	const { user, isAuthenticated, isLoading } = useAuth();
+	const { user, isAuthenticated, isLoading, signOut } = useAuth();
 
-	// Check if Cognito access token is valid
+	// Check if Cognito access token is valid and handle expired tokens
 	useEffect(() => {
 		if (!isLoading && requireAuth) {
 			// If user is not authenticated or doesn't have a valid access token
@@ -41,29 +43,29 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 				return;
 			}
 
-			// Check if access token is expired (basic JWT expiration check)
-			try {
-				const token = user.accessToken;
-				const tokenParts = token.split(".");
-				if (tokenParts.length === 3) {
-					const payload = JSON.parse(atob(tokenParts[1]));
-					const currentTime = Math.floor(Date.now() / 1000);
+			// Validate token and check expiration
+			const tokenValidation = validateToken(user.accessToken);
 
-					if (payload.exp && payload.exp < currentTime) {
-						console.log(
-							"AuthGuard: Access token expired, redirecting to login"
-						);
-						navigate("/login", { replace: true });
-						return;
-					}
-				}
-			} catch (error) {
-				console.error("AuthGuard: Error validating token:", error);
+			if (!tokenValidation.isValid) {
+				console.log("AuthGuard: Invalid token format, logging out");
+				signOut();
 				navigate("/login", { replace: true });
 				return;
 			}
+
+			if (tokenValidation.isExpired) {
+				console.log(
+					"AuthGuard: Token expired, automatically logging out"
+				);
+				signOut();
+				navigate("/login", { replace: true });
+				return;
+			}
+
+			// Token is valid and not expired
+			console.log("AuthGuard: Token is valid");
 		}
-	}, [isAuthenticated, user, isLoading, requireAuth, navigate]);
+	}, [isAuthenticated, user, isLoading, requireAuth, navigate, signOut]);
 
 	// Show loading state while checking authentication
 	if (isLoading && showLoading) {

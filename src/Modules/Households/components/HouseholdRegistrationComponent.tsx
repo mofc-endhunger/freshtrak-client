@@ -460,8 +460,6 @@ const HouseholdRegistrationComponent: React.FC<
 						preferred_language: "en",
 						notes: "",
 						is_active: true,
-						created_at: new Date().toISOString(),
-						updated_at: new Date().toISOString(),
 						head_of_household: false,
 					});
 				}
@@ -496,8 +494,6 @@ const HouseholdRegistrationComponent: React.FC<
 						preferred_language: "en",
 						notes: "",
 						is_active: true,
-						created_at: new Date().toISOString(),
-						updated_at: new Date().toISOString(),
 						head_of_household: false,
 					});
 				}
@@ -532,8 +528,6 @@ const HouseholdRegistrationComponent: React.FC<
 						preferred_language: "en",
 						notes: "",
 						is_active: true,
-						created_at: new Date().toISOString(),
-						updated_at: new Date().toISOString(),
 						head_of_household: false,
 					});
 				}

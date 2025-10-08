@@ -17,8 +17,6 @@ export interface Household {
   zip_code: string;
   preferred_language: string;
   notes?: string;
-  created_at: string;
-  updated_at: string;
   members: HouseholdMember[];
   counts: HouseholdCounts;
 }
@@ -48,8 +46,6 @@ export interface HouseholdMember {
   preferred_language?: string;
   notes?: string;
   is_active: boolean;
-  created_at: string;
-  updated_at: string;
   head_of_household: boolean;
 }
 
@@ -126,8 +122,6 @@ export interface UpdateHouseholdRequest {
   deleted_by: number | null;
   deleted_on: string | null;
   members: ApiHouseholdMember[];
-  created_at: string | null;
-  updated_at: string;
   counts: {
     seniors: number;
     adults: number;

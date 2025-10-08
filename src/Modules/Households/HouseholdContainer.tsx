@@ -139,11 +139,12 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 			const currentHouseholdData =
 				await householdsApiService.getUsersMe();
 
-			// Merge current data with updates
+			// Merge current data with updates, excluding updated_at
+			const { updated_at, ...currentDataWithoutTimestamp } =
+				currentHouseholdData;
 			const updateData = {
-				...currentHouseholdData,
+				...currentDataWithoutTimestamp,
 				...householdData,
-				updated_at: new Date().toISOString(),
 			};
 
 			const response = await householdsApiService.updateHousehold(
@@ -168,8 +169,11 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				await householdsApiService.getUsersMe();
 
 			// Update only the fields that were changed, keeping the rest from current data
+			// Exclude updated_at from the request
+			const { updated_at, ...currentDataWithoutTimestamp } =
+				currentHouseholdData;
 			const updateData = {
-				...currentHouseholdData,
+				...currentDataWithoutTimestamp,
 				address_line_1: registrationData.address_line_1 || null,
 				address_line_2: registrationData.address_line_2 || null,
 				city: registrationData.city || null,
@@ -215,7 +219,6 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							date_of_birth:
 								registrationData.date_of_birth ||
 								updatedMembers[0].date_of_birth,
-							updated_at: new Date().toISOString(),
 						};
 					}
 
@@ -238,8 +241,6 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 								? Number(member.gender_id)
 								: null,
 							suffix_id: member.suffix_id || null,
-							created_at: null,
-							updated_at: new Date().toISOString(),
 						})
 					);
 
@@ -266,7 +267,6 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 								date_of_birth:
 									registrationData.date_of_birth ||
 									updatedMembers[0].date_of_birth,
-								updated_at: new Date().toISOString(),
 							};
 						}
 						const newMembers =
@@ -290,7 +290,6 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 						total: allMembers.length,
 					};
 				})(),
-				updated_at: new Date().toISOString(),
 			};
 
 			await householdsApiService.updateHousehold(

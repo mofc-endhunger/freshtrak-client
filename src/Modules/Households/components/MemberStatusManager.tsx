@@ -291,7 +291,7 @@ export const useMemberStatusManager = () => {
 		// For now, return basic status information
 		return {
 			currentStatus: member.status,
-			lastUpdated: member.updated_at,
+			lastUpdated: "N/A", // Timestamp no longer available in member object
 			canChangeStatus: true,
 		};
 	};

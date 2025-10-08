@@ -276,13 +276,11 @@ export class HouseholdCacheService {
     this.update(key, (household: Household) => ({
       ...household,
       ...data,
-      updated_at: new Date().toISOString(),
     }));
 
     this.update(currentKey, (household: Household) => ({
       ...household,
       ...data,
-      updated_at: new Date().toISOString(),
     }));
 
     try {

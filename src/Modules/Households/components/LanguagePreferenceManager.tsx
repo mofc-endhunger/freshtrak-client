@@ -555,9 +555,11 @@ export const useLanguagePreferenceManager = () => {
 				await householdsApiService.getUsersMe();
 
 			// Update household language preference - merge current data with language updates
+			// Exclude updated_at from the request
+			const { updated_at, ...currentDataWithoutTimestamp } =
+				currentHouseholdData;
 			await householdsApiService.updateHousehold(householdId, {
-				...currentHouseholdData,
-				updated_at: new Date().toISOString(),
+				...currentDataWithoutTimestamp,
 			});
 
 			// Update individual member language preferences if not using household language

@@ -8,6 +8,7 @@ import localization from "../Localization/LocalizationComponent";
 import { setCurrentLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
 import { useAuth } from "../Authentication/AuthContext";
+import { validateToken } from "../../Utils/TokenUtils";
 import { Button } from "../../components/ui/button";
 import {
 	Dialog,
@@ -52,7 +53,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const dispatch = useDispatch();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, user } = useAuth();
 
 	const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
 
@@ -116,13 +117,28 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	};
 
 	useEffect(() => {
-		// Check authentication status - simply check for cognitoUser
+		// Check authentication status - check for cognitoUser and valid token
 		const cognitoUser = localStorage.getItem("cognitoUser");
 
-		// Only set isLoggedIn to true for Cognito users
+		// Only set isLoggedIn to true for Cognito users with valid tokens
 		// Guest users and untracked users should see the login button
 		if (cognitoUser) {
-			setIsLoggedIn(true);
+			try {
+				const user = JSON.parse(cognitoUser);
+				// Check if user has a valid, non-expired access token
+				if (user?.accessToken) {
+					const tokenValidation = validateToken(user.accessToken);
+					// Only show as logged in if token is valid and not expired
+					setIsLoggedIn(
+						tokenValidation.isValid && !tokenValidation.isExpired
+					);
+				} else {
+					setIsLoggedIn(false);
+				}
+			} catch (error) {
+				console.error("Error parsing cognitoUser:", error);
+				setIsLoggedIn(false);
+			}
 		} else {
 			setIsLoggedIn(false);
 		}
@@ -139,7 +155,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		return () => {
 			window.removeEventListener("scroll", handleScroll);
 		};
-	}, [isAuthenticated]);
+	}, [isAuthenticated, user]);
 
 	// Get current page type and background state
 	const pageType = getPageType();

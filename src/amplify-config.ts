@@ -7,7 +7,7 @@ const amplifyConfig = {
     Cognito: {
       userPoolId: process.env.REACT_APP_USER_POOL_ID || 'us-east-1_demo123',
       userPoolClientId: process.env.REACT_APP_USER_POOL_CLIENT_ID || 'demo-client-id',
-      region: process.env.REACT_APP_AWS_REGION || 'us-east-1',
+      userPoolClientSecret: process.env.REACT_APP_USER_POOL_CLIENT_SECRET,
       loginWith: {
         email: true,
         username: false,
@@ -25,7 +25,6 @@ const amplifyConfig = {
     },
   },
 };
-
 // Configure Amplify
 Amplify.configure(amplifyConfig);
 

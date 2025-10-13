@@ -32,6 +32,48 @@ const RegistrationEventDetailsContainer: React.FC<
 	const event = useSelector(selectEvent) as Event;
 	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
 
+	// Consolidated authentication check function
+	const isUserAuthenticated = (): boolean => {
+		const cognitoUser = localStorage.getItem("cognitoUser");
+		const userProfile = localStorage.getItem("userProfile");
+
+		// Check if user has guest authentication with valid token
+		if (userProfile) {
+			try {
+				const userProfileData = JSON.parse(userProfile);
+				const expiresAt = new Date(userProfileData.expires_at);
+				const now = new Date();
+
+				// Check if token is not expired
+				if (expiresAt > now) {
+					return true;
+				} else {
+					// Token is expired, remove it from localStorage
+					localStorage.removeItem("userProfile");
+					return false;
+				}
+			} catch (error) {
+				console.warn("Could not parse userProfile:", error);
+				// Remove invalid userProfile from localStorage
+				localStorage.removeItem("userProfile");
+				return false;
+			}
+		}
+
+		// Check if user has Cognito authentication
+		if (cognitoUser) {
+			try {
+				const cognitoUserData = JSON.parse(cognitoUser);
+				return cognitoUserData.isSignedIn === true;
+			} catch (error) {
+				console.warn("Could not parse cognitoUser:", error);
+				return false;
+			}
+		}
+
+		return false;
+	};
+
 	useEffect(() => {
 		if (Object.keys(selectedEvent).length === 0 && !isError && !pageError) {
 			getEvent();
@@ -40,31 +82,11 @@ const RegistrationEventDetailsContainer: React.FC<
 
 	// Check authentication on component mount and hide modal if user is authenticated
 	useEffect(() => {
-		const cognitoUser = localStorage.getItem("cognitoUser");
-		const localUserToken = localStorage.getItem("userToken");
-		const guestId = localStorage.getItem("guestId");
-		const userProfile = localStorage.getItem("userProfile");
-
-		// Parse cognitoUser to check isSignedIn property
-		let isCognitoSignedIn = false;
-		if (cognitoUser) {
-			try {
-				const cognitoUserData = JSON.parse(cognitoUser);
-				isCognitoSignedIn = cognitoUserData.isSignedIn === true;
-			} catch (error) {
-				console.warn("Could not parse cognitoUser:", error);
-			}
-		}
-
-		const isUserAuthenticated =
-			(cognitoUser && isCognitoSignedIn) ||
-			(localUserToken && guestId && userProfile);
-
-		// If user is authenticated, hide the auth modal
-		if (isUserAuthenticated) {
+		if (isUserAuthenticated()) {
 			setshowAuthenticationModal(false);
 		}
-	}, [showAuthenticationModal]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const getEvent = async (): Promise<void> => {
 		try {
@@ -85,45 +107,17 @@ const RegistrationEventDetailsContainer: React.FC<
 		}
 	};
 
-	useEffect(() => {
-		const cognitoUser = localStorage.getItem("cognitoUser");
-		const isLoggedIn = localStorage.getItem("isLoggedIn");
-		if (cognitoUser && isLoggedIn === "true") {
-			setshowAuthenticationModal(false);
-		}
-	}, [showAuthenticationModal]);
-
 	const fetchUserToken = async (): Promise<void> => {
 		setLoading(true);
-		const { GUEST_AUTH, GUEST_USER } = API_URL;
 		try {
+			const { GUEST_USER } = API_URL;
+
 			// Clear Cognito authentication data when logging in as guest
 			localStorage.removeItem("cognitoUser");
-			localStorage.removeItem("isLoggedIn");
 
 			// Get guest authentication
-			const resp = await axios.post(GUEST_AUTH);
-			const { guestId, token, type } = resp.data;
-
-			// Store guest authentication data
-			localStorage.setItem("userToken", token);
-			localStorage.setItem("guestId", guestId);
-			localStorage.setItem("guestType", type);
-			localStorage.setItem("isLoggedIn", "true");
-
-			// Fetch user profile
-			const userResp = await axios.get(GUEST_USER, {
-				headers: { Authorization: `Bearer ${token}` },
-			});
-			const { id, role } = userResp.data;
-
-			// Store user profile with new structure
-			const userProfile = {
-				id,
-				role,
-				guestId,
-				type,
-			};
+			const resp = await axios.post(GUEST_USER);
+			const userProfile = resp.data;
 			localStorage.setItem("userProfile", JSON.stringify(userProfile));
 
 			setLoading(false);
@@ -143,30 +137,8 @@ const RegistrationEventDetailsContainer: React.FC<
 	};
 
 	const getUserToken = (): void => {
-		// Check if user is authenticated with Cognito
-		const cognitoUser = localStorage.getItem("cognitoUser");
-
-		// Check if user is authenticated as guest
-		const localUserToken = localStorage.getItem("userToken");
-		const guestId = localStorage.getItem("guestId");
-		const userProfile = localStorage.getItem("userProfile");
-
-		// Parse cognitoUser to check isSignedIn property
-		let isCognitoSignedIn = false;
-		if (cognitoUser) {
-			try {
-				const cognitoUserData = JSON.parse(cognitoUser);
-				isCognitoSignedIn = cognitoUserData.isSignedIn === true;
-			} catch (error) {
-				console.warn("Could not parse cognitoUser:", error);
-			}
-		}
-
-		// If user is authenticated with either Cognito or guest, proceed to registration
-		if (
-			(cognitoUser && isCognitoSignedIn) ||
-			(localUserToken && guestId && userProfile)
-		) {
+		// If user is authenticated, proceed to registration
+		if (isUserAuthenticated()) {
 			setshowAuthenticationModal(false);
 
 			// Navigate to registration form
@@ -186,33 +158,12 @@ const RegistrationEventDetailsContainer: React.FC<
 			: setshowAuthenticationModal(true);
 	};
 
-	// Check if user is authenticated to determine if auth modal should show
-	const cognitoUser = localStorage.getItem("cognitoUser");
-	const localUserToken = localStorage.getItem("userToken");
-	const guestId = localStorage.getItem("guestId");
-	const userProfile = localStorage.getItem("userProfile");
-
-	// Parse cognitoUser to check isSignedIn property
-	let isCognitoSignedIn = false;
-	if (cognitoUser) {
-		try {
-			const cognitoUserData = JSON.parse(cognitoUser);
-			isCognitoSignedIn = cognitoUserData.isSignedIn === true;
-		} catch (error) {
-			console.warn("Could not parse cognitoUser:", error);
-		}
-	}
-
-	const isUserAuthenticated =
-		(cognitoUser && isCognitoSignedIn) ||
-		(localUserToken && guestId && userProfile);
-
 	return (
 		<Fragment>
 			{isLoading && <SpinnerComponent />}
 
 			{/* Only show auth modal if user is not authenticated AND modal should show */}
-			{!isUserAuthenticated && showAuthenticationModal && (
+			{!isUserAuthenticated() && showAuthenticationModal && (
 				<AuthenticationModalComponent
 					show={showAuthenticationModal}
 					setshow={setshowAuthenticationModal}

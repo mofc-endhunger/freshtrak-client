@@ -162,8 +162,32 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				}
 			}
 
+			// Check if user has guest authentication with valid token
+			let isGuestAuthenticated = false;
+			if (userProfile) {
+				try {
+					const userProfileData = JSON.parse(userProfile);
+					const expiresAt = new Date(userProfileData.expires_at);
+					const now = new Date();
+
+					// Check if token is not expired
+					if (expiresAt > now) {
+						isGuestAuthenticated = true;
+					} else {
+						// Token is expired, remove it from localStorage
+						localStorage.removeItem("userProfile");
+					}
+				} catch (error) {
+					console.warn("Could not parse userProfile:", error);
+					// Remove invalid userProfile from localStorage
+					localStorage.removeItem("userProfile");
+				}
+			}
+
 			const isUserAuthenticated =
-				token || (cognitoUser && isCognitoSignedIn);
+				token ||
+				isGuestAuthenticated ||
+				(cognitoUser && isCognitoSignedIn);
 
 			if (!isUserAuthenticated) {
 				setShowAuthModal(true);

@@ -10,7 +10,7 @@ export const API_URL = {
 	EVENT_URL: BASE_URL + "api/events",
 	EVENT_DATES_URL: BASE_URL + "api/event_dates",
 	AGENCY_EVENTS: `${BASE_URL}api/agencies`,
-	GUEST_AUTH: `${REGISTRATION_URL}api/auth/guest`,
+	//GUEST_AUTH: `${REGISTRATION_URL}api/auth/guest`,
 	GUEST_USER: `${REGISTRATION_URL}api/guest-authentications`,
 	CREATE_RESERVATION: `${REGISTRATION_URL}api/registrations`,
 	TWILIO_SMS: `${REGISTRATION_URL}twilio/sms`,

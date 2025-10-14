@@ -90,11 +90,26 @@ const LoginPage: React.FC = () => {
 	};
 
 	/**
-	 * Handles successful confirmation - redirect to home
+	 * Handles successful confirmation - redirect to home or household setup
 	 */
 	const handleConfirmSuccess = (): void => {
 		setErrorMessage("");
+
+		// Mark this user as a new user who just completed email confirmation
+		// This will trigger the household setup offer in HouseholdSignUpWrapper
+		if (pendingEmail) {
+			const flagData = {
+				email: pendingEmail,
+				timestamp: Date.now(),
+				completed: true,
+			};
+
+			// Store a flag to indicate this is a new user sign-up
+			localStorage.setItem("new_user_signup", JSON.stringify(flagData));
+		}
+
 		// Redirect to home page after successful confirmation
+		// Note: Household setup will be offered via HouseholdSignUpWrapper
 		navigate("/");
 	};
 

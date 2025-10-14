@@ -6,6 +6,28 @@
 // ============================================================================
 
 /**
+ * Family member data interface for household setup
+ */
+export interface FamilyMemberData {
+  first_name: string;
+  last_name: string;
+  middle_name?: string;
+  gender_id: number; // 1 for male, 2 for female, 3 for other, 4 for prefer_not_to_say
+  date_of_birth: string;
+  suffix_id?: number;
+}
+
+/**
+ * Household counts interface
+ */
+export interface HouseholdCounts {
+  seniors: number;
+  adults: number;
+  children: number;
+  total: number;
+}
+
+/**
  * Registration form data interface
  * Represents the complete user registration form data
  */
@@ -41,6 +63,11 @@ export interface RegistrationFormData {
   seniors_in_household: number;
   adults_in_household: number;
   children_in_household: number;
+
+  // Family Members (for household setup)
+  family_members?: FamilyMemberData[];
+  household_counts?: HouseholdCounts;
+  deleted_member_ids?: number[];
 
   // Additional Information
   license_plate?: string;

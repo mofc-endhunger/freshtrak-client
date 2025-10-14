@@ -15,6 +15,10 @@ export const API_URL = {
 	CREATE_RESERVATION: `${REGISTRATION_URL}api/registrations`,
 	TWILIO_SMS: `${REGISTRATION_URL}twilio/sms`,
 	SEND_EMAIL: `${REGISTRATION_URL}twilio/email`,
+	// Household endpoints
+	HOUSEHOLDS: `${REGISTRATION_URL}households`,
+	HOUSEHOLD_MEMBERS: householdId =>
+		`${REGISTRATION_URL}households/${householdId}/members`,
 };
 
 export const RENDER_URL = {

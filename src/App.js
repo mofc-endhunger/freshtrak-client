@@ -2,6 +2,7 @@ import React from "react";
 import AppRoutes from "./Core/Routes";
 import { useSelector } from "react-redux";
 import { AuthProvider } from "./Modules/Authentication/AuthContext";
+import { HouseholdSignUpWrapper } from "./Modules/Households/components/HouseholdSignUpWrapper";
 import "./amplify-config";
 
 // import "./Assets/scss/main.scss";
@@ -14,7 +15,9 @@ const App = () => {
 		<div className="App">
 			<div className="main-wrapper">
 				<AuthProvider>
-					<AppRoutes language={language} />
+					<HouseholdSignUpWrapper>
+						<AppRoutes language={language} />
+					</HouseholdSignUpWrapper>
 				</AuthProvider>
 			</div>
 		</div>

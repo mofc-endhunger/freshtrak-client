@@ -86,8 +86,13 @@ describe("HomeContainer", () => {
 		);
 	};
 
-	it("renders the component with correct heading and form", () => {
+	it("renders the component with correct heading and form", async () => {
 		renderWithProvider();
+
+		// Wait for initial loading to finish
+		await waitFor(() => {
+			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+		});
 
 		expect(screen.getByText("Zip Code")).toBeInTheDocument();
 		expect(
@@ -116,6 +121,12 @@ describe("HomeContainer", () => {
 		renderWithProvider();
 
 		const zipInput = screen.getByPlaceholderText("Enter zip code");
+
+		// Wait for loading to finish, then find the search button
+		await waitFor(() => {
+			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+		});
+
 		const searchButton = screen.getByRole("button", { name: "Search" });
 
 		// Fill in the form
@@ -129,6 +140,11 @@ describe("HomeContainer", () => {
 
 	it("shows validation error for empty zip code", async () => {
 		renderWithProvider();
+
+		// Wait for loading to finish, then find the search button
+		await waitFor(() => {
+			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+		});
 
 		const searchButton = screen.getByRole("button", { name: "Search" });
 		fireEvent.click(searchButton);
@@ -148,6 +164,12 @@ describe("HomeContainer", () => {
 		renderWithProvider();
 
 		const zipInput = screen.getByPlaceholderText("Enter zip code");
+
+		// Wait for loading to finish, then find the search button
+		await waitFor(() => {
+			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+		});
+
 		const searchButton = screen.getByRole("button", { name: "Search" });
 
 		fireEvent.change(zipInput, { target: { value: "67890" } });
@@ -167,6 +189,11 @@ describe("HomeContainer", () => {
 
 		renderWithProvider();
 
+		// Wait for initial loading to finish
+		await waitFor(() => {
+			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+		});
+
 		const zipInput = screen.getByPlaceholderText("Enter zip code");
 		const searchButton = screen.getByRole("button", { name: "Search" });
 
@@ -184,6 +211,11 @@ describe("HomeContainer", () => {
 		mockAxios.get.mockRejectedValueOnce(new Error("API Error"));
 
 		renderWithProvider();
+
+		// Wait for initial loading to finish
+		await waitFor(() => {
+			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+		});
 
 		const zipInput = screen.getByPlaceholderText("Enter zip code");
 		const searchButton = screen.getByRole("button", { name: "Search" });
@@ -228,8 +260,13 @@ describe("HomeContainer", () => {
 		);
 	});
 
-	it("renders form with shadcn components", () => {
+	it("renders form with shadcn components", async () => {
 		renderWithProvider();
+
+		// Wait for loading to finish
+		await waitFor(() => {
+			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+		});
 
 		// Check that Label component is used
 		const label = screen.getByText("Zip Code");

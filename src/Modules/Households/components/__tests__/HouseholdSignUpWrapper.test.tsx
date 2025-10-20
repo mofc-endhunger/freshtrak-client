@@ -22,6 +22,7 @@ jest.mock("../../services/HouseholdSignUpIntegration", () => ({
 		createHousehold: jest.fn(),
 		skipHouseholdSetup: jest.fn(),
 		deferHouseholdSetup: jest.fn(),
+		isNewUserSignUp: jest.fn(() => false),
 	}),
 }));
 
@@ -148,6 +149,7 @@ describe("HouseholdSignUpWrapper Integration", () => {
 				createHousehold: mockCreateHousehold,
 				skipHouseholdSetup: mockSkipHouseholdSetup,
 				deferHouseholdSetup: mockDeferHouseholdSetup,
+				isNewUserSignUp: jest.fn(() => false),
 			}),
 		}));
 

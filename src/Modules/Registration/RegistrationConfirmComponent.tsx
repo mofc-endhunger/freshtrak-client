@@ -1,15 +1,14 @@
 import * as React from "react";
 import { Fragment, useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { API_URL, RENDER_URL, BASE_URL } from "../../Utils/Urls";
+import { RENDER_URL, BASE_URL } from "../../Utils/Urls";
 import axios from "axios";
 import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
-import { setCurrentUser, selectUser } from "../../Store/userSlice";
+import { selectUser } from "../../Store/userSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDateDayAndDate } from "../../Utils/DateFormat";
 import { Link } from "react-router-dom";
 import { EventFormat } from "../../Utils/EventHandler";
-import { formatMMDDYYYY } from "../../Utils/DateFormat";
 import EventCardComponent from "../Events/EventCardComponent";
 import QRCode from "react-qr-code";
 import { Button } from "../../components/ui/button";
@@ -28,7 +27,6 @@ import {
 	RegistrationConfirmProps,
 	RegistrationFormData,
 	Event,
-	UserApiResponse,
 	EventApiResponse,
 } from "./types/registration.types";
 
@@ -47,6 +45,7 @@ const RegistrationConfirmComponent: React.FC<
 	const [isError, setIsError] = useState<boolean>(false);
 	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
 	const [pageError, setPageError] = useState<boolean>(false);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
 	const [showGuestSigninModal, setShowGuestSigninModal] =
 		useState<boolean>(false);
@@ -69,38 +68,6 @@ const RegistrationConfirmComponent: React.FC<
 			return "";
 		}
 	};
-
-	const getUser = useCallback(
-		async (token: string): Promise<void> => {
-			const { GUEST_USER } = API_URL;
-			try {
-				const resp = await axios.get<UserApiResponse>(GUEST_USER, {
-					params: {},
-					headers: { Authorization: `Bearer ${token}` },
-				});
-				const { data } = resp;
-				if (
-					data?.date_of_birth !== null &&
-					data?.date_of_birth !== undefined
-				) {
-					data.date_of_birth = formatMMDDYYYY(data.date_of_birth);
-				}
-				if (data?.phone !== null && data?.phone !== undefined) {
-					const phoneRegex =
-						/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-					data.phone = String(data.phone).replace(
-						phoneRegex,
-						"($1) $2-$3"
-					);
-				}
-				dispatch(setCurrentUser(data as RegistrationFormData));
-				setUser(data as RegistrationFormData);
-			} catch (e) {
-				console.error(e);
-			}
-		},
-		[dispatch]
-	);
 
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
@@ -126,7 +93,6 @@ const RegistrationConfirmComponent: React.FC<
 
 	useEffect(fetchBusinesses, [
 		getEvent,
-		getUser,
 		isError,
 		pageError,
 		selectedEvent,
@@ -150,10 +116,7 @@ const RegistrationConfirmComponent: React.FC<
 			if (Object.keys(selectedEvent).length === 0) {
 				getEvent();
 			}
-			// Only fetch user if token is present
-			if (user === null && userToken) {
-				getUser(userToken);
-			}
+			// User data is passed via navigation state, no need to fetch
 		}
 	}
 

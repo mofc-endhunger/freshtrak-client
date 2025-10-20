@@ -5,6 +5,7 @@
  * Handles authentication, error handling, caching, and retry logic.
  */
 
+import { handleAuthError } from '../Utils/AuthErrorHandler';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import {
   CreateHouseholdRequest,
@@ -30,14 +31,12 @@ import {
  * Configuration for the Households API service
  */
 const API_CONFIG: HouseholdApiConfig = {
-  //baseUrl: process.env.REACT_APP_PANTRY_FINDER_API || '',
-  //TODO: change this to the actual API URL
-  baseUrl: 'http://localhost:3000',
+  baseUrl: process.env.REACT_APP_REGISTRATION_API || '',
   endpoints: {
-    createHousehold: '/api/users',
-    getUsersMe: '/api/users/me',
-    getHouseholdById: (id: number) => `/api/households/${id}`,
-    updateHousehold: (id: number) => `/api/users/${id}`,
+    createHousehold: 'api/users',
+    getUsersMe: 'api/users/me',
+    getHouseholdById: (id: number) => `api/households/${id}`,
+    updateHousehold: (id: number) => `api/users/${id}`,
   },
   timeout: 30000, // 30 seconds
   retryAttempts: 3,
@@ -229,6 +228,19 @@ export class HouseholdsApiService {
         return response;
       },
       (error) => {
+        // Handle authentication errors specifically
+        if (handleAuthError(error, {
+          userType: "cognito",
+          redirectPath: "/login",
+        })) {
+          // Auth error was handled, return a rejected promise with auth error
+          return Promise.reject({
+            type: 'AUTHENTICATION_ERROR',
+            message: 'Authentication failed',
+            handled: true
+          });
+        }
+
         const apiError = ApiErrorHandler.createError(error);
         console.error('Households API Error:', apiError);
         return Promise.reject(apiError);

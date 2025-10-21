@@ -46,7 +46,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 
 			// Check if this is the setup route
 			const isSetupRoute =
-				window.location.pathname === "/households/setup";
+				window.location.pathname === RENDER_URL.HOUSEHOLD_SETUP_URL;
 			if (isSetupRoute) {
 				// Check if user came from account page (update existing) or initial setup (create new)
 				const fromAccount = searchParams.get("from") === "account";

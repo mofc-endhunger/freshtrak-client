@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  freshtrak-client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: freshtrak-client-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for hot-reloading
+      - ./src:/app/src
+      - ./public:/app/public
+      # Mount environment files
+      - ./.env.development:/app/.env.development
+      # Prevent node_modules from being overwritten by mount
+      - /app/node_modules
+    networks:
+      - freshtrak-network
+    stdin_open: true  # Keep STDIN open (equivalent to docker run -i)
+    tty: true        # Allocate a pseudo-TTY (equivalent to docker run -t)
+
+networks:
+  freshtrak-network:
+    driver: bridge

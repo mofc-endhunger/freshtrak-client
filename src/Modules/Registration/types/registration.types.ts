@@ -31,6 +31,10 @@ export interface HouseholdCounts {
  * Registration form data interface
  * Represents the complete user registration form data
  */
+
+export interface RegistrationFormDataPatch {
+  updated: boolean;
+}
 export interface RegistrationFormData {
   // Personal Information
   first_name: string;

@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "homepage": "https://freshtrak.com",
   "dependencies": {
@@ -15,6 +15,7 @@
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.2.6",
     "@reduxjs/toolkit": "^1.9.7",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -68,11 +69,17 @@
   "scripts": {
     "start": "env-cmd -f .env.development react-scripts start",
     "build": "env-cmd -f .env.${REACT_APP_ENV} react-scripts build",
-    "build:development": "REACT_APP_ENV=development yarn build",
-    "build:beta": "REACT_APP_ENV=beta yarn build",
-    "build:production": "REACT_APP_ENV=production yarn build",
+    "build:development": "REACT_APP_ENV=development npm run build",
+    "build:beta": "REACT_APP_ENV=beta npm run build",
+    "build:production": "REACT_APP_ENV=production npm run build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:shell": "docker-compose exec freshtrak-client sh",
+    "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up"
   },
   "eslintConfig": {
     "extends": "react-app"

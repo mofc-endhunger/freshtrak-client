@@ -24,10 +24,12 @@ interface ServiceCategory {
 	service_category_name: string;
 }
 
-interface SearchFormData {
+export interface SearchFormData {
 	zip_code: string;
 	distance: string;
 	serviceCat: string;
+	availability: string;
+	reservations: boolean;
 	street?: string;
 	lat?: string;
 	long?: string;
@@ -40,11 +42,20 @@ interface SearchComponentProps {
 	z_code: string;
 	range: string;
 	categories: ServiceCategory[];
+	isLoading?: boolean;
 }
 
 const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 	(
-		{ register, errors = {}, onSubmitHandler, z_code, range, categories },
+		{
+			register,
+			errors = {},
+			onSubmitHandler,
+			z_code,
+			range,
+			categories,
+			isLoading = false,
+		},
 		ref
 	) => {
 		const [address, setAddress] = useState<string>("");
@@ -55,6 +66,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 		const [zipCode, setZipCode] = useState<string>(z_code);
 		const [distance, setDistance] = useState<string>(range);
 		const [serviceCat, setServiceCat] = useState<string>("");
+		const [availability, setAvailability] = useState<string>("All");
+		const [reservations, setReservations] = useState<boolean>(false);
 		const [showFilter, setShowFilter] = useState<boolean>(
 			z_code !== undefined
 		);
@@ -152,6 +165,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 													distance:
 														DEFAULT_DISTANCE.toString(),
 													serviceCat: "",
+													availability: "All",
+													reservations: false,
 												});
 											} else {
 												setShowFilter(false);
@@ -188,8 +203,16 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 							id="search-resource"
 							value="Search For Resources"
 							className="w-full min-h-[50px]"
+							disabled={isLoading}
 						>
-							{localization.search_for_resources}
+							{isLoading ? (
+								<div className="flex items-center justify-center space-x-2">
+									<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+									<span>Searching...</span>
+								</div>
+							) : (
+								localization.search_for_resources
+							)}
 						</Button>
 					</div>
 					<div className="w-full mt-2">
@@ -210,6 +233,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 									zip_code: zipCode,
 									distance: "",
 									serviceCat: "",
+									availability: "All",
+									reservations: false,
 								});
 							}}
 							distance={{
@@ -223,6 +248,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 										zip_code: zipCode,
 										distance: e.target.value,
 										serviceCat: serviceCat,
+										availability: availability,
+										reservations: reservations,
 									});
 								},
 							}}
@@ -238,6 +265,40 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 										zip_code: zipCode,
 										distance: distance,
 										serviceCat: e.target.value,
+										availability: availability,
+										reservations: reservations,
+									});
+								},
+							}}
+							availability={{
+								show: showDistance,
+								defaultValue: availability,
+								onChangeHandler: (e: {
+									target: { value: string };
+								}) => {
+									setAvailability(e.target.value);
+									onSubmitHandler({
+										zip_code: zipCode,
+										distance: distance,
+										serviceCat: serviceCat,
+										availability: e.target.value,
+										reservations: reservations,
+									});
+								},
+							}}
+							reservations={{
+								show: showDistance,
+								defaultValue: reservations,
+								onChangeHandler: (e: {
+									target: { value: boolean };
+								}) => {
+									setReservations(e.target.value);
+									onSubmitHandler({
+										zip_code: zipCode,
+										distance: distance,
+										serviceCat: serviceCat,
+										availability: availability,
+										reservations: e.target.value,
 									});
 								},
 							}}

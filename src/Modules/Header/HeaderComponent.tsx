@@ -200,7 +200,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 				}`}
 				style={{
 					boxShadow: shouldShowBackgroundColor
-						? "0 4px 8px #b9b9b9"
+						? "0 4px 8px #28CE85"
 						: "",
 					overflow: "visible",
 				}}

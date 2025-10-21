@@ -17,7 +17,6 @@ import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
-	DialogHeader,
 	DialogTitle,
 } from "../../components/ui/dialog";
 import localization from "../Localization/LocalizationComponent";
@@ -236,14 +235,12 @@ const RegistrationConfirmComponent: React.FC<
 				onOpenChange={setShowGuestSigninModal}
 			>
 				<DialogContent className="sm:max-w-md bg-white border border-gray-200 text-gray-900">
-					<DialogHeader>
-						<DialogTitle className="text-center text-gray-900">
-							Create Account
-						</DialogTitle>
-						<DialogDescription className="text-center text-gray-600">
-							{localization.guest_signin_prompt}
-						</DialogDescription>
-					</DialogHeader>
+					<DialogTitle className="text-center text-gray-900">
+						Create Account
+					</DialogTitle>
+					<DialogDescription className="text-center text-gray-600">
+						{localization.guest_signin_prompt}
+					</DialogDescription>
 					<div className="flex flex-col space-y-3 mt-4">
 						<Button
 							onClick={() => {

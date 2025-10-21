@@ -16,7 +16,6 @@ import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
-	DialogHeader,
 	DialogTitle,
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
@@ -188,12 +187,10 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 			onOpenChange={setshow}
 		>
 			<DialogContent className="sm:max-w-md bg-white border border-gray-200 text-gray-900">
-				<DialogHeader className="border-b border-gray-200">
-					<DialogTitle className="text-center w-full py-2 text-gray-900">
-						{getModalTitle()}
-					</DialogTitle>
-					<DialogDescription></DialogDescription>
-				</DialogHeader>
+				<DialogTitle className="text-center w-full py-2 text-gray-900 border-b border-gray-200">
+					{getModalTitle()}
+				</DialogTitle>
+				<DialogDescription></DialogDescription>
 
 				<div className="p-6">
 					{/* Tab Navigation */}

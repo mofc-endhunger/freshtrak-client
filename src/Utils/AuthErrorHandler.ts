@@ -134,3 +134,21 @@ export const clearAllAuthData = (): void => {
   localStorage.removeItem("userToken");
   localStorage.removeItem("currentUser");
 };
+
+/**
+ * Gets the Cognito token from localStorage
+ * @returns The Cognito token or null if not found
+ */
+export const getCognitoToken = (): string | null => {
+  const cognitoUser = localStorage.getItem("cognitoUser");
+  if (cognitoUser) {
+    try {
+      const cognitoUserData = JSON.parse(cognitoUser);
+      return cognitoUserData.accessToken || null;
+    } catch (error) {
+      console.warn("Could not parse cognitoUser:", error);
+      return null;
+    }
+  }
+  return null;
+};

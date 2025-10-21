@@ -238,6 +238,49 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						console.error("Error parsing cognitoUser:", error);
 					}
 				}
+			} else if (user && location.state?.householdData) {
+				// Prefill form with household data if available
+				try {
+					const householdData = location.state
+						.householdData as UsersMeResponse;
+					const prefilledUser = {
+						...user,
+						// Prefill address information
+						address_line_1:
+							householdData.address_line_1 || user.address_line_1,
+						address_line_2:
+							householdData.address_line_2 || user.address_line_2,
+						city: householdData.city || user.city,
+						state: householdData.state || user.state,
+						zip_code: householdData.zip_code || user.zip_code,
+						phone: householdData.phone || user.phone,
+						email: householdData.email || user.email,
+						// Prefill household member counts
+						adults_in_household:
+							householdData.counts?.adults ||
+							user.adults_in_household,
+						children_in_household:
+							householdData.counts?.children ||
+							user.children_in_household,
+						seniors_in_household:
+							householdData.counts?.seniors ||
+							user.seniors_in_household,
+						// Prefill household name if available
+						identification_code:
+							householdData.identification_code ||
+							user.identification_code,
+					};
+					setUser(prefilledUser);
+					console.log(
+						"🏠 Prefilled form with household data:",
+						prefilledUser
+					);
+				} catch (error) {
+					console.error(
+						"Error prefilling with household data:",
+						error
+					);
+				}
 			}
 		}
 
@@ -266,6 +309,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		eventDateId,
 		navigate,
 		getEvent,
+		location.state,
 	]);
 
 	const handleAuthLogin = (): void => {

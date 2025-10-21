@@ -23,6 +23,7 @@ export interface RegistrationResponse {
 export interface HouseholdConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onBackHome: () => void;
   onConfirm: () => void;
   onReview: () => void;
   householdData: UsersMeResponse | null;

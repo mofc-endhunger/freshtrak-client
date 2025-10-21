@@ -6,7 +6,9 @@ import {
 	DialogDescription,
 	DialogTitle,
 	DialogFooter,
+	DialogHeader,
 } from "../../components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "../../components/ui/button";
 import { API_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
@@ -16,6 +18,7 @@ import HouseholdConfirmationModal from "../Registration/components/HouseholdConf
 import { HouseholdRegistrationService } from "../../Services/HouseholdRegistrationService";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { UsersMeResponse } from "../Households/types/api.types";
+import { useAuth } from "../Authentication/AuthContext";
 
 import { Event } from "./types/family.types";
 
@@ -94,6 +97,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	const [eventDate, setEventDate] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const navigate = useNavigate();
+	const { isAuthenticated } = useAuth();
 
 	// Household confirmation modal state
 	const [showHouseholdModal, setShowHouseholdModal] = useState(false);
@@ -136,8 +140,16 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		setIsLoadingHousehold(true);
 		setHouseholdError(null);
 
+		// If user is not authenticated (guest user), skip household data fetch
+		if (!isAuthenticated) {
+			// Proceed directly to registration form for guest users
+			navigateToRegistration(slot, null);
+			setIsLoadingHousehold(false);
+			return;
+		}
+
 		try {
-			// Fetch household data
+			// Fetch household data only for authenticated users
 			const household = await householdsApiService.getUsersMe();
 			setHouseholdData(household);
 
@@ -240,6 +252,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		setHouseholdError(null);
 	};
 
+	const handleBackHome = () => {
+		navigate(RENDER_URL.ROOT_URL);
+	};
+
 	useEffect(() => {
 		if (acceptReservations === 1 && eventDateId) {
 			handleShow();
@@ -272,32 +288,33 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 
 	return (
 		<Fragment>
-			<Dialog
-				key={show ? "open" : "closed"}
-				open={show}
-				onOpenChange={setShow}
-			>
-				<DialogContent
-					className="sm:max-w-md bg-highlight border-none text-white"
-					aria-modal="true"
-				>
-					<DialogTitle
-						id="timeslot-modal-title"
-						className="flex items-center py-2 border-b border-white"
-					>
-						<span className="pr-3">
-							<img
-								aria-hidden="true"
-								alt=""
-								src={alarmIcon}
-								className="w-6 h-6"
-							/>
-						</span>
-						Choose Time Slot
-					</DialogTitle>
-					<DialogDescription id="timeslot-modal-description">
+			<Dialog open={show} onOpenChange={setShow}>
+				<VisuallyHidden>
+					<DialogTitle>Choose Time Slot</DialogTitle>
+					<DialogDescription>
 						Select an available time slot for your registration.
 					</DialogDescription>
+				</VisuallyHidden>
+				<DialogContent className="sm:max-w-md bg-highlight border-none text-white">
+					<DialogHeader>
+						<DialogTitle
+							id="timeslot-modal-title"
+							className="flex items-center py-2 border-b border-white"
+						>
+							<span className="pr-3">
+								<img
+									aria-hidden="true"
+									alt=""
+									src={alarmIcon}
+									className="w-6 h-6"
+								/>
+							</span>
+							Choose Time Slot
+						</DialogTitle>
+						<DialogDescription id="timeslot-modal-description">
+							Select an available time slot for your registration.
+						</DialogDescription>
+					</DialogHeader>
 					<div className="container py-4">
 						{isLoading ? (
 							<div
@@ -407,6 +424,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			<HouseholdConfirmationModal
 				isOpen={showHouseholdModal}
 				onClose={handleHouseholdModalClose}
+				onBackHome={handleBackHome}
 				onConfirm={handleHouseholdConfirm}
 				onReview={handleHouseholdReview}
 				householdData={householdData}

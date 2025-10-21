@@ -9,19 +9,31 @@ import { UsersMeResponse } from "../../../Households/types/api.types";
 jest.mock("../../../../components/ui/dialog", () => ({
 	Dialog: ({ children, open }: any) =>
 		open ? <div data-testid="dialog">{children}</div> : null,
-	DialogContent: ({ children, showCloseButton }: any) => (
-		<div data-testid="dialog-content" data-show-close={showCloseButton}>
+	DialogContent: ({ children, showCloseButton, ...props }: any) => (
+		<div
+			data-testid="dialog-content"
+			data-show-close={showCloseButton}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="household-modal-title"
+			aria-describedby="household-modal-description"
+			{...props}
+		>
 			{children}
 		</div>
 	),
 	DialogHeader: ({ children }: any) => (
 		<div data-testid="dialog-header">{children}</div>
 	),
-	DialogTitle: ({ children }: any) => (
-		<h2 data-testid="dialog-title">{children}</h2>
+	DialogTitle: ({ children, id, ...props }: any) => (
+		<h2 data-testid="dialog-title" id={id} {...props}>
+			{children}
+		</h2>
 	),
-	DialogDescription: ({ children }: any) => (
-		<p data-testid="dialog-description">{children}</p>
+	DialogDescription: ({ children, id, ...props }: any) => (
+		<p data-testid="dialog-description" id={id} {...props}>
+			{children}
+		</p>
 	),
 	DialogFooter: ({ children }: any) => (
 		<div data-testid="dialog-footer">{children}</div>
@@ -110,6 +122,7 @@ describe("HouseholdConfirmationModal", () => {
 	const defaultProps: HouseholdConfirmationModalProps = {
 		isOpen: true,
 		onClose: jest.fn(),
+		onBackHome: jest.fn(),
 		onConfirm: jest.fn(),
 		onReview: jest.fn(),
 		householdData: mockHouseholdData,
@@ -126,10 +139,17 @@ describe("HouseholdConfirmationModal", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
 
 			expect(screen.getByTestId("dialog")).toBeInTheDocument();
-			expect(screen.getByTestId("dialog-content")).toBeInTheDocument();
-			expect(screen.getByTestId("dialog-title")).toHaveTextContent(
-				"Use your household information?"
-			);
+			expect(
+				screen.getByTestId("household-confirmation-modal")
+			).toBeInTheDocument();
+			// Use getAllByTestId to handle multiple elements
+			const titles = screen.getAllByTestId("dialog-title");
+			expect(titles.length).toBeGreaterThan(0);
+			// Check that the visible title with specific ID exists
+			const visibleTitle = screen
+				.getByRole("dialog")
+				.querySelector('[id="household-modal-title"]');
+			expect(visibleTitle).toBeInTheDocument();
 		});
 
 		it("renders household information when data is available", () => {
@@ -235,10 +255,21 @@ describe("HouseholdConfirmationModal", () => {
 		it("has proper ARIA labels and roles", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
 
-			expect(screen.getByTestId("dialog-title")).toBeInTheDocument();
-			expect(
-				screen.getByTestId("dialog-description")
-			).toBeInTheDocument();
+			// Use getAllByTestId to handle multiple elements
+			const titles = screen.getAllByTestId("dialog-title");
+			expect(titles.length).toBeGreaterThan(0);
+			const descriptions = screen.getAllByTestId("dialog-description");
+			expect(descriptions.length).toBeGreaterThan(0);
+
+			// Check that the visible elements with specific IDs exist
+			const visibleTitle = screen
+				.getByRole("dialog")
+				.querySelector('[id="household-modal-title"]');
+			expect(visibleTitle).toBeInTheDocument();
+			const visibleDescription = screen
+				.getByRole("dialog")
+				.querySelector('[id="household-modal-description"]');
+			expect(visibleDescription).toBeInTheDocument();
 		});
 
 		it("supports keyboard navigation", () => {

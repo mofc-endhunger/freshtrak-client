@@ -5,7 +5,9 @@ import {
 	DialogDescription,
 	DialogFooter,
 	DialogTitle,
+	DialogHeader,
 } from "../../../components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "../../../components/ui/button";
 import HouseholdInfoDisplay from "./HouseholdInfoDisplay";
 import { HouseholdConfirmationModalProps } from "../types/household-registration.types";
@@ -20,6 +22,7 @@ import LoadingSpinner from "../../General/LoadingSpinner";
 const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 	isOpen,
 	onClose,
+	onBackHome,
 	onConfirm,
 	onReview,
 	householdData,
@@ -50,24 +53,33 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={handleClose}>
+			<VisuallyHidden>
+				<DialogTitle>Use your household information?</DialogTitle>
+				<DialogDescription>
+					We found household information on your account. Would you
+					like to register using this information?
+				</DialogDescription>
+			</VisuallyHidden>
 			<DialogContent
 				className="sm:max-w-md bg-white border border-gray-200"
 				showCloseButton={!isLoading}
 				data-testid="household-confirmation-modal"
 			>
-				<DialogTitle
-					id="household-modal-title"
-					className="text-xl font-semibold text-gray-900"
-				>
-					Use your household information?
-				</DialogTitle>
-				<DialogDescription
-					id="household-modal-description"
-					className="text-gray-600"
-				>
-					We found household information on your account. Would you
-					like to register using this information?
-				</DialogDescription>
+				<DialogHeader>
+					<DialogTitle
+						id="household-modal-title"
+						className="text-xl font-semibold text-gray-900"
+					>
+						Use your household information?
+					</DialogTitle>
+					<DialogDescription
+						id="household-modal-description"
+						className="text-gray-600"
+					>
+						We found household information on your account. Would
+						you like to register using this information?
+					</DialogDescription>
+				</DialogHeader>
 
 				<div className="py-4" role="main" aria-live="polite">
 					{isLoading ? (
@@ -95,7 +107,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 									<div className="mt-2 text-sm text-red-700">
 										<p>{error}</p>
 									</div>
-									<div className="mt-4">
+									<div className="flex gap-2 mt-4">
 										<Button
 											variant="outline"
 											size="sm"
@@ -104,6 +116,15 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 											aria-describedby="error-description"
 										>
 											Review & Update Instead
+										</Button>
+										{/* Take back home button */}
+										<Button
+											variant="outline"
+											size="sm"
+											onClick={onBackHome}
+											className="text-gray-700 border-gray-300 hover:bg-gray-50"
+										>
+											Back Home
 										</Button>
 									</div>
 								</div>
@@ -125,7 +146,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 
 				<DialogFooter className="flex flex-col sm:flex-row gap-2">
 					<Button
-						variant="outline"
+						variant="highlightOutline"
 						onClick={handleReview}
 						disabled={isLoading}
 						className="w-full sm:w-auto bg-white text-gray-700 border-gray-300 hover:bg-gray-50"

@@ -108,6 +108,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const [disabled, setDisabled] = useState<boolean>(false);
 	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
 	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
+	const householdDataProcessedRef = useRef<boolean>(false);
 
 	const event = useSelector(selectEvent);
 	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
@@ -238,8 +239,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						console.error("Error parsing cognitoUser:", error);
 					}
 				}
-			} else if (user && location.state?.householdData) {
-				// Prefill form with household data if available
+			} else if (
+				user &&
+				location.state?.householdData &&
+				!householdDataProcessedRef.current
+			) {
+				// Prefill form with household data if available (only once)
 				try {
 					const householdData = location.state
 						.householdData as UsersMeResponse;
@@ -271,6 +276,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							user.identification_code,
 					};
 					setUser(prefilledUser);
+					householdDataProcessedRef.current = true; // Mark as processed
 					console.log(
 						"🏠 Prefilled form with household data:",
 						prefilledUser
@@ -311,6 +317,11 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		getEvent,
 		location.state,
 	]);
+
+	// Reset household data processing flag when location changes
+	useEffect(() => {
+		householdDataProcessedRef.current = false;
+	}, [location.state]);
 
 	const handleAuthLogin = (): void => {
 		const token = localStorage.getItem("userToken");

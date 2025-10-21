@@ -538,10 +538,9 @@ const HouseholdRegistrationComponent: React.FC<
 					adults: Number(formValues.adults_in_household) || 0,
 					children: Number(formValues.children_in_household) || 0,
 					total:
-						Number(formValues.seniors_in_household) ||
-						0 + Number(formValues.adults_in_household) ||
-						0 + Number(formValues.children_in_household) ||
-						0,
+						(Number(formValues.seniors_in_household) || 0) +
+						(Number(formValues.adults_in_household) || 0) +
+						(Number(formValues.children_in_household) || 0),
 				};
 
 				return (

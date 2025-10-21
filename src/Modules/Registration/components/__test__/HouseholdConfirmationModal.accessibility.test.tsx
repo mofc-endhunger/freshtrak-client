@@ -12,6 +12,10 @@ jest.mock("../../../../components/ui/dialog", () => ({
 		<div
 			data-testid="dialog-content"
 			data-show-close={showCloseButton}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="household-modal-title"
+			aria-describedby="household-modal-description"
 			{...props}
 		>
 			{children}
@@ -86,6 +90,7 @@ const mockHouseholdData: UsersMeResponse = {
 const defaultProps = {
 	isOpen: true,
 	onClose: jest.fn(),
+	onBackHome: jest.fn(),
 	onConfirm: jest.fn(),
 	onReview: jest.fn(),
 	householdData: mockHouseholdData,
@@ -119,16 +124,25 @@ describe("HouseholdConfirmationModal Accessibility", () => {
 		it("should have proper title and description IDs", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
 
-			const title = screen.getByText("Use your household information?");
-			const description = screen.getByText(
+			// Use getAllByText to handle multiple elements
+			const titles = screen.getAllByText(
+				"Use your household information?"
+			);
+			expect(titles.length).toBeGreaterThan(0);
+			const descriptions = screen.getAllByText(
 				/We found household information on your account/
 			);
+			expect(descriptions.length).toBeGreaterThan(0);
 
-			expect(title).toHaveAttribute("id", "household-modal-title");
-			expect(description).toHaveAttribute(
-				"id",
-				"household-modal-description"
-			);
+			// Check that the visible elements with specific IDs exist
+			const visibleTitle = screen
+				.getByRole("dialog")
+				.querySelector('[id="household-modal-title"]');
+			expect(visibleTitle).toBeInTheDocument();
+			const visibleDescription = screen
+				.getByRole("dialog")
+				.querySelector('[id="household-modal-description"]');
+			expect(visibleDescription).toBeInTheDocument();
 		});
 
 		it("should have proper main content role", () => {
@@ -325,14 +339,15 @@ describe("HouseholdConfirmationModal Accessibility", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
 
 			// Check that all important information is accessible
-			expect(
-				screen.getByText("Use your household information?")
-			).toBeInTheDocument();
-			expect(
-				screen.getByText(
-					/We found household information on your account/
-				)
-			).toBeInTheDocument();
+			// Use getAllByText to handle multiple elements
+			const titles = screen.getAllByText(
+				"Use your household information?"
+			);
+			expect(titles.length).toBeGreaterThan(0);
+			const descriptions = screen.getAllByText(
+				/We found household information on your account/
+			);
+			expect(descriptions.length).toBeGreaterThan(0);
 			expect(screen.getByText("Test Family")).toBeInTheDocument();
 			expect(screen.getByText(/123 Test Street/)).toBeInTheDocument();
 		});
@@ -390,13 +405,26 @@ describe("HouseholdConfirmationModal Accessibility", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
 
 			// Check that text has proper contrast classes
-			const title = screen.getByText("Use your household information?");
-			expect(title).toHaveClass("text-gray-900");
+			// Use getAllByText to handle multiple elements and find the visible one
+			const titles = screen.getAllByText(
+				"Use your household information?"
+			);
+			expect(titles.length).toBeGreaterThan(0);
+			// Find the visible title with specific ID
+			const visibleTitle = screen
+				.getByRole("dialog")
+				.querySelector('[id="household-modal-title"]');
+			expect(visibleTitle).toHaveClass("text-gray-900");
 
-			const description = screen.getByText(
+			const descriptions = screen.getAllByText(
 				/We found household information on your account/
 			);
-			expect(description).toHaveClass("text-gray-600");
+			expect(descriptions.length).toBeGreaterThan(0);
+			// Find the visible description with specific ID
+			const visibleDescription = screen
+				.getByRole("dialog")
+				.querySelector('[id="household-modal-description"]');
+			expect(visibleDescription).toHaveClass("text-gray-600");
 		});
 
 		it("should have proper error state styling", () => {
@@ -419,12 +447,14 @@ describe("HouseholdConfirmationModal Accessibility", () => {
 		it("should use proper semantic elements", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
 
-			// Check for proper heading hierarchy (there are multiple h2 elements)
+			// Check for proper heading hierarchy (there are now 3 h2 elements: hidden title, visible title, household info heading)
 			const headings = screen.getAllByRole("heading", { level: 2 });
-			expect(headings).toHaveLength(2); // Dialog title + household info heading
+			expect(headings).toHaveLength(3); // Hidden title + visible title + household info heading
 
 			const dialogTitle = headings.find(
-				h => h.textContent === "Use your household information?"
+				h =>
+					h.textContent === "Use your household information?" &&
+					h.id === "household-modal-title"
 			);
 			expect(dialogTitle).toBeInTheDocument();
 

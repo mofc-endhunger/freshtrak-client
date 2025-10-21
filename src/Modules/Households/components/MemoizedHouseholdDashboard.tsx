@@ -357,7 +357,9 @@ const MemberOverviewCard = memo(({ stats }: { stats: DashboardStats }) => (
 						<div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
 							<Calendar className="w-4 h-4 text-purple-600" />
 						</div>
-						<span className="font-medium">Children (&lt;18)</span>
+						<span className="font-medium">
+							Children (18 and under)
+						</span>
 					</div>
 					<Badge variant="outline">{stats.childrenCount}</Badge>
 				</div>

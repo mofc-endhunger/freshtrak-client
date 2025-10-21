@@ -30,9 +30,7 @@ import {
  * Configuration for the Households API service
  */
 const API_CONFIG: HouseholdApiConfig = {
-  //baseUrl: process.env.REACT_APP_PANTRY_FINDER_API || '',
-  //TODO: change this to the actual API URL
-  baseUrl: 'http://localhost:3000',
+  baseUrl: process.env.REACT_APP_PANTRY_FINDER_API || '',
   endpoints: {
     createHousehold: '/api/users',
     getUsersMe: '/api/users/me',

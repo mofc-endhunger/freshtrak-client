@@ -362,7 +362,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							message,
 						});
 					} catch (e) {
-						console.log(e);
+						console.warn(e);
 					}
 					setLoading(false);
 				} catch (err) {

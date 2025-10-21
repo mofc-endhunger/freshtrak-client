@@ -238,7 +238,9 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 											type="button"
 											variant="ghost"
 											className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
-											onClick={() => navigate("/login")}
+											onClick={() =>
+												navigate(RENDER_URL.LOGIN_URL)
+											}
 										>
 											LOG IN
 										</Button>

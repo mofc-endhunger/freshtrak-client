@@ -71,7 +71,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 			);
 			getEventByDateId(usersRegData.data);
 		} catch (e) {
-			console.log(e);
+			console.warn(e);
 		}
 	};
 

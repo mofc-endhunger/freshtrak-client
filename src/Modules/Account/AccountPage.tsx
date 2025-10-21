@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Authentication/AuthContext";
 import { AuthGuard } from "../Households/components/AuthGuard";
+import { RENDER_URL } from "../../Utils/Urls";
 import { Button } from "../../components/ui/button";
 import {
 	Card,
@@ -100,7 +101,7 @@ const AccountPage: React.FC = () => {
 	 * This is for users who need to complete or update their household setup
 	 */
 	const navigateToHouseholdSetup = (): void => {
-		navigate("/households/setup?from=account");
+		navigate(`${RENDER_URL.HOUSEHOLD_SETUP_URL}?from=account`);
 	};
 
 	/**
@@ -108,7 +109,7 @@ const AccountPage: React.FC = () => {
 	 * This is for users who already have a household and want to update it
 	 */
 	const navigateToHouseholdDashboard = (): void => {
-		navigate("/households/setup?from=account");
+		navigate(`${RENDER_URL.HOUSEHOLD_SETUP_URL}?from=account`);
 	};
 
 	/**
@@ -171,7 +172,7 @@ const AccountPage: React.FC = () => {
 						<div className="flex items-center justify-between mb-4">
 							<Button
 								variant="ghost"
-								onClick={() => navigate("/")}
+								onClick={() => navigate(RENDER_URL.ROOT_URL)}
 								className="text-gray-600 hover:text-gray-900"
 							>
 								<ArrowLeft className="mr-2 h-4 w-4" />

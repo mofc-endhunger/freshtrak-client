@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TagManager from "react-gtm-module";
+import { RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import SignInFormComponent from "./SignInFormComponent";
 import SignUpFormComponent from "./SignUpFormComponent";
@@ -75,7 +76,7 @@ const LoginPage: React.FC = () => {
 			});
 
 			// Redirect to home page after guest login
-			navigate("/");
+			navigate(RENDER_URL.ROOT_URL);
 		} catch (error) {
 			console.error("Guest login error:", error);
 			handleAuthError("Failed to login as guest. Please try again.");
@@ -90,7 +91,7 @@ const LoginPage: React.FC = () => {
 	const handleAuthSuccess = (): void => {
 		setErrorMessage("");
 		// Redirect to home page after successful authentication
-		navigate("/");
+		navigate(RENDER_URL.ROOT_URL);
 	};
 
 	/**
@@ -130,7 +131,7 @@ const LoginPage: React.FC = () => {
 
 		// Redirect to home page after successful confirmation
 		// Note: Household setup will be offered via HouseholdSignUpWrapper
-		navigate("/");
+		navigate(RENDER_URL.ROOT_URL);
 	};
 
 	/**
@@ -311,7 +312,7 @@ const LoginPage: React.FC = () => {
 				<div className="text-center mt-6">
 					<Button
 						variant="ghost"
-						onClick={() => navigate("/")}
+						onClick={() => navigate(RENDER_URL.ROOT_URL)}
 						className="text-gray-600 hover:text-gray-900"
 					>
 						← Back to Home

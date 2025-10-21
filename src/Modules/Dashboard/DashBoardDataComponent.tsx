@@ -1,20 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import SearchComponent from "../General/SearchComponent";
+import SearchComponent, { SearchFormData } from "../General/SearchComponent";
 import DashboardCreateAccountComponent from "./DashboardCreateAccountComponent";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import { DashBoardDataComponentProps } from "./types/dashboard.types";
-
-// Import the SearchFormData type from SearchComponent to avoid conflicts
-type SearchFormData = {
-	zip_code: string;
-	distance: string;
-	serviceCat: string;
-	street?: string;
-	lat?: string;
-	long?: string;
-};
 
 /**
  * DashBoardDataComponent - Handles search functionality and main content display
@@ -44,9 +34,14 @@ const DashBoardDataComponent: React.FC<DashBoardDataComponentProps> = () => {
 
 	/**
 	 * Handles form submission and navigates to events list
-	 * @param {SearchFormData} data - Form data containing zip_code and distance
+	 * @param {SearchFormData} data - Form data containing zip_code, distance, and availability
 	 */
-	const onSubmit = ({ zip_code, distance }: SearchFormData) => {
+	const onSubmit = ({
+		zip_code,
+		distance,
+		availability,
+		reservations,
+	}: SearchFormData) => {
 		let url = `/events/list/`;
 		if (zip_code) {
 			url += zip_code + "/";
@@ -54,6 +49,19 @@ const DashBoardDataComponent: React.FC<DashBoardDataComponentProps> = () => {
 		if (distance) {
 			url += distance + "/";
 		}
+		// Use query parameters for availability and reservations
+		const queryParams = new URLSearchParams();
+		if (availability && availability !== "All") {
+			queryParams.set("availability", availability);
+		}
+		if (reservations) {
+			queryParams.set("reservations", "true");
+		}
+
+		if (queryParams.toString()) {
+			url += `?${queryParams.toString()}`;
+		}
+
 		navigate(url);
 	};
 

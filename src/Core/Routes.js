@@ -48,6 +48,13 @@ const PrivacyComponent = lazy(() =>
 );
 const TermsComponent = lazy(() => import("../Modules/Policies/TermsComponent"));
 const LoginPage = lazy(() => import("../Modules/Authentication/LoginPage"));
+const HouseholdContainer = lazy(() =>
+	import("../Modules/Households/HouseholdContainer")
+);
+const AccountPage = lazy(() => import("../Modules/Account/AccountPage"));
+const ProtectedRoute = lazy(() =>
+	import("../Modules/Authentication/ProtectedRoute")
+);
 
 const AppRoutes = () => {
 	React.useEffect(() => {}, []);
@@ -62,7 +69,10 @@ const AppRoutes = () => {
 							path={RENDER_URL.ROOT_URL}
 							element={<DashBoardContainer />}
 						/>
-						<Route path="/login" element={<LoginPage />} />
+						<Route
+							path={RENDER_URL.LOGIN_URL}
+							element={<LoginPage />}
+						/>
 						<Route
 							path={RENDER_URL.EVENT_LIST_URL}
 							element={<EventContainer />}
@@ -72,7 +82,38 @@ const AppRoutes = () => {
 							element={<FamilyContainer />}
 						/>
 						{/* Flag to turn off/on Home Page Container for Loggedin user feature */}
-						<Route path="/user-home" element={<HomeContainer />} />
+						<Route
+							path={RENDER_URL.USER_HOME_URL}
+							element={<HomeContainer />}
+						/>
+
+						{/* Household Management - Protected Routes */}
+						<Route
+							path={RENDER_URL.HOUSEHOLDS_URL}
+							element={
+								<ProtectedRoute>
+									<HouseholdContainer />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path={RENDER_URL.HOUSEHOLD_SETUP_URL}
+							element={
+								<ProtectedRoute>
+									<HouseholdContainer />
+								</ProtectedRoute>
+							}
+						/>
+
+						{/* Account Management - Protected Route */}
+						<Route
+							path={RENDER_URL.ACCOUNT_URL}
+							element={
+								<ProtectedRoute>
+									<AccountPage />
+								</ProtectedRoute>
+							}
+						/>
 
 						{/* Out of Scope */}
 						{/* <Route
@@ -151,7 +192,12 @@ const AppRoutes = () => {
               component={SignInContainer}
             /> */}
 
-						<Route path="*" element={<Navigate to="/" replace />} />
+						<Route
+							path="*"
+							element={
+								<Navigate to={RENDER_URL.ROOT_URL} replace />
+							}
+						/>
 
 						{/* Add URLs above this line */}
 					</Routes>

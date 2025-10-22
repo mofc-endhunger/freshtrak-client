@@ -71,7 +71,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 			);
 			getEventByDateId(usersRegData.data);
 		} catch (e) {
-			console.log(e);
+			console.warn(e);
 		}
 	};
 
@@ -229,8 +229,16 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 								<Button
 									type="submit"
 									className="px-4 py-2 w-full sm:w-auto"
+									disabled={loading}
 								>
-									Search
+									{loading ? (
+										<div className="flex items-center justify-center space-x-2">
+											<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+											<span>Searching...</span>
+										</div>
+									) : (
+										"Search"
+									)}
 								</Button>
 							</div>
 						</form>

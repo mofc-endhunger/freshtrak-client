@@ -24,6 +24,8 @@ const buttonVariants = cva(
 				custom: "bg-default-button text-text-color hover:bg-default-button/90 min-w-[220px]",
 				highlight:
 					"bg-highlight text-white min-h-12 uppercase min-w-48",
+				highlightOutline:
+					"bg-background text-highlight border border-highlight hover:bg-highlight hover:text-white min-h-12 uppercase min-w-48",
 			},
 			size: {
 				default: "h-9 px-4 py-2 has-[>svg]:px-3",

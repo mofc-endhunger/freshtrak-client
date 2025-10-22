@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import back from "../../Assets/img/back.svg";
 import "../../Assets/scss/main.scss";
+import { RENDER_URL } from "../../Utils/Urls";
 
 const BackButtonComponent = () => {
 	const navigate = useNavigate();
@@ -15,11 +16,15 @@ const BackButtonComponent = () => {
 		if (hasTimeslotId) {
 			// Extract eventDateId from the URL (it's the 4th part, index 3)
 			const eventDateId = pathParts[3];
-			navigate(`/register/event/${eventDateId}`);
+			navigate(
+				`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${eventDateId}`
+			);
 		} else {
 			// If no timeslot ID, extract eventDateId from the 4th part (index 3)
 			const eventDateId = pathParts[3];
-			navigate(`/register/event/${eventDateId}`);
+			navigate(
+				`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${eventDateId}`
+			);
 		}
 	};
 

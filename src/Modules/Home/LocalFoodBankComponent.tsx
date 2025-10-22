@@ -26,7 +26,6 @@ import axios from "axios";
 import { Badge } from "../../components/ui/badge";
 import {
 	LocalFoodBankComponentProps,
-	LocalFoodBankComponentState,
 	FoodBank,
 	FoodBankApiResponse,
 } from "./types/home.types";

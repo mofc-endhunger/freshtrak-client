@@ -184,6 +184,7 @@ const EventContainer: React.FC = () => {
 								z_code={zipCode}
 								range={distance?.toString() || ""}
 								categories={categories}
+								isLoading={loading}
 							/>
 						</form>
 						{loading && (

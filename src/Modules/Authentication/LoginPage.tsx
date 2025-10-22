@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TagManager from "react-gtm-module";
+import { RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import SignInFormComponent from "./SignInFormComponent";
 import SignUpFormComponent from "./SignUpFormComponent";
@@ -36,34 +37,13 @@ const LoginPage: React.FC = () => {
 	const onGuestLogin = async (): Promise<void> => {
 		setIsLoading(true);
 		try {
-			const { GUEST_AUTH, GUEST_USER } = API_URL;
+			const { GUEST_USER } = API_URL;
 
 			// Clear Cognito authentication data when logging in as guest
 			localStorage.removeItem("cognitoUser");
 
-			// Get guest authentication
-			const resp = await axios.post(GUEST_AUTH);
-			const { guestId, token, type } = resp.data;
-
-			// Store guest authentication data
-			localStorage.setItem("userToken", token);
-			localStorage.setItem("guestId", guestId);
-			localStorage.setItem("guestType", type);
-			localStorage.setItem("isLoggedIn", "true");
-
-			// Fetch user profile
-			const userResp = await axios.get(GUEST_USER, {
-				headers: { Authorization: `Bearer ${token}` },
-			});
-			const { id, role } = userResp.data;
-
-			// Store user profile with new structure
-			const userProfile = {
-				id,
-				role,
-				guestId,
-				type,
-			};
+			const resp = await axios.post(GUEST_USER);
+			const userProfile = resp.data;
 			localStorage.setItem("userProfile", JSON.stringify(userProfile));
 
 			// Track guest login event with Google Tag Manager
@@ -76,7 +56,7 @@ const LoginPage: React.FC = () => {
 			});
 
 			// Redirect to home page after guest login
-			navigate("/");
+			navigate(RENDER_URL.ROOT_URL);
 		} catch (error) {
 			console.error("Guest login error:", error);
 			handleAuthError("Failed to login as guest. Please try again.");
@@ -91,7 +71,7 @@ const LoginPage: React.FC = () => {
 	const handleAuthSuccess = (): void => {
 		setErrorMessage("");
 		// Redirect to home page after successful authentication
-		navigate("/");
+		navigate(RENDER_URL.ROOT_URL);
 	};
 
 	/**
@@ -111,12 +91,27 @@ const LoginPage: React.FC = () => {
 	};
 
 	/**
-	 * Handles successful confirmation - redirect to home
+	 * Handles successful confirmation - redirect to home or household setup
 	 */
 	const handleConfirmSuccess = (): void => {
 		setErrorMessage("");
+
+		// Mark this user as a new user who just completed email confirmation
+		// This will trigger the household setup offer in HouseholdSignUpWrapper
+		if (pendingEmail) {
+			const flagData = {
+				email: pendingEmail,
+				timestamp: Date.now(),
+				completed: true,
+			};
+
+			// Store a flag to indicate this is a new user sign-up
+			localStorage.setItem("new_user_signup", JSON.stringify(flagData));
+		}
+
 		// Redirect to home page after successful confirmation
-		navigate("/");
+		// Note: Household setup will be offered via HouseholdSignUpWrapper
+		navigate(RENDER_URL.ROOT_URL);
 	};
 
 	/**
@@ -297,7 +292,7 @@ const LoginPage: React.FC = () => {
 				<div className="text-center mt-6">
 					<Button
 						variant="ghost"
-						onClick={() => navigate("/")}
+						onClick={() => navigate(RENDER_URL.ROOT_URL)}
 						className="text-gray-600 hover:text-gray-900"
 					>
 						← Back to Home

@@ -43,6 +43,37 @@ export interface SignInResult {
   accessToken?: string;
 }
 
+export interface UserAttributesResult {
+  [key: string]: string | undefined;
+  // Common standard attributes
+  sub?: string;                    // Unique user identifier
+  email?: string;                  // User's email
+  name?: string;                   // User's full name
+  given_name?: string;             // First name
+  family_name?: string;            // Last name
+  phone_number?: string;           // Phone number
+  email_verified?: string;         // Email verification status
+  phone_number_verified?: string;  // Phone verification status
+  updated_at?: string;             // Last updated timestamp
+  locale?: string;                 // User's locale
+  zoneinfo?: string;               // Timezone
+  birthdate?: string;              // Birth date
+  gender?: string;                 // Gender
+  address?: string;                // Address
+  picture?: string;                // Profile picture URL
+  website?: string;                // Website URL
+  profile?: string;                // Profile URL
+  preferred_username?: string;     // Preferred username
+  nickname?: string;               // Nickname
+  middle_name?: string;            // Middle name
+  // Additional fields we add
+  account_created_date?: string;   // Account creation date (from custom attribute)
+  account_last_modified?: string;  // Last modified date
+  user_status?: string;            // User status
+  // Custom attributes (prefixed with 'custom:')
+  'custom:account_created_date'?: string;  // Raw custom attribute
+}
+
 /**
  * Custom signup function that handles SECRET_HASH for clients with secrets
  */
@@ -70,6 +101,14 @@ export const customSignUp = async (params: SignUpParams): Promise<SignUpResult> 
         Name: 'name',
         Value: params.name,
       },
+      // Note: Custom attributes require User Pool schema configuration
+      // For now, we'll store account creation date in localStorage instead
+      // TODO: Consider migrating to AdminGetUser API or database storage in the future
+      // for better separation of concerns and to avoid cluttering user attributes
+      {
+        Name: 'custom:account_created_date',
+        Value: new Date().toISOString(),
+      },
     ],
   };
 
@@ -83,6 +122,8 @@ export const customSignUp = async (params: SignUpParams): Promise<SignUpResult> 
 
   try {
     const result = await cognito.signUp(signUpParams).promise();
+
+    // Note: Account creation date is tracked by Cognito but not accessible via getUser API
 
     return {
       userId: result.UserSub || '',
@@ -173,5 +214,38 @@ export const customSignIn = async (params: SignInParams): Promise<SignInResult> 
   } catch (error: any) {
     console.error('AWSCognitoService: initiateAuth failed:', error.message);
     throw new Error(error.message || 'Failed to sign in');
+  }
+};
+
+/**
+ * Custom fetch user attributes function that uses access token
+ */
+export const customFetchUserAttributes = async (accessToken: string): Promise<UserAttributesResult> => {
+  try {
+    const getUserParams = {
+      AccessToken: accessToken
+    };
+
+    const result = await cognito.getUser(getUserParams).promise();
+
+    // Convert AWS format to our format
+    const attributes: UserAttributesResult = {};
+    if (result.UserAttributes) {
+      result.UserAttributes.forEach(attr => {
+        if (attr.Name && attr.Value) {
+          attributes[attr.Name] = attr.Value;
+        }
+      });
+    }
+
+    // Extract account creation date from custom attribute
+    if (attributes['custom:account_created_date']) {
+      attributes.account_created_date = attributes['custom:account_created_date'];
+    }
+
+    return attributes;
+  } catch (error: any) {
+    console.error('AWSCognitoService: getUser failed:', error.message);
+    throw new Error(error.message || 'Failed to fetch user attributes');
   }
 };

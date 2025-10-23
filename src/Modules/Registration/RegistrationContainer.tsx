@@ -24,6 +24,7 @@ import AuthenticationModalComponent from "../Authentication/AuthenticationModal"
 import {
 	RegistrationContainerProps,
 	RegistrationFormData,
+	RegistrationFormDataPatch,
 	Event,
 	ApiResponse,
 } from "./types/registration.types";
@@ -140,7 +141,9 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	useEffect(() => {
 		const token = localStorage.getItem("userToken");
 		const userProfile = localStorage.getItem("userProfile");
-		setUserToken(token || undefined);
+		setUserToken(
+			token || JSON.parse(userProfile || "{}").token || undefined
+		);
 
 		// Only proceed if we're not in an error state
 		if (!isError && !pageError) {
@@ -385,7 +388,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							message,
 						});
 					} catch (e) {
-						console.log(e);
+						console.warn(e);
 					}
 					setLoading(false);
 				} catch (err) {
@@ -404,32 +407,57 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		const event_slot_id = parseInt(eventSlotId || "0", 10);
 		const { GUEST_USER, CREATE_RESERVATION } = API_URL;
 		let updatedUser = user;
+
+		// Get identification_code from stored user profile
+		const userProfile = localStorage.getItem("userProfile");
+		if (userProfile) {
+			try {
+				const userProfileData = JSON.parse(userProfile);
+				if (
+					userProfileData.user &&
+					userProfileData.user.identification_code
+				) {
+					updatedUser = {
+						...user,
+						identification_code:
+							userProfileData.user.identification_code,
+					};
+				}
+			} catch (e) {
+				console.error("Error parsing user profile:", e);
+			}
+		}
+
 		try {
-			const userResp = await axios.post<
-				ApiResponse<RegistrationFormData>
+			const userResp = await axios.patch<
+				ApiResponse<RegistrationFormDataPatch>
 			>(
 				GUEST_USER,
-				{ user },
+				updatedUser, // Send user data directly, not wrapped in { user: ... }
 				{
-					headers: { Authorization: `Bearer ${userToken}` },
+					headers: { "X-Guest-Token": `${userToken}` },
 				}
 			);
 			// Use the response data, which should include identification_code
-			updatedUser = userResp.data.data || user;
+			// Merge response data with existing user data to maintain all required fields
+			updatedUser = { ...updatedUser, ...(userResp.data.data || {}) };
 		} catch (e: any) {
 			console.error("User creation error:", e);
+			console.error("Error details:", e.response?.data);
 			// If user creation fails, we should still try to create the reservation
 			// but log the error for debugging
 		}
 		try {
 			await axios.post<ApiResponse<any>>(
 				CREATE_RESERVATION,
-				{
-					reservation: eventSlotId
-						? { event_date_id, event_slot_id }
-						: { event_date_id },
-				},
-				{ headers: { Authorization: `Bearer ${userToken}` } }
+				eventSlotId
+					? {
+							event_id: selectedEvent.eventId,
+							event_date_id,
+							event_slot_id,
+					  }
+					: { event_id: selectedEvent.eventId, event_date_id },
+				{ headers: { "X-Guest-Token": `${userToken}` } }
 			);
 			TagManager.dataLayer({
 				dataLayer: {

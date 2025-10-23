@@ -42,11 +42,20 @@ interface SearchComponentProps {
 	z_code: string;
 	range: string;
 	categories: ServiceCategory[];
+	isLoading?: boolean;
 }
 
 const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 	(
-		{ register, errors = {}, onSubmitHandler, z_code, range, categories },
+		{
+			register,
+			errors = {},
+			onSubmitHandler,
+			z_code,
+			range,
+			categories,
+			isLoading = false,
+		},
 		ref
 	) => {
 		const [address, setAddress] = useState<string>("");
@@ -194,8 +203,16 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 							id="search-resource"
 							value="Search For Resources"
 							className="w-full min-h-[50px]"
+							disabled={isLoading}
 						>
-							{localization.search_for_resources}
+							{isLoading ? (
+								<div className="flex items-center justify-center space-x-2">
+									<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+									<span>Searching...</span>
+								</div>
+							) : (
+								localization.search_for_resources
+							)}
 						</Button>
 					</div>
 					<div className="w-full mt-2">

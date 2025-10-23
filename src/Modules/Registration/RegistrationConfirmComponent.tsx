@@ -285,7 +285,7 @@ const RegistrationConfirmComponent: React.FC<
 						<Button
 							onClick={() => {
 								setShowGuestSigninModal(false);
-								navigate("/login");
+								navigate(RENDER_URL.LOGIN_URL);
 							}}
 							variant="default"
 							className="w-full"

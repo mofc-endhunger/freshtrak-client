@@ -22,6 +22,7 @@ interface PrimaryInfoFormComponentProps {
 	continueHandler?: (values: any) => void;
 	className?: string;
 	"data-testid"?: string;
+	isHouseholdSetup?: boolean;
 }
 
 const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
@@ -34,6 +35,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 	continueHandler,
 	className = "",
 	"data-testid": testId = "primary-info-form-component",
+	isHouseholdSetup = false,
 }) => {
 	const date_of_birth = watch("date_of_birth") || "";
 
@@ -298,16 +300,18 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 			</div>
 
 			{/* Continue Button */}
-			<div className="flex justify-start pt-4">
-				<Button
-					type="button"
-					onClick={handleContinue}
-					variant="highlight"
-					data-testid="continue-button"
-				>
-					Continue
-				</Button>
-			</div>
+			{!isHouseholdSetup && (
+				<div className="flex justify-start pt-4">
+					<Button
+						type="button"
+						onClick={handleContinue}
+						variant="highlight"
+						data-testid="continue-button"
+					>
+						Continue
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 };

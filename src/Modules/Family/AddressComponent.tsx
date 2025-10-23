@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import {
 	UseFormRegister,
 	UseFormWatch,
@@ -17,15 +17,6 @@ interface AddressComponentProps {
 	errors: FieldErrors<any>;
 	className?: string;
 	"data-testid"?: string;
-}
-
-// Address data interface
-interface AddressData {
-	address_line_1: string;
-	address_line_2?: string;
-	city: string;
-	state: string;
-	zip_code: string;
 }
 
 // Google Places address component interface

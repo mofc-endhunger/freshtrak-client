@@ -22,8 +22,6 @@ export const handleAuthError = (
 ): boolean => {
   // Check if this is a 401 authentication error
   if (error?.response?.status === 401 || error?.type === 'AUTHENTICATION_ERROR') {
-    console.log(`Auth error detected for ${options.userType} user`);
-
     // Clean up localStorage based on user type
     if (options.userType === "cognito") {
       // Clear all Cognito-related data

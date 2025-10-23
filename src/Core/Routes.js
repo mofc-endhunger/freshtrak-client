@@ -69,7 +69,10 @@ const AppRoutes = () => {
 							path={RENDER_URL.ROOT_URL}
 							element={<DashBoardContainer />}
 						/>
-						<Route path="/login" element={<LoginPage />} />
+						<Route
+							path={RENDER_URL.LOGIN_URL}
+							element={<LoginPage />}
+						/>
 						<Route
 							path={RENDER_URL.EVENT_LIST_URL}
 							element={<EventContainer />}
@@ -79,11 +82,14 @@ const AppRoutes = () => {
 							element={<FamilyContainer />}
 						/>
 						{/* Flag to turn off/on Home Page Container for Loggedin user feature */}
-						<Route path="/user-home" element={<HomeContainer />} />
+						<Route
+							path={RENDER_URL.USER_HOME_URL}
+							element={<HomeContainer />}
+						/>
 
 						{/* Household Management - Protected Routes */}
 						<Route
-							path="/households"
+							path={RENDER_URL.HOUSEHOLDS_URL}
 							element={
 								<ProtectedRoute>
 									<HouseholdContainer />
@@ -91,7 +97,7 @@ const AppRoutes = () => {
 							}
 						/>
 						<Route
-							path="/households/setup"
+							path={RENDER_URL.HOUSEHOLD_SETUP_URL}
 							element={
 								<ProtectedRoute>
 									<HouseholdContainer />
@@ -101,7 +107,7 @@ const AppRoutes = () => {
 
 						{/* Account Management - Protected Route */}
 						<Route
-							path="/account"
+							path={RENDER_URL.ACCOUNT_URL}
 							element={
 								<ProtectedRoute>
 									<AccountPage />
@@ -186,7 +192,12 @@ const AppRoutes = () => {
               component={SignInContainer}
             /> */}
 
-						<Route path="*" element={<Navigate to="/" replace />} />
+						<Route
+							path="*"
+							element={
+								<Navigate to={RENDER_URL.ROOT_URL} replace />
+							}
+						/>
 
 						{/* Add URLs above this line */}
 					</Routes>

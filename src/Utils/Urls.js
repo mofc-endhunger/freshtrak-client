@@ -36,4 +36,8 @@ export const RENDER_URL = {
 	QRCODE_URL: "/qrcode",
 	PRIVACY: "/privacy",
 	TERMS: "/terms",
+	ACCOUNT_URL: "/account",
+	HOUSEHOLD_SETUP_URL: "/households/setup",
+	LOGIN_URL: "/login",
+	USER_HOME_URL: "/user-home",
 };

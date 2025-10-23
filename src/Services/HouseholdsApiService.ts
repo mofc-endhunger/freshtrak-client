@@ -321,7 +321,6 @@ export class HouseholdsApiService {
 
     // Use mock data if API is not available
     if (USE_MOCK_DATA) {
-      console.log('🔧 Using mock data for createHousehold');
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -367,10 +366,7 @@ export class HouseholdsApiService {
     const requestFn = () => this.axiosInstance.post(API_CONFIG.endpoints.createHousehold, apiData);
 
     try {
-      console.log('📤 POST /users - Request data:', JSON.stringify(apiData, null, 2));
       const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
-
-      console.log('📥 POST /users - Response data:', JSON.stringify(response.data, null, 2));
 
       // Map the response to match the expected HouseholdResponse format
       const apiResponse = response.data;
@@ -410,7 +406,6 @@ export class HouseholdsApiService {
   async getHousehold(householdId: number): Promise<HouseholdResponse> {
     // Use mock data if API is not available
     if (USE_MOCK_DATA) {
-      console.log('🔧 Using mock data for getHousehold');
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 300));
 
@@ -466,7 +461,6 @@ export class HouseholdsApiService {
       const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getUsersMe);
       const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
 
-      console.log('📥 GET /users/me - Response data:', JSON.stringify(response.data, null, 2));
       return response.data;
     } catch (error) {
       const errorDetails = ApiErrorHandler.createError(error, context);
@@ -485,7 +479,6 @@ export class HouseholdsApiService {
       const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getHouseholdById(householdId));
       const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
 
-      console.log('📥 GET /households/{id} - Response data:', JSON.stringify(response.data, null, 2));
       return response.data;
     } catch (error) {
       const errorDetails = ApiErrorHandler.createError(error, context);

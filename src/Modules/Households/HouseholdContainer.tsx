@@ -10,6 +10,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../Authentication/AuthContext";
+import { RENDER_URL } from "../../Utils/Urls";
 import { HouseholdDashboard } from "./HouseholdDashboard";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { Household } from "./types/household.types";
@@ -45,7 +46,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 
 			// Check if this is the setup route
 			const isSetupRoute =
-				window.location.pathname === "/households/setup";
+				window.location.pathname === RENDER_URL.HOUSEHOLD_SETUP_URL;
 			if (isSetupRoute) {
 				// Check if user came from account page (update existing) or initial setup (create new)
 				const fromAccount = searchParams.get("from") === "account";
@@ -298,7 +299,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 			);
 
 			// Redirect back to account page
-			navigate("/account");
+			navigate(RENDER_URL.ACCOUNT_URL);
 		} catch (error: any) {
 			console.error("Error updating household:", error);
 			setError(error.message || "Failed to update household");
@@ -350,9 +351,9 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 					setShowSetupWizard(false);
 					// If user came from Account Settings, redirect back there
 					if (searchParams.get("from") === "account") {
-						navigate("/account");
+						navigate(RENDER_URL.ACCOUNT_URL);
 					} else {
-						navigate("/");
+						navigate(RENDER_URL.ROOT_URL);
 					}
 				}}
 			/>
@@ -379,7 +380,9 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							<div className="flex space-x-3">
 								<Button
 									variant="outline"
-									onClick={() => navigate("/account")}
+									onClick={() =>
+										navigate(RENDER_URL.ACCOUNT_URL)
+									}
 								>
 									<Settings className="w-4 h-4 mr-2" />
 									Account Settings

@@ -246,7 +246,7 @@ describe("HouseholdInfoDisplay Accessibility", () => {
 
 			// Check for proper heading elements
 			const headings = screen.getAllByRole("heading");
-			expect(headings).toHaveLength(4); // h2 + h3 + h4 + h4 + h4
+			expect(headings).toHaveLength(5); // h2 (sr-only) + h2 + h3 + h4 + h4 + h4
 		});
 
 		it("should have proper heading levels", () => {

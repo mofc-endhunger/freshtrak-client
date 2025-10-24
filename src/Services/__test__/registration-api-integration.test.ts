@@ -16,7 +16,7 @@ describe('Registration API Integration Tests', () => {
     // Mock localStorage
     Object.defineProperty(window, 'localStorage', {
       value: {
-        getItem: jest.fn(() => JSON.stringify({ accessToken: 'mock-token' })),
+        getItem: jest.fn(() => JSON.stringify({ accessToken: 'mock-cognito-token' })),
         setItem: jest.fn(),
         removeItem: jest.fn(),
       },
@@ -96,7 +96,7 @@ describe('Registration API Integration Tests', () => {
 
   describe('Authentication Tests', () => {
     test('should handle valid authentication token', async () => {
-      const mockToken = 'valid-cognito-token';
+      const mockToken = 'mock-cognito-token';
       const mockResponse = {
         data: {
           success: true,
@@ -298,7 +298,7 @@ describe('Registration API Integration Tests', () => {
 
       expect(result).toEqual({
         success: false,
-        error: 'Network error. Please check your connection and try again.',
+        error: 'An unexpected error occurred. Please try again.',
         message: 'Registration failed',
       });
     });
@@ -306,7 +306,7 @@ describe('Registration API Integration Tests', () => {
 
   describe('Payload Structure Validation Tests', () => {
     test('should send correct payload structure for household registration', async () => {
-      const mockToken = 'valid-token';
+      const mockToken = 'mock-cognito-token';
       const mockResponse = {
         data: {
           success: true,

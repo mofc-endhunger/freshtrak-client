@@ -19,6 +19,12 @@ import { EventFormat } from "../../Utils/EventHandler";
 import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
 import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
+import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
+import {
+	UsersMeResponse,
+	UpdateHouseholdApiRequest,
+} from "../Households/types/api.types";
+import { handleAuthError } from "../../Utils/AuthErrorHandler";
 
 // Type imports from registration.types.ts
 import {
@@ -398,6 +404,171 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		}
 	};
 
+	// Helper function to determine user type
+	const determineUserType = (): "guest" | "cognito" => {
+		const cognitoUser = localStorage.getItem("cognitoUser");
+		if (cognitoUser) {
+			try {
+				const cognitoUserData = JSON.parse(cognitoUser);
+				return cognitoUserData.isSignedIn === true
+					? "cognito"
+					: "guest";
+			} catch (error) {
+				console.warn("Could not parse cognitoUser:", error);
+			}
+		}
+		return "guest";
+	};
+
+	// Helper function to get Cognito token
+	const getCognitoToken = (): string | null => {
+		const cognitoUser = localStorage.getItem("cognitoUser");
+		if (cognitoUser) {
+			try {
+				const cognitoUserData = JSON.parse(cognitoUser);
+				return cognitoUserData.accessToken || null;
+			} catch (error) {
+				console.warn("Could not parse cognitoUser for token:", error);
+			}
+		}
+		return null;
+	};
+
+	// Helper function to map registration data to household structure
+	const mapRegistrationToHousehold = (
+		registrationData: RegistrationFormData,
+		currentHousehold: UsersMeResponse
+	): UpdateHouseholdApiRequest => {
+		// Update the primary member (members[0]) with registration data
+		const updatedMembers = [...currentHousehold.members];
+		if (updatedMembers.length > 0) {
+			updatedMembers[0] = {
+				...updatedMembers[0],
+				date_of_birth: registrationData.date_of_birth,
+			};
+		}
+
+		return {
+			// Preserve existing household structure
+			...currentHousehold,
+
+			// Update only the fields from registration
+			address_line_1: registrationData.address_line_1,
+			address_line_2: registrationData.address_line_2 || null,
+			city: registrationData.city,
+			state: registrationData.state,
+			zip_code: registrationData.zip_code,
+			phone: registrationData.phone,
+			email: registrationData.email,
+
+			// Update counts only (not individual members)
+			counts: {
+				seniors: registrationData.seniors_in_household,
+				adults: registrationData.adults_in_household,
+				children: registrationData.children_in_household,
+				total:
+					registrationData.seniors_in_household +
+					registrationData.adults_in_household +
+					registrationData.children_in_household,
+			},
+
+			// Update members array with primary member's date_of_birth
+			members: updatedMembers,
+		};
+	};
+
+	// Helper function to handle Cognito user update
+	const updateCognitoUser = async (
+		user: RegistrationFormData
+	): Promise<void> => {
+		const cognitoToken = getCognitoToken();
+		if (!cognitoToken) {
+			throw new Error("No Cognito token found. Please sign in again.");
+		}
+
+		try {
+			// Create HouseholdsApiService instance with Cognito token
+			const householdsApiService = new HouseholdsApiService();
+
+			// Get current household data from /me endpoint
+			const householdData = await householdsApiService.getUsersMe();
+
+			// Ensure we have members data
+			if (!householdData.members || householdData.members.length === 0) {
+				throw new Error(
+					"No household members found. Please contact support."
+				);
+			}
+
+			// Map registration data to household structure
+			const updateData = mapRegistrationToHousehold(user, householdData);
+
+			// Update household using primary member ID
+			await householdsApiService.updateHousehold(
+				parseInt(householdData.members[0].user_id || "0", 10),
+				updateData
+			);
+		} catch (error: any) {
+			// Handle authentication errors specifically
+			if (
+				handleAuthError(error, {
+					userType: "cognito",
+					redirectPath: "/login",
+					showToast,
+				})
+			) {
+				// Auth error was handled, re-throw to stop registration flow
+				throw error;
+			}
+			// Re-throw other errors to be handled by the main error handler
+			throw error;
+		}
+	};
+
+	// Helper function to handle errors gracefully
+	const handleRegistrationError = (
+		error: any,
+		userType: "guest" | "cognito"
+	) => {
+		console.error(`${userType} registration error:`, error);
+
+		// Reset loading state to enable the Register button
+		setDisabled(false);
+
+		let errorMessage = "Registration failed. Please try again.";
+		let shouldRedirect = false;
+		let redirectPath = "";
+
+		if (userType === "cognito") {
+			if (error.message?.includes("token")) {
+				errorMessage =
+					"Your session has expired. Please sign in again.";
+				shouldRedirect = true;
+				redirectPath = "/login";
+			} else if (error.response?.status === 404) {
+				errorMessage = "Household not found. Please contact support.";
+				shouldRedirect = true;
+				redirectPath = "/";
+			} else if (error.response?.status >= 500) {
+				errorMessage = "Server error. Please try again later.";
+			}
+		} else {
+			if (error.response?.status === 401) {
+				errorMessage = "Guest session expired. Please start over.";
+				shouldRedirect = true;
+				redirectPath = "/";
+			}
+		}
+
+		showToast(errorMessage, "error");
+
+		if (shouldRedirect) {
+			setTimeout(() => {
+				navigate(redirectPath);
+			}, 2000);
+		}
+	};
+
 	const register = async (
 		user: RegistrationFormData,
 		event: Event
@@ -408,46 +579,71 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		const { GUEST_USER, CREATE_RESERVATION } = API_URL;
 		let updatedUser = user;
 
-		// Get identification_code from stored user profile
-		const userProfile = localStorage.getItem("userProfile");
-		if (userProfile) {
-			try {
-				const userProfileData = JSON.parse(userProfile);
-				if (
-					userProfileData.user &&
-					userProfileData.user.identification_code
-				) {
-					updatedUser = {
-						...user,
-						identification_code:
-							userProfileData.user.identification_code,
-					};
-				}
-			} catch (e) {
-				console.error("Error parsing user profile:", e);
-			}
-		}
+		// Determine user type (guest vs cognito)
+		const userType = determineUserType();
 
 		try {
-			const userResp = await axios.patch<
-				ApiResponse<RegistrationFormDataPatch>
-			>(
-				GUEST_USER,
-				updatedUser, // Send user data directly, not wrapped in { user: ... }
-				{
-					headers: { "X-Guest-Token": `${userToken}` },
+			if (userType === "guest") {
+				// Existing guest flow
+				// Get identification_code from stored user profile
+				const userProfile = localStorage.getItem("userProfile");
+				if (userProfile) {
+					try {
+						const userProfileData = JSON.parse(userProfile);
+						if (
+							userProfileData.user &&
+							userProfileData.user.identification_code
+						) {
+							updatedUser = {
+								...user,
+								identification_code:
+									userProfileData.user.identification_code,
+							};
+						}
+					} catch (e) {
+						console.error("Error parsing user profile:", e);
+					}
 				}
-			);
-			// Use the response data, which should include identification_code
-			// Merge response data with existing user data to maintain all required fields
-			updatedUser = { ...updatedUser, ...(userResp.data.data || {}) };
+
+				const userResp = await axios.patch<
+					ApiResponse<RegistrationFormDataPatch>
+				>(
+					GUEST_USER,
+					updatedUser, // Send user data directly, not wrapped in { user: ... }
+					{
+						headers: { "X-Guest-Token": `${userToken}` },
+					}
+				);
+				// Use the response data, which should include identification_code
+				// Merge response data with existing user data to maintain all required fields
+				updatedUser = { ...updatedUser, ...(userResp.data.data || {}) };
+			} else {
+				// New cognito flow
+				await updateCognitoUser(user);
+			}
 		} catch (e: any) {
-			console.error("User creation error:", e);
-			console.error("Error details:", e.response?.data);
-			// If user creation fails, we should still try to create the reservation
-			// but log the error for debugging
+			// Handle authentication errors specifically
+			if (
+				handleAuthError(e, {
+					userType,
+					redirectPath: userType === "cognito" ? "/login" : "/",
+					showToast,
+				})
+			) {
+				// Auth error was handled, exit early
+				return;
+			}
+			// Handle other errors with existing error handler
+			handleRegistrationError(e, userType);
+			return; // Exit early on error
 		}
 		try {
+			// Prepare headers based on user type
+			const headers: any =
+				userType === "guest"
+					? { "X-Guest-Token": `${userToken}` }
+					: { Authorization: `Bearer ${getCognitoToken()}` };
+
 			await axios.post<ApiResponse<any>>(
 				CREATE_RESERVATION,
 				eventSlotId
@@ -457,7 +653,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							event_slot_id,
 					  }
 					: { event_id: selectedEvent.eventId, event_date_id },
-				{ headers: { "X-Guest-Token": `${userToken}` } }
+				{ headers }
 			);
 			TagManager.dataLayer({
 				dataLayer: {
@@ -490,6 +686,18 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			});
 		} catch (e: any) {
 			console.error("Registration error:", e);
+
+			// Handle authentication errors specifically
+			if (
+				handleAuthError(e, {
+					userType,
+					redirectPath: userType === "cognito" ? "/login" : "/",
+					showToast,
+				})
+			) {
+				// Auth error was handled, exit early
+				return;
+			}
 
 			// Handle different types of errors
 			if (e.response && e.response.data) {

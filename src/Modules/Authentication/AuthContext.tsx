@@ -112,25 +112,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 							userAttributes = await customFetchUserAttributes(
 								accessToken
 							);
-							console.log(
-								"🔍 customFetchUserAttributes() returned:",
-								userAttributes
-							);
-							console.log(
-								"🔍 Available attributes:",
-								Object.keys(userAttributes)
-							);
-							console.log(
-								"🔍 Account creation date:",
-								userAttributes.account_created_date
-							);
 						}
 					} else {
 						userAttributes = await fetchUserAttributes();
-						console.log(
-							"🔍 fetchUserAttributes() returned:",
-							userAttributes
-						);
 					}
 				} catch (userError) {
 					console.warn("Could not fetch user attributes:", userError);
@@ -169,7 +153,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					userAttributes.name.trim() !== ""
 				) {
 					userName = userAttributes.name;
-					console.log("✅ Using name from userAttributes:", userName);
 				}
 
 				// Try to extract name from JWT token as another fallback
@@ -392,13 +375,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			// Automatically sign in the user after email confirmation
 			if (password) {
 				try {
-					console.log(
-						"🔄 Automatically signing in user after email confirmation"
-					);
 					await handleSignIn(email, password);
-					console.log(
-						"✅ User automatically signed in after email confirmation"
-					);
 
 					// Set flag to indicate this is a new user who should see setup popup
 					localStorage.setItem("shouldShowSetupWizard", "true");

@@ -3,13 +3,7 @@ import { waitFor, render } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import configureStore from "redux-mock-store";
 import EventListContainer from "../EventListContainer";
-import {
-	mockEvent,
-	mockAgency,
-	mockEventDate,
-	mockForms,
-	testData,
-} from "../../../Testing";
+import { mockAgency, testData } from "../../../Testing";
 import { Provider } from "react-redux";
 import axios from "axios";
 

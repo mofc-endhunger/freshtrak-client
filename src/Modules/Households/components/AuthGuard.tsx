@@ -9,6 +9,7 @@ import React, { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Authentication/AuthContext";
 import { validateToken } from "../../../Utils/TokenUtils";
+import { RENDER_URL } from "../../../Utils/Urls";
 
 interface AuthGuardProps {
 	children: ReactNode;
@@ -36,10 +37,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 		if (!isLoading && requireAuth) {
 			// If user is not authenticated or doesn't have a valid access token
 			if (!isAuthenticated || !user?.accessToken) {
-				console.log(
-					"AuthGuard: Redirecting to login - no valid access token"
-				);
-				navigate("/login", { replace: true });
+				navigate(RENDER_URL.LOGIN_URL, { replace: true });
 				return;
 			}
 
@@ -47,23 +45,16 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 			const tokenValidation = validateToken(user.accessToken);
 
 			if (!tokenValidation.isValid) {
-				console.log("AuthGuard: Invalid token format, logging out");
 				signOut();
-				navigate("/login", { replace: true });
+				navigate(RENDER_URL.LOGIN_URL, { replace: true });
 				return;
 			}
 
 			if (tokenValidation.isExpired) {
-				console.log(
-					"AuthGuard: Token expired, automatically logging out"
-				);
 				signOut();
-				navigate("/login", { replace: true });
+				navigate(RENDER_URL.LOGIN_URL, { replace: true });
 				return;
 			}
-
-			// Token is valid and not expired
-			console.log("AuthGuard: Token is valid");
 		}
 	}, [isAuthenticated, user, isLoading, requireAuth, navigate, signOut]);
 

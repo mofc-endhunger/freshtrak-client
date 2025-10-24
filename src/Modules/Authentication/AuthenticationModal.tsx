@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { RENDER_URL } from "../../Utils/Urls";
 import TagManager from "react-gtm-module";
 import SignInFormComponent from "./SignInFormComponent";
 import SignUpFormComponent from "./SignUpFormComponent";
@@ -99,7 +100,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 		if (onLogin) {
 			onLogin();
 		} else {
-			navigate("/");
+			navigate(RENDER_URL.ROOT_URL);
 		}
 	};
 
@@ -147,7 +148,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 		if (onLogin) {
 			onLogin();
 		} else {
-			navigate("/");
+			navigate(RENDER_URL.ROOT_URL);
 		}
 	};
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Authentication/AuthContext";
+import { RENDER_URL } from "../../../Utils/Urls";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -60,7 +61,7 @@ const UserAccountButton: React.FC = () => {
 	 */
 	const handleAccountClick = (): void => {
 		setIsOpen(false);
-		navigate("/account");
+		navigate(RENDER_URL.ACCOUNT_URL);
 	};
 
 	/**
@@ -70,7 +71,7 @@ const UserAccountButton: React.FC = () => {
 		try {
 			setIsOpen(false);
 			await signOut();
-			navigate("/");
+			navigate(RENDER_URL.ROOT_URL);
 		} catch (error) {
 			console.error("Logout error:", error);
 		}
@@ -81,7 +82,7 @@ const UserAccountButton: React.FC = () => {
 	 */
 	const handleHomeClick = (): void => {
 		setIsOpen(false);
-		navigate("/");
+		navigate(RENDER_URL.ROOT_URL);
 	};
 
 	if (!user) {

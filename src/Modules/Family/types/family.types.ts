@@ -3,6 +3,7 @@
 // Event-related types
 export interface Event {
   id?: string;
+  eventId?: string;
   name?: string;
   date?: string;
   time?: string;

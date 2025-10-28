@@ -1,5 +1,5 @@
 // React and third-party imports
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 // Component imports
@@ -122,51 +122,64 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 		}
 	};
 
+	// Track if we've already reset the form for this user to prevent infinite loops
+	const lastResetUserRef = useRef<string | null>(null);
+
 	useEffect(() => {
-		const safeUser =
-			user && typeof user === "object"
-				? user
-				: ({} as Partial<RegistrationFormData>);
-		const {
-			first_name = "",
-			middle_name = "",
-			last_name = "",
-			suffix = "",
-			date_of_birth = "",
-			gender = "",
-			address_line_1 = "",
-			address_line_2 = "",
-			city = "",
-			state = "",
-			zip_code = "",
-			phone = "",
-			permission_to_text = false,
-			email = "",
-			permission_to_email = false,
-			seniors_in_household = 0,
-			adults_in_household = 0,
-			children_in_household = 0,
-		} = safeUser;
-		reset({
-			first_name,
-			middle_name,
-			last_name,
-			suffix,
-			date_of_birth,
-			gender,
-			address_line_1,
-			address_line_2,
-			city,
-			state,
-			zip_code,
-			phone,
-			permission_to_text,
-			email,
-			permission_to_email,
-			seniors_in_household,
-			adults_in_household,
-			children_in_household,
-		});
+		// Create a stable identifier for the user to prevent unnecessary resets
+		const userIdentifier = user ? JSON.stringify(user) : "empty";
+
+		// Only reset if the user data has actually changed
+		if (lastResetUserRef.current !== userIdentifier) {
+			const safeUser =
+				user && typeof user === "object"
+					? user
+					: ({} as Partial<RegistrationFormData>);
+			const {
+				first_name = "",
+				middle_name = "",
+				last_name = "",
+				suffix = "",
+				date_of_birth = "",
+				gender = "",
+				address_line_1 = "",
+				address_line_2 = "",
+				city = "",
+				state = "",
+				zip_code = "",
+				phone = "",
+				permission_to_text = false,
+				email = "",
+				permission_to_email = false,
+				seniors_in_household = 0,
+				adults_in_household = 0,
+				children_in_household = 0,
+			} = safeUser;
+
+			reset({
+				first_name,
+				middle_name,
+				last_name,
+				suffix,
+				date_of_birth,
+				gender,
+				address_line_1,
+				address_line_2,
+				city,
+				state,
+				zip_code,
+				phone,
+				permission_to_text,
+				email,
+				permission_to_email,
+				seniors_in_household,
+				adults_in_household,
+				children_in_household,
+			});
+
+			// Update the ref to track that we've reset for this user
+			lastResetUserRef.current = userIdentifier;
+		}
 	}, [user, reset]);
 	const onSubmit = async (data: RegistrationFormData): Promise<void> => {
 		setIsSubmitting(true);

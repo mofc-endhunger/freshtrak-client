@@ -108,6 +108,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const [disabled, setDisabled] = useState<boolean>(false);
 	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
 	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
+	const householdDataProcessedRef = useRef<boolean>(false);
 
 	const event = useSelector(selectEvent);
 	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
@@ -238,6 +239,50 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						console.error("Error parsing cognitoUser:", error);
 					}
 				}
+			} else if (
+				user &&
+				location.state?.householdData &&
+				!householdDataProcessedRef.current
+			) {
+				// Prefill form with household data if available (only once)
+				try {
+					const householdData = location.state
+						.householdData as UsersMeResponse;
+					const prefilledUser = {
+						...user,
+						// Prefill address information
+						address_line_1:
+							householdData.address_line_1 || user.address_line_1,
+						address_line_2:
+							householdData.address_line_2 || user.address_line_2,
+						city: householdData.city || user.city,
+						state: householdData.state || user.state,
+						zip_code: householdData.zip_code || user.zip_code,
+						phone: householdData.phone || user.phone,
+						email: householdData.email || user.email,
+						// Prefill household member counts
+						adults_in_household:
+							householdData.counts?.adults ||
+							user.adults_in_household,
+						children_in_household:
+							householdData.counts?.children ||
+							user.children_in_household,
+						seniors_in_household:
+							householdData.counts?.seniors ||
+							user.seniors_in_household,
+						// Prefill household name if available
+						identification_code:
+							householdData.identification_code ||
+							user.identification_code,
+					};
+					setUser(prefilledUser);
+					householdDataProcessedRef.current = true; // Mark as processed
+				} catch (error) {
+					console.error(
+						"Error prefilling with household data:",
+						error
+					);
+				}
 			}
 		}
 
@@ -266,7 +311,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		eventDateId,
 		navigate,
 		getEvent,
+		location.state,
 	]);
+
+	// Reset household data processing flag when location changes
+	useEffect(() => {
+		householdDataProcessedRef.current = false;
+	}, [location.state]);
 
 	const handleAuthLogin = (): void => {
 		const token = localStorage.getItem("userToken");

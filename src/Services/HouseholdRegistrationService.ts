@@ -79,7 +79,6 @@ export class HouseholdRegistrationService {
         event_slot_id: timeslotData.eventSlotId,
       };
 
-      console.log(`🏠 Registering with household data (attempt ${attempt + 1}):`, payload);
 
       const response = await axios.post<RegistrationResponse>(
         API_URL.CREATE_RESERVATION,
@@ -90,7 +89,6 @@ export class HouseholdRegistrationService {
         }
       );
 
-      console.log('✅ Household registration successful:', response.data);
 
       return {
         success: true,
@@ -104,7 +102,6 @@ export class HouseholdRegistrationService {
 
       // Check if we should retry
       if (registrationError.retryable && attempt < this.maxRetryAttempts - 1) {
-        console.log(`🔄 Retrying registration in ${this.retryDelay}ms...`);
         await this.delay(this.retryDelay);
         return this.registerWithRetry(timeslotData, attempt + 1);
       }
@@ -155,17 +152,6 @@ export class HouseholdRegistrationService {
     const hasValidCounts = Object.values(householdData.counts).every(count => count >= 0);
 
     const isComplete = hasRequiredFields && hasMembers && hasValidCounts;
-
-    console.log('🔍 Household completeness check:', {
-      hasRequiredFields,
-      hasMembers,
-      hasValidCounts,
-      isComplete,
-      missingFields: requiredFields.filter(field => {
-        const value = householdData[field as keyof UsersMeResponse];
-        return value === null || value === undefined || value === '';
-      }),
-    });
 
     return isComplete;
   }

@@ -277,10 +277,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					};
 					setUser(prefilledUser);
 					householdDataProcessedRef.current = true; // Mark as processed
-					console.log(
-						"🏠 Prefilled form with household data:",
-						prefilledUser
-					);
 				} catch (error) {
 					console.error(
 						"Error prefilling with household data:",

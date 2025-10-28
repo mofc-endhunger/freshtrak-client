@@ -15,6 +15,7 @@ import ErrorComponent from "../General/ErrorComponent";
 import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import RegistrationComponent from "./RegistrationComponent";
+import { AlreadyRegisteredError } from "../../components/shared";
 import { EventFormat } from "../../Utils/EventHandler";
 import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
@@ -107,6 +108,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const [errors, setErrors] = useState<string[]>([]);
 	const [disabled, setDisabled] = useState<boolean>(false);
 	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+	const [showAlreadyRegistered, setShowAlreadyRegistered] =
+		useState<boolean>(false);
 	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
 
 	const event = useSelector(selectEvent);
@@ -292,6 +295,26 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		return `Your QRCode for the Reservation ${CLIENT_URL}qrcode/${identification_code}/${eventDateId}${
 			eventSlotId ? "/" + eventSlotId : ""
 		}`;
+	};
+
+	// Check if error message indicates "already registered"
+	const isAlreadyRegisteredError = (errorData: any): boolean => {
+		if (!errorData || typeof errorData !== "object") {
+			return false;
+		}
+
+		const errorText = JSON.stringify(errorData).toLowerCase();
+		const alreadyRegisteredKeywords = [
+			"already registered",
+			"alread registered",
+			"already exist",
+			"user already",
+			"duplicate registration",
+		];
+
+		return alreadyRegisteredKeywords.some(keyword =>
+			errorText.includes(keyword)
+		);
 	};
 
 	const formatErrorMessage = (message: string): string => {
@@ -699,6 +722,17 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				return;
 			}
 
+			// Check for "already registered" error
+			if (
+				e.response &&
+				e.response.data &&
+				isAlreadyRegisteredError(e.response.data)
+			) {
+				setShowAlreadyRegistered(true);
+				setDisabled(false);
+				return;
+			}
+
 			// Handle different types of errors
 			if (e.response && e.response.data) {
 				// API error with response data
@@ -750,6 +784,22 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				setshow={setShowAuthModal}
 				onLogin={handleAuthLogin}
 			/>
+		);
+	}
+
+	// Show already registered error message
+	if (showAlreadyRegistered) {
+		return (
+			<Fragment>
+				<NotifyToast />
+				<AlreadyRegisteredError
+					eventName={selectedEvent?.agencyName}
+					onBackToHome={() => {
+						setShowAlreadyRegistered(false);
+						navigate(RENDER_URL.ROOT_URL);
+					}}
+				/>
+			</Fragment>
 		);
 	}
 

@@ -11,20 +11,30 @@ const BackButtonComponent = () => {
 	const backHome = () => {
 		const currentPath = location.pathname;
 		const pathParts = currentPath.split("/");
-		const hasTimeslotId = pathParts.length === 5; // /register/form/:eventDateId/:timeslotId (5 parts due to leading empty string)
 
-		if (hasTimeslotId) {
+		// Handle different URL patterns:
+		// /register/event/:eventDateId (4 parts) -> go to results page or home
+		// /register/form/:eventDateId (4 parts) -> go to event details
+		// /register/form/:eventDateId/:timeslotId (5 parts) -> go to event details
+
+		if (pathParts.length === 4 && pathParts[2] === "event") {
+			// /register/event/:eventDateId - go back to search results or home
+			navigate(RENDER_URL.ROOT_URL);
+		} else if (pathParts.length >= 4 && pathParts[2] === "form") {
+			// /register/form/:eventDateId or /register/form/:eventDateId/:timeslotId
 			// Extract eventDateId from the URL (it's the 4th part, index 3)
 			const eventDateId = pathParts[3];
-			navigate(
-				`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${eventDateId}`
-			);
+			if (eventDateId) {
+				navigate(
+					`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${eventDateId}`
+				);
+			} else {
+				// Fallback to home if no eventDateId
+				navigate(RENDER_URL.ROOT_URL);
+			}
 		} else {
-			// If no timeslot ID, extract eventDateId from the 4th part (index 3)
-			const eventDateId = pathParts[3];
-			navigate(
-				`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${eventDateId}`
-			);
+			// Default fallback
+			navigate(RENDER_URL.ROOT_URL);
 		}
 	};
 

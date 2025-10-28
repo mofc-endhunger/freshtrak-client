@@ -8,9 +8,9 @@ import {
 	confirmResetPassword,
 	resendSignUpCode,
 	fetchUserAttributes,
+	fetchAuthSession,
 } from "aws-amplify/auth";
 import { AuthContextType } from "./types/authentication.types";
-import { getSecretHash } from "../../Utils/CognitoUtils";
 import {
 	customSignUp,
 	customConfirmSignUp,
@@ -85,6 +85,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					username: email,
 					password,
 				});
+
+				// Get access token from Amplify session
+				if (result.isSignedIn) {
+					try {
+						const session = await fetchAuthSession();
+						if (session.tokens?.accessToken) {
+							result = {
+								isSignedIn: result.isSignedIn,
+								signInDetails: {
+									isSignedIn: result.isSignedIn,
+									accessToken:
+										session.tokens.accessToken.toString(),
+								},
+							};
+						}
+					} catch (sessionError) {
+						console.warn(
+							"Could not fetch session tokens:",
+							sessionError
+						);
+					}
+				}
 			}
 
 			if (result.isSignedIn) {
@@ -440,21 +462,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Generate SECRET_HASH if client secret is configured
-			const secretHash = getSecretHash(email);
-
-			const resetOptions: any = { username: email };
-
-			// Add SECRET_HASH if available
-			if (secretHash) {
-				resetOptions.options = {
-					clientMetadata: {
-						SECRET_HASH: secretHash,
-					},
-				};
-			}
-
-			await resetPassword(resetOptions);
+			// Use Amplify reset password (no secrets required)
+			await resetPassword({
+				username: email,
+			});
 		} catch (error: any) {
 			console.error("Reset password error:", error);
 			throw new Error(error.message || "Failed to reset password");
@@ -471,25 +482,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Generate SECRET_HASH if client secret is configured
-			const secretHash = getSecretHash(email);
-
-			const confirmResetOptions: any = {
+			// Use Amplify confirm reset password (no secrets required)
+			await confirmResetPassword({
 				username: email,
 				confirmationCode: code,
 				newPassword,
-			};
-
-			// Add SECRET_HASH if available
-			if (secretHash) {
-				confirmResetOptions.options = {
-					clientMetadata: {
-						SECRET_HASH: secretHash,
-					},
-				};
-			}
-
-			await confirmResetPassword(confirmResetOptions);
+			});
 		} catch (error: any) {
 			console.error("Confirm reset password error:", error);
 			throw new Error(
@@ -506,21 +504,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Generate SECRET_HASH if client secret is configured
-			const secretHash = getSecretHash(email);
-
-			const resendOptions: any = { username: email };
-
-			// Add SECRET_HASH if available
-			if (secretHash) {
-				resendOptions.options = {
-					clientMetadata: {
-						SECRET_HASH: secretHash,
-					},
-				};
-			}
-
-			await resendSignUpCode(resendOptions);
+			// Use Amplify resend confirmation code (no secrets required)
+			await resendSignUpCode({
+				username: email,
+			});
 		} catch (error: any) {
 			console.error("Resend confirmation code error:", error);
 			throw new Error(

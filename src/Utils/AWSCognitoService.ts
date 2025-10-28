@@ -1,6 +1,5 @@
 // Use AWS SDK v2 for better compatibility
 import * as AWS from 'aws-sdk';
-import { generateSecretHash } from './CognitoUtils';
 
 // Configure AWS
 AWS.config.update({
@@ -75,11 +74,10 @@ export interface UserAttributesResult {
 }
 
 /**
- * Custom signup function that handles SECRET_HASH for clients with secrets
+ * Custom signup function (no client secret required)
  */
 export const customSignUp = async (params: SignUpParams): Promise<SignUpResult> => {
   const clientId = process.env.REACT_APP_USER_POOL_CLIENT_ID;
-  const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
 
   if (!clientId) {
     throw new Error('REACT_APP_USER_POOL_CLIENT_ID is not configured');
@@ -112,14 +110,6 @@ export const customSignUp = async (params: SignUpParams): Promise<SignUpResult> 
     ],
   };
 
-  // Add SECRET_HASH if client secret is configured
-  if (clientSecret) {
-    const secretHash = generateSecretHash(username, clientId, clientSecret);
-    signUpParams.SecretHash = secretHash;
-  } else {
-    console.warn('AWSCognitoService: No client secret configured');
-  }
-
   try {
     const result = await cognito.signUp(signUpParams).promise();
 
@@ -137,11 +127,10 @@ export const customSignUp = async (params: SignUpParams): Promise<SignUpResult> 
 };
 
 /**
- * Custom confirm signup function that handles SECRET_HASH for clients with secrets
+ * Custom confirm signup function (no client secret required)
  */
 export const customConfirmSignUp = async (params: ConfirmSignUpParams): Promise<ConfirmSignUpResult> => {
   const clientId = process.env.REACT_APP_USER_POOL_CLIENT_ID;
-  const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
 
   if (!clientId) {
     throw new Error('REACT_APP_USER_POOL_CLIENT_ID is not configured');
@@ -152,14 +141,6 @@ export const customConfirmSignUp = async (params: ConfirmSignUpParams): Promise<
     Username: params.username,
     ConfirmationCode: params.confirmationCode,
   };
-
-  // Add SECRET_HASH if client secret is configured
-  if (clientSecret) {
-    const secretHash = generateSecretHash(params.username, clientId, clientSecret);
-    confirmSignUpParams.SecretHash = secretHash;
-  } else {
-    console.warn('AWSCognitoService: No client secret configured for confirmSignUp');
-  }
 
   try {
     await cognito.confirmSignUp(confirmSignUpParams).promise();
@@ -174,11 +155,10 @@ export const customConfirmSignUp = async (params: ConfirmSignUpParams): Promise<
 };
 
 /**
- * Custom sign in function that handles SECRET_HASH for clients with secrets
+ * Custom sign in function (no client secret required)
  */
 export const customSignIn = async (params: SignInParams): Promise<SignInResult> => {
   const clientId = process.env.REACT_APP_USER_POOL_CLIENT_ID;
-  const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
 
   if (!clientId) {
     throw new Error('REACT_APP_USER_POOL_CLIENT_ID is not configured');
@@ -195,14 +175,6 @@ export const customSignIn = async (params: SignInParams): Promise<SignInResult> 
         PASSWORD: params.password,
       },
     };
-
-    // Add SECRET_HASH if client secret is configured
-    if (clientSecret) {
-      const secretHash = generateSecretHash(params.email, clientId, clientSecret);
-      signInParams.AuthParameters.SECRET_HASH = secretHash;
-    } else {
-      console.warn('AWSCognitoService: No client secret configured for signIn');
-    }
 
     const result = await cognito.initiateAuth(signInParams).promise();
 

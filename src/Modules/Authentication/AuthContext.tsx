@@ -214,6 +214,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					(result as any).signInDetails?.accessToken ||
 					(result as any).signInDetails?.signInDetails?.accessToken ||
 					(result as any).accessToken;
+
+				// Extract account creation and last modified from JWT token claims
+				let accountCreatedDate =
+					userAttributes?.account_created_date || null;
+				let accountLastModified =
+					userAttributes?.account_last_modified || null;
+
+				if (accessToken) {
+					try {
+						const tokenParts = accessToken.split(".");
+						if (tokenParts.length === 3) {
+							const payload = JSON.parse(atob(tokenParts[1]));
+							// auth_time is when the user was created/authn first time
+							if (payload.auth_time && !accountCreatedDate) {
+								accountCreatedDate = new Date(
+									payload.auth_time * 1000
+								).toISOString();
+							}
+							// iat is "issued at" time - last auth time
+							if (payload.iat && !accountLastModified) {
+								accountLastModified = new Date(
+									payload.iat * 1000
+								).toISOString();
+							}
+						}
+					} catch (jwtError) {
+						console.warn(
+							"Could not extract dates from JWT token:",
+							jwtError
+						);
+					}
+				}
+
 				// Create flattened signInDetails object
 				const signInDetails = {
 					isSignedIn: result.isSignedIn || true, // Ensure it's always true if we reach this point
@@ -227,11 +260,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					isSignedIn: true,
 					accessToken: accessToken,
 					signInDetails: signInDetails,
-					// Add account creation date if available (currently not available from getUser API)
-					accountCreatedDate:
-						userAttributes?.account_created_date || null,
-					accountLastModified:
-						userAttributes?.account_last_modified || null,
+					// Add account creation date and last modified from JWT token or custom attributes
+					accountCreatedDate: accountCreatedDate,
+					accountLastModified: accountLastModified,
 					userStatus: userAttributes?.user_status || null,
 				};
 

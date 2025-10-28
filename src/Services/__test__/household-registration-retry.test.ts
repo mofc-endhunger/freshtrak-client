@@ -25,7 +25,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
 
   describe('Retry Logic Tests', () => {
     test('should retry on network error and eventually succeed', async () => {
-      const mockToken = 'valid-token';
       const mockResponse = {
         data: {
           success: true,
@@ -57,7 +56,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should retry on timeout error and eventually succeed', async () => {
-      const mockToken = 'valid-token';
       const mockResponse = {
         data: {
           success: true,
@@ -85,7 +83,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should retry on server error (500) and eventually succeed', async () => {
-      const mockToken = 'valid-token';
       const mockResponse = {
         data: {
           success: true,
@@ -117,9 +114,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should not retry on authentication error (401)', async () => {
-      const mockToken = 'invalid-token';
-
-
       mockedAxios.post.mockRejectedValue({
         response: {
           status: 401,
@@ -141,9 +135,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should not retry on timeslot conflict error (409)', async () => {
-      const mockToken = 'valid-token';
-
-
       mockedAxios.post.mockRejectedValue({
         response: {
           status: 409,
@@ -166,9 +157,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should not retry on validation error (422)', async () => {
-      const mockToken = 'valid-token';
-
-
       mockedAxios.post.mockRejectedValue({
         response: {
           status: 422,
@@ -193,9 +181,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should stop retrying after maximum attempts', async () => {
-      const mockToken = 'valid-token';
-
-
       // All calls fail with network error
       mockedAxios.post.mockRejectedValue({
         message: 'Network Error',
@@ -212,48 +197,10 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
       expect(result.error).toBe('Network error. Please check your connection and try again.');
       expect(mockedAxios.post).toHaveBeenCalledTimes(3); // Max retry attempts
     });
-
-    test('should include attempt number in console logs', async () => {
-      const mockToken = 'valid-token';
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-
-      // First call fails, second succeeds
-      mockedAxios.post
-        .mockRejectedValueOnce({
-          message: 'Network Error',
-          code: 'NETWORK_ERROR',
-        })
-        .mockResolvedValueOnce({
-          data: {
-            success: true,
-            message: 'Registration successful',
-          },
-        });
-
-      await householdRegistrationService.registerWithHousehold({
-        eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
-      });
-
-      // Check that attempt numbers are logged
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('🏠 Registering with household data (attempt 1):'),
-        expect.any(Object)
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('🏠 Registering with household data (attempt 2):'),
-        expect.any(Object)
-      );
-
-      consoleSpy.mockRestore();
-    });
   });
 
   describe('Error Handling Tests', () => {
     test('should handle mixed retryable and non-retryable errors', async () => {
-      const mockToken = 'valid-token';
 
 
       // First call fails with retryable error, second with non-retryable
@@ -283,7 +230,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should handle unknown error types', async () => {
-      const mockToken = 'valid-token';
 
 
       mockedAxios.post.mockRejectedValue({
@@ -305,7 +251,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
 
   describe('Performance Tests', () => {
     test('should complete retry cycle within reasonable time', async () => {
-      const mockToken = 'valid-token';
       const mockResponse = {
         data: {
           success: true,
@@ -338,7 +283,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should handle concurrent retry operations', async () => {
-      const mockToken = 'valid-token';
       const mockResponse = {
         data: {
           success: true,

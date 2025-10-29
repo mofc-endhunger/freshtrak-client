@@ -21,6 +21,10 @@ import {
 	DialogHeader,
 } from "../../components/ui/dialog";
 import localization from "../Localization/LocalizationComponent";
+import { Printer, Download } from "lucide-react";
+import PrintableConfirmationCard, {
+	generateConfirmationCardPNG,
+} from "./components/PrintableConfirmationCard";
 
 // Type imports from registration.types.ts
 import {
@@ -134,8 +138,71 @@ const RegistrationConfirmComponent: React.FC<
 		identification_code = "",
 	} = user_data || {};
 
+	// Get event address details
+	const eventAddress = (event as any)?.eventAddress || "";
+	const eventCity = (event as any)?.eventCity || "";
+	const eventState = (event as any)?.eventState || "";
+	const eventZip = (event as any)?.eventZip || "";
+
+	// Format event date and time
+	const eventDateFormatted = formatDateDayAndDate(event.date);
+	const eventTime =
+		location.state?.eventTimeStamp?.start_time &&
+		location.state?.eventTimeStamp?.end_time
+			? `${location.state.eventTimeStamp.start_time} - ${location.state.eventTimeStamp.end_time}`
+			: `${event.startTime} - ${event.endTime}`;
+
+	// Format agency address
+	const agencyAddress = [eventAddress, eventCity, eventState, eventZip]
+		.filter(Boolean)
+		.join(", ");
+
+	// Handle print functionality
+	const handlePrint = useCallback(() => {
+		window.print();
+	}, []);
+
+	// Handle save functionality (PNG)
+	const handleSave = useCallback(async () => {
+		if (!event) return;
+
+		try {
+			await generateConfirmationCardPNG(
+				event,
+				agencyAddress,
+				eventDateFormatted,
+				eventTime,
+				identification_code,
+				eventDateId,
+				event_slot_id
+			);
+		} catch (error) {
+			console.error("Error generating confirmation card:", error);
+		}
+	}, [
+		event,
+		identification_code,
+		eventDateId,
+		event_slot_id,
+		agencyAddress,
+		eventDateFormatted,
+		eventTime,
+	]);
+
 	return (
 		<Fragment>
+			{/* Print-only section */}
+			{event && (
+				<PrintableConfirmationCard
+					event={event}
+					agencyAddress={agencyAddress}
+					eventDateFormatted={eventDateFormatted}
+					eventTime={eventTime}
+					identificationCode={identification_code}
+					eventDateId={eventDateId}
+					eventSlotId={event_slot_id}
+				/>
+			)}
 			{event && (
 				<div className="mt-4 max-w-6xl mx-auto px-4">
 					<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 register-confirmation">
@@ -167,16 +234,42 @@ const RegistrationConfirmComponent: React.FC<
 							</h2>
 							<br />
 						</div>
-						<div>
+						<div className="relative">
 							<h2>Your QR Code:</h2>
-							<div className="flex justify-center p-4 bg-white">
-								<QRCode
-									value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
-										event_slot_id
-											? "&event_slot_id=" + event_slot_id
-											: ""
-									}`}
-								/>
+							<div className="relative flex justify-center p-4 bg-white">
+								<div className="flex justify-center p-4 bg-white">
+									<QRCode
+										value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
+											event_slot_id
+												? "&event_slot_id=" +
+												  event_slot_id
+												: ""
+										}`}
+									/>
+								</div>
+								{/* Action buttons in top right corner */}
+								<div className="absolute top-0 right-0 flex gap-2 p-2">
+									<Button
+										onClick={handlePrint}
+										variant="outline"
+										size="icon"
+										className="bg-white hover:bg-gray-50"
+										title="Print"
+										aria-label="Print confirmation"
+									>
+										<Printer className="h-4 w-4" />
+									</Button>
+									<Button
+										onClick={handleSave}
+										variant="outline"
+										size="icon"
+										className="bg-white hover:bg-gray-50"
+										title="Save"
+										aria-label="Save confirmation"
+									>
+										<Download className="h-4 w-4" />
+									</Button>
+								</div>
 							</div>
 							<br />
 						</div>
@@ -209,11 +302,13 @@ const RegistrationConfirmComponent: React.FC<
 
 						{event.eventDetails &&
 							event.eventDetails.length > 0 && (
-								<h5>
-									<b> Additional Location Information </b>
-								</h5>
+								<>
+									<h5>
+										<b> Additional Location Information </b>
+									</h5>
+									<p className="mb-5">{event.eventDetails}</p>
+								</>
 							)}
-						<p className="mb-5">{event.eventDetails}</p>
 
 						<Link to={RENDER_URL.ROOT_URL}>
 							<div className="flex justify-center mt-4">

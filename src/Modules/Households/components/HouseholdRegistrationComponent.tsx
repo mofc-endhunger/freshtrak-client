@@ -17,6 +17,7 @@ import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 // Type imports
 import { RegistrationFormData } from "../../Registration/types/registration.types";
 import { ApiHouseholdMember } from "../types/api.types";
+import { getGenderFromId, getGenderDisplayName } from "../utils/householdUtils";
 
 interface HouseholdRegistrationComponentProps {
 	onComplete: (data: RegistrationFormData) => Promise<void>;
@@ -89,12 +90,25 @@ const HouseholdRegistrationComponent: React.FC<
 				) {
 					setCurrentHouseholdMembers(userData.members);
 					const primaryMember = userData.members[0];
+
+					// Convert gender_id to gender display name for form
+					const getGenderForForm = (
+						genderId: number | null
+					): string => {
+						if (!genderId) return "";
+						const gender = getGenderFromId(genderId);
+						return getGenderDisplayName(gender);
+					};
+
 					setPrefilledData({
 						first_name: primaryMember.first_name || "",
 						last_name: primaryMember.last_name || "",
 						middle_name: primaryMember.middle_name || "",
 						date_of_birth: convertDateFormat(
 							primaryMember.date_of_birth || ""
+						),
+						gender: getGenderForForm(
+							primaryMember.gender_id || null
 						),
 						phone: userData.phone || "",
 						email: userData.email || "",

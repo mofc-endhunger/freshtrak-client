@@ -26,6 +26,11 @@ import {
 	UpdateHouseholdApiRequest,
 } from "../Households/types/api.types";
 import { handleAuthError } from "../../Utils/AuthErrorHandler";
+import {
+	getGenderId,
+	getGenderFromId,
+	getGenderDisplayName,
+} from "../Households/utils/householdUtils";
 
 // Type imports from registration.types.ts
 import {
@@ -251,6 +256,54 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				try {
 					const householdData = location.state
 						.householdData as UsersMeResponse;
+
+					// Get primary member data for DOB and gender
+					const primaryMember =
+						householdData.members &&
+						householdData.members.length > 0
+							? householdData.members[0]
+							: null;
+
+					// Convert date from yyyy-mm-dd to mm/dd/yyyy format for form
+					const convertDateFormat = (dateString: string): string => {
+						if (!dateString || dateString === "1900-01-01") {
+							return "";
+						}
+						try {
+							const [year, month, day] = dateString
+								.split("-")
+								.map(Number);
+							if (
+								isNaN(year) ||
+								isNaN(month) ||
+								isNaN(day) ||
+								year < 1900 ||
+								year > 2100 ||
+								month < 1 ||
+								month > 12 ||
+								day < 1 ||
+								day > 31
+							) {
+								return "";
+							}
+							const monthStr = String(month).padStart(2, "0");
+							const dayStr = String(day).padStart(2, "0");
+							const yearStr = String(year);
+							return `${monthStr}/${dayStr}/${yearStr}`;
+						} catch (error) {
+							return "";
+						}
+					};
+
+					// Convert gender_id to gender display name for form
+					const getGenderForForm = (
+						genderId: number | null
+					): string => {
+						if (!genderId) return "";
+						const gender = getGenderFromId(genderId);
+						return getGenderDisplayName(gender);
+					};
+
 					const prefilledUser = {
 						...user,
 						// Prefill address information
@@ -263,6 +316,15 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						zip_code: householdData.zip_code || user.zip_code,
 						phone: householdData.phone || user.phone,
 						email: householdData.email || user.email,
+						// Prefill date_of_birth and gender from primary member
+						date_of_birth: primaryMember
+							? convertDateFormat(
+									primaryMember.date_of_birth || ""
+							  )
+							: user.date_of_birth || "",
+						gender: primaryMember
+							? getGenderForForm(primaryMember.gender_id || null)
+							: user.gender || "",
 						// Prefill household member counts
 						adults_in_household:
 							householdData.counts?.adults ||
@@ -508,6 +570,22 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		return null;
 	};
 
+	// Helper function to convert registration gender format to household format
+	const normalizeGenderToHouseholdFormat = (
+		gender: string
+	): "male" | "female" | "other" | "prefer_not_to_say" => {
+		const normalized = gender.toLowerCase().trim();
+		if (normalized === "male") return "male";
+		if (normalized === "female") return "female";
+		if (normalized === "other") return "other";
+		if (
+			normalized === "prefer not to say" ||
+			normalized === "prefer_not_to_say"
+		)
+			return "prefer_not_to_say";
+		return "prefer_not_to_say";
+	};
+
 	// Helper function to map registration data to household structure
 	const mapRegistrationToHousehold = (
 		registrationData: RegistrationFormData,
@@ -516,6 +594,15 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		// Exclude updated_at from the request (like HouseholdContainer does)
 		const { updated_at, ...currentHouseholdWithoutTimestamp } =
 			currentHousehold;
+
+		// Convert registration gender to gender_id if provided
+		let genderId: number | null = null;
+		if (registrationData.gender) {
+			const normalizedGender = normalizeGenderToHouseholdFormat(
+				registrationData.gender
+			);
+			genderId = getGenderId(normalizedGender);
+		}
 
 		// Update the primary member (members[0]) with all registration data
 		const updatedMembers = currentHousehold.members.map((member, index) => {
@@ -532,10 +619,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						null,
 					date_of_birth:
 						registrationData.date_of_birth || member.date_of_birth,
-					// Ensure proper typing for nullable fields
-					gender_id: member.gender_id
-						? Number(member.gender_id)
-						: null,
+					// Update gender_id from registration data if provided, otherwise keep existing
+					gender_id:
+						genderId !== null
+							? genderId
+							: member.gender_id
+							? Number(member.gender_id)
+							: null,
 					suffix_id: member.suffix_id
 						? Number(member.suffix_id)
 						: null,

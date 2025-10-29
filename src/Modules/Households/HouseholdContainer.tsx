@@ -18,6 +18,7 @@ import HouseholdRegistrationComponent from "./components/HouseholdRegistrationCo
 import { AuthGuard } from "./components/AuthGuard";
 import { Button } from "../../components/ui/button";
 import { Settings } from "lucide-react";
+import { getGenderId } from "./utils/householdUtils";
 
 interface HouseholdContainerProps {
 	className?: string;
@@ -205,6 +206,34 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 						}));
 
 					if (updatedMembers.length > 0) {
+						// Convert registration gender to gender_id if provided
+						let genderId: number | null = null;
+						if (registrationData.gender) {
+							// Normalize gender format for getGenderId
+							const normalizeGender = (
+								gender: string
+							):
+								| "male"
+								| "female"
+								| "other"
+								| "prefer_not_to_say" => {
+								const normalized = gender.toLowerCase().trim();
+								if (normalized === "male") return "male";
+								if (normalized === "female") return "female";
+								if (normalized === "other") return "other";
+								if (
+									normalized === "prefer not to say" ||
+									normalized === "prefer_not_to_say"
+								)
+									return "prefer_not_to_say";
+								return "prefer_not_to_say";
+							};
+							const normalizedGender = normalizeGender(
+								registrationData.gender
+							);
+							genderId = getGenderId(normalizedGender);
+						}
+
 						// Update primary member details
 						updatedMembers[0] = {
 							...updatedMembers[0],
@@ -220,6 +249,13 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							date_of_birth:
 								registrationData.date_of_birth ||
 								updatedMembers[0].date_of_birth,
+							// Update gender_id from registration data if provided, otherwise keep existing
+							gender_id:
+								genderId !== null
+									? genderId
+									: updatedMembers[0].gender_id
+									? Number(updatedMembers[0].gender_id)
+									: null,
 						};
 					}
 

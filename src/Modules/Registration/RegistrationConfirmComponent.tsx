@@ -17,8 +17,8 @@ import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
-	DialogHeader,
 	DialogTitle,
+	DialogHeader,
 } from "../../components/ui/dialog";
 import localization from "../Localization/LocalizationComponent";
 

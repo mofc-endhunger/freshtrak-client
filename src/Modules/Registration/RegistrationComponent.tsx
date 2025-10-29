@@ -13,7 +13,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 	event,
 	disabled,
 }) => {
-		return (
+	return (
 		<HouseholdForm
 			mode="registration"
 			onSubmit={onRegister}
@@ -22,7 +22,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 				console.log("Registration cancelled");
 			}}
 			prefilledData={user}
-								event={event}
+			event={event}
 			disabled={disabled}
 			title="Event Registration"
 			subtitle="Complete your registration for the upcoming event"

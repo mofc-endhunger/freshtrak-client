@@ -25,6 +25,7 @@ import {
 	UpdateHouseholdApiRequest,
 } from "../Households/types/api.types";
 import { handleAuthError } from "../../Utils/AuthErrorHandler";
+import config from "../../config";
 
 // Type imports from registration.types.ts
 import {
@@ -115,7 +116,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 	const currentUser = useSelector(selectUser);
 	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
-	const CLIENT_URL = process.env.REACT_APP_CLIENT_URL;
+	const CLIENT_URL = config.CLIENT_URL;
 
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {

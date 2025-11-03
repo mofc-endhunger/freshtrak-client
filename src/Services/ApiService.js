@@ -3,8 +3,9 @@
 import axios from "axios";
 import { API_URL } from "../Utils/Urls";
 import { CONFIRMATION_EMAIL } from "../Utils/Constants";
+import config from "../config";
 
-const CLIENT_URL = process.env.REACT_APP_CLIENT_URL;
+const CLIENT_URL = config.CLIENT_URL;
 
 const getReservationText = location => {
 	return location.state

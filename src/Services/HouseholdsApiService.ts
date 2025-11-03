@@ -26,12 +26,13 @@ import {
   mockHousehold,
   mockHouseholdResponse,
 } from '../Testing/mock-households';
+import config from '../config';
 
 /**
  * Configuration for the Households API service
  */
 const API_CONFIG: HouseholdApiConfig = {
-  baseUrl: process.env.REACT_APP_REGISTRATION_API || '',
+  baseUrl: config.REGISTRATION_API || '',
   endpoints: {
     createHousehold: 'api/users',
     getUsersMe: 'api/users/me',

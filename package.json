@@ -65,11 +65,11 @@
     "zod": "^4.0.15"
   },
   "scripts": {
-    "start": "env-cmd -f .env.development react-scripts start",
-    "build": "env-cmd -f .env.${REACT_APP_ENV} react-scripts build",
-    "build:development": "REACT_APP_ENV=development npm run build",
-    "build:beta": "REACT_APP_ENV=beta npm run build",
-    "build:production": "REACT_APP_ENV=production npm run build",
+    "start": "env-cmd -f .env react-scripts start",
+    "build": "react-scripts build",
+    "build:development": "env-cmd -f .env npm run build",
+    "build:beta": "react-scripts build",
+    "build:production": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "docker:build": "docker-compose build",

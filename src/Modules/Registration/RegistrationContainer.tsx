@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import config from "../../config";
 import TagManager from "react-gtm-module";
 import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
 import { selectUser } from "../../Store/userSlice";

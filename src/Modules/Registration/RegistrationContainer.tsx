@@ -668,18 +668,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			members: updatedMembers,
 		};
 
-		console.log(
-			"mapRegistrationToHousehold - final payload:",
-			JSON.stringify(
-				{
-					payloadKeys: Object.keys(payload),
-					payload,
-				},
-				null,
-				2
-			)
-		);
-
 		return payload;
 	};
 
@@ -698,14 +686,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 			// Get current household data from /me endpoint
 			const householdData = await householdsApiService.getUsersMe();
-			console.log(
-				"getUsersMe - parsed household data:",
-				JSON.parse(JSON.stringify(householdData))
-			);
-			console.log(
-				"updateCognitoUser - registration data:",
-				JSON.parse(JSON.stringify(user))
-			);
 
 			// Ensure we have members data
 			if (!householdData.members || householdData.members.length === 0) {
@@ -716,11 +696,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 			// Map registration data to household structure
 			const updateData = mapRegistrationToHousehold(user, householdData);
-
-			console.log(
-				"updateCognitoUser - primary member in updateData:",
-				updateData.members[0]
-			);
 
 			// Update household using primary member ID
 			await householdsApiService.updateHousehold(

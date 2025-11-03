@@ -1,5 +1,6 @@
 // React imports
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 // Component imports
 import { HouseholdForm } from "../../components/shared";
@@ -13,13 +14,14 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 	event,
 	disabled,
 }) => {
+	const navigate = useNavigate();
+
 	return (
 		<HouseholdForm
 			mode="registration"
 			onSubmit={onRegister}
 			onCancel={() => {
-				// Handle cancel - could navigate back or show confirmation
-				console.log("Registration cancelled");
+				navigate(-1);
 			}}
 			prefilledData={user}
 			event={event}

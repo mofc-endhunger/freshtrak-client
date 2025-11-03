@@ -120,7 +120,7 @@ const HouseholdRegistrationComponent: React.FC<
 					});
 				} else {
 					// No members found - set empty prefilled data
-					console.log("No members found in user data");
+					console.error("No members found in user data");
 				}
 			} catch (error) {
 				console.error("Error fetching user data:", error);
@@ -138,7 +138,7 @@ const HouseholdRegistrationComponent: React.FC<
 	useEffect(() => {
 		if (authUser) {
 			const nameParts = authUser.name?.split(" ") || [];
-			setPrefilledData(prev => ({
+			setPrefilledData((prev) => ({
 				...prev,
 				first_name: nameParts[0] || "",
 				last_name: nameParts.slice(1).join(" ") || "",
@@ -150,7 +150,7 @@ const HouseholdRegistrationComponent: React.FC<
 
 	// Handle member deletion
 	const handleDeleteMember = (memberId: number): void => {
-		setDeletedMemberIds(prev => [...prev, memberId]);
+		setDeletedMemberIds((prev) => [...prev, memberId]);
 	};
 
 	// Loading state

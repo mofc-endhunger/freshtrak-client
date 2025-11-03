@@ -8,14 +8,15 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import "leaflet/dist/leaflet.css";
 import "./index.css";
+import config from "./config";
 
-const GA_ID = process.env.REACT_APP_GA_ID;
+const GA_ID = config.GA_ID;
 if (GA_ID) {
 	ReactGA.initialize(GA_ID);
 	ReactGA.pageview(window.location.pathname + window.location.search);
 }
 
-const GTM_ID = process.env.REACT_APP_GTM_ID;
+const GTM_ID = config.GTM_ID;
 const tagManagerArgs = {
 	gtmId: GTM_ID,
 };

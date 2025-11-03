@@ -8,15 +8,9 @@ import {
 	confirmResetPassword,
 	resendSignUpCode,
 	fetchUserAttributes,
+	fetchAuthSession,
 } from "aws-amplify/auth";
 import { AuthContextType } from "./types/authentication.types";
-import { getSecretHash } from "../../Utils/CognitoUtils";
-import {
-	customSignUp,
-	customConfirmSignUp,
-	customSignIn,
-	customFetchUserAttributes,
-} from "../../Utils/AWSCognitoService";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -58,33 +52,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Check if client secret is configured
-			const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
+			// Use Amplify sign in
+			const result = await signIn({
+				username: email,
+				password,
+			});
 
-			let result;
-
-			if (clientSecret) {
-				// Use custom sign in with SECRET_HASH for clients with secrets
-
-				const customResult = await customSignIn({
-					email,
-					password,
-				});
-
-				// Convert custom result to match Amplify format
-				result = {
-					isSignedIn: customResult.isSignedIn,
-					signInDetails: {
-						isSignedIn: customResult.isSignedIn,
-						accessToken: customResult.accessToken,
-					},
-				};
-			} else {
-				// Use standard Amplify sign in for clients without secrets
-				result = await signIn({
-					username: email,
-					password,
-				});
+			// Get access token from Amplify session
+			let accessToken: string | undefined;
+			if (result.isSignedIn) {
+				try {
+					const session = await fetchAuthSession();
+					if (session.tokens?.accessToken) {
+						accessToken = session.tokens.accessToken.toString();
+					}
+				} catch (sessionError) {
+					console.warn(
+						"Could not fetch session tokens:",
+						sessionError
+					);
+				}
 			}
 
 			if (result.isSignedIn) {
@@ -101,21 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 				// Always fetch user attributes to get account creation date and other info
 				try {
-					if (clientSecret) {
-						const accessToken =
-							(result as any).signInDetails?.accessToken ||
-							(result as any).signInDetails?.signInDetails
-								?.accessToken ||
-							(result as any).accessToken;
-
-						if (accessToken) {
-							userAttributes = await customFetchUserAttributes(
-								accessToken
-							);
-						}
-					} else {
-						userAttributes = await fetchUserAttributes();
-					}
+					userAttributes = await fetchUserAttributes();
 				} catch (userError) {
 					console.warn("Could not fetch user attributes:", userError);
 				}
@@ -156,26 +129,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				}
 
 				// Try to extract name from JWT token as another fallback
-				if (userName === email) {
+				if (userName === email && accessToken) {
 					try {
-						const accessToken =
-							(result as any).signInDetails?.accessToken ||
-							(result as any).signInDetails?.signInDetails
-								?.accessToken ||
-							(result as any).accessToken;
-
-						if (accessToken) {
-							// Decode JWT token to get user info
-							const tokenParts = accessToken.split(".");
-							if (tokenParts.length === 3) {
-								const payload = JSON.parse(atob(tokenParts[1]));
-								// Check if there's a name in the token
-								if (
-									payload.name &&
-									payload.name.trim() !== ""
-								) {
-									userName = payload.name;
-								}
+						// Decode JWT token to get user info
+						const tokenParts = accessToken.split(".");
+						if (tokenParts.length === 3) {
+							const payload = JSON.parse(atob(tokenParts[1]));
+							// Check if there's a name in the token
+							if (payload.name && payload.name.trim() !== "") {
+								userName = payload.name;
 							}
 						}
 					} catch (jwtError) {
@@ -188,10 +150,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					userName = email.split("@")[0];
 				}
 
-				const accessToken =
-					(result as any).signInDetails?.accessToken ||
-					(result as any).signInDetails?.signInDetails?.accessToken ||
-					(result as any).accessToken;
+				// Extract account creation and last modified from JWT token claims
+				let accountCreatedDate =
+					userAttributes?.account_created_date || null;
+				let accountLastModified =
+					userAttributes?.account_last_modified || null;
+
+				if (accessToken) {
+					try {
+						const tokenParts = accessToken.split(".");
+						if (tokenParts.length === 3) {
+							const payload = JSON.parse(atob(tokenParts[1]));
+							// auth_time is when the user was created/authn first time
+							if (payload.auth_time && !accountCreatedDate) {
+								accountCreatedDate = new Date(
+									payload.auth_time * 1000
+								).toISOString();
+							}
+							// iat is "issued at" time - last auth time
+							if (payload.iat && !accountLastModified) {
+								accountLastModified = new Date(
+									payload.iat * 1000
+								).toISOString();
+							}
+						}
+					} catch (jwtError) {
+						console.warn(
+							"Could not extract dates from JWT token:",
+							jwtError
+						);
+					}
+				}
+
 				// Create flattened signInDetails object
 				const signInDetails = {
 					isSignedIn: result.isSignedIn || true, // Ensure it's always true if we reach this point
@@ -205,11 +195,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					isSignedIn: true,
 					accessToken: accessToken,
 					signInDetails: signInDetails,
-					// Add account creation date if available (currently not available from getUser API)
-					accountCreatedDate:
-						userAttributes?.account_created_date || null,
-					accountLastModified:
-						userAttributes?.account_last_modified || null,
+					// Add account creation date and last modified from JWT token or custom attributes
+					accountCreatedDate: accountCreatedDate,
+					accountLastModified: accountLastModified,
 					userStatus: userAttributes?.user_status || null,
 				};
 
@@ -243,39 +231,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Check if client secret is configured
-			const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
-
-			let result;
-
-			if (clientSecret) {
-				// Use custom signup with SECRET_HASH for clients with secrets
-				const customResult = await customSignUp({
-					username: email,
-					password,
-					email,
-					name,
-				});
-
-				// Convert custom result to match Amplify format
-				result = {
-					userId: customResult.userId,
-					username: customResult.username,
-					isSignUpComplete: customResult.isPendingConfirmation,
-				};
-			} else {
-				// Use standard Amplify signup for clients without secrets
-				result = await signUp({
-					username: email,
-					password,
-					options: {
-						userAttributes: {
-							email,
-							name,
-						},
+			// Use Amplify signup
+			const result = await signUp({
+				username: email,
+				password,
+				options: {
+					userAttributes: {
+						email,
+						name,
 					},
-				});
-			}
+				},
+			});
 
 			// Store pending user data
 			const pendingUser = {
@@ -313,40 +279,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Check if client secret is configured
-			const clientSecret = process.env.REACT_APP_USER_POOL_CLIENT_SECRET;
-
-			if (clientSecret) {
-				// Use custom confirm signup with SECRET_HASH for clients with secrets
-				// Get the stored username from pending user data
-				const pendingUserData = localStorage.getItem("pendingUser");
-				let username = email; // fallback to email
-
-				if (pendingUserData) {
-					try {
-						const pendingUser = JSON.parse(pendingUserData);
-						username = pendingUser.username || email;
-					} catch (parseError) {
-						console.warn(
-							"Could not parse pending user data:",
-							parseError
-						);
-					}
-				}
-
-				await customConfirmSignUp({
-					username: username,
-					confirmationCode: code,
-				});
-			} else {
-				// Use standard Amplify confirm signup for clients without secrets
-				const confirmOptions: any = {
-					username: email,
-					confirmationCode: code,
-				};
-
-				await confirmSignUp(confirmOptions);
-			}
+			// Use Amplify confirm signup
+			await confirmSignUp({
+				username: email,
+				confirmationCode: code,
+			});
 
 			// Get pending user data to retrieve name and password
 			const pendingUserData = localStorage.getItem("pendingUser");
@@ -440,21 +377,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Generate SECRET_HASH if client secret is configured
-			const secretHash = getSecretHash(email);
-
-			const resetOptions: any = { username: email };
-
-			// Add SECRET_HASH if available
-			if (secretHash) {
-				resetOptions.options = {
-					clientMetadata: {
-						SECRET_HASH: secretHash,
-					},
-				};
-			}
-
-			await resetPassword(resetOptions);
+			// Use Amplify reset password (no secrets required)
+			await resetPassword({
+				username: email,
+			});
 		} catch (error: any) {
 			console.error("Reset password error:", error);
 			throw new Error(error.message || "Failed to reset password");
@@ -471,25 +397,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Generate SECRET_HASH if client secret is configured
-			const secretHash = getSecretHash(email);
-
-			const confirmResetOptions: any = {
+			// Use Amplify confirm reset password (no secrets required)
+			await confirmResetPassword({
 				username: email,
 				confirmationCode: code,
 				newPassword,
-			};
-
-			// Add SECRET_HASH if available
-			if (secretHash) {
-				confirmResetOptions.options = {
-					clientMetadata: {
-						SECRET_HASH: secretHash,
-					},
-				};
-			}
-
-			await confirmResetPassword(confirmResetOptions);
+			});
 		} catch (error: any) {
 			console.error("Confirm reset password error:", error);
 			throw new Error(
@@ -506,21 +419,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
-			// Generate SECRET_HASH if client secret is configured
-			const secretHash = getSecretHash(email);
-
-			const resendOptions: any = { username: email };
-
-			// Add SECRET_HASH if available
-			if (secretHash) {
-				resendOptions.options = {
-					clientMetadata: {
-						SECRET_HASH: secretHash,
-					},
-				};
-			}
-
-			await resendSignUpCode(resendOptions);
+			// Use Amplify resend confirmation code (no secrets required)
+			await resendSignUpCode({
+				username: email,
+			});
 		} catch (error: any) {
 			console.error("Resend confirmation code error:", error);
 			throw new Error(

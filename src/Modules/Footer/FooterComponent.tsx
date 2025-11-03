@@ -3,8 +3,9 @@ import LogoComponent from "../General/LogoComponent";
 import { Link } from "react-router-dom";
 import { RENDER_URL } from "../../Utils/Urls";
 import { getFormattedAppVersion } from "../../Utils/VersionUtils";
+import config from "../../config";
 
-const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
+const FRESHTRAK_PARTNERS_URL = config.FRESHTRAK_PARTNERS_URL;
 
 const FooterComponent: React.FC = () => (
 	<div className="container mx-auto px-4 pt-12">

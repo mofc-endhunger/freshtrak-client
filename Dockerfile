@@ -50,6 +50,10 @@ RUN rm -rf ./*
 # Copy built application from builder stage
 COPY --from=builder /app/build .
 
+# Copy entrypoint script for runtime configuration
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Copy nginx configuration for SPA routing
 RUN echo 'server { \
     listen 80; \
@@ -63,5 +67,5 @@ RUN echo 'server { \
 # Expose port
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Use entrypoint script to inject runtime config and start nginx
+CMD ["/entrypoint.sh"]

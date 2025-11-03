@@ -1,13 +1,13 @@
 import { Amplify } from 'aws-amplify';
+import config from './config';
 
-// Demo configuration for AWS Cognito
-// In production, these values should come from environment variables
+// Configuration for AWS Cognito
+// Client secret is no longer required - Cognito client is configured without secrets
 const amplifyConfig = {
   Auth: {
     Cognito: {
-      userPoolId: process.env.REACT_APP_USER_POOL_ID || 'us-east-1_demo123',
-      userPoolClientId: process.env.REACT_APP_USER_POOL_CLIENT_ID || 'demo-client-id',
-      userPoolClientSecret: process.env.REACT_APP_USER_POOL_CLIENT_SECRET,
+      userPoolId: config.USER_POOL_ID || 'us-east-1_demo123',
+      userPoolClientId: config.USER_POOL_CLIENT_ID || 'demo-client-id',
       loginWith: {
         email: true,
         username: false,

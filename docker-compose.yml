@@ -13,8 +13,8 @@ services:
       # Mount source code for hot-reloading
       - ./src:/app/src
       - ./public:/app/public
-      # Mount environment files
-      - ./.env.development:/app/.env.development
+      # Mount environment file
+      - ./.env:/app/.env
       # Prevent node_modules from being overwritten by mount
       - /app/node_modules
     networks:

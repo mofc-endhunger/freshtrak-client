@@ -123,7 +123,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 	const currentUser = useSelector(selectUser);
 	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
-	const CLIENT_URL = process.env.REACT_APP_CLIENT_URL;
+	const CLIENT_URL = config.CLIENT_URL;
 
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
@@ -425,7 +425,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			"duplicate registration",
 		];
 
-		return alreadyRegisteredKeywords.some(keyword =>
+		return alreadyRegisteredKeywords.some((keyword) =>
 			errorText.includes(keyword)
 		);
 	};

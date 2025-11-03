@@ -1,9 +1,10 @@
 /**
  * API and Render url defined
  */
+import config from '../config';
 
-export const BASE_URL = process.env.REACT_APP_PANTRY_FINDER_API;
-const REGISTRATION_URL = process.env.REACT_APP_REGISTRATION_API;
+export const BASE_URL = config.PANTRY_FINDER_API;
+const REGISTRATION_URL = config.REGISTRATION_API;
 export const API_URL = {
 	EVENTS_LIST: BASE_URL + "api/agencies",
 	FOODBANK_LIST: BASE_URL + "api/foodbanks",

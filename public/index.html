@@ -57,7 +57,10 @@
       Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
-    --></head>
+    -->
+		<!-- Runtime configuration - loaded before React app initializes -->
+		<script src="%PUBLIC_URL%/runtime-config.js"></script>
+	</head>
 	<body>
 		<noscript>You need to enable JavaScript to run this app.</noscript>
 		<div id="root"></div>

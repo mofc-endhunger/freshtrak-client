@@ -26,6 +26,7 @@ import {
 	PageType,
 	MobileMenuSection,
 } from "./types/header.types";
+import config from "../../config";
 
 /**
  * HeaderComponent - Main header component with navigation and mobile menu
@@ -55,7 +56,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const navigate = useNavigate();
 	const { isAuthenticated, user } = useAuth();
 
-	const FRESHTRAK_PARTNERS_URL = process.env.REACT_APP_FRESHTRAK_PARTNERS_URL;
+	const FRESHTRAK_PARTNERS_URL = config.FRESHTRAK_PARTNERS_URL;
 
 	/**
 	 * Determines the current page type for background color logic

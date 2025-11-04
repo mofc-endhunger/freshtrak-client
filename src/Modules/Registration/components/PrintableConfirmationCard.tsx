@@ -145,6 +145,9 @@ export const generateConfirmationCardPNG = async (
 	eventSlotId?: string
 ): Promise<void> => {
 	try {
+		// Font family constant for consistent styling across the card
+		const FONT_FAMILY = "'Noto Sans', sans-serif";
+
 		const qrCodeValue = `https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identificationCode.toUpperCase()}&event_date_id=${eventDateId}${
 			eventSlotId ? "&event_slot_id=" + eventSlotId : ""
 		}`;
@@ -176,32 +179,32 @@ export const generateConfirmationCardPNG = async (
 		ctx.textAlign = "center";
 
 		// Title
-		ctx.font = "bold 48px 'Noto Sans', sans-serif";
+		ctx.font = `bold 48px ${FONT_FAMILY}`;
 		ctx.fillStyle = "#392947";
 		ctx.fillText("Registration Confirmation", width / 2, 100);
 
 		// Agency Name
-		ctx.font = "bold 36px 'Noto Sans', sans-serif";
+		ctx.font = `bold 36px ${FONT_FAMILY}`;
 		ctx.fillStyle = "#392947";
 		ctx.fillText(event.agencyName, width / 2, 180);
 
 		// Agency Address
 		if (agencyAddress) {
-			ctx.font = "24px 'Noto Sans', sans-serif";
+			ctx.font = `24px ${FONT_FAMILY}`;
 			ctx.fillStyle = "#616161";
 			const addressLines = agencyAddress.split(", ");
 			let yOffset = 240;
-			addressLines.forEach(line => {
+			addressLines.forEach((line) => {
 				ctx.fillText(line, width / 2, yOffset);
 				yOffset += 35;
 			});
 		}
 
 		// Event Date and Time
-		ctx.font = "28px 'Noto Sans', sans-serif";
+		ctx.font = `28px ${FONT_FAMILY}`;
 		ctx.fillStyle = "#392947";
 		ctx.fillText(eventDateFormatted, width / 2, 380);
-		ctx.font = "24px 'Noto Sans', sans-serif";
+		ctx.font = `24px ${FONT_FAMILY}`;
 		ctx.fillText(eventTime, width / 2, 420);
 
 		// QR Code
@@ -211,16 +214,16 @@ export const generateConfirmationCardPNG = async (
 		ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
 
 		// Confirmation Number
-		ctx.font = "bold 32px 'Noto Sans', sans-serif";
+		ctx.font = `bold 32px ${FONT_FAMILY}`;
 		ctx.fillStyle = "#392947";
 		ctx.fillText("Confirmation Number:", width / 2, 980);
-		ctx.font = "bold 40px 'Noto Sans', sans-serif";
+		ctx.font = `bold 40px ${FONT_FAMILY}`;
 		ctx.fillStyle = "#009F56";
 		ctx.fillText(identificationCode.toUpperCase(), width / 2, 1040);
 
 		// Convert to blob and download
 		canvas.toBlob(
-			blob => {
+			(blob) => {
 				if (blob) {
 					const url = URL.createObjectURL(blob);
 					const link = document.createElement("a");

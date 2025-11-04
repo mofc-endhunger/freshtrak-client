@@ -420,7 +420,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		const errorText = JSON.stringify(errorData).toLowerCase();
 		const alreadyRegisteredKeywords = [
 			"already registered",
-			"alread registered",
 			"already exist",
 			"user already",
 			"duplicate registration",

@@ -25,6 +25,7 @@ import { Printer, Download } from "lucide-react";
 import PrintableConfirmationCard, {
 	generateConfirmationCardPNG,
 } from "./components/PrintableConfirmationCard";
+import { StorageService } from "../../Utils/StorageService";
 
 // Type imports from registration.types.ts
 import {
@@ -53,15 +54,15 @@ const RegistrationConfirmComponent: React.FC<
 	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
 	const [showGuestSigninModal, setShowGuestSigninModal] =
 		useState<boolean>(false);
-	const eventDateId = sessionStorage.getItem("registeredEventDateID");
+	const eventDateId = StorageService.getRegisteredEventDateID();
 
-	const isLoggedIn = localStorage.getItem("isLoggedIn");
-	const cognitoUser = localStorage.getItem("cognitoUser");
-	if (!isLoggedIn || !JSON.parse(isLoggedIn)) {
-		localStorage.removeItem("userToken");
-		localStorage.removeItem("guestId");
-		localStorage.removeItem("guestType");
-		localStorage.removeItem("search_zip");
+	const isLoggedIn = StorageService.getItem<string>("isLoggedIn");
+	const cognitoUser = StorageService.getCognitoUser();
+	if (!isLoggedIn || isLoggedIn !== "true") {
+		StorageService.clearUserToken();
+		StorageService.removeItem("guestId");
+		StorageService.removeItem("guestType");
+		StorageService.removeItem("search_zip");
 	}
 
 	const formatPhoneNumber = (input: string | null): string => {

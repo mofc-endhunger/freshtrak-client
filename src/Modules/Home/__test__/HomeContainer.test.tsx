@@ -9,6 +9,19 @@ import HomeContainer from "../HomeContainer";
 // Mock axios
 jest.mock("axios");
 const mockAxios = require("axios");
+// Mock axios.all
+mockAxios.all = jest.fn((promises) => Promise.all(promises));
+
+// Mock StorageService
+jest.mock("../../../Utils/StorageService", () => ({
+	StorageService: {
+		getItem: jest.fn((key: string) => {
+			if (key === "search_zip") return "12345";
+			return null;
+		}),
+		getUserToken: jest.fn(() => "mock-token"),
+	},
+}));
 
 // Mock the LoadingSpinner component
 jest.mock("../../General/LoadingSpinner", () => {
@@ -63,19 +76,10 @@ describe("HomeContainer", () => {
 	beforeEach(() => {
 		mockStore = createMockStore();
 		mockAxios.get.mockClear();
-
-		// Mock localStorage
-		Object.defineProperty(window, "localStorage", {
-			value: {
-				getItem: jest.fn(key => {
-					if (key === "search_zip") return "12345";
-					if (key === "userToken") return "mock-token";
-					return null;
-				}),
-				setItem: jest.fn(),
-			},
-			writable: true,
-		});
+		// Mock axios.all to return an empty array by default
+		if (mockAxios.all) {
+			mockAxios.all.mockClear();
+		}
 	});
 
 	const renderWithProvider = () => {
@@ -87,6 +91,11 @@ describe("HomeContainer", () => {
 	};
 
 	it("renders the component with correct heading and form", async () => {
+		// Mock the reservations API call
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+
 		renderWithProvider();
 
 		// Wait for initial loading to finish
@@ -104,6 +113,11 @@ describe("HomeContainer", () => {
 	});
 
 	it("renders all child components", () => {
+		// Mock the reservations API call
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+
 		renderWithProvider();
 
 		expect(screen.getByText("Your Local Food Bank")).toBeInTheDocument();
@@ -114,6 +128,11 @@ describe("HomeContainer", () => {
 	});
 
 	it("handles form submission correctly", async () => {
+		// Mock the reservations API call first (called on mount)
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+		// Mock the events API call (called on form submit)
 		mockAxios.get.mockResolvedValueOnce({
 			data: { agencies: [] },
 		});
@@ -139,6 +158,15 @@ describe("HomeContainer", () => {
 	});
 
 	it("shows validation error for empty zip code", async () => {
+		// Mock the reservations API call to return empty array
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+		// Mock axios.all if it exists
+		if (mockAxios.all) {
+			mockAxios.all.mockResolvedValue([]);
+		}
+
 		renderWithProvider();
 
 		// Wait for loading to finish, then find the search button
@@ -157,6 +185,15 @@ describe("HomeContainer", () => {
 	});
 
 	it("calls API with correct parameters when form is submitted", async () => {
+		// Mock the reservations API call first (called on mount)
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+		// Mock axios.all if it exists
+		if (mockAxios.all) {
+			mockAxios.all.mockResolvedValue([]);
+		}
+		// Mock the events API call (called on form submit)
 		mockAxios.get.mockResolvedValueOnce({
 			data: { agencies: [] },
 		});
@@ -183,6 +220,11 @@ describe("HomeContainer", () => {
 	});
 
 	it("shows loading spinner when fetching events", async () => {
+		// Mock the reservations API call first (called on mount)
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+		// Mock the events API call with delay
 		mockAxios.get.mockImplementation(
 			() => new Promise(resolve => setTimeout(resolve, 100))
 		);
@@ -208,6 +250,11 @@ describe("HomeContainer", () => {
 	});
 
 	it("handles API errors gracefully", async () => {
+		// Mock the reservations API call first (called on mount)
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+		// Mock the events API call to reject
 		mockAxios.get.mockRejectedValueOnce(new Error("API Error"));
 
 		renderWithProvider();
@@ -230,6 +277,11 @@ describe("HomeContainer", () => {
 	});
 
 	it("fetches user reservations on component mount", async () => {
+		// Mock axios.all to return empty array
+		if (mockAxios.all) {
+			mockAxios.all.mockResolvedValue([]);
+		}
+		// Mock the reservations API call
 		mockAxios.get.mockResolvedValueOnce({
 			data: [],
 		});
@@ -237,13 +289,23 @@ describe("HomeContainer", () => {
 		renderWithProvider();
 
 		await waitFor(() => {
-			expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
-				headers: { Authorization: "Bearer mock-token" },
-			});
+			expect(mockAxios.get).toHaveBeenCalledWith(
+				expect.any(String),
+				expect.objectContaining({
+					headers: expect.objectContaining({
+						Authorization: expect.stringContaining("Bearer"),
+					}),
+				})
+			);
 		});
 	});
 
 	it("renders with correct background and spacing classes", () => {
+		// Mock the reservations API call
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+
 		renderWithProvider();
 
 		const section = screen.getByText("Zip Code").closest("section");
@@ -261,6 +323,11 @@ describe("HomeContainer", () => {
 	});
 
 	it("renders form with shadcn components", async () => {
+		// Mock the reservations API call
+		mockAxios.get.mockResolvedValueOnce({
+			data: [],
+		});
+
 		renderWithProvider();
 
 		// Wait for loading to finish

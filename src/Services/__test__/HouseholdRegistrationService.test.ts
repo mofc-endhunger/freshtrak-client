@@ -13,21 +13,31 @@ jest.mock('../../Utils/Urls', () => ({
   },
 }));
 
+// Mock StorageService
+const mockGetCognitoUser = jest.fn();
+
+jest.mock('../../Utils/StorageService', () => ({
+  StorageService: {
+    getCognitoUser: (...args: any[]) => mockGetCognitoUser(...args),
+  },
+}));
+
 describe('HouseholdRegistrationService', () => {
   let service: HouseholdRegistrationService;
 
   beforeEach(() => {
     service = new HouseholdRegistrationService();
     jest.clearAllMocks();
-
-    // Mock localStorage for getAuthToken
-    Object.defineProperty(window, 'localStorage', {
-      value: {
-        getItem: jest.fn(() => JSON.stringify({ accessToken: 'mock-token' })),
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
+    // Reset mock to return token
+    mockGetCognitoUser.mockReturnValue({
+      email: 'test@example.com',
+      name: 'Test User',
+      isSignedIn: true,
+      accessToken: 'mock-token',
+      signInDetails: {
+        isSignedIn: true,
+        accessToken: 'mock-token',
       },
-      writable: true,
     });
   });
 

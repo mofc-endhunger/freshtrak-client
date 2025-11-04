@@ -6,21 +6,31 @@ import { API_URL } from '../../Utils/Urls';
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
+// Mock StorageService
+const mockGetCognitoUser = jest.fn();
+
+jest.mock('../../Utils/StorageService', () => ({
+  StorageService: {
+    getCognitoUser: (...args: any[]) => mockGetCognitoUser(...args),
+  },
+}));
+
 describe('Registration API Integration Tests', () => {
   let householdRegistrationService: HouseholdRegistrationService;
 
   beforeEach(() => {
     householdRegistrationService = new HouseholdRegistrationService();
     jest.clearAllMocks();
-
-    // Mock localStorage
-    Object.defineProperty(window, 'localStorage', {
-      value: {
-        getItem: jest.fn(() => JSON.stringify({ accessToken: 'mock-cognito-token' })),
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
+    // Reset mock to return token
+    mockGetCognitoUser.mockReturnValue({
+      email: 'test@example.com',
+      name: 'Test User',
+      isSignedIn: true,
+      accessToken: 'mock-cognito-token',
+      signInDetails: {
+        isSignedIn: true,
+        accessToken: 'mock-cognito-token',
       },
-      writable: true,
     });
   });
 

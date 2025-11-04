@@ -2,6 +2,7 @@ import axios from 'axios';
 import { API_URL } from '../Utils/Urls';
 import { UsersMeResponse } from '../Modules/Households/types/api.types';
 import { RegistrationResponse, HouseholdRegistrationError } from '../Modules/Registration/types/household-registration.types';
+import { StorageService } from '../Utils/StorageService';
 
 /**
  * HouseholdRegistrationService
@@ -15,25 +16,19 @@ export class HouseholdRegistrationService {
   private readonly retryDelay = 1000; // 1 second
 
   /**
-   * Get authentication token from localStorage
+   * Get authentication token from storage
    * @returns The Cognito token or null if not found
    */
   private getAuthToken(): string | null {
     try {
-      const cognitoUser = localStorage.getItem('cognitoUser');
+      const cognitoUser = StorageService.getCognitoUser();
 
-      if (cognitoUser) {
-        const userData = JSON.parse(cognitoUser);
-
-        if (!userData.accessToken) {
-          console.warn('⚠️ HouseholdRegistrationService - No accessToken found in userData:', userData);
-        }
-
-        return userData.accessToken || null;
+      if (cognitoUser?.accessToken) {
+        return cognitoUser.accessToken;
       }
       return null;
     } catch (error) {
-      console.warn('⚠️ HouseholdRegistrationService - Error parsing cognitoUser:', error);
+      console.warn('⚠️ HouseholdRegistrationService - Error getting auth token:', error);
       return null;
     }
   }

@@ -9,6 +9,7 @@ import { setCurrentLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
 import { useAuth } from "../Authentication/AuthContext";
 import { validateToken } from "../../Utils/TokenUtils";
+import { StorageService } from "../../Utils/StorageService";
 import { Button } from "../../components/ui/button";
 import {
 	Dialog,
@@ -119,30 +120,9 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 
 	useEffect(() => {
 		// Check authentication status - check for cognitoUser and valid token
-		const cognitoUser = localStorage.getItem("cognitoUser");
-
 		// Only set isLoggedIn to true for Cognito users with valid tokens
 		// Guest users and untracked users should see the login button
-		if (cognitoUser) {
-			try {
-				const user = JSON.parse(cognitoUser);
-				// Check if user has a valid, non-expired access token
-				if (user?.accessToken) {
-					const tokenValidation = validateToken(user.accessToken);
-					// Only show as logged in if token is valid and not expired
-					setIsLoggedIn(
-						tokenValidation.isValid && !tokenValidation.isExpired
-					);
-				} else {
-					setIsLoggedIn(false);
-				}
-			} catch (error) {
-				console.error("Error parsing cognitoUser:", error);
-				setIsLoggedIn(false);
-			}
-		} else {
-			setIsLoggedIn(false);
-		}
+		setIsLoggedIn(StorageService.isLoggedInUser());
 
 		// Handle scroll events for background color logic
 		const handleScroll = (): void => {

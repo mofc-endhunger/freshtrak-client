@@ -25,6 +25,7 @@ import UsersRegistrations from "../Home/UsersRegistrations";
 import EventNearByComponent from "../Home/EventNearByComponent";
 import { API_URL, RENDER_URL } from "../../Utils/Urls";
 import { setCurrentZip } from "../../Store/Search/searchSlice";
+import { StorageService } from "../../Utils/StorageService";
 import axios from "axios";
 import EventListComponent from "../Events/EventListComponent";
 import { EventHandler, HomeEventFormat } from "../../Utils/EventHandler";
@@ -49,7 +50,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 	const [agencyData, setAgencyData] = useState<any>({});
 	const [reservedEvents, setReservedEvents] = useState<ReservedEvent[]>([]);
 	const [zipCode, setZipCode] = useState<string | null>(
-		localStorage.getItem("search_zip")
+		StorageService.getItem<string>("search_zip")
 	);
 	const [loading, setLoading] = useState<boolean>(false);
 	const dispatch = useDispatch();
@@ -60,16 +61,20 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 	}, []);
 
 	const getUsersReservations = async (): Promise<void> => {
-		const userToken = localStorage.getItem("userToken");
+		const userToken = StorageService.getUserToken();
 		const { CREATE_RESERVATION } = API_URL;
 		try {
-			const usersRegData: UserReservationsApiResponse = await axios.get(
+			const response = await axios.get<UserReservationsApiResponse>(
 				CREATE_RESERVATION,
 				{
 					headers: { Authorization: `Bearer ${userToken}` },
 				}
 			);
-			getEventByDateId(usersRegData.data);
+			// Handle both direct array response and wrapped response
+			const userRegData = Array.isArray(response.data)
+				? response.data
+				: response.data?.data || [];
+			getEventByDateId(userRegData);
 		} catch (e) {
 			console.warn(e);
 		}
@@ -78,6 +83,14 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 	const getEventByDateId = async (
 		userRegData: UserRegistration[]
 	): Promise<void> => {
+		if (
+			!userRegData ||
+			!Array.isArray(userRegData) ||
+			userRegData.length === 0
+		) {
+			setReservedEvents([]);
+			return;
+		}
 		const userRegEvents: Promise<any>[] = [];
 		const { EVENT_URL } = API_URL;
 		userRegData.forEach((userReg: UserRegistration) => {
@@ -87,28 +100,30 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 		});
 		const regEvents = await axios.all(userRegEvents);
 		const events: ReservedEvent[] = [];
-		regEvents.forEach((event: any, index: number) => {
-			let filteredEvents: HomeEventFormatData | null = null;
-			if (event.data?.events[0]) {
-				filteredEvents = HomeEventFormat(
-					event.data.events[0],
-					userRegData[index].event_date_id
-				);
-			}
-			if (filteredEvents) {
-				// Convert HomeEventFormatData to ReservedEvent
-				const reservedEvent: ReservedEvent = {
-					...filteredEvents,
-					name: filteredEvents.eventName, // Add the missing name property
-					event_date_id: userRegData[index].event_date_id,
-					acceptReservations: filteredEvents.acceptReservations,
-					acceptInterest: filteredEvents.acceptInterest,
-					acceptWalkin: filteredEvents.acceptWalkin,
-					eventService: filteredEvents.eventService || "", // Provide default value for eventService
-				};
-				events.push(reservedEvent);
-			}
-		});
+		if (regEvents && Array.isArray(regEvents)) {
+			regEvents.forEach((event: any, index: number) => {
+				let filteredEvents: HomeEventFormatData | null = null;
+				if (event.data?.events[0]) {
+					filteredEvents = HomeEventFormat(
+						event.data.events[0],
+						userRegData[index].event_date_id
+					);
+				}
+				if (filteredEvents) {
+					// Convert HomeEventFormatData to ReservedEvent
+					const reservedEvent: ReservedEvent = {
+						...filteredEvents,
+						name: filteredEvents.eventName, // Add the missing name property
+						event_date_id: userRegData[index].event_date_id,
+						acceptReservations: filteredEvents.acceptReservations,
+						acceptInterest: filteredEvents.acceptInterest,
+						acceptWalkin: filteredEvents.acceptWalkin,
+						eventService: filteredEvents.eventService || "", // Provide default value for eventService
+					};
+					events.push(reservedEvent);
+				}
+			});
+		}
 		setReservedEvents(events);
 	};
 
@@ -156,7 +171,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 		}
 	};
 
-	const EventList: React.FC<EventListProps> = props => {
+	const EventList: React.FC<EventListProps> = (props) => {
 		const filterEvents = (eventList: FilteredEvents): FilteredEvents => {
 			if (props.filter === "today") {
 				const todayDate = moment(new Date()).format("YYYY-MM-DD");

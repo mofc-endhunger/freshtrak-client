@@ -11,6 +11,7 @@ import {
 	fetchAuthSession,
 } from "aws-amplify/auth";
 import { AuthContextType } from "./types/authentication.types";
+import { StorageService, CognitoUser } from "../../Utils/StorageService";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -29,11 +30,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	useEffect(() => {
 		const initAuth = async () => {
 			try {
-				// In a real implementation, you would check the current user here
-				// For demo purposes, we'll check localStorage
-				const storedUser = localStorage.getItem("cognitoUser");
+				// Check for stored Cognito user using StorageService
+				const storedUser = StorageService.getCognitoUser();
 				if (storedUser) {
-					setUser(JSON.parse(storedUser));
+					setUser(storedUser);
 				}
 			} catch (error) {
 				console.error("Error initializing auth:", error);
@@ -77,10 +77,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			if (result.isSignedIn) {
 				// Get user name from multiple sources
 				// Clear guest authentication data when logging in with Cognito
-				localStorage.removeItem("userToken");
-				localStorage.removeItem("guestId");
-				localStorage.removeItem("guestType");
-				localStorage.removeItem("userProfile");
+				StorageService.clearUserToken();
+				StorageService.removeItem("guestId");
+				StorageService.removeItem("guestType");
+				StorageService.removeItem("userProfile");
 
 				// Get user attributes to fetch name and other info
 				let userName = email; // fallback to email
@@ -95,27 +95,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 				// First, try to get name from stored userName (most reliable for confirmed users)
 				const userNameKey = `userName_${email}`;
-				const storedUserName = localStorage.getItem(userNameKey);
+				const storedUserName =
+					StorageService.getItem<string>(userNameKey);
 				if (storedUserName && storedUserName.trim() !== "") {
 					userName = storedUserName;
 				} else {
 					// Fallback to pending user data (for unconfirmed users)
-					const pendingUser = localStorage.getItem("pendingUser");
-					if (pendingUser) {
-						try {
-							const pendingData = JSON.parse(pendingUser);
-							if (
-								pendingData.name &&
-								pendingData.name.trim() !== ""
-							) {
-								userName = pendingData.name;
-							}
-						} catch (parseError) {
-							console.warn(
-								"Could not parse pending user data:",
-								parseError
-							);
-						}
+					const pendingUser = StorageService.getItem<{
+						name?: string;
+						[key: string]: any;
+					}>("pendingUser");
+					if (pendingUser?.name && pendingUser.name.trim() !== "") {
+						userName = pendingUser.name;
 					}
 				}
 
@@ -185,35 +176,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				// Create flattened signInDetails object
 				const signInDetails = {
 					isSignedIn: result.isSignedIn || true, // Ensure it's always true if we reach this point
-					accessToken: accessToken,
+					accessToken: accessToken || "", // Ensure it's always a string
 				};
 
 				// Store user data with flattened structure
-				const userData = {
+				const userData: CognitoUser = {
 					email,
 					name: userName,
 					isSignedIn: true,
-					accessToken: accessToken,
+					accessToken: accessToken || "",
 					signInDetails: signInDetails,
 					// Add account creation date and last modified from JWT token or custom attributes
-					accountCreatedDate: accountCreatedDate,
-					accountLastModified: accountLastModified,
-					userStatus: userAttributes?.user_status || null,
+					accountCreatedDate: accountCreatedDate || undefined,
+					accountLastModified: accountLastModified || undefined,
+					userStatus: userAttributes?.user_status || undefined,
 				};
 
 				setUser(userData);
-				localStorage.setItem("cognitoUser", JSON.stringify(userData));
-				localStorage.setItem("isLoggedIn", "true");
+				StorageService.setItem("cognitoUser", userData);
+				StorageService.setItem("isLoggedIn", "true");
 
 				// Set userToken for registration system compatibility
 				if (accessToken) {
-					localStorage.setItem("userToken", accessToken);
+					StorageService.setUserToken(accessToken);
 				} else {
 					console.warn(
 						"⚠️ AuthContext - No accessToken available to set userToken"
 					);
 				}
-				localStorage.removeItem("household_signup_state");
+				StorageService.removeItem("household_signup_state");
 			}
 		} catch (error: any) {
 			console.error("Sign in error:", error);
@@ -252,7 +243,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				isPendingConfirmation: true,
 				userId: result.userId,
 			};
-			localStorage.setItem("pendingUser", JSON.stringify(pendingUser));
+			StorageService.setItem("pendingUser", pendingUser);
 		} catch (error: any) {
 			console.error("Sign up error:", error);
 			// Provide more user-friendly error messages
@@ -286,28 +277,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			});
 
 			// Get pending user data to retrieve name and password
-			const pendingUserData = localStorage.getItem("pendingUser");
+			const pendingUser = StorageService.getItem<{
+				name?: string;
+				password?: string;
+			}>("pendingUser");
 			let userName = email; // fallback to email
 			let password = "";
 
-			if (pendingUserData) {
-				try {
-					const pendingUser = JSON.parse(pendingUserData);
-					userName = pendingUser.name || email;
-					password = pendingUser.password || "";
-				} catch (parseError) {
-					console.warn(
-						"Could not parse pending user data:",
-						parseError
-					);
-				}
+			if (pendingUser) {
+				userName = pendingUser.name || email;
+				password = pendingUser.password || "";
 			}
 
 			// Clear guest authentication data when confirming Cognito sign-up
 			// Note: We don't remove userToken here as it might be needed for registration
-			localStorage.removeItem("guestId");
-			localStorage.removeItem("guestType");
-			localStorage.removeItem("userProfile");
+			StorageService.removeItem("guestId");
+			StorageService.removeItem("guestType");
+			StorageService.removeItem("userProfile");
 
 			// Automatically sign in the user after email confirmation
 			if (password) {
@@ -315,7 +301,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					await handleSignIn(email, password);
 
 					// Set flag to indicate this is a new user who should see setup popup
-					localStorage.setItem("shouldShowSetupWizard", "true");
+					StorageService.setItem("shouldShowSetupWizard", "true");
 					return; // Exit early since handleSignIn already sets user data
 				} catch (signInError) {
 					console.warn(
@@ -328,27 +314,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 			// Fallback: Store confirmed user data without accessToken
 			// This will show the popup but user will need to sign in manually
-			const userData = {
+			const userData: CognitoUser = {
 				email,
 				name: userName,
 				isSignedIn: true,
-				isConfirmed: true,
+				accessToken: "",
+				signInDetails: {
+					isSignedIn: true,
+					accessToken: "",
+				},
 			};
 			setUser(userData);
-			localStorage.setItem("cognitoUser", JSON.stringify(userData));
-			localStorage.setItem("isLoggedIn", "true");
+			StorageService.setItem("cognitoUser", userData);
+			StorageService.setItem("isLoggedIn", "true");
 
 			// Store the name for future sign-ins before clearing pending data (user-specific)
 			if (userData.name && userData.name !== userData.email) {
 				const userNameKey = `userName_${userData.email}`;
-				localStorage.setItem(userNameKey, userData.name);
+				StorageService.setItem(userNameKey, userData.name);
 			}
 
 			// Clear pending user data
-			localStorage.removeItem("pendingUser");
+			StorageService.removeItem("pendingUser");
 
 			// Set flag to indicate this is a new user who should see setup popup
-			localStorage.setItem("shouldShowSetupWizard", "true");
+			StorageService.setItem("shouldShowSetupWizard", "true");
 		} catch (error: any) {
 			console.error("Confirm sign up error:", error);
 			throw new Error(error.message || "Failed to confirm sign up");
@@ -363,8 +353,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			await signOut();
 			setUser(null);
 
-			// Clear all data from localStorage
-			localStorage.clear();
+			// Clear all authentication data using StorageService
+			StorageService.clearAllAuthData();
+			// Note: We don't clear all localStorage as it may contain other app data
+			// Use clearAllAuthData() which only clears auth-related keys
 		} catch (error: any) {
 			console.error("Sign out error:", error);
 			throw new Error(error.message || "Failed to sign out");

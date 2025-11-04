@@ -5,6 +5,7 @@
 
 import { HouseholdsApiService } from '../../../Services/HouseholdsApiService';
 import { CreateHouseholdApiRequest, HouseholdResponse } from '../types/api.types';
+import { StorageService } from '../../../Utils/StorageService';
 
 export interface HouseholdSignUpState {
   hasOfferedSetup: boolean;
@@ -33,7 +34,6 @@ export interface HouseholdSignUpActions {
  */
 export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions {
   private apiService: HouseholdsApiService;
-  private storageKey = 'household_signup_state';
 
   constructor(apiService: HouseholdsApiService) {
     this.apiService = apiService;
@@ -124,22 +124,10 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
    * Get current sign-up state
    */
   getSignUpState(): HouseholdSignUpState {
-    try {
-      const stored = localStorage.getItem(this.storageKey);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return {
-          hasOfferedSetup: parsed.hasOfferedSetup || false,
-          userChoice: parsed.userChoice || null,
-          completionStatus: parsed.completionStatus || 'pending',
-          householdId: parsed.householdId || null,
-          lastPromptDate: parsed.lastPromptDate ? new Date(parsed.lastPromptDate) : null,
-          isNewUser: parsed.isNewUser || false,
-          userId: parsed.userId || null,
-        };
-      }
-    } catch (error) {
-      console.error('Error reading sign-up state:', error);
+    const state = StorageService.getHouseholdSignUpState();
+    
+    if (state) {
+      return state;
     }
 
     // Return default state
@@ -160,8 +148,8 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
   updateSignUpState(state: Partial<HouseholdSignUpState>): void {
     try {
       const currentState = this.getSignUpState();
-      const newState = { ...currentState, ...state };
-      this.persistSignUpState(newState);
+      const newState: HouseholdSignUpState = { ...currentState, ...state };
+      StorageService.setHouseholdSignUpState(newState);
     } catch (error) {
       console.error('Error updating sign-up state:', error);
     }
@@ -171,36 +159,7 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
    * Check if we should show a completion prompt
    */
   shouldShowPrompt(currentUserEmail: string): boolean {
-    const state = this.getSignUpState();
-
-    // Don't show if this is a different user (user switched accounts)
-    if (state.userId && state.userId !== currentUserEmail) {
-      return false;
-    }
-
-    // Don't show if already completed or permanently skipped
-    if (state.completionStatus === 'completed' || state.userChoice === 'skip') {
-      return false;
-    }
-
-    // Don't show if we haven't offered setup yet
-    if (!state.hasOfferedSetup) {
-      return false;
-    }
-
-    // Only show for new users who just completed email confirmation
-    if (!state.isNewUser) {
-      return false;
-    }
-
-    // Show if user chose 'later' and enough time has passed
-    if (state.userChoice === 'later' && state.lastPromptDate) {
-      const daysSinceLastPrompt = (Date.now() - state.lastPromptDate.getTime()) / (1000 * 60 * 60 * 24);
-      return daysSinceLastPrompt >= 1; // Show again after 1 day
-    }
-
-    // Show if user hasn't made a choice yet
-    return state.userChoice === null;
+    return StorageService.shouldShowRegistrationPrompt(currentUserEmail);
   }
 
   /**
@@ -214,11 +173,12 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
 
   /**
    * Persist sign-up state to localStorage
+   * @deprecated Use StorageService.setHouseholdSignUpState() directly
    */
   private persistSignUpState(state?: HouseholdSignUpState): void {
     try {
       const stateToStore = state || this.getSignUpState();
-      localStorage.setItem(this.storageKey, JSON.stringify(stateToStore));
+      StorageService.setHouseholdSignUpState(stateToStore);
     } catch (error) {
       console.error('Error persisting sign-up state:', error);
     }
@@ -229,7 +189,7 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
    */
   clearSignUpState(): void {
     try {
-      localStorage.removeItem(this.storageKey);
+      StorageService.removeItem('household_signup_state');
     } catch (error) {
       console.error('Error clearing sign-up state:', error);
     }
@@ -256,19 +216,19 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
    */
   isNewUserSignUp(userEmail: string): boolean {
     try {
-
-      // Check if there's a new user signup flag in localStorage
-      const newUserFlag = localStorage.getItem('new_user_signup');
+      // Check if there's a new user signup flag in storage
+      const newUserFlag = StorageService.getItem<{
+        timestamp: number;
+        completed: boolean;
+      }>('new_user_signup');
 
       if (newUserFlag) {
-        const flagData = JSON.parse(newUserFlag);
-
         // Check if the flag is recent (within last 5 minutes) and completed
-        const isRecent = (Date.now() - flagData.timestamp) < (5 * 60 * 1000); // 5 minutes
+        const isRecent = (Date.now() - newUserFlag.timestamp) < (5 * 60 * 1000); // 5 minutes
 
-        if (isRecent && flagData.completed) {
+        if (isRecent && newUserFlag.completed) {
           // Clear the flag since we're processing it
-          localStorage.removeItem('new_user_signup');
+          StorageService.removeItem('new_user_signup');
           return true;
         }
       }

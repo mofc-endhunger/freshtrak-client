@@ -38,6 +38,7 @@ export const RENDER_URL = {
 	PRIVACY: "/privacy",
 	TERMS: "/terms",
 	ACCOUNT_URL: "/account",
+	HOUSEHOLDS_URL: "/households",
 	HOUSEHOLD_SETUP_URL: "/households/setup",
 	LOGIN_URL: "/login",
 	USER_HOME_URL: "/user-home",

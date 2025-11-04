@@ -97,7 +97,7 @@ describe("RegistrationConfirmComponent", () => {
 			user: { user: mockFamily },
 		});
 
-		const { getByText } = render(
+		const { getAllByText } = render(
 			<Provider store={testStore}>
 				<MemoryRouter>
 					<RegistrationConfirmComponent location={user_mock_data} />
@@ -105,7 +105,8 @@ describe("RegistrationConfirmComponent", () => {
 			</Provider>
 		);
 
-		// Verify the identification code is displayed
-		getByText(identification_code);
+		// Verify the identification code is displayed (appears in multiple places)
+		const identificationCodes = getAllByText(identification_code);
+		expect(identificationCodes.length).toBeGreaterThan(0);
 	});
 });

@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import config from "../../config";
 import TagManager from "react-gtm-module";
 import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
 import { selectUser } from "../../Store/userSlice";
@@ -15,6 +16,7 @@ import ErrorComponent from "../General/ErrorComponent";
 import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import RegistrationComponent from "./RegistrationComponent";
+import { AlreadyRegisteredError } from "../../components/shared";
 import { EventFormat } from "../../Utils/EventHandler";
 import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
@@ -25,7 +27,11 @@ import {
 	UpdateHouseholdApiRequest,
 } from "../Households/types/api.types";
 import { handleAuthError } from "../../Utils/AuthErrorHandler";
-import config from "../../config";
+import {
+	getGenderId,
+	getGenderFromId,
+	getGenderDisplayName,
+} from "../Households/utils/householdUtils";
 
 // Type imports from registration.types.ts
 import {
@@ -108,6 +114,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const [errors, setErrors] = useState<string[]>([]);
 	const [disabled, setDisabled] = useState<boolean>(false);
 	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+	const [showAlreadyRegistered, setShowAlreadyRegistered] =
+		useState<boolean>(false);
 	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
 	const householdDataProcessedRef = useRef<boolean>(false);
 
@@ -249,6 +257,54 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				try {
 					const householdData = location.state
 						.householdData as UsersMeResponse;
+
+					// Get primary member data for DOB and gender
+					const primaryMember =
+						householdData.members &&
+						householdData.members.length > 0
+							? householdData.members[0]
+							: null;
+
+					// Convert date from yyyy-mm-dd to mm/dd/yyyy format for form
+					const convertDateFormat = (dateString: string): string => {
+						if (!dateString || dateString === "1900-01-01") {
+							return "";
+						}
+						try {
+							const [year, month, day] = dateString
+								.split("-")
+								.map(Number);
+							if (
+								isNaN(year) ||
+								isNaN(month) ||
+								isNaN(day) ||
+								year < 1900 ||
+								year > 2100 ||
+								month < 1 ||
+								month > 12 ||
+								day < 1 ||
+								day > 31
+							) {
+								return "";
+							}
+							const monthStr = String(month).padStart(2, "0");
+							const dayStr = String(day).padStart(2, "0");
+							const yearStr = String(year);
+							return `${monthStr}/${dayStr}/${yearStr}`;
+						} catch (error) {
+							return "";
+						}
+					};
+
+					// Convert gender_id to gender display name for form
+					const getGenderForForm = (
+						genderId: number | null
+					): string => {
+						if (!genderId) return "";
+						const gender = getGenderFromId(genderId);
+						return getGenderDisplayName(gender);
+					};
+
 					const prefilledUser = {
 						...user,
 						// Prefill address information
@@ -261,6 +317,15 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						zip_code: householdData.zip_code || user.zip_code,
 						phone: householdData.phone || user.phone,
 						email: householdData.email || user.email,
+						// Prefill date_of_birth and gender from primary member
+						date_of_birth: primaryMember
+							? convertDateFormat(
+									primaryMember.date_of_birth || ""
+							  )
+							: user.date_of_birth || "",
+						gender: primaryMember
+							? getGenderForForm(primaryMember.gender_id || null)
+							: user.gender || "",
 						// Prefill household member counts
 						adults_in_household:
 							householdData.counts?.adults ||
@@ -344,6 +409,25 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		return `Your QRCode for the Reservation ${CLIENT_URL}qrcode/${identification_code}/${eventDateId}${
 			eventSlotId ? "/" + eventSlotId : ""
 		}`;
+	};
+
+	// Check if error message indicates "already registered"
+	const isAlreadyRegisteredError = (errorData: any): boolean => {
+		if (!errorData || typeof errorData !== "object") {
+			return false;
+		}
+
+		const errorText = JSON.stringify(errorData).toLowerCase();
+		const alreadyRegisteredKeywords = [
+			"already registered",
+			"already exist",
+			"user already",
+			"duplicate registration",
+		];
+
+		return alreadyRegisteredKeywords.some((keyword) =>
+			errorText.includes(keyword)
+		);
 	};
 
 	const formatErrorMessage = (message: string): string => {
@@ -486,47 +570,104 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		return null;
 	};
 
+	// Helper function to convert registration gender format to household format
+	const normalizeGenderToHouseholdFormat = (
+		gender: string
+	): "male" | "female" | "other" | "prefer_not_to_say" => {
+		const normalized = gender.toLowerCase().trim();
+		if (normalized === "male") return "male";
+		if (normalized === "female") return "female";
+		if (normalized === "other") return "other";
+		if (
+			normalized === "prefer not to say" ||
+			normalized === "prefer_not_to_say"
+		)
+			return "prefer_not_to_say";
+		return "prefer_not_to_say";
+	};
+
 	// Helper function to map registration data to household structure
 	const mapRegistrationToHousehold = (
 		registrationData: RegistrationFormData,
 		currentHousehold: UsersMeResponse
 	): UpdateHouseholdApiRequest => {
-		// Update the primary member (members[0]) with registration data
-		const updatedMembers = [...currentHousehold.members];
-		if (updatedMembers.length > 0) {
-			updatedMembers[0] = {
-				...updatedMembers[0],
-				date_of_birth: registrationData.date_of_birth,
-			};
+		// Exclude updated_at from the request (like HouseholdContainer does)
+		const { updated_at, ...currentHouseholdWithoutTimestamp } =
+			currentHousehold;
+
+		// Convert registration gender to gender_id if provided
+		let genderId: number | null = null;
+		if (registrationData.gender) {
+			const normalizedGender = normalizeGenderToHouseholdFormat(
+				registrationData.gender
+			);
+			genderId = getGenderId(normalizedGender);
 		}
 
-		return {
-			// Preserve existing household structure
-			...currentHousehold,
+		// Update the primary member (members[0]) with all registration data
+		const updatedMembers = currentHousehold.members.map((member, index) => {
+			// For the primary member (index 0), update with registration data
+			if (index === 0) {
+				return {
+					...member,
+					first_name:
+						registrationData.first_name || member.first_name,
+					last_name: registrationData.last_name || member.last_name,
+					middle_name:
+						registrationData.middle_name ||
+						member.middle_name ||
+						null,
+					date_of_birth:
+						registrationData.date_of_birth || member.date_of_birth,
+					// Update gender_id from registration data if provided, otherwise keep existing
+					gender_id:
+						genderId !== null
+							? genderId
+							: member.gender_id
+							? Number(member.gender_id)
+							: null,
+					suffix_id: member.suffix_id
+						? Number(member.suffix_id)
+						: null,
+				};
+			}
+			// For other members, preserve existing data with proper typing
+			return {
+				...member,
+				gender_id: member.gender_id ? Number(member.gender_id) : null,
+				suffix_id: member.suffix_id ? Number(member.suffix_id) : null,
+			};
+		});
 
-			// Update only the fields from registration
-			address_line_1: registrationData.address_line_1,
+		const payload = {
+			// Preserve existing household structure (excluding updated_at)
+			...currentHouseholdWithoutTimestamp,
+
+			// Update fields from registration
+			address_line_1: registrationData.address_line_1 || null,
 			address_line_2: registrationData.address_line_2 || null,
-			city: registrationData.city,
-			state: registrationData.state,
-			zip_code: registrationData.zip_code,
-			phone: registrationData.phone,
-			email: registrationData.email,
+			city: registrationData.city || null,
+			state: registrationData.state || null,
+			zip_code: registrationData.zip_code || null,
+			phone: registrationData.phone || null,
+			email: registrationData.email || null,
 
-			// Update counts only (not individual members)
+			// Update counts from registration
 			counts: {
-				seniors: registrationData.seniors_in_household,
-				adults: registrationData.adults_in_household,
-				children: registrationData.children_in_household,
+				seniors: registrationData.seniors_in_household || 0,
+				adults: registrationData.adults_in_household || 0,
+				children: registrationData.children_in_household || 0,
 				total:
-					registrationData.seniors_in_household +
-					registrationData.adults_in_household +
-					registrationData.children_in_household,
+					(registrationData.seniors_in_household || 0) +
+					(registrationData.adults_in_household || 0) +
+					(registrationData.children_in_household || 0),
 			},
 
-			// Update members array with primary member's date_of_birth
+			// Update members array with all updates
 			members: updatedMembers,
 		};
+
+		return payload;
 	};
 
 	// Helper function to handle Cognito user update
@@ -751,6 +892,17 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				return;
 			}
 
+			// Check for "already registered" error
+			if (
+				e.response &&
+				e.response.data &&
+				isAlreadyRegisteredError(e.response.data)
+			) {
+				setShowAlreadyRegistered(true);
+				setDisabled(false);
+				return;
+			}
+
 			// Handle different types of errors
 			if (e.response && e.response.data) {
 				// API error with response data
@@ -802,6 +954,22 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				setshow={setShowAuthModal}
 				onLogin={handleAuthLogin}
 			/>
+		);
+	}
+
+	// Show already registered error message
+	if (showAlreadyRegistered) {
+		return (
+			<Fragment>
+				<NotifyToast />
+				<AlreadyRegisteredError
+					eventName={selectedEvent?.agencyName}
+					onBackToHome={() => {
+						setShowAlreadyRegistered(false);
+						navigate(RENDER_URL.ROOT_URL);
+					}}
+				/>
+			</Fragment>
 		);
 	}
 

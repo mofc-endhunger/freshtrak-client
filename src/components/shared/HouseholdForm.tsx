@@ -758,10 +758,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 					children:
 						Number(state.formValues.children_in_household) || 0,
 					total:
-						Number(state.formValues.seniors_in_household) ||
-						0 + Number(state.formValues.adults_in_household) ||
-						0 + Number(state.formValues.children_in_household) ||
-						0,
+						(Number(state.formValues.seniors_in_household) || 0) +
+						(Number(state.formValues.adults_in_household) || 0) +
+						(Number(state.formValues.children_in_household) || 0),
 				};
 
 				return (

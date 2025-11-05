@@ -244,8 +244,9 @@ export class StorageService {
     /**
      * Clear expired data from storage
      * Automatically removes expired guest tokens and invalid data
+     * @param storageType - 'local' or 'session', defaults to 'local'
      */
-    private static clearExpiredData(storageType: StorageType = 'local'): void {
+    static clearExpiredData(storageType: StorageType = 'local'): void {
         // Check and clear expired guest user profile
         const guestUser = this.getItem<GuestUserProfile>('freshtrak_user_guest', storageType);
         if (guestUser && guestUser.expires_at) {
@@ -548,6 +549,83 @@ export class StorageService {
         this.removeItem('freshtrak_user_token');
         this.removeItem('freshtrak_user_current');
         this.removeItem('freshtrak_user_logged_in');
+    }
+
+    /**
+     * Clear all application data from localStorage
+     * This includes all user data, household data, preferences, etc.
+     * Use this when user logs out to ensure complete cleanup
+     */
+    static clearAllAppData(): void {
+        try {
+            const storage = this.getStorage('local');
+            const keysToRemove: string[] = [];
+
+            // Get all keys from localStorage
+            for (let i = 0; i < storage.length; i++) {
+                const key = storage.key(i);
+                if (key) {
+                    // Remove all freshtrak_ prefixed keys
+                    if (key.startsWith('freshtrak_')) {
+                        keysToRemove.push(key);
+                    }
+                    // Remove legacy keys that might still exist
+                    if (LEGACY_KEY_MAP[key] ||
+                        key === 'householdId' ||
+                        key === 'search_zip' ||
+                        key === 'pendingUser' ||
+                        key === 'shouldShowSetupWizard' ||
+                        key === 'household_signup_state' ||
+                        key === 'household' ||
+                        key === 'isLoggedIn' ||
+                        key === 'userToken' ||
+                        key === 'cognitoUser' ||
+                        key === 'userProfile' ||
+                        key === 'guestId' ||
+                        key === 'guestType') {
+                        keysToRemove.push(key);
+                    }
+                    // Remove dynamically created userName_ keys (userName_<email>)
+                    if (key.startsWith('userName_')) {
+                        keysToRemove.push(key);
+                    }
+                    // Remove Redux persist data
+                    if (key === 'persist:root') {
+                        keysToRemove.push(key);
+                    }
+                }
+            }
+
+            // Remove all identified keys
+            keysToRemove.forEach(key => {
+                try {
+                    storage.removeItem(key);
+                } catch (error) {
+                    console.warn(`Failed to remove key ${key}:`, error);
+                }
+            });
+
+            // Also clear sessionStorage
+            const sessionStorage = this.getStorage('session');
+            const sessionKeysToRemove: string[] = [];
+
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key && key.startsWith('freshtrak_')) {
+                    sessionKeysToRemove.push(key);
+                }
+            }
+
+            sessionKeysToRemove.forEach(key => {
+                try {
+                    sessionStorage.removeItem(key);
+                } catch (error) {
+                    console.warn(`Failed to remove session key ${key}:`, error);
+                }
+            });
+        } catch (error) {
+            console.error('Error clearing app data:', error);
+        }
     }
 
     /**

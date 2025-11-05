@@ -12,6 +12,7 @@ import {
 } from "aws-amplify/auth";
 import { AuthContextType } from "./types/authentication.types";
 import { StorageService, CognitoUser } from "../../Utils/StorageService";
+import { persistor } from "../../Store/store";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -353,10 +354,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			await signOut();
 			setUser(null);
 
-			// Clear all authentication data using StorageService
-			StorageService.clearAllAuthData();
-			// Note: We don't clear all localStorage as it may contain other app data
-			// Use clearAllAuthData() which only clears auth-related keys
+			// Clear all application data from localStorage and sessionStorage
+			// This includes auth data, household data, preferences, etc.
+			StorageService.clearAllAppData();
+			
+			// Purge Redux persist store to clear persisted state
+			await persistor.purge();
 		} catch (error: any) {
 			console.error("Sign out error:", error);
 			throw new Error(error.message || "Failed to sign out");

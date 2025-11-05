@@ -105,14 +105,19 @@ const RegistrationConfirmComponent: React.FC<
 		userToken,
 	]);
 
-	// Show guest signin modal for guest users
+	// Show guest signin modal for guest users only
 	useEffect(() => {
-		if (!cognitoUser) {
+		// Only show modal if user is a guest user (not a Cognito user)
+		const isGuest = StorageService.isGuestUser();
+		const isCognito = StorageService.isLoggedInUser();
+		
+		if (isGuest && !isCognito) {
 			setTimeout(() => {
 				setShowGuestSigninModal(true);
 			}, 3000);
 		}
-	}, [cognitoUser]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	function fetchBusinesses(): void {
 		const token = localStorage.getItem("userToken");

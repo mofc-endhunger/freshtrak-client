@@ -16,7 +16,6 @@ import ErrorComponent from "../General/ErrorComponent";
 import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import RegistrationComponent from "./RegistrationComponent";
-import { AlreadyRegisteredError } from "../../components/shared";
 import { EventFormat } from "../../Utils/EventHandler";
 import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
@@ -115,8 +114,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const [errors, setErrors] = useState<string[]>([]);
 	const [disabled, setDisabled] = useState<boolean>(false);
 	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-	const [showAlreadyRegistered, setShowAlreadyRegistered] =
-		useState<boolean>(false);
 	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
 	const householdDataProcessedRef = useRef<boolean>(false);
 
@@ -849,7 +846,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				e.response.data &&
 				isAlreadyRegisteredError(e.response.data)
 			) {
-				setShowAlreadyRegistered(true);
+				// Redirect to already registered page instead of showing inline
+				navigate(RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL, {
+					state: {
+						eventName: selectedEvent?.agencyName,
+					},
+				});
 				setDisabled(false);
 				return;
 			}
@@ -905,22 +907,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				setshow={setShowAuthModal}
 				onLogin={handleAuthLogin}
 			/>
-		);
-	}
-
-	// Show already registered error message
-	if (showAlreadyRegistered) {
-		return (
-			<Fragment>
-				<NotifyToast />
-				<AlreadyRegisteredError
-					eventName={selectedEvent?.agencyName}
-					onBackToHome={() => {
-						setShowAlreadyRegistered(false);
-						navigate(RENDER_URL.ROOT_URL);
-					}}
-				/>
-			</Fragment>
 		);
 	}
 

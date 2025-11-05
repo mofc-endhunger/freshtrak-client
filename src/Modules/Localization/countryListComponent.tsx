@@ -33,7 +33,7 @@ const countryOptions: CountryOption[] = [
 	{ key: "tgl", value: "tgl", text: "Tagalog" },
 ];
 
-const CountryListComponent: React.FC<CountryListComponentProps> = props => {
+const CountryListComponent: React.FC<CountryListComponentProps> = (props) => {
 	const [selectedValue, setSelectedValue] = useState<string>("");
 
 	const handleValueChange = (value: string) => {
@@ -51,7 +51,7 @@ const CountryListComponent: React.FC<CountryListComponentProps> = props => {
 				<SelectValue placeholder="Select Language" />
 			</SelectTrigger>
 			<SelectContent className="bg-white z-[10000]">
-				{countryOptions.map(option => (
+				{countryOptions.map((option) => (
 					<SelectItem
 						key={option.key}
 						value={option.value}

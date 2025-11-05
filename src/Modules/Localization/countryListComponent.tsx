@@ -50,7 +50,7 @@ const CountryListComponent: React.FC<CountryListComponentProps> = props => {
 			<SelectTrigger className="bg-white text-gray-400 border border-white rounded px-2 md:px-3 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 h-auto min-w-[140px]">
 				<SelectValue placeholder="Select Language" />
 			</SelectTrigger>
-			<SelectContent className="bg-white">
+			<SelectContent className="bg-white z-[10000]">
 				{countryOptions.map(option => (
 					<SelectItem
 						key={option.key}

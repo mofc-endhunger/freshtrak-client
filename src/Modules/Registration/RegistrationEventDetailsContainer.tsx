@@ -18,7 +18,7 @@ interface RegistrationEventDetailsContainerProps {
 
 const RegistrationEventDetailsContainer: React.FC<
 	RegistrationEventDetailsContainerProps
-> = props => {
+> = (props) => {
 	const navigate = useNavigate();
 
 	const { id: eventDateId } = useParams();
@@ -49,15 +49,32 @@ const RegistrationEventDetailsContainer: React.FC<
 	};
 
 	useEffect(() => {
+		// Store the referrer URL if it's a search results page (backup for navigation)
+		if (typeof window !== "undefined" && document.referrer) {
+			try {
+				const referrerUrl = new URL(document.referrer);
+				if (referrerUrl.pathname.startsWith("/events/list")) {
+					sessionStorage.setItem(
+						"searchResultsUrl",
+						referrerUrl.pathname + referrerUrl.search
+					);
+				}
+			} catch (e) {
+				// Ignore URL parsing errors
+			}
+		}
 		if (Object.keys(selectedEvent).length === 0 && !isError && !pageError) {
 			getEvent();
 		}
 	});
 
-	// Check authentication on component mount and hide modal if user is authenticated
+	// Check authentication on component mount and when authentication state might change
 	useEffect(() => {
 		if (isUserAuthenticated()) {
 			setshowAuthenticationModal(false);
+		} else {
+			// If not authenticated, modal state should be controlled by getUserToken
+			// Don't automatically show modal here - let getUserToken handle it
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -87,13 +104,13 @@ const RegistrationEventDetailsContainer: React.FC<
 			const { GUEST_USER } = API_URL;
 
 			// Clear Cognito authentication data when logging in as guest
-			StorageService.clearAuthData('cognito');
+			StorageService.clearAuthData("cognito");
 
 			// Get guest authentication
 			const resp = await axios.post(GUEST_USER);
 			const userProfile = resp.data;
 			// Use StorageService to store guest user profile
-			StorageService.setItem('freshtrak_user_guest', userProfile);
+			StorageService.setItem("freshtrak_user_guest", userProfile);
 
 			setLoading(false);
 			setshowAuthenticationModal(false);

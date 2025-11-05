@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import back from "../../Assets/img/back.svg";
 import "../../Assets/scss/main.scss";
 import { RENDER_URL } from "../../Utils/Urls";
+import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 
 const BackButtonComponent = () => {
 	const navigate = useNavigate();
@@ -19,6 +20,24 @@ const BackButtonComponent = () => {
 
 		if (pathParts.length === 4 && pathParts[2] === "event") {
 			// /register/event/:eventDateId - go back to search results or home
+
+			// First, try to retrieve stored search results URL from sessionStorage
+			const storedSearchUrl = sessionStorage.getItem("searchResultsUrl");
+			if (storedSearchUrl) {
+				navigate(storedSearchUrl);
+				return;
+			}
+
+			// Fallback: Try to reconstruct search URL from localStorage
+			const searchZip = localStorage.getItem("search_zip");
+			if (searchZip) {
+				// Reconstruct search results URL with default distance
+				const searchUrl = `/events/list/${searchZip}/${DEFAULT_DISTANCE}/`;
+				navigate(searchUrl);
+				return;
+			}
+
+			// Final fallback: navigate to home
 			navigate(RENDER_URL.ROOT_URL);
 		} else if (pathParts.length >= 4 && pathParts[2] === "form") {
 			// /register/form/:eventDateId or /register/form/:eventDateId/:timeslotId

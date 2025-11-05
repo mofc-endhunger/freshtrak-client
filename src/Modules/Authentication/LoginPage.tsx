@@ -12,6 +12,7 @@ import LoadingSpinner from "../General/LoadingSpinner";
 import { Button } from "../../components/ui/button";
 import { AuthModalTab, GTMEvent } from "./types/authentication.types";
 import { API_URL } from "../../Utils/Urls";
+import { StorageService } from "../../Utils/StorageService";
 
 /**
  * LoginPage - Full-page login interface with authentication forms
@@ -40,11 +41,16 @@ const LoginPage: React.FC = () => {
 			const { GUEST_USER } = API_URL;
 
 			// Clear Cognito authentication data when logging in as guest
-			localStorage.removeItem("cognitoUser");
+			StorageService.clearAuthData("cognito");
 
 			const resp = await axios.post(GUEST_USER);
 			const userProfile = resp.data;
-			localStorage.setItem("userProfile", JSON.stringify(userProfile));
+			// Use StorageService to store guest user profile (uses 'freshtrak_user_guest' key)
+			StorageService.setItem("freshtrak_user_guest", userProfile);
+			// Also store token if available
+			if (userProfile.token) {
+				StorageService.setUserToken(userProfile.token);
+			}
 
 			// Track guest login event with Google Tag Manager
 			const gtmEvent: GTMEvent = {

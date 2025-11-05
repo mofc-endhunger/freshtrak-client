@@ -72,7 +72,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "For Foodbanks",
 		advance_registration: "Registering in advance is",
 		by_registration:
-			"By registering now, you can save time time on-site and keep yourself and our volunteers safe.",
+			"By registering now, you can save time on-site and make the check-in process smoother for you and our volunteers.",
 		male: "Male",
 		female: "Female",
 		other: "Other",
@@ -115,8 +115,7 @@ let localization = new LocalizedStrings({
 		by_service_catogory: "por categoría de servicio",
 		by_availability: "por disponibilidad",
 		only_reservations: "Solo Reservas",
-		show_only_reservations:
-			"Mostrar solo eventos que aceptan reservas",
+		show_only_reservations: "Mostrar solo eventos que aceptan reservas",
 		register: "Regístrate ahora.",
 		save_time: "Ahorrar tiempo.",
 		stay_safe: "Mantente segura",
@@ -155,7 +154,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "Para bancos de alimentos",
 		advance_registration: "Registrarse con anticipación es",
 		by_registration:
-			"Al registrarse ahora, puede ahorrar tiempo en el sitio y mantenerse a salvo a usted y a nuestros voluntarios.",
+			"Al registrarse ahora, puede ahorrar tiempo en el sitio y hacer que el proceso de registro sea más fluido para usted y nuestros voluntarios.",
 		male: "Masculina",
 		female: "Mujer",
 		other: "Otra/Otro",
@@ -235,7 +234,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "For Foodbanks",
 		advance_registration: "Isdiiwaangalinta hore waa",
 		by_registration:
-			"Marka aad isdiiwaangaliso hada, waxaad waqti kuheli kartaa goobta isla markaana naftaada iyo tabaruceyaasheena badbaadin kartaa.",
+			"Marka aad isdiiwaangaliso hada, waxaad waqti kuheli kartaa goobta isla markaana samayn kartaa habka isdiiwaangelinta uu ugu fududyahay adiga iyo tabaruceyaasheena.",
 		male: "Lab",
 		female: "Dheddig",
 		other: "Kale",
@@ -315,7 +314,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "Для Фудбанков",
 		advance_registration: "Предварительная регистрация - это",
 		by_registration:
-			"Регистрируясь сейчас, вы можете сэкономить время на работе и обезопасить себя и наших волонтеров.",
+			"Регистрируясь сейчас, вы можете сэкономить время на месте и сделать процесс регистрации более плавным для вас и наших волонтеров.",
 		male: "Мужской",
 		female: "женский",
 		other: "Другой",
@@ -395,7 +394,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "Foodbanks için",
 		advance_registration: "Önceden kayıt olmak",
 		by_registration:
-			"Şimdi kaydolarak, yerinde zaman kazanabilir ve kendinizi ve gönüllülerimizi güvende tutabilirsiniz.",
+			"Şimdi kaydolarak, yerinde zaman kazanabilir ve kayıt sürecini sizin ve gönüllülerimiz için daha sorunsuz hale getirebilirsiniz.",
 		male: "Erkek",
 		female: "Kadın",
 		other: "Diğer",
@@ -472,7 +471,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "لبنوك الطعام",
 		advance_registration: "التسجيل مقدما هو",
 		by_registration:
-			"من خلال التسجيل الآن ، يمكنك توفير الوقت في الموقع والحفاظ على سلامتك أنت ومتطوعينا.",
+			"من خلال التسجيل الآن، يمكنك توفير الوقت في الموقع وجعل عملية التسجيل أكثر سلاسة لك وللمتطوعين لدينا.",
 		male: "ذكر",
 		female: "أنثى",
 		other: "آخر",
@@ -547,7 +546,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "对于食品银行",
 		advance_registration: "提前注册为",
 		by_registration:
-			"通过立即注册，您可以节省现场时间，并确保自己和我们的志愿者的安全。",
+			"通过立即注册，您可以节省现场时间，并使签到过程对您和我们的志愿者更加顺畅。",
 		male: "男性",
 		female: "女性",
 		other: "其他",
@@ -624,7 +623,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "फूडबैंक के लिए",
 		advance_registration: "अग्रिम में पंजीकरण है",
 		by_registration:
-			"अब पंजीकरण करके, आप साइट पर समय बचा सकते हैं और अपने आप को और हमारे स्वयंसेवकों को सुरक्षित रख सकते हैं।",
+			"अब पंजीकरण करके, आप साइट पर समय बचा सकते हैं और आपके और हमारे स्वयंसेवकों के लिए चेक-इन प्रक्रिया को अधिक सुगम बना सकते हैं।",
 		male: "पुरुष",
 		female: "महिला",
 		other: "अन्य",
@@ -702,7 +701,7 @@ let localization = new LocalizedStrings({
 		for_foodbanks: "Foodbanks को लागी",
 		advance_registration: "अग्रिम दर्ता गर्नु हो",
 		by_registration:
-			"अहिले दर्ता गरेर, तपाईं साइटमा समय बचत गर्न सक्नुहुनेछ र आफैलाई र हाम्रा स्वयंसेवकहरूलाई सुरक्षित राख्न सक्नुहुन्छ।",
+			"अहिले दर्ता गरेर, तपाईं साइटमा समय बचत गर्न सक्नुहुनेछ र तपाईं र हाम्रा स्वयंसेवकहरूको लागि चेक-इन प्रक्रिया सजिलो बनाउन सक्नुहुन्छ।",
 		male: "नर",
 		female: "महिला",
 		other: "अन्य",

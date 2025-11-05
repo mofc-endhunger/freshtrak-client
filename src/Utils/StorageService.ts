@@ -325,7 +325,34 @@ export class StorageService {
      * @returns GuestUserProfile object or null if not found/expired
      */
     static getGuestUser(): GuestUserProfile | null {
-        const profile = this.getItem<GuestUserProfile>('freshtrak_user_guest');
+        // Try new namespaced key first
+        let profile = this.getItem<GuestUserProfile>('freshtrak_user_guest');
+
+        // If not found, try legacy key directly (for backward compatibility)
+        // We access localStorage directly to avoid normalization
+        if (!profile) {
+            try {
+                const storage = this.getStorage('local');
+                const legacyValue = storage.getItem('userProfile');
+                if (legacyValue) {
+                    try {
+                        profile = JSON.parse(legacyValue) as GuestUserProfile;
+                        // If found via legacy key, migrate it to new key
+                        if (profile) {
+                            this.setItem('freshtrak_user_guest', profile);
+                            // Remove legacy key after migration
+                            storage.removeItem('userProfile');
+                        }
+                    } catch (parseError) {
+                        // Invalid JSON in legacy key, remove it
+                        storage.removeItem('userProfile');
+                        return null;
+                    }
+                }
+            } catch (error) {
+                console.warn('Error checking legacy userProfile key:', error);
+            }
+        }
 
         if (!profile) {
             return null;
@@ -338,11 +365,25 @@ export class StorageService {
                 if (expiresAt <= new Date()) {
                     // Token expired, remove it
                     this.removeItem('freshtrak_user_guest');
+                    // Also remove legacy key directly
+                    try {
+                        const storage = this.getStorage('local');
+                        storage.removeItem('userProfile');
+                    } catch (e) {
+                        // Ignore errors removing legacy key
+                    }
                     return null;
                 }
             } catch (error) {
                 // Invalid date format, remove it
                 this.removeItem('freshtrak_user_guest');
+                // Also remove legacy key directly
+                try {
+                    const storage = this.getStorage('local');
+                    storage.removeItem('userProfile');
+                } catch (e) {
+                    // Ignore errors removing legacy key
+                }
                 return null;
             }
         }

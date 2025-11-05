@@ -69,13 +69,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			// This prevents "There is already a signed in user" error from AWS Amplify
 			try {
 				const existingSession = await fetchAuthSession();
-				if (existingSession.tokens && Object.keys(existingSession.tokens).length > 0) {
+				if (
+					existingSession.tokens &&
+					Object.keys(existingSession.tokens).length > 0
+				) {
 					// There's an existing session, sign out first
 					try {
 						await signOut();
 					} catch (signOutError) {
 						// Ignore sign out errors - session might already be invalid
-						console.warn("Could not sign out existing session:", signOutError);
+						console.warn(
+							"Could not sign out existing session:",
+							signOutError
+						);
 					}
 				}
 			} catch (sessionError) {
@@ -387,7 +393,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			// Clear all application data from localStorage and sessionStorage
 			// This includes auth data, household data, preferences, etc.
 			StorageService.clearAllAppData();
-			
+
 			// Purge Redux persist store to clear persisted state
 			await persistor.purge();
 		} catch (error: any) {

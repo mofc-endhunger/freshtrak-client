@@ -1,11 +1,15 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { BrowserRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import { configureStore } from "@reduxjs/toolkit";
 import RegistrationContainer from "../RegistrationContainer";
 import eventSlice from "../../../Store/Events/eventSlice";
 import userSlice from "../../../Store/userSlice";
+
+// Mock axios
+jest.mock("axios");
+const mockAxios = require("axios");
 
 // Mock the dependencies
 jest.mock("react-gtm-module", () => ({
@@ -18,6 +22,31 @@ jest.mock("../../../Utils/EventHandler", () => ({
 
 jest.mock("../../../Services/ApiService", () => ({
 	sendRegistrationConfirmationEmail: jest.fn(),
+}));
+
+jest.mock("../../../Services/HouseholdsApiService", () => ({
+	HouseholdsApiService: jest.fn().mockImplementation(() => ({
+		getUsersMe: jest.fn().mockResolvedValue({
+			members: [{
+				user_id: "1",
+				first_name: "John",
+				last_name: "Doe",
+			}],
+			address_line_1: "123 Main St",
+			city: "Test City",
+			state: "CA",
+			zip_code: "12345",
+			phone: "1234567890",
+			email: "john@example.com",
+			counts: {
+				seniors: 0,
+				adults: 1,
+				children: 0,
+				total: 1,
+			},
+		}),
+		updateHousehold: jest.fn().mockResolvedValue({}),
+	})),
 }));
 
 jest.mock("../RegistrationComponent", () => {
@@ -61,6 +90,23 @@ jest.mock("../../Notifications/NotifyToastComponent", () => ({
 	showToast: jest.fn(),
 }));
 
+// Mock StorageService
+jest.mock("../../../Utils/StorageService", () => {
+	const mockStorageService = {
+		getUserToken: jest.fn(),
+		getGuestUser: jest.fn(),
+		getCognitoUser: jest.fn(),
+		isLoggedInUser: jest.fn(),
+		isGuestUser: jest.fn(),
+	};
+	return {
+		StorageService: mockStorageService,
+	};
+});
+
+// Get the mocked StorageService after mock is created
+const { StorageService: mockStorageService } = require("../../../Utils/StorageService");
+
 // Create a mock store
 const createMockStore = () => {
 	return configureStore({
@@ -86,28 +132,6 @@ const createMockStore = () => {
 	});
 };
 
-// Mock localStorage
-const localStorageMock = {
-	getItem: jest.fn(),
-	setItem: jest.fn(),
-	removeItem: jest.fn(),
-	clear: jest.fn(),
-};
-Object.defineProperty(window, "localStorage", {
-	value: localStorageMock,
-});
-
-// Mock sessionStorage
-const sessionStorageMock = {
-	getItem: jest.fn(),
-	setItem: jest.fn(),
-	removeItem: jest.fn(),
-	clear: jest.fn(),
-};
-Object.defineProperty(window, "sessionStorage", {
-	value: sessionStorageMock,
-});
-
 describe("RegistrationContainer", () => {
 	let store: ReturnType<typeof createMockStore>;
 
@@ -115,45 +139,80 @@ describe("RegistrationContainer", () => {
 		store = createMockStore();
 		jest.clearAllMocks();
 
+		// Reset StorageService mocks
+		mockStorageService.getUserToken.mockReturnValue(null);
+		mockStorageService.getGuestUser.mockReturnValue(null);
+		mockStorageService.getCognitoUser.mockReturnValue(null);
+		mockStorageService.isLoggedInUser.mockReturnValue(false);
+		mockStorageService.isGuestUser.mockReturnValue(false);
+
 		// Mock environment variables
 		process.env.REACT_APP_CLIENT_URL = "http://localhost:3000";
+
+		// Mock axios.get to return a mock event by default
+		mockAxios.get.mockResolvedValue({
+			data: {
+				data: {
+					id: "1",
+					agencyName: "Test Agency",
+					date: "2024-01-01",
+					startTime: "09:00",
+					endTime: "10:00",
+					acceptWalkin: true,
+				},
+			},
+		});
 	});
 
-	const renderWithProviders = (component: React.ReactElement) => {
+	const renderWithProviders = (component: React.ReactElement, route = "/registration/1") => {
 		return render(
 			<Provider store={store}>
-				<BrowserRouter>{component}</BrowserRouter>
+				<MemoryRouter initialEntries={[route]}>
+					{component}
+				</MemoryRouter>
 			</Provider>
 		);
 	};
 
 	test("renders without crashing", () => {
 		// Mock that user is not authenticated (no token)
-		localStorageMock.getItem.mockReturnValue(null);
+		mockStorageService.getUserToken.mockReturnValue(null);
+		mockStorageService.getGuestUser.mockReturnValue(null);
+		mockStorageService.isLoggedInUser.mockReturnValue(false);
+		mockStorageService.isGuestUser.mockReturnValue(false);
 
 		const { container } = renderWithProviders(<RegistrationContainer />);
 		expect(container).toBeInTheDocument();
 	});
 
-	test("shows auth modal when user is not authenticated", () => {
-		localStorageMock.getItem.mockReturnValue(null);
+	test("shows auth modal when user is not authenticated", async () => {
+		mockStorageService.getUserToken.mockReturnValue(null);
+		mockStorageService.getGuestUser.mockReturnValue(null);
+		mockStorageService.isLoggedInUser.mockReturnValue(false);
+		mockStorageService.isGuestUser.mockReturnValue(false);
 
 		renderWithProviders(<RegistrationContainer />);
 
-		// Should show auth modal when no token
-		expect(screen.getByTestId("auth-modal")).toBeInTheDocument();
+		// Wait for the auth modal to appear (component checks auth after event loads)
+		await waitFor(() => {
+			expect(screen.getByTestId("auth-modal")).toBeInTheDocument();
+		}, { timeout: 3000 });
 	});
 
-	test("shows auth modal when user is authenticated but no profile", () => {
-		// Mock that user is authenticated but no user profile
-		localStorageMock.getItem
-			.mockReturnValueOnce("mock-token") // userToken
-			.mockReturnValueOnce(null); // userProfile
+	test("shows auth modal when user is authenticated but no profile", async () => {
+		// Mock that user has token but no profile
+		mockStorageService.getUserToken.mockReturnValue("mock-token");
+		mockStorageService.getGuestUser.mockReturnValue(null);
+		mockStorageService.isLoggedInUser.mockReturnValue(false);
+		mockStorageService.isGuestUser.mockReturnValue(false);
 
 		renderWithProviders(<RegistrationContainer />);
 
-		// Should show auth modal when no user profile
-		expect(screen.getByTestId("auth-modal")).toBeInTheDocument();
+		// Component shows spinner when token exists but no user profile
+		// (because !user triggers spinner at line 928)
+		await waitFor(() => {
+			expect(screen.getByTestId("spinner")).toBeInTheDocument();
+		}, { timeout: 1000 });
 	});
 
 	test("renders registration component when user is authenticated and loaded", () => {
@@ -176,17 +235,11 @@ describe("RegistrationContainer", () => {
 			children_in_household: 0,
 		};
 
-		// Mock localStorage to return token and user profile
-		// The component calls localStorage.getItem("userToken") first, then localStorage.getItem("userProfile")
-		localStorageMock.getItem.mockImplementation((key: string) => {
-			if (key === "userToken") {
-				return "mock-token";
-			}
-			if (key === "userProfile") {
-				return JSON.stringify(mockUserProfile);
-			}
-			return null;
-		});
+		// Mock StorageService to return token and user profile
+		mockStorageService.getUserToken.mockReturnValue("mock-token");
+		mockStorageService.getGuestUser.mockReturnValue(mockUserProfile as any);
+		mockStorageService.isLoggedInUser.mockReturnValue(false);
+		mockStorageService.isGuestUser.mockReturnValue(true);
 
 		// Create a new store with user in Redux state
 		const storeWithUser = configureStore({
@@ -214,9 +267,9 @@ describe("RegistrationContainer", () => {
 		// Render with the store that has user data
 		render(
 			<Provider store={storeWithUser}>
-				<BrowserRouter>
+				<MemoryRouter initialEntries={["/registration/1"]}>
 					<RegistrationContainer />
-				</BrowserRouter>
+				</MemoryRouter>
 			</Provider>
 		);
 

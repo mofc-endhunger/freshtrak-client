@@ -32,6 +32,7 @@ export const RENDER_URL = {
 	FRESHTRAK_ABOUT: "/freshtrak-about",
 	REGISTRATION_FORM_URL: "/register/form",
 	REGISTRATION_CONFIRM_URL: "/register/confirm",
+	REGISTRATION_ALREADY_REGISTERED_URL: "/register/already-registered",
 	AGENCY_EVENT_LIST: "/agency/events",
 	HOME_URL: "/home",
 	QRCODE_URL: "/qrcode",

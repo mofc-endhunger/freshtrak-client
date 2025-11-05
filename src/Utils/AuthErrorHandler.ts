@@ -4,6 +4,8 @@
  * Provides clean redirects and localStorage cleanup for both Cognito and guest users
  */
 
+import { StorageService } from './StorageService';
+
 export interface AuthErrorHandlerOptions {
   userType: "cognito" | "guest";
   redirectPath?: string;
@@ -22,19 +24,8 @@ export const handleAuthError = (
 ): boolean => {
   // Check if this is a 401 authentication error
   if (error?.response?.status === 401 || error?.type === 'AUTHENTICATION_ERROR') {
-    // Clean up localStorage based on user type
-    if (options.userType === "cognito") {
-      // Clear all Cognito-related data
-      localStorage.removeItem("cognitoUser");
-      localStorage.removeItem("userToken");
-    } else {
-      // Clear guest-related data
-      localStorage.removeItem("userProfile");
-      localStorage.removeItem("userToken");
-    }
-
-    // Clear any other authentication-related data
-    localStorage.removeItem("currentUser");
+    // Clean up storage based on user type using StorageService
+    StorageService.clearAuthData(options.userType);
 
     // Show appropriate error message
     const errorMessage = options.userType === "cognito"
@@ -83,6 +74,7 @@ export const useAuthErrorHandler = (
 
 /**
  * Utility function to check if a guest token is expired
+ * @deprecated Use StorageService.getGuestUser() instead, which automatically checks expiration
  * @param userProfile - The user profile object from localStorage
  * @returns true if token is expired, false otherwise
  */
@@ -102,6 +94,7 @@ export const isGuestTokenExpired = (userProfile: string | null): boolean => {
 
 /**
  * Utility function to check if a Cognito token is expired
+ * @deprecated Use StorageService.getCognitoUser() instead, which automatically validates tokens
  * @param cognitoUser - The cognito user object from localStorage
  * @returns true if token is expired, false otherwise
  */
@@ -124,29 +117,18 @@ export const isCognitoTokenExpired = (cognitoUser: string | null): boolean => {
 
 /**
  * Clean up all authentication data from localStorage
+ * @deprecated Use StorageService.clearAllAuthData() instead
  * Used when user needs to be completely logged out
  */
 export const clearAllAuthData = (): void => {
-  localStorage.removeItem("cognitoUser");
-  localStorage.removeItem("userProfile");
-  localStorage.removeItem("userToken");
-  localStorage.removeItem("currentUser");
+  StorageService.clearAllAuthData();
 };
 
 /**
  * Gets the Cognito token from localStorage
+ * @deprecated Use StorageService.getUserToken() or StorageService.getCognitoUser() instead
  * @returns The Cognito token or null if not found
  */
 export const getCognitoToken = (): string | null => {
-  const cognitoUser = localStorage.getItem("cognitoUser");
-  if (cognitoUser) {
-    try {
-      const cognitoUserData = JSON.parse(cognitoUser);
-      return cognitoUserData.accessToken || null;
-    } catch (error) {
-      console.warn("Could not parse cognitoUser:", error);
-      return null;
-    }
-  }
-  return null;
+  return StorageService.getUserToken();
 };

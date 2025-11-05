@@ -198,6 +198,25 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		setShow(false);
 	};
 
+	// Check if error message indicates "already registered"
+	const isAlreadyRegisteredError = (errorMessage: string | null | undefined): boolean => {
+		if (!errorMessage) {
+			return false;
+		}
+
+		const errorText = errorMessage.toLowerCase();
+		const alreadyRegisteredKeywords = [
+			"already registered",
+			"already exist",
+			"user already",
+			"duplicate registration",
+		];
+
+		return alreadyRegisteredKeywords.some((keyword) =>
+			errorText.includes(keyword)
+		);
+	};
+
 	// Household confirmation modal handlers
 	const handleHouseholdConfirm = async () => {
 		if (!selectedSlot) return;
@@ -227,15 +246,46 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				setShowHouseholdModal(false);
 				setShow(false);
 			} else {
-				// Registration failed - show error
+				// Check for "already registered" error
+				const errorMessage = result.error || "Registration failed";
+				if (isAlreadyRegisteredError(errorMessage)) {
+					// Redirect to already registered page instead of showing error
+					setShowHouseholdModal(false);
+					setShow(false);
+					navigate(RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL, {
+						state: {
+							eventName: event?.agencyName || event?.name,
+						},
+					});
+					return;
+				}
+
+				// Registration failed - show error for other errors
 				console.error("Household registration failed:", result.error);
-				setHouseholdError(result.error || "Registration failed");
+				setHouseholdError(errorMessage);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error("Household registration error:", error);
-			setHouseholdError(
-				"An unexpected error occurred during registration"
-			);
+			
+			// Check if the error response indicates "already registered"
+			const errorMessage = error?.response?.data?.message || 
+				error?.message || 
+				"An unexpected error occurred during registration";
+			
+			if (isAlreadyRegisteredError(errorMessage) || 
+				(error?.response?.data && isAlreadyRegisteredError(JSON.stringify(error.response.data)))) {
+				// Redirect to already registered page
+				setShowHouseholdModal(false);
+				setShow(false);
+				navigate(RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL, {
+					state: {
+						eventName: event?.agencyName || event?.name,
+					},
+				});
+				return;
+			}
+
+			setHouseholdError(errorMessage);
 		} finally {
 			setIsLoadingHousehold(false);
 		}

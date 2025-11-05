@@ -16,7 +16,6 @@ import ErrorComponent from "../General/ErrorComponent";
 import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import RegistrationComponent from "./RegistrationComponent";
-import { AlreadyRegisteredError } from "../../components/shared";
 import { EventFormat } from "../../Utils/EventHandler";
 import { NotifyToast, showToast } from "../Notifications/NotifyToastComponent";
 import { sendRegistrationConfirmationEmail } from "../../Services/ApiService";
@@ -26,12 +25,13 @@ import {
 	UsersMeResponse,
 	UpdateHouseholdApiRequest,
 } from "../Households/types/api.types";
-import { handleAuthError } from "../../Utils/AuthErrorHandler";
+import { handleAuthError, getCognitoToken } from "../../Utils/AuthErrorHandler";
 import {
 	getGenderId,
 	getGenderFromId,
 	getGenderDisplayName,
 } from "../Households/utils/householdUtils";
+import { StorageService } from "../../Utils/StorageService";
 
 // Type imports from registration.types.ts
 import {
@@ -114,8 +114,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const [errors, setErrors] = useState<string[]>([]);
 	const [disabled, setDisabled] = useState<boolean>(false);
 	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
-	const [showAlreadyRegistered, setShowAlreadyRegistered] =
-		useState<boolean>(false);
 	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
 	const householdDataProcessedRef = useRef<boolean>(false);
 
@@ -155,10 +153,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	}, [eventDateId, dispatch]);
 
 	useEffect(() => {
-		const token = localStorage.getItem("userToken");
-		const userProfile = localStorage.getItem("userProfile");
+		const token = StorageService.getUserToken();
+		const userProfile = StorageService.getGuestUser();
 		setUserToken(
-			token || JSON.parse(userProfile || "{}").token || undefined
+			token || (userProfile as any)?.token || undefined
 		);
 
 		// Only proceed if we're not in an error state
@@ -170,43 +168,16 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 			// Handle user authentication and profile
 			// Check for both guest authentication (userToken) and Cognito authentication
-			const cognitoUser = localStorage.getItem("cognitoUser");
-			let isCognitoSignedIn = false;
-			if (cognitoUser) {
-				try {
-					const cognitoUserData = JSON.parse(cognitoUser);
-					isCognitoSignedIn = cognitoUserData.isSignedIn === true;
-				} catch (error) {
-					console.warn("Could not parse cognitoUser:", error);
-				}
-			}
+			const cognitoUser = StorageService.getCognitoUser();
+			const isCognitoSignedIn = StorageService.isLoggedInUser();
 
 			// Check if user has guest authentication with valid token
-			let isGuestAuthenticated = false;
-			if (userProfile) {
-				try {
-					const userProfileData = JSON.parse(userProfile);
-					const expiresAt = new Date(userProfileData.expires_at);
-					const now = new Date();
-
-					// Check if token is not expired
-					if (expiresAt > now) {
-						isGuestAuthenticated = true;
-					} else {
-						// Token is expired, remove it from localStorage
-						localStorage.removeItem("userProfile");
-					}
-				} catch (error) {
-					console.warn("Could not parse userProfile:", error);
-					// Remove invalid userProfile from localStorage
-					localStorage.removeItem("userProfile");
-				}
-			}
+			const isGuestAuthenticated = StorageService.isGuestUser();
 
 			const isUserAuthenticated =
 				token ||
 				isGuestAuthenticated ||
-				(cognitoUser && isCognitoSignedIn);
+				isCognitoSignedIn;
 
 			if (!isUserAuthenticated) {
 				setShowAuthModal(true);
@@ -215,23 +186,22 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				if (userProfile) {
 					// Guest user - use existing userProfile
 					try {
-						setUser(sanitizeUser(JSON.parse(userProfile)));
+						setUser(sanitizeUser(userProfile as any));
 					} catch (error) {
 						console.error("Error parsing userProfile:", error);
 					}
 				} else if (cognitoUser && isCognitoSignedIn) {
 					// Cognito user - create user object from cognitoUser data
 					try {
-						const cognitoUserData = JSON.parse(cognitoUser);
 						const cognitoUserObj = {
 							first_name:
-								cognitoUserData.name?.split(" ")[0] || "",
+								cognitoUser.name?.split(" ")[0] || "",
 							last_name:
-								cognitoUserData.name
+								cognitoUser.name
 									?.split(" ")
 									.slice(1)
 									.join(" ") || "",
-							email: cognitoUserData.email || "",
+							email: cognitoUser.email || "",
 							phone_number: "",
 							address: "",
 							city: "",
@@ -386,12 +356,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	}, [location.state]);
 
 	const handleAuthLogin = (): void => {
-		const token = localStorage.getItem("userToken");
-		const userProfile = localStorage.getItem("userProfile");
+		const token = StorageService.getUserToken();
+		const userProfile = StorageService.getGuestUser();
 		if (token && userProfile) {
 			setUserToken(token || undefined);
 			try {
-				setUser(sanitizeUser(JSON.parse(userProfile)));
+				setUser(sanitizeUser(userProfile as any));
 			} catch (error) {
 				console.error("Error parsing userProfile:", error);
 			}
@@ -512,7 +482,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		if (identification_code) {
 			let message = `You have successfully registered for an event, ${getReservationText()} Your confirmation code is ${identification_code.toUpperCase()}.
     ${getCodeURL(identification_code)}`;
-			let search_zip = localStorage.getItem("search_zip");
+			let search_zip = StorageService.getItem<string>("search_zip");
 			if (search_zip) {
 				setLoading(true);
 				let foodBankUri = API_URL.FOODBANK_LIST;
@@ -542,32 +512,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 	// Helper function to determine user type
 	const determineUserType = (): "guest" | "cognito" => {
-		const cognitoUser = localStorage.getItem("cognitoUser");
-		if (cognitoUser) {
-			try {
-				const cognitoUserData = JSON.parse(cognitoUser);
-				return cognitoUserData.isSignedIn === true
-					? "cognito"
-					: "guest";
-			} catch (error) {
-				console.warn("Could not parse cognitoUser:", error);
-			}
+		if (StorageService.isLoggedInUser()) {
+			return "cognito";
 		}
 		return "guest";
-	};
-
-	// Helper function to get Cognito token
-	const getCognitoToken = (): string | null => {
-		const cognitoUser = localStorage.getItem("cognitoUser");
-		if (cognitoUser) {
-			try {
-				const cognitoUserData = JSON.parse(cognitoUser);
-				return cognitoUserData.accessToken || null;
-			} catch (error) {
-				console.warn("Could not parse cognitoUser for token:", error);
-			}
-		}
-		return null;
 	};
 
 	// Helper function to convert registration gender format to household format
@@ -779,10 +727,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			if (userType === "guest") {
 				// Existing guest flow
 				// Get identification_code from stored user profile
-				const userProfile = localStorage.getItem("userProfile");
+				const userProfile = StorageService.getGuestUser();
 				if (userProfile) {
 					try {
-						const userProfileData = JSON.parse(userProfile);
+						const userProfileData = userProfile as any;
 						if (
 							userProfileData.user &&
 							userProfileData.user.identification_code
@@ -864,7 +812,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				);
 			}
 			if (eventDateId) {
-				sessionStorage.setItem("registeredEventDateID", eventDateId);
+				StorageService.setRegisteredEventDateID(eventDateId);
 			}
 			navigate(RENDER_URL.REGISTRATION_CONFIRM_URL, {
 				state: {
@@ -898,7 +846,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				e.response.data &&
 				isAlreadyRegisteredError(e.response.data)
 			) {
-				setShowAlreadyRegistered(true);
+				// Redirect to already registered page instead of showing inline
+				navigate(RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL, {
+					state: {
+						eventName: selectedEvent?.agencyName,
+					},
+				});
 				setDisabled(false);
 				return;
 			}
@@ -954,22 +907,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				setshow={setShowAuthModal}
 				onLogin={handleAuthLogin}
 			/>
-		);
-	}
-
-	// Show already registered error message
-	if (showAlreadyRegistered) {
-		return (
-			<Fragment>
-				<NotifyToast />
-				<AlreadyRegisteredError
-					eventName={selectedEvent?.agencyName}
-					onBackToHome={() => {
-						setShowAlreadyRegistered(false);
-						navigate(RENDER_URL.ROOT_URL);
-					}}
-				/>
-			</Fragment>
 		);
 	}
 

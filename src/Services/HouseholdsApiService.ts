@@ -6,6 +6,7 @@
  */
 
 import { handleAuthError } from '../Utils/AuthErrorHandler';
+import { StorageService } from '../Utils/StorageService';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import {
   CreateHouseholdRequest,
@@ -250,20 +251,14 @@ export class HouseholdsApiService {
   }
 
   /**
-   * Get authentication token from localStorage
+   * Get authentication token from storage
    */
   private getAuthToken(): string | null {
     try {
-      const cognitoUser = localStorage.getItem('cognitoUser');
+      const cognitoUser = StorageService.getCognitoUser();
 
-      if (cognitoUser) {
-        const userData = JSON.parse(cognitoUser);
-
-        if (!userData.accessToken) {
-          console.warn('⚠️ HouseholdsApiService - No accessToken found in userData:', userData);
-        }
-
-        return userData.accessToken || null;
+      if (cognitoUser?.accessToken) {
+        return cognitoUser.accessToken;
       }
       return null;
     } catch (error) {

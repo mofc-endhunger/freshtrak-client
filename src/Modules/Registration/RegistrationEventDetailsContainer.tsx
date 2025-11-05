@@ -10,6 +10,7 @@ import RegistrationTextInfoComponent from "../Registration/RegistrationTextInfoC
 import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
 import { EventFormat } from "../../Utils/EventHandler";
 import { Event, EventApiResponse } from "./types/registration.types";
+import { StorageService } from "../../Utils/StorageService";
 
 interface RegistrationEventDetailsContainerProps {
 	// Add specific props as needed
@@ -32,43 +33,16 @@ const RegistrationEventDetailsContainer: React.FC<
 	const event = useSelector(selectEvent) as Event;
 	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
 
-	// Consolidated authentication check function
+	// Consolidated authentication check function using StorageService
 	const isUserAuthenticated = (): boolean => {
-		const cognitoUser = localStorage.getItem("cognitoUser");
-		const userProfile = localStorage.getItem("userProfile");
-
-		// Check if user has guest authentication with valid token
-		if (userProfile) {
-			try {
-				const userProfileData = JSON.parse(userProfile);
-				const expiresAt = new Date(userProfileData.expires_at);
-				const now = new Date();
-
-				// Check if token is not expired
-				if (expiresAt > now) {
-					return true;
-				} else {
-					// Token is expired, remove it from localStorage
-					localStorage.removeItem("userProfile");
-					return false;
-				}
-			} catch (error) {
-				console.warn("Could not parse userProfile:", error);
-				// Remove invalid userProfile from localStorage
-				localStorage.removeItem("userProfile");
-				return false;
-			}
+		// Check if user has Cognito authentication (validated token)
+		if (StorageService.isLoggedInUser()) {
+			return true;
 		}
 
-		// Check if user has Cognito authentication
-		if (cognitoUser) {
-			try {
-				const cognitoUserData = JSON.parse(cognitoUser);
-				return cognitoUserData.isSignedIn === true;
-			} catch (error) {
-				console.warn("Could not parse cognitoUser:", error);
-				return false;
-			}
+		// Check if user has guest authentication (validated token)
+		if (StorageService.isGuestUser()) {
+			return true;
 		}
 
 		return false;
@@ -113,12 +87,13 @@ const RegistrationEventDetailsContainer: React.FC<
 			const { GUEST_USER } = API_URL;
 
 			// Clear Cognito authentication data when logging in as guest
-			localStorage.removeItem("cognitoUser");
+			StorageService.clearAuthData('cognito');
 
 			// Get guest authentication
 			const resp = await axios.post(GUEST_USER);
 			const userProfile = resp.data;
-			localStorage.setItem("userProfile", JSON.stringify(userProfile));
+			// Use StorageService to store guest user profile
+			StorageService.setItem('freshtrak_user_guest', userProfile);
 
 			setLoading(false);
 			setshowAuthenticationModal(false);

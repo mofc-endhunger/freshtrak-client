@@ -39,6 +39,9 @@ const RegistrationEventDetailsContainer = lazy(() =>
 const RegistrationConfirmComponent = lazy(() =>
 	import("../Modules/Registration/RegistrationConfirmComponent")
 );
+const AlreadyRegisteredPage = lazy(() =>
+	import("../Modules/Registration/AlreadyRegisteredPage")
+);
 const HomeContainer = lazy(() => import("../Modules/Home/HomeContainer.tsx"));
 const QRCodeComponent = lazy(() =>
 	import("../Modules/Registration/QRCodeComponent")
@@ -154,6 +157,11 @@ const AppRoutes = () => {
 						<Route
 							path={`${RENDER_URL.REGISTRATION_CONFIRM_URL}`}
 							element={<RegistrationConfirmComponent />}
+						/>
+
+						<Route
+							path={RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL}
+							element={<AlreadyRegisteredPage />}
 						/>
 
 						<Route

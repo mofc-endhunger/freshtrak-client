@@ -16,8 +16,13 @@ export abstract class BasePage {
 
   /**
    * Navigate to the page
+   * Can be overridden with parameters in subclasses
    */
-  abstract navigate(): Promise<void>;
+  async navigate(...args: any[]): Promise<void> {
+    // Default implementation - should be overridden
+    await this.page.goto('/');
+    await this.waitForLoad();
+  }
 
   /**
    * Wait for page to load

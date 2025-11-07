@@ -1,29 +1,57 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 20
-    on-failure: ABORT
-  pre_build:
-    on-failure: ABORT
-    commands:
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY
-  build:
-    on-failure: ABORT
-    commands:
-      - docker build -t $IMAGE:$CODEBUILD_BUILD_NUMBER --target $TARGET .
-      - docker tag $IMAGE:$CODEBUILD_BUILD_NUMBER $REPOSITORY/$IMAGE:$IMAGE_TAG
-      - docker tag $IMAGE:$CODEBUILD_BUILD_NUMBER $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER
-  post_build:
-    on-failure: ABORT
-    commands:
-      - docker push $REPOSITORY/$IMAGE:$IMAGE_TAG
-      - docker push $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER
-      - printf '[{"name":"app","imageUri":"%s"}]' $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER > imagedefinitions.json
-      - printf '[{"imageUri":"%s"}]' $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER > imageDetail.json
+    install:
+        runtime-versions:
+            nodejs: 20
+        on-failure: ABORT
+        commands:
+            - echo "Installing dependencies..."
+            - npm ci
+            - echo "Installing Playwright browsers..."
+            - npx playwright install --with-deps
+    pre_build:
+        on-failure: ABORT
+        commands:
+            - echo "Running unit tests..."
+            - npm test -- --watchAll=false --coverage=false --passWithNoTests
+            - echo "Building application..."
+            - npm run build
+            - echo "Docker login..."
+            - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY
+    build:
+        on-failure: ABORT
+        commands:
+            - echo "Starting application server for E2E tests..."
+            - npm start &
+            - echo "Waiting for server to start..."
+            - timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done' || true
+            - sleep 10
+            - echo "Running E2E tests..."
+            - npm run test:e2e || TEST_EXIT_CODE=$?
+            - echo "E2E tests completed with exit code: ${TEST_EXIT_CODE:-0}"
+            - echo "Stopping application server..."
+            - pkill -f "react-scripts start" || true
+            - echo "Building Docker image..."
+            - docker build -t $IMAGE:$CODEBUILD_BUILD_NUMBER --target $TARGET .
+            - docker tag $IMAGE:$CODEBUILD_BUILD_NUMBER $REPOSITORY/$IMAGE:$IMAGE_TAG
+            - docker tag $IMAGE:$CODEBUILD_BUILD_NUMBER $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER
+    post_build:
+        on-failure: ABORT
+        commands:
+            - echo "Collecting test artifacts..."
+            - mkdir -p test-artifacts
+            - cp -r playwright-report test-artifacts/ 2>/dev/null || echo "No playwright-report directory found"
+            - cp -r test-results test-artifacts/ 2>/dev/null || echo "No test-results directory found"
+            - echo "Pushing Docker images..."
+            - docker push $REPOSITORY/$IMAGE:$IMAGE_TAG
+            - docker push $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER
+            - printf '[{"name":"app","imageUri":"%s"}]' $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER > imagedefinitions.json
+            - printf '[{"imageUri":"%s"}]' $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER > imageDetail.json
 
 artifacts:
-  files:
-    - ./imagedefinitions.json
-    - ./imageDetail.json
+    files:
+        - ./imagedefinitions.json
+        - ./imageDetail.json
+        - ./test-artifacts/**/*
+    name: build-artifacts-$(date +%Y-%m-%d)

@@ -6,6 +6,25 @@ This directory contains end-to-end tests for the FreshTrak Client application us
 
 The E2E tests are organized using the Page Object Model (POM) pattern for maintainability and reusability. Tests cover critical user flows including authentication, registration, event browsing, and family management.
 
+## Quick Start
+
+```bash
+# Install dependencies (if not already installed)
+npm install
+
+# Install Playwright browsers
+npx playwright install
+
+# Run all tests
+npm run test:e2e
+
+# Run tests in UI mode (recommended for development)
+npm run test:e2e:ui
+
+# Run specific test file
+npx playwright test e2e/tests/auth/login.spec.ts
+```
+
 ## Directory Structure
 
 ```
@@ -188,6 +207,16 @@ Tests run automatically in the CI/CD pipeline (AWS CodeBuild). See `buildspec.ym
 - Review browser compatibility
 - Update selectors if needed
 - Check for browser-specific features
+
+## Documentation
+
+- **[Test Writing Guidelines](./TEST_WRITING_GUIDELINES.md)** - How to write tests
+- **[Page Object Pattern](./PAGE_OBJECT_PATTERN.md)** - Page Object Model guide
+- **[Troubleshooting Guide](./TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Visual Testing](./VISUAL_TESTING.md)** - Visual regression testing
+- **[Browser Compatibility](./BROWSER_COMPATIBILITY.md)** - Cross-browser testing
+- **[CI/CD Setup](./CI_CD_SETUP.md)** - CI/CD integration guide
+- **[Environment Variables](./ENVIRONMENT_VARIABLES.md)** - Test environment configuration
 
 ## Resources
 

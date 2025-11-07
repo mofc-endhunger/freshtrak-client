@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
-import { createTestUser, generateTestEmail } from '../../fixtures/test-data';
+import { createTestUser } from '../../fixtures/test-data';
 
 test.describe('User Sign Up', () => {
   test('should sign up with valid information', async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe('User Sign Up', () => {
     const confirmationVisible = await page.locator('[data-testid="confirmation-code-input"]')
       .isVisible({ timeout: 5000 })
       .catch(() => false);
-    
+
     // Either confirmation is visible or we're redirected
     expect(confirmationVisible || !page.url().includes('/login')).toBe(true);
   });
@@ -33,7 +33,7 @@ test.describe('User Sign Up', () => {
     // Check if confirmation code input is visible
     const confirmationInput = page.locator('[data-testid="confirmation-code-input"]');
     const isVisible = await confirmationInput.isVisible({ timeout: 5000 }).catch(() => false);
-    
+
     // Note: This test may need adjustment based on actual app behavior
     // Some apps redirect immediately, others show confirmation
     expect(isVisible || !page.url().includes('/login')).toBe(true);
@@ -53,13 +53,13 @@ test.describe('User Sign Up', () => {
     // But we can test the flow
     const confirmationInput = page.locator('[data-testid="confirmation-code-input"]');
     const isVisible = await confirmationInput.isVisible({ timeout: 5000 }).catch(() => false);
-    
+
     if (isVisible) {
       // In a real test, you'd get the code from email or test environment
       // For now, we'll just verify the input is there
       await confirmationInput.fill('123456');
-      await loginPage.click('[data-testid="confirm-button"]');
-      
+      await page.locator('[data-testid="confirm-button"]').click();
+
       // Should redirect after confirmation
       await page.waitForTimeout(2000);
     }
@@ -69,21 +69,21 @@ test.describe('User Sign Up', () => {
     const loginPage = new LoginPage(page);
 
     await loginPage.navigate();
-    
+
     // Try to sign up with invalid email
-    await loginPage.click('[data-testid="sign-up-tab"]');
-    await loginPage.fill('[data-testid="email-input"]', 'invalid-email');
-    await loginPage.fill('[data-testid="password-input"]', 'short');
-    
+    await page.locator('[data-testid="sign-up-tab"]').click();
+    await page.locator('[data-testid="email-input"]').fill('invalid-email');
+    await page.locator('[data-testid="password-input"]').fill('short');
+
     // Try to submit
-    await loginPage.click('[data-testid="sign-up-button"]');
-    
+    await page.locator('[data-testid="sign-up-button"]').click();
+
     // Should show validation errors
     await page.waitForTimeout(1000);
-    
+
     const errors = page.locator('[data-testid="error-message"], .error, [role="alert"]');
     const errorCount = await errors.count();
-    
+
     // Should have at least one validation error
     expect(errorCount).toBeGreaterThan(0);
   });

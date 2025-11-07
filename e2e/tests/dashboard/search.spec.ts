@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import { DashboardPage } from '../../pages/DashboardPage';
-import { TEST_DATA } from '../../utils/constants';
 
 test.describe('Dashboard Search', () => {
   test.beforeEach(async ({ page }) => {

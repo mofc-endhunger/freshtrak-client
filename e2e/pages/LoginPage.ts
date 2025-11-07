@@ -21,15 +21,19 @@ export class LoginPage extends BasePage {
      * Sign in with email and password
      */
     async signIn(email: string, password: string): Promise<void> {
-        // Ensure we're on the sign in tab
-        const signInTab = this.locator(LoginSelectors.signInTab);
+        // Ensure we're on the sign in tab (if tabs are visible)
+        const signInTab = this.page.getByRole('button', { name: /^sign in$/i }).first();
         if (await signInTab.isVisible({ timeout: 2000 }).catch(() => false)) {
-            await this.click(LoginSelectors.signInTab);
+            await signInTab.click();
+            await this.page.waitForTimeout(300); // Wait for tab switch
         }
 
         await this.fill(LoginSelectors.emailInput, email);
         await this.fill(LoginSelectors.passwordInput, password);
-        await this.click(LoginSelectors.signInButton);
+        
+        // Use getByRole for submit button - find the submit button in the form
+        const submitButton = this.page.locator('form').getByRole('button', { name: /sign in/i, exact: false });
+        await submitButton.click();
         await this.waitForLoad();
     }
 
@@ -38,19 +42,19 @@ export class LoginPage extends BasePage {
      */
     async signUp(email: string, password: string, name: string): Promise<void> {
         // Switch to sign up tab
-        await this.click(LoginSelectors.signUpTab);
+        const signUpTab = this.page.getByRole('button', { name: /^sign up$/i }).first();
+        await signUpTab.click();
+        await this.page.waitForTimeout(500); // Wait for tab switch
 
-        // Fill sign up form (assuming the form has these fields)
+        // Fill sign up form
+        await this.fill(LoginSelectors.nameInput, name);
         await this.fill(LoginSelectors.emailInput, email);
         await this.fill(LoginSelectors.passwordInput, password);
+        await this.fill(LoginSelectors.confirmPasswordInput, password);
 
-        // Note: Name field selector may need to be added to selectors.ts
-        const nameInput = this.locator('[data-testid="name-input"]');
-        if (await nameInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-            await nameInput.fill(name);
-        }
-
-        await this.click(LoginSelectors.signUpButton);
+        // Use getByRole for submit button
+        const submitButton = this.page.getByRole('button', { name: /create account/i });
+        await submitButton.click();
         await this.waitForLoad();
     }
 
@@ -58,7 +62,7 @@ export class LoginPage extends BasePage {
      * Confirm sign up with confirmation code
      */
     async confirmSignUp(confirmationCode: string): Promise<void> {
-        await this.fill(LoginSelectors.confirmationCodeInput, confirmationCode);
+        await this.fill(LoginSelectors.codeInput, confirmationCode);
         await this.click(LoginSelectors.confirmButton);
         await this.waitForLoad();
     }
@@ -67,7 +71,10 @@ export class LoginPage extends BasePage {
      * Continue as guest
      */
     async continueAsGuest(): Promise<void> {
-        await this.click(LoginSelectors.guestButton);
+        // Use Playwright's getByText for more reliable text matching
+        const guestButton = this.page.getByRole('button', { name: /continue as guest/i });
+        await guestButton.waitFor({ state: 'visible', timeout: 10000 });
+        await guestButton.click();
         await this.waitForLoad();
     }
 
@@ -75,11 +82,11 @@ export class LoginPage extends BasePage {
      * Verify error message is displayed
      */
     async verifyErrorMessage(expectedMessage?: string): Promise<void> {
-        const errorSelector = '[data-testid="error-message"]';
-        await expect(this.locator(errorSelector)).toBeVisible();
+        const errorSelector = LoginSelectors.errorMessage;
+        await expect(this.locator(errorSelector).first()).toBeVisible();
 
         if (expectedMessage) {
-            await expect(this.locator(errorSelector)).toContainText(expectedMessage);
+            await expect(this.locator(errorSelector).first()).toContainText(expectedMessage);
         }
     }
 

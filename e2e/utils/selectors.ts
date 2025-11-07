@@ -14,15 +14,26 @@ export const DashboardSelectors = {
 } as const;
 
 export const LoginSelectors = {
-  emailInput: '[data-testid="email-input"]',
-  passwordInput: '[data-testid="password-input"]',
-  signInButton: '[data-testid="sign-in-button"]',
-  signUpButton: '[data-testid="sign-up-button"]',
-  guestButton: '[data-testid="guest-button"]',
-  signUpTab: '[data-testid="sign-up-tab"]',
-  signInTab: '[data-testid="sign-in-tab"]',
-  confirmationCodeInput: '[data-testid="confirmation-code-input"]',
-  confirmButton: '[data-testid="confirm-button"]',
+  // Using id attributes (most stable)
+  emailInput: '#email',
+  passwordInput: '#password',
+  nameInput: '#name',
+  confirmPasswordInput: '#confirmPassword',
+  codeInput: '#code',
+  
+  // Buttons - using text content (Playwright's :has-text() is more reliable)
+  signInButton: 'button:has-text("Sign In"):not(:has-text("Sign Up"))',
+  signUpButton: 'button:has-text("Create Account")',
+  guestButton: 'button:has-text("Continue as Guest")',
+  confirmButton: 'button:has-text("Confirm Account")',
+  resendCodeButton: 'button:has-text("Resend Code")',
+  
+  // Tab buttons - these are in the tab navigation area
+  signInTab: 'button:has-text("Sign In"):not([type="submit"])',
+  signUpTab: 'button:has-text("Sign Up"):not([type="submit"])',
+  
+  // Error message - using class or role
+  errorMessage: '.text-red-600, [role="alert"], .error, p.text-red-500',
 } as const;
 
 export const EventsSelectors = {

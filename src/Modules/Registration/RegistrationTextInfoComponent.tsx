@@ -5,7 +5,6 @@ import TagManager from "react-gtm-module";
 import RegistrationHeaderComponent from "./RegistrationHeaderComponent";
 import EventCardComponent from "../Events/EventCardComponent";
 import BackButtonComponent from "../General/BackButtonComponent";
-import { getItemLocalStorage } from "../../Utils/Util";
 import localization from "../Localization/LocalizationComponent";
 import { Event } from "./types/registration.types";
 import { Button } from "../../components/ui/button";
@@ -19,8 +18,6 @@ interface RegistrationTextInfoComponentProps {
 const RegistrationTextInfoComponent: React.FC<
 	RegistrationTextInfoComponentProps
 > = ({ event, onRegisterNow }) => {
-	const isLoggedInValue = getItemLocalStorage("isLoggedIn");
-	const isLoggedIn = isLoggedInValue ? JSON.parse(isLoggedInValue) : false;
 	const clickedRegisterNow = (): void => {
 		onRegisterNow(true);
 		TagManager.dataLayer({
@@ -32,7 +29,7 @@ const RegistrationTextInfoComponent: React.FC<
 	return (
 		<Fragment>
 			<BackButtonComponent />
-			{!isLoggedIn && <RegistrationHeaderComponent event={event} />}
+			<RegistrationHeaderComponent event={event} />
 			{event && (
 				<Card className="w-full md:w-1/2 border-none shadow-none p-0">
 					<CardContent className="py-6 px-0">

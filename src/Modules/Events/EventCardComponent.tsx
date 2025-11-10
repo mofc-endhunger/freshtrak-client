@@ -47,7 +47,7 @@ interface EventCardComponentProps {
 	targetUrl?: string;
 }
 
-const EventCardComponent: React.FC<EventCardComponentProps> = props => {
+const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 	const [showDetails, setShowDetails] = useState<boolean>(false);
 	const [showMapModal, setShowMapModal] = useState<boolean>(false);
 	const [mapCoordinates, setMapCoordinates] = useState<Coordinates | null>(
@@ -115,7 +115,20 @@ const EventCardComponent: React.FC<EventCardComponentProps> = props => {
 				<button
 					type="button"
 					className="btn bg-[#392947] text-white px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px] ml-1 w-full"
-					onClick={() => dispatch(setCurrentEvent(props.event))}
+					onClick={() => {
+						// Store the current search results URL before navigating to event details
+						const currentPath = window.location.pathname;
+						if (currentPath.startsWith("/events/list")) {
+							const currentSearch = window.location.search;
+							const searchResultsUrl =
+								currentPath + currentSearch;
+							sessionStorage.setItem(
+								"searchResultsUrl",
+								searchResultsUrl
+							);
+						}
+						dispatch(setCurrentEvent(props.event));
+					}}
 				>
 					{buttonName}
 				</button>

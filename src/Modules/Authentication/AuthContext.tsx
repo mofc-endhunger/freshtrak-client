@@ -53,6 +53,42 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			setIsLoading(true);
 
+			// Clear guest authentication data BEFORE attempting Cognito sign in
+			// This prevents "There is already a signed in user" error when switching from guest to Cognito
+			const isGuestUser = StorageService.isGuestUser();
+			if (isGuestUser) {
+				StorageService.clearUserToken();
+				StorageService.removeItem("guestId");
+				StorageService.removeItem("guestType");
+				StorageService.removeItem("userProfile");
+				// Also clear any guest session data that might interfere
+				StorageService.removeItem("freshtrak_user_guest");
+			}
+
+			// Check for existing Amplify session and sign out if present
+			// This prevents "There is already a signed in user" error from AWS Amplify
+			try {
+				const existingSession = await fetchAuthSession();
+				if (
+					existingSession.tokens &&
+					Object.keys(existingSession.tokens).length > 0
+				) {
+					// There's an existing session, sign out first
+					try {
+						await signOut();
+					} catch (signOutError) {
+						// Ignore sign out errors - session might already be invalid
+						console.warn(
+							"Could not sign out existing session:",
+							signOutError
+						);
+					}
+				}
+			} catch (sessionError) {
+				// No existing session or error fetching it - proceed with sign in
+				console.warn("Could not check existing session:", sessionError);
+			}
+
 			// Use Amplify sign in
 			const result = await signIn({
 				username: email,
@@ -357,7 +393,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			// Clear all application data from localStorage and sessionStorage
 			// This includes auth data, household data, preferences, etc.
 			StorageService.clearAllAppData();
-			
+
 			// Purge Redux persist store to clear persisted state
 			await persistor.purge();
 		} catch (error: any) {

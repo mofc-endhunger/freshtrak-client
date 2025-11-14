@@ -697,11 +697,27 @@ test.describe('Registration Flow', () => {
         const addressVisible = addressExists ? await addressInput.isVisible({ timeout: 2000 }).catch(() => false) : false;
         console.log(`[Test] Address input exists: ${addressExists}, visible: ${addressVisible}`);
         
-        // Check for Continue button
-        const continueButton = page.locator(RegistrationSelectors.nextButton).first();
-        const continueExists = await continueButton.count() > 0;
-        const continueVisible = continueExists ? await continueButton.isVisible({ timeout: 2000 }).catch(() => false) : false;
-        console.log(`[Test] Continue button exists: ${continueExists}, visible: ${continueVisible}`);
+        // Check for Continue button - try different selectors
+        const continueButtonSelectors = [
+            '[data-testid="continue-button"]',
+            '[data-testid="continue button"]',
+            'button:has-text("Continue")',
+            'button:has-text("Next")'
+        ];
+        
+        let continueButtonFound = false;
+        for (const selector of continueButtonSelectors) {
+            const button = page.locator(selector).first();
+            const exists = await button.count() > 0;
+            const visible = exists ? await button.isVisible({ timeout: 1000 }).catch(() => false) : false;
+            const enabled = visible ? await button.isEnabled({ timeout: 500 }).catch(() => false) : false;
+            console.log(`[Test] Continue button "${selector}": exists=${exists}, visible=${visible}, enabled=${enabled}`);
+            if (visible && enabled) {
+                continueButtonFound = true;
+                break;
+            }
+        }
+        console.log(`[Test] Continue button found and clickable: ${continueButtonFound}`);
         
         // Check what step indicator shows (if any)
         const stepIndicators = await page.locator('[class*="step"], [data-step], [aria-label*="step"]').all();

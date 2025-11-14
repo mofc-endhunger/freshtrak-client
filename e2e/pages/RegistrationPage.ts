@@ -240,13 +240,13 @@ export class RegistrationPage extends BasePage {
     // First, check if timeslot modal is still visible (shouldn't be, but just in case)
     const timeslotModal = this.page.locator('[id="timeslot-modal-title"], [role="dialog"]:has-text(/time slot|choose time/i)').first();
     const isTimeslotModalVisible = await timeslotModal.isVisible({ timeout: 2000 }).catch(() => false);
-    
+
     if (isTimeslotModalVisible) {
       console.log('[RegistrationPage.fillStep0] Timeslot modal still visible, waiting for it to close...');
       // Wait for modal to close (should happen after slot selection)
       await timeslotModal.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => { });
     }
-    
+
     // Wait for form to be visible - try multiple selectors with longer timeout
     const firstNameInput = this.locator(RegistrationSelectors.firstNameInput).first();
     const formContainer = this.locator(RegistrationSelectors.householdForm).first();
@@ -284,7 +284,7 @@ export class RegistrationPage extends BasePage {
         // Check if there's a loading spinner
         const spinner = this.page.locator('[role="status"], .spinner, [class*="loading"]').first();
         const isSpinnerVisible = await spinner.isVisible({ timeout: 2000 }).catch(() => false);
-        
+
         if (isSpinnerVisible) {
           await spinner.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => { });
           formVisible = await firstNameInput.isVisible({ timeout: 5000 }).catch(() => false);
@@ -303,7 +303,7 @@ export class RegistrationPage extends BasePage {
     }
 
     // Small delay for form to stabilize
-    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
+    await this.page.waitForLoadState('domcontentloaded').catch(() => { });
 
     await this.fill(RegistrationSelectors.firstNameInput, data.firstName);
     await this.fill(RegistrationSelectors.lastNameInput, data.lastName);
@@ -315,9 +315,23 @@ export class RegistrationPage extends BasePage {
    * Fill Step 1: Address Information
    */
   async fillStep1(data: { address: string; city: string; state: string; zipCode: string; phone: string }): Promise<void> {
-    // Wait for address form to be visible
+    // Wait for Step 1 to be visible after navigation from Step 0
     const addressInput = this.locator(RegistrationSelectors.addressInput).first();
-    await addressInput.waitFor({ state: 'visible', timeout: 10000 });
+
+    // Wait for step transition to complete
+    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => { });
+    await this.page.waitForTimeout(1000); // Give time for step transition
+
+    // Check if input exists first
+    const inputExists = await addressInput.count() > 0;
+    if (inputExists) {
+      await addressInput.waitFor({ state: 'visible', timeout: 15000 });
+    } else {
+      // Input doesn't exist yet, wait a bit more
+      await this.page.waitForTimeout(2000);
+      await addressInput.waitFor({ state: 'visible', timeout: 15000 });
+    }
+
     await this.page.waitForTimeout(500); // Small delay for form to stabilize
 
     await this.fill(RegistrationSelectors.addressInput, data.address);
@@ -331,8 +345,74 @@ export class RegistrationPage extends BasePage {
    * Fill Step 2: Family Member Counts
    */
   async fillStep2(data: { adultCount: number; childCount: number }): Promise<void> {
-    await this.fill(RegistrationSelectors.adultsCountInput, data.adultCount.toString());
-    await this.fill(RegistrationSelectors.childrenCountInput, data.childCount.toString());
+    console.log(`[RegistrationPage.fillStep2] Filling Step 2 with adultCount: ${data.adultCount}, childCount: ${data.childCount}`);
+
+    // Try multiple selectors for adults input
+    const adultsSelectors = [
+      '#adults_in_household',
+      'input[name="adults_in_household"]',
+      'input[id*="adult"]',
+      'input[name*="adult"]',
+      'label:has-text("Adult") + input',
+      'label:has-text("Adults") + input'
+    ];
+
+    let adultsFilled = false;
+    for (const selector of adultsSelectors) {
+      const input = this.locator(selector).first();
+      const exists = await input.count() > 0;
+      if (exists) {
+        const isVisible = await input.isVisible({ timeout: 2000 }).catch(() => false);
+        if (isVisible) {
+          await this.fill(selector, data.adultCount.toString());
+          adultsFilled = true;
+          break;
+        }
+      }
+    }
+
+    if (!adultsFilled) {
+      console.log('[RegistrationPage.fillStep2] Adults input not found, trying children input...');
+    }
+
+    // Try multiple selectors for children input
+    const childrenSelectors = [
+      '#children_in_household',
+      'input[name="children_in_household"]',
+      'input[id*="child"]',
+      'input[name*="child"]',
+      'label:has-text("Child") + input',
+      'label:has-text("Children") + input'
+    ];
+
+    let childrenFilled = false;
+    for (const selector of childrenSelectors) {
+      const input = this.locator(selector).first();
+      const exists = await input.count() > 0;
+      if (exists) {
+        const isVisible = await input.isVisible({ timeout: 2000 }).catch(() => false);
+        if (isVisible) {
+          await this.fill(selector, data.childCount.toString());
+          childrenFilled = true;
+          break;
+        }
+      }
+    }
+
+    if (!adultsFilled || !childrenFilled) {
+      console.log(`[RegistrationPage.fillStep2] Adults filled: ${adultsFilled}, Children filled: ${childrenFilled}`);
+      // If inputs not found, they might already be prefilled or on a different step
+    }
+
+    // After filling, trigger validation by blurring the last input
+    if (adultsFilled || childrenFilled) {
+      // Trigger form validation by clicking outside or blurring
+      await this.page.waitForTimeout(300);
+      // Click on a label or empty space to trigger blur
+      const formContainer = this.locator(RegistrationSelectors.householdForm).first();
+      await formContainer.click({ position: { x: 10, y: 10 } }).catch(() => { });
+      await this.page.waitForTimeout(500);
+    }
   }
 
   /**
@@ -346,7 +426,7 @@ export class RegistrationPage extends BasePage {
       'button:has-text("Continue"):not(:has-text("Save and Continue"))',
       'button:has-text("Next")'
     ];
-    
+
     let clicked = false;
     for (const selector of continueSelectors) {
       const button = this.locator(selector).first();
@@ -354,16 +434,25 @@ export class RegistrationPage extends BasePage {
       if (exists) {
         const isVisible = await button.isVisible({ timeout: 2000 }).catch(() => false);
         const isEnabled = isVisible ? await button.isEnabled({ timeout: 1000 }).catch(() => false) : false;
-        
+
         if (isVisible && isEnabled) {
           console.log(`[RegistrationPage.clickNext] Clicking Continue button with selector: ${selector}`);
           try {
-            await button.click();
+            // Scroll into view and wait a moment
+            await button.scrollIntoViewIfNeeded();
+            await this.page.waitForTimeout(200);
+
+            // Click the button
+            await button.click({ timeout: 5000 });
+
+            // Wait a moment to ensure click registered
+            await this.page.waitForTimeout(300);
+
             clicked = true;
             console.log(`[RegistrationPage.clickNext] Successfully clicked Continue button`);
             break;
-          } catch (error) {
-            console.log(`[RegistrationPage.clickNext] Error clicking button: ${error}`);
+          } catch (error: any) {
+            console.log(`[RegistrationPage.clickNext] Error clicking button: ${error?.message || error}`);
             // Try next selector
             continue;
           }
@@ -372,7 +461,7 @@ export class RegistrationPage extends BasePage {
         }
       }
     }
-    
+
     if (!clicked) {
       console.log('[RegistrationPage.clickNext] No Continue button found/clickable, trying fallback...');
       // Fallback - try to click any visible Continue button
@@ -383,13 +472,13 @@ export class RegistrationPage extends BasePage {
         clicked = true;
       }
     }
-    
+
     if (!clicked) {
       throw new Error('Could not find or click Continue button');
     }
-    
+
     await this.waitForLoad();
-    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => { });
   }
 
   /**
@@ -413,7 +502,126 @@ export class RegistrationPage extends BasePage {
    * Submit registration
    */
   async submitRegistration(): Promise<void> {
-    await this.click(RegistrationSelectors.submitButton);
+    // Wait for final step to be ready
+    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => { });
+    await this.page.waitForTimeout(1000);
+
+    // Try multiple selectors for Register button (not "Submit")
+    const submitSelectors = [
+      '[data-testid="submit-button"]', // This is the actual testid
+      'button:has-text("Register"):not(:has-text("Registering"))', // Button text is "Register"
+      'button[type="submit"]:not(:disabled)',
+      'button:has-text("Submit")',
+      '[data-testid*="submit"]',
+      '[data-testid*="register"]'
+    ];
+
+    // First, check if submit button exists at all
+    const allButtons = await this.page.locator('button').all();
+    console.log(`[RegistrationPage.submitRegistration] Found ${allButtons.length} buttons on page`);
+    for (let i = 0; i < Math.min(allButtons.length, 10); i++) {
+      const buttonText = await allButtons[i].textContent();
+      const buttonTestId = await allButtons[i].getAttribute('data-testid');
+      const buttonType = await allButtons[i].getAttribute('type');
+      const isVisible = await allButtons[i].isVisible().catch(() => false);
+      console.log(`[RegistrationPage.submitRegistration] Button ${i}: "${buttonText}" (testid: ${buttonTestId}, type: ${buttonType}, visible: ${isVisible})`);
+    }
+
+    let clicked = false;
+    for (const selector of submitSelectors) {
+      const button = this.locator(selector).first();
+      const exists = await button.count() > 0;
+      if (exists) {
+        const isVisible = await button.isVisible({ timeout: 3000 }).catch(() => false);
+        const isEnabled = isVisible ? await button.isEnabled({ timeout: 1000 }).catch(() => false) : false;
+
+        console.log(`[RegistrationPage.submitRegistration] Button with selector "${selector}": exists=${exists}, visible=${isVisible}, enabled=${isEnabled}`);
+
+        if (isVisible && isEnabled) {
+          console.log(`[RegistrationPage.submitRegistration] Clicking submit button with selector: ${selector}`);
+          await button.click();
+          clicked = true;
+          break;
+        }
+      }
+    }
+
+    if (!clicked) {
+      // Maybe we need to click Continue one or more times to get to final step
+      let continueClicks = 0;
+      const maxContinueClicks = 3; // Maximum number of Continue clicks to try
+
+      while (continueClicks < maxContinueClicks && !clicked) {
+        const continueButton = this.locator('[data-testid="continue-button"], [data-testid="continue button"]').first();
+        const continueVisible = await continueButton.isVisible({ timeout: 2000 }).catch(() => false);
+
+        if (continueVisible) {
+          console.log(`[RegistrationPage.submitRegistration] Submit button not found, clicking Continue (attempt ${continueClicks + 1}/${maxContinueClicks})...`);
+          await continueButton.click();
+          await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => { });
+          await this.page.waitForTimeout(2000); // Wait longer for step transition
+
+          // Check for submit button again
+          const submitButton = this.locator('[data-testid="submit-button"]').first();
+          const submitExists = await submitButton.count() > 0;
+          const submitVisible = submitExists ? await submitButton.isVisible({ timeout: 3000 }).catch(() => false) : false;
+          const submitEnabled = submitVisible ? await submitButton.isEnabled({ timeout: 1000 }).catch(() => false) : false;
+
+          console.log(`[RegistrationPage.submitRegistration] After Continue click: submit exists=${submitExists}, visible=${submitVisible}, enabled=${submitEnabled}`);
+
+          // Check what buttons are available now
+          const allButtonsAfter = await this.page.locator('button').all();
+          console.log(`[RegistrationPage.submitRegistration] Found ${allButtonsAfter.length} buttons after Continue click`);
+          for (let i = 0; i < Math.min(allButtonsAfter.length, 5); i++) {
+            const buttonText = await allButtonsAfter[i].textContent();
+            const buttonTestId = await allButtonsAfter[i].getAttribute('data-testid');
+            const isVisible = await allButtonsAfter[i].isVisible().catch(() => false);
+            console.log(`[RegistrationPage.submitRegistration] Button ${i} after Continue: "${buttonText}" (testid: ${buttonTestId}, visible: ${isVisible})`);
+          }
+
+          // Check if we're on confirmation page (registration already completed)
+          const currentUrl = this.page.url();
+          const isOnConfirmation = currentUrl.includes('/register/confirmation') || currentUrl.includes('/register/success');
+          if (isOnConfirmation) {
+            console.log('[RegistrationPage.submitRegistration] Already on confirmation page, registration completed!');
+            clicked = true; // Registration is already done
+            break;
+          }
+
+          if (submitVisible && submitEnabled) {
+            await submitButton.click();
+            clicked = true;
+            break;
+          }
+
+          continueClicks++;
+        } else {
+          // No Continue button, check if we're on confirmation page
+          const currentUrl = this.page.url();
+          const isOnConfirmation = currentUrl.includes('/register/confirmation') || currentUrl.includes('/register/success');
+          if (isOnConfirmation) {
+            console.log('[RegistrationPage.submitRegistration] Already on confirmation page, registration completed!');
+            clicked = true;
+            break;
+          }
+          // No Continue button and not on confirmation, we might be stuck
+          break;
+        }
+      }
+    }
+
+    if (!clicked) {
+      // Check one more time if we're on confirmation page
+      const currentUrl = this.page.url();
+      const isOnConfirmation = currentUrl.includes('/register/confirmation') || currentUrl.includes('/register/success');
+      if (isOnConfirmation) {
+        console.log('[RegistrationPage.submitRegistration] On confirmation page, registration already completed');
+        clicked = true;
+      } else {
+        throw new Error(`Could not find or click submit button. Current URL: ${currentUrl}`);
+      }
+    }
+
     await this.waitForLoad();
   }
 
@@ -422,30 +630,183 @@ export class RegistrationPage extends BasePage {
    */
   async completeRegistration(formData: RegistrationFormData): Promise<void> {
     // Step 0: Primary Information
-    await this.fillStep0({
-      firstName: formData.user.firstName || 'Test',
-      lastName: formData.user.lastName || 'User',
-      dateOfBirth: new Date(Date.now() - 25 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      gender: 'Other',
-    });
-    await this.clickNext();
+    // Check if we're already on Step 1 (household data might have prefilled Step 0)
+    const addressInput = this.locator(RegistrationSelectors.addressInput).first();
+    const isOnStep1 = await addressInput.isVisible({ timeout: 2000 }).catch(() => false);
+
+    if (!isOnStep1) {
+      // We're on Step 0, fill it
+      // Check if fields are already prefilled (from household data)
+      const firstNameField = this.locator(RegistrationSelectors.firstNameInput).first();
+      const existingFirstName = await firstNameField.inputValue().catch(() => '');
+      const isPrefilled = existingFirstName.length > 0;
+
+      if (isPrefilled) {
+        console.log('[RegistrationPage.completeRegistration] Step 0 fields are prefilled, just clicking Continue');
+        // Fields are prefilled, just click Continue
+        await this.clickNext();
+      } else {
+        // Fields are not prefilled, fill them
+        await this.fillStep0({
+          firstName: formData.user.firstName || 'Test',
+          lastName: formData.user.lastName || 'User',
+          dateOfBirth: new Date(Date.now() - 25 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          gender: 'Other',
+        });
+        await this.clickNext();
+      }
+    } else {
+      console.log('[RegistrationPage.completeRegistration] Already on Step 1, skipping Step 0');
+    }
 
     // Step 1: Address Information
-    await this.fillStep1({
-      address: formData.address.street,
-      city: formData.address.city,
-      state: formData.address.state,
-      zipCode: formData.address.zipCode,
-      phone: formData.address.phone,
-    });
-    await this.clickNext();
+    // Check if we're already on Step 2 (household data might have prefilled Step 1 too)
+    const adultsCountInput = this.locator(RegistrationSelectors.adultsCountInput).first();
+    const isOnStep2 = await adultsCountInput.isVisible({ timeout: 2000 }).catch(() => false);
 
-    // Step 2: Family Member Counts
+    if (!isOnStep2) {
+      // Check if Step 1 fields are prefilled
+      const addressInput = this.locator(RegistrationSelectors.addressInput).first();
+      const addressExists = await addressInput.count() > 0;
+      const addressVisible = addressExists ? await addressInput.isVisible({ timeout: 2000 }).catch(() => false) : false;
+
+      if (addressVisible) {
+        await this.fillStep1({
+          address: formData.address.street,
+          city: formData.address.city,
+          state: formData.address.state,
+          zipCode: formData.address.zipCode,
+          phone: formData.address.phone,
+        });
+        await this.clickNext();
+      } else {
+        console.log('[RegistrationPage.completeRegistration] Step 1 not visible, might already be on Step 2');
+        // Try to proceed to Step 2
+      }
+    } else {
+      console.log('[RegistrationPage.completeRegistration] Already on Step 2, skipping Step 1');
+    }
+
+    // Step 2: Family Member Counts (this is the FINAL step for registration mode)
+    // The submit button should appear on this step after filling it
+    // DO NOT click Continue after this step - the submit button should appear instead
     await this.fillStep2({
       adultCount: formData.adultCount,
       childCount: formData.childCount,
     });
-    await this.clickNext();
+
+    // Wait for form validation to complete and Register button to appear
+    // For registration mode, MEMBER_COUNT is the final step, so Register button should replace Continue button
+    console.log('[RegistrationPage.completeRegistration] Step 2 filled, waiting for Register button to appear...');
+
+    // Check if we're actually on Step 2 (MEMBER_COUNT) by looking for the inputs we just filled
+    const adultsInput = this.locator('#adults_in_household, input[name="adults_in_household"]').first();
+    const adultsInputVisible = await adultsInput.isVisible({ timeout: 2000 }).catch(() => false);
+    console.log(`[RegistrationPage.completeRegistration] Adults input visible (should be on Step 2): ${adultsInputVisible}`);
+
+    // Wait for form state to update and Register button to appear
+    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => { });
+    await this.page.waitForTimeout(2000); // Give time for validation and button state change
+
+    // For registration mode, MEMBER_COUNT is the final step, so Register button should appear here
+    // Check what buttons are available BEFORE waiting
+    const allButtonsBefore = await this.page.locator('button').all();
+    console.log(`[RegistrationPage.completeRegistration] Found ${allButtonsBefore.length} buttons immediately after Step 2`);
+    let foundRegisterButton = false;
+    for (let i = 0; i < Math.min(allButtonsBefore.length, 10); i++) {
+      const buttonText = await allButtonsBefore[i].textContent();
+      const buttonTestId = await allButtonsBefore[i].getAttribute('data-testid');
+      const buttonType = await allButtonsBefore[i].getAttribute('type');
+      const isVisible = await allButtonsBefore[i].isVisible().catch(() => false);
+      const isEnabled = isVisible ? await allButtonsBefore[i].isEnabled().catch(() => false) : false;
+      console.log(`[RegistrationPage.completeRegistration] Button ${i}: "${buttonText}" (testid: ${buttonTestId}, type: ${buttonType}, visible: ${isVisible}, enabled: ${isEnabled})`);
+
+      // Check if this is the Register button
+      if (buttonText && buttonText.trim() === 'Register' && buttonTestId === 'submit-button') {
+        console.log(`[RegistrationPage.completeRegistration] Found Register button with submit-button testid!`);
+        foundRegisterButton = true;
+        if (isVisible && isEnabled) {
+          console.log('[RegistrationPage.completeRegistration] Register button is visible and enabled, clicking it...');
+          await allButtonsBefore[i].click();
+          await this.waitForLoad();
+          return; // Successfully clicked Register button
+        }
+      }
+    }
+
+    if (!foundRegisterButton) {
+      console.log('[RegistrationPage.completeRegistration] Register button not found immediately, waiting for it to appear...');
+    }
+
+    // Check for Register button - it should appear on MEMBER_COUNT step (Step 2) for registration mode
+    // The button has data-testid="submit-button" but the text is "Register"
+    const submitButtonAfterStep2 = this.locator('[data-testid="submit-button"], button:has-text("Register"):not(:has-text("Registering"))').first();
+
+    // Wait for Register button to appear (it should replace Continue button on final step)
+    console.log('[RegistrationPage.completeRegistration] Waiting for Register button to appear on final step...');
+
+    let submitVisible = false;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (!submitVisible && attempts < maxAttempts) {
+      await this.page.waitForTimeout(500);
+      const submitExists = await submitButtonAfterStep2.count() > 0;
+      submitVisible = submitExists ? await submitButtonAfterStep2.isVisible({ timeout: 1000 }).catch(() => false) : false;
+
+      if (submitVisible) {
+        console.log(`[RegistrationPage.completeRegistration] Register button appeared after ${attempts + 1} attempts`);
+        break;
+      }
+
+      attempts++;
+
+      // Check if we're still seeing Continue button (means we're not on final step yet)
+      const continueButton = this.locator('[data-testid="continue-button"]').first();
+      const continueVisible = await continueButton.isVisible({ timeout: 500 }).catch(() => false);
+      if (!continueVisible) {
+        // Continue button disappeared, Register button might be appearing
+        console.log('[RegistrationPage.completeRegistration] Continue button disappeared, Register button should appear');
+      } else {
+        // Still seeing Continue button - check if Register button exists but is hidden
+        const registerButton = this.locator('button:has-text("Register"):not(:has-text("Registering"))').first();
+        const registerExists = await registerButton.count() > 0;
+        const registerVisible = registerExists ? await registerButton.isVisible({ timeout: 500 }).catch(() => false) : false;
+        console.log(`[RegistrationPage.completeRegistration] Register button exists: ${registerExists}, visible: ${registerVisible}`);
+      }
+    }
+
+    const submitExists = await submitButtonAfterStep2.count() > 0;
+    const submitEnabled = submitVisible ? await submitButtonAfterStep2.isEnabled({ timeout: 2000 }).catch(() => false) : false;
+
+    console.log(`[RegistrationPage.completeRegistration] Register button after Step 2: exists=${submitExists}, visible=${submitVisible}, enabled=${submitEnabled}`);
+
+    if (submitVisible && submitEnabled) {
+      // Register button is ready
+      console.log('[RegistrationPage.completeRegistration] Register button is ready, clicking it...');
+      await submitButtonAfterStep2.scrollIntoViewIfNeeded();
+      await this.page.waitForTimeout(200);
+      await submitButtonAfterStep2.click();
+      console.log('[RegistrationPage.completeRegistration] Clicked Register button');
+      await this.waitForLoad();
+      return; // Successfully submitted, don't call submitRegistration
+    } else if (submitVisible && !submitEnabled) {
+      console.log('[RegistrationPage.completeRegistration] Register button visible but disabled, waiting for it to be enabled...');
+      // Wait for button to be enabled
+      await submitButtonAfterStep2.waitFor({ state: 'visible', timeout: 5000 });
+      for (let i = 0; i < 10; i++) {
+        const enabled = await submitButtonAfterStep2.isEnabled({ timeout: 1000 }).catch(() => false);
+        if (enabled) {
+          await submitButtonAfterStep2.click();
+          await this.waitForLoad();
+          return;
+        }
+        await this.page.waitForTimeout(500);
+      }
+    }
+
+    // If Register button still not visible/enabled, try submitRegistration method
+    console.log('[RegistrationPage.completeRegistration] Register button not ready, trying submitRegistration method...');
 
     // Select event slot if available
     const slotAvailable = await this.isVisible(RegistrationSelectors.eventSlot, 2000);

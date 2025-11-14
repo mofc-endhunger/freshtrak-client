@@ -22,9 +22,9 @@ export default defineConfig({
   // Opt out of parallel tests on CI
   workers: process.env.CI ? 1 : undefined,
 
-  // Reporter configuration
+  // Reporter configuration - use list for terminal output
   reporter: [
-    ['html'],
+    ['list'], // Terminal-friendly reporter
     ['json', { outputFile: 'test-results/results.json' }],
     ['junit', { outputFile: 'test-results/junit.xml' }]
   ],

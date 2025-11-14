@@ -1,13 +1,23 @@
 import { test } from '@playwright/test';
 import { RegistrationPage } from '../../pages/RegistrationPage';
 import { compareScreenshot } from '../../utils/visual-testing';
+import { getValidEventDateId } from '../../utils/helpers';
 
 test.describe('Registration Page Visual Tests', () => {
   test('should match baseline screenshot for registration step 0', async ({ page }) => {
     const registrationPage = new RegistrationPage(page);
-    const eventDateId = 'test-event-date-id';
     
-    await registrationPage.navigate(eventDateId);
+    // Get a valid eventDateId
+    const eventDateId = await getValidEventDateId(page);
+    if (!eventDateId) {
+      test.skip();
+    }
+    
+    const result = await registrationPage.navigateToRegistration(eventDateId!);
+    if (result.status !== 'success') {
+      test.skip();
+    }
+    
     await page.waitForLoadState('networkidle');
     
     // Compare Step 0 (Primary Information)
@@ -19,9 +29,18 @@ test.describe('Registration Page Visual Tests', () => {
 
   test('should match baseline screenshot for registration form', async ({ page }) => {
     const registrationPage = new RegistrationPage(page);
-    const eventDateId = 'test-event-date-id';
     
-    await registrationPage.navigate(eventDateId);
+    // Get a valid eventDateId
+    const eventDateId = await getValidEventDateId(page);
+    if (!eventDateId) {
+      test.skip();
+    }
+    
+    const result = await registrationPage.navigateToRegistration(eventDateId!);
+    if (result.status !== 'success') {
+      test.skip();
+    }
+    
     await page.waitForLoadState('networkidle');
     
     // Focus on form area

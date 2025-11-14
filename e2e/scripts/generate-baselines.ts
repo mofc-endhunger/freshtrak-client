@@ -7,6 +7,7 @@ import { FamilyPage } from '../pages/FamilyPage';
 import { AccountPage } from '../pages/AccountPage';
 import { DEFAULT_TEST_CREDENTIALS } from '../fixtures/test-data';
 import { createBaselineScreenshot } from '../utils/visual-testing';
+import { getBaseUrl, createUrlPattern } from '../utils/helpers';
 
 /**
  * Generate Baseline Screenshots
@@ -17,11 +18,10 @@ import { createBaselineScreenshot } from '../utils/visual-testing';
  * Usage: npx ts-node e2e/scripts/generate-baselines.ts
  */
 
-const BASE_URL = process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000';
-
 async function generateBaselines() {
     console.log('Starting baseline screenshot generation...');
-    console.log(`Base URL: ${BASE_URL}`);
+    const baseUrl = getBaseUrl();
+    console.log(`Base URL: ${baseUrl}`);
 
     const browser = await chromium.launch({ headless: false });
     const context = await browser.newContext({
@@ -76,7 +76,7 @@ async function generateBaselines() {
                 DEFAULT_TEST_CREDENTIALS.email,
                 DEFAULT_TEST_CREDENTIALS.password
             );
-            await page.waitForURL(/^\/(?!login)/, { timeout: 10000 });
+            await page.waitForURL(createUrlPattern('/'), { timeout: 10000 });
 
             const familyPage = new FamilyPage(page);
             await familyPage.navigate();

@@ -3,6 +3,7 @@ import { AccountPage } from '../../pages/AccountPage';
 import { LoginPage } from '../../pages/LoginPage';
 import { DEFAULT_TEST_CREDENTIALS } from '../../fixtures/test-data';
 import { compareScreenshot } from '../../utils/visual-testing';
+import { createUrlPattern } from '../../utils/helpers';
 
 test.describe('Account Page Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -13,7 +14,7 @@ test.describe('Account Page Visual Tests', () => {
       DEFAULT_TEST_CREDENTIALS.email,
       DEFAULT_TEST_CREDENTIALS.password
     );
-    await page.waitForURL(/^\/(?!login)/, { timeout: 10000 });
+    await page.waitForURL(createUrlPattern('/'), { timeout: 10000 });
   });
 
   test('should match baseline screenshot for account page', async ({ page }) => {

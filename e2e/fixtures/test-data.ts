@@ -119,10 +119,15 @@ export function createRegistrationFormData(
 
 /**
  * Default test credentials (for use in test environment)
+ * 
+ * These credentials are used for authenticated test scenarios.
+ * Can be overridden via environment variables:
+ * - TEST_USER_EMAIL
+ * - TEST_USER_PASSWORD
  */
 export const DEFAULT_TEST_CREDENTIALS = {
-  email: process.env.TEST_USER_EMAIL || 'test@example.com',
-  password: process.env.TEST_USER_PASSWORD || 'TestPassword123!',
+  email: process.env.TEST_USER_EMAIL || 'fireigunufra-7274@yopmail.com',
+  password: process.env.TEST_USER_PASSWORD || 'Temp123!',
   name: 'Test User',
 } as const;
 

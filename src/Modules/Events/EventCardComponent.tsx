@@ -114,6 +114,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = props => {
 			<LinkContainer to={targetUrl}>
 				<button
 					type="button"
+					data-testid={buttonName === "Reserve Time" ? "reserve-time-button" : buttonName === "RSVP" ? "rsvp-button" : "event-action-button"}
 					className="btn bg-[#392947] text-white px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px] ml-1 w-full"
 					onClick={() => dispatch(setCurrentEvent(props.event))}
 				>

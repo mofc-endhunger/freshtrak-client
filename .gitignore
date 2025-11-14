@@ -7,6 +7,8 @@ node_modules
 
 # testing
 coverage
+/playwright-report
+/test-results
 
 # production
 build
@@ -19,6 +21,8 @@ build
 .DS_Store
 .env
 .env.*
+# exclude png
+*.png
 
 npm-debug.log*
 yarn-debug.log*

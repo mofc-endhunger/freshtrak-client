@@ -49,7 +49,26 @@ export abstract class BasePage {
    * Wait for element to be visible
    */
   protected async waitForElement(selector: string, timeout: number = TIMEOUTS.MEDIUM): Promise<void> {
-    await this.page.waitForSelector(selector, { state: 'visible', timeout });
+    // For comma-separated selectors, try each one
+    if (selector.includes(',')) {
+      const selectors = selector.split(',').map(s => s.trim());
+      let found = false;
+      for (const sel of selectors) {
+        try {
+          await this.page.waitForSelector(sel, { state: 'visible', timeout: Math.min(timeout, 5000) });
+          found = true;
+          break;
+        } catch (e) {
+          // Try next selector
+          continue;
+        }
+      }
+      if (!found) {
+        throw new Error(`None of the selectors matched: ${selector}`);
+      }
+    } else {
+      await this.page.waitForSelector(selector, { state: 'visible', timeout });
+    }
   }
 
   /**

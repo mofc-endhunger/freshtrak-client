@@ -4,15 +4,19 @@
  * Centralized constants used across E2E tests
  */
 
-// Test URLs
+// Test URLs - matching actual routes from RENDER_URL
 export const TEST_URLS = {
     BASE_URL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000',
     DASHBOARD: '/',
     LOGIN: '/login',
-    EVENTS: '/events',
-    FAMILY: '/family',
+    EVENTS: '/events/list',  // Base events list URL
+    FAMILY: '/family/create',
     ACCOUNT: '/account',
-    REGISTRATION: '/registration',
+    REGISTRATION_FORM: '/register/form',
+    REGISTRATION_EVENT_DETAILS: '/register/event',
+    REGISTRATION_CONFIRM: '/register/confirm',
+    HOUSEHOLDS: '/households',
+    USER_HOME: '/user-home',
 } as const;
 
 // Test Timeouts (in milliseconds)

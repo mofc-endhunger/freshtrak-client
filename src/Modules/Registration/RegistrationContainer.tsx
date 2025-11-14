@@ -127,18 +127,29 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
-			const resp = await axios.get<{ data: Event; errors?: string[] }>(
+			const resp = await axios.get<{ data: Event; event?: Event; errors?: string[] }>(
 				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
 			);
 			const { data } = resp;
+			// Handle both response structures: { data: { event: {...} } } and { event: {...} }
+			let eventToFormat: Event | null = null;
 			if (data && data.data) {
-				const eventData = EventFormat(data.data, eventDateId);
+				eventToFormat = data.data;
+			} else if (data && data.event) {
+				eventToFormat = data.event;
+			} else if (data && (data as any).event) {
+				// Fallback for direct event property
+				eventToFormat = (data as any).event;
+			}
+			
+			if (eventToFormat) {
+				const eventData = EventFormat(eventToFormat, eventDateId);
 				dispatch(setCurrentEvent(eventData));
 				setSelectedEvent(eventData);
 				setLoading(false);
 			} else {
 				setPageError(true);
-				setErrors(data.errors || []);
+				setErrors(data?.errors || []);
 				setLoading(false);
 			}
 		} catch (e: any) {

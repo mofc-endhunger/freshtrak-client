@@ -64,10 +64,22 @@ export class AccountPage extends BasePage {
     }
 
     /**
-     * Logout
+     * Logout - uses header dropdown menu
      */
     async logout(): Promise<void> {
-        await this.click(AccountSelectors.logoutButton);
+        // Open user account dropdown menu in header
+        const userButton = this.page.locator(AccountSelectors.userAccountButton).first();
+        await userButton.waitFor({ state: 'visible', timeout: 10000 });
+        await userButton.click();
+        
+        // Wait for dropdown menu to appear
+        await this.page.waitForTimeout(500);
+        
+        // Click Sign Out in dropdown menu
+        const signOutButton = this.page.getByRole('menuitem', { name: /sign out/i });
+        await signOutButton.waitFor({ state: 'visible', timeout: 5000 });
+        await signOutButton.click();
+        
         await this.waitForLoad();
     }
 

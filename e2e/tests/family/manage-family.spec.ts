@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { FamilyPage } from '../../pages/FamilyPage';
 import { LoginPage } from '../../pages/LoginPage';
 import { createTestFamilyMember, DEFAULT_TEST_CREDENTIALS } from '../../fixtures/test-data';
+import { createUrlPattern } from '../../utils/helpers';
 
 test.describe('Manage Family', () => {
   test.beforeEach(async ({ page }) => {
@@ -12,7 +13,7 @@ test.describe('Manage Family', () => {
       DEFAULT_TEST_CREDENTIALS.email,
       DEFAULT_TEST_CREDENTIALS.password
     );
-    await page.waitForURL(/^\/(?!login)/, { timeout: 10000 });
+    await page.waitForURL(createUrlPattern('/'), { timeout: 10000 });
   });
 
   test('should view family member list', async ({ page }) => {

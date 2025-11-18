@@ -29,7 +29,6 @@ import { handleAuthError, getCognitoToken } from "../../Utils/AuthErrorHandler";
 import {
 	getGenderId,
 	getGenderFromId,
-	getGenderDisplayName,
 } from "../Households/utils/householdUtils";
 import { StorageService } from "../../Utils/StorageService";
 

@@ -155,9 +155,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	useEffect(() => {
 		const token = StorageService.getUserToken();
 		const userProfile = StorageService.getGuestUser();
-		setUserToken(
-			token || (userProfile as any)?.token || undefined
-		);
+		setUserToken(token || (userProfile as any)?.token || undefined);
 
 		// Only proceed if we're not in an error state
 		if (!isError && !pageError) {
@@ -175,9 +173,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			const isGuestAuthenticated = StorageService.isGuestUser();
 
 			const isUserAuthenticated =
-				token ||
-				isGuestAuthenticated ||
-				isCognitoSignedIn;
+				token || isGuestAuthenticated || isCognitoSignedIn;
 
 			if (!isUserAuthenticated) {
 				setShowAuthModal(true);
@@ -194,8 +190,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					// Cognito user - create user object from cognitoUser data
 					try {
 						const cognitoUserObj = {
-							first_name:
-								cognitoUser.name?.split(" ")[0] || "",
+							first_name: cognitoUser.name?.split(" ")[0] || "",
 							last_name:
 								cognitoUser.name
 									?.split(" ")
@@ -235,7 +230,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							? householdData.members[0]
 							: null;
 
-					// Convert date from yyyy-mm-dd to mm/dd/yyyy format for form
+					// Convert date from yyyy-mm-dd to MM / DD / YYYY format for form
 					const convertDateFormat = (dateString: string): string => {
 						if (!dateString || dateString === "1900-01-01") {
 							return "";
@@ -260,19 +255,28 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							const monthStr = String(month).padStart(2, "0");
 							const dayStr = String(day).padStart(2, "0");
 							const yearStr = String(year);
-							return `${monthStr}/${dayStr}/${yearStr}`;
+							// Return in MM / DD / YYYY format (with spaces around slashes) for form
+							return `${monthStr} / ${dayStr} / ${yearStr}`;
 						} catch (error) {
 							return "";
 						}
 					};
 
-					// Convert gender_id to gender display name for form
+					// Convert gender_id to form value (lowercase format expected by form)
 					const getGenderForForm = (
 						genderId: number | null
 					): string => {
 						if (!genderId) return "";
 						const gender = getGenderFromId(genderId);
-						return getGenderDisplayName(gender);
+						// Form expects: "male", "female", "other", "not_specify"
+						// Map from household format to form format
+						const genderMap: Record<string, string> = {
+							male: "male",
+							female: "female",
+							other: "other",
+							prefer_not_to_say: "not_specify",
+						};
+						return genderMap[gender] || "";
 					};
 
 					const prefilledUser = {

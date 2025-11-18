@@ -84,14 +84,46 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		isLoadingUserData: false, // Parent component handles loading state
 	});
 
-	// Utility function to convert date from yyyy-mm-dd to mm/dd/yyyy
+	// Utility function to convert date to MM / DD / YYYY format
+	// Handles both yyyy-mm-dd and mm/dd/yyyy input formats
 	const convertDateFormat = (dateString: string): string => {
 		if (!dateString || dateString === "1900-01-01") {
 			return "";
 		}
 
 		try {
-			const [year, month, day] = dateString.split("-").map(Number);
+			let year: number, month: number, day: number;
+
+			// Check if date is in yyyy-mm-dd format
+			if (
+				dateString.includes("-") &&
+				dateString.split("-").length === 3
+			) {
+				[year, month, day] = dateString.split("-").map(Number);
+			}
+			// Check if date is already in mm/dd/yyyy or mm / dd / yyyy format
+			else if (dateString.includes("/")) {
+				const parts = dateString.split("/").map((part) => part.trim());
+				if (parts.length === 3) {
+					// Determine format: if first part is > 12, it's yyyy/mm/dd, else mm/dd/yyyy
+					if (parseInt(parts[0]) > 12) {
+						// yyyy/mm/dd format
+						year = parseInt(parts[0]);
+						month = parseInt(parts[1]);
+						day = parseInt(parts[2]);
+					} else {
+						// mm/dd/yyyy format
+						month = parseInt(parts[0]);
+						day = parseInt(parts[1]);
+						year = parseInt(parts[2]);
+					}
+				} else {
+					return "";
+				}
+			} else {
+				return "";
+			}
+
 			if (isNaN(year) || isNaN(month) || isNaN(day)) {
 				return "";
 			}
@@ -111,7 +143,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			const dayStr = String(day).padStart(2, "0");
 			const yearStr = String(year);
 
-			return `${monthStr}/${dayStr}/${yearStr}`;
+			// Return in MM / DD / YYYY format (with spaces around slashes)
+			return `${monthStr} / ${dayStr} / ${yearStr}`;
 		} catch (error) {
 			return "";
 		}
@@ -183,7 +216,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	// Step navigation handlers
 	const continueHandler = (values: Partial<RegistrationFormData>): void => {
-		setState(prev => ({
+		setState((prev) => ({
 			...prev,
 			formValues: { ...prev.formValues, ...values },
 		}));
@@ -191,7 +224,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		// Handle different step flows based on mode
 		if (mode === "registration") {
 			// Registration mode: simple linear flow
-			setState(prev => ({ ...prev, formStep: prev.formStep + 1 }));
+			setState((prev) => ({ ...prev, formStep: prev.formStep + 1 }));
 		} else {
 			// Household setup mode: complex flow with conditional steps
 			if (state.formStep === HouseholdFormStep.MEMBER_COUNT) {
@@ -201,16 +234,16 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 				const hasAdditionalMembers =
 					seniorCount > 0 || adultCount > 0 || childCount > 0;
-				setState(prev => ({ ...prev, hasAdditionalMembers }));
+				setState((prev) => ({ ...prev, hasAdditionalMembers }));
 
 				if (hasAdditionalMembers) {
-					setState(prev => ({
+					setState((prev) => ({
 						...prev,
 						formStep: HouseholdFormStep.FAMILY_MEMBER_DETAILS,
 					}));
 					return;
 				} else {
-					setState(prev => ({
+					setState((prev) => ({
 						...prev,
 						formStep: HouseholdFormStep.CONTACT,
 					}));
@@ -222,7 +255,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			// (The navigation buttons will handle submission at this step)
 
 			// Default behavior for other steps
-			setState(prev => ({ ...prev, formStep: prev.formStep + 1 }));
+			setState((prev) => ({ ...prev, formStep: prev.formStep + 1 }));
 		}
 	};
 
@@ -230,7 +263,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		if (mode === "householdSetup") {
 			// Handle navigation from family member details step
 			if (state.formStep === HouseholdFormStep.FAMILY_MEMBER_DETAILS) {
-				setState(prev => ({
+				setState((prev) => ({
 					...prev,
 					formStep: HouseholdFormStep.MEMBER_COUNT,
 				}));
@@ -240,12 +273,12 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			// Handle navigation from contact information step
 			if (state.formStep === HouseholdFormStep.CONTACT) {
 				if (state.hasAdditionalMembers) {
-					setState(prev => ({
+					setState((prev) => ({
 						...prev,
 						formStep: HouseholdFormStep.FAMILY_MEMBER_DETAILS,
 					}));
 				} else {
-					setState(prev => ({
+					setState((prev) => ({
 						...prev,
 						formStep: HouseholdFormStep.MEMBER_COUNT,
 					}));
@@ -255,14 +288,14 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		}
 
 		// Default behavior for other steps
-		setState(prev => ({ ...prev, formStep: prev.formStep - 1 }));
+		setState((prev) => ({ ...prev, formStep: prev.formStep - 1 }));
 	};
 
 	const handleFamilyMembersComplete = (
 		members: HouseholdMember[],
 		counts: HouseholdCounts
 	): void => {
-		setState(prev => ({
+		setState((prev) => ({
 			...prev,
 			familyMembers: members,
 			householdCounts: counts,
@@ -271,7 +304,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	};
 
 	const handleFamilyMembersSkip = (counts: HouseholdCounts): void => {
-		setState(prev => ({
+		setState((prev) => ({
 			...prev,
 			householdCounts: counts,
 			formStep: HouseholdFormStep.CONTACT,
@@ -282,7 +315,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	const handleSlotChange = (
 		e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
 	): void => {
-		setState(prev => ({ ...prev, selectedSlotId: e.target.value }));
+		setState((prev) => ({ ...prev, selectedSlotId: e.target.value }));
 	};
 
 	// Validation handler for registration mode step 1
@@ -302,11 +335,11 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		const res: boolean = await trigger(field_array);
 		if (res) {
 			const values: RegistrationFormData = getValues();
-			setState(prev => ({
+			setState((prev) => ({
 				...prev,
 				formValues: { ...prev.formValues, ...values },
 			}));
-			setState(prev => ({ ...prev, formStep: prev.formStep + 1 }));
+			setState((prev) => ({ ...prev, formStep: prev.formStep + 1 }));
 		}
 	};
 
@@ -314,7 +347,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	const handleFormSubmit = async (
 		data: RegistrationFormData
 	): Promise<void> => {
-		setState(prev => ({ ...prev, isSubmitting: true }));
+		setState((prev) => ({ ...prev, isSubmitting: true }));
 		try {
 			// Get all current form values
 			const allFormValues = getValues();
@@ -338,7 +371,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 				// Add family members and counts
 				if (state.familyMembers.length > 0) {
-					data.family_members = state.familyMembers.map(member => ({
+					data.family_members = state.familyMembers.map((member) => ({
 						first_name: member.first_name,
 						last_name: member.last_name,
 						middle_name: member.middle_name,
@@ -363,7 +396,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		} catch (error) {
 			console.error("Form submission error:", error);
 		} finally {
-			setState(prev => ({ ...prev, isSubmitting: false }));
+			setState((prev) => ({ ...prev, isSubmitting: false }));
 		}
 	};
 
@@ -383,7 +416,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			"state",
 			"zip_code",
 		];
-		keys.forEach(key => {
+		keys.forEach((key) => {
 			if (data[key] !== undefined) {
 				(data as any)[key] = sanitizeString(data[key]);
 			}
@@ -430,8 +463,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	// Progress indicator component
 	const ProgressIndicator = (): JSX.Element => {
 		const steps = modeConfig.steps
-			.filter(step => step.isVisible)
-			.map(step => step.title);
+			.filter((step) => step.isVisible)
+			.map((step) => step.title);
 
 		// Add family member details step if there are additional members in household mode
 		if (

@@ -35,9 +35,9 @@ import {
 	EventApiResponse,
 } from "./types/registration.types";
 
-const RegistrationConfirmComponent: React.FC<
-	RegistrationConfirmProps
-> = props => {
+const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
+	props
+) => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const currentUser = useSelector(selectUser) as RegistrationFormData | null;
@@ -57,7 +57,6 @@ const RegistrationConfirmComponent: React.FC<
 	const eventDateId = StorageService.getRegisteredEventDateID();
 
 	const isLoggedIn = StorageService.getItem<string>("isLoggedIn");
-	const cognitoUser = StorageService.getCognitoUser();
 	if (!isLoggedIn || isLoggedIn !== "true") {
 		StorageService.clearUserToken();
 		StorageService.removeItem("guestId");
@@ -110,7 +109,7 @@ const RegistrationConfirmComponent: React.FC<
 		// Only show modal if user is a guest user (not a Cognito user)
 		const isGuest = StorageService.isGuestUser();
 		const isCognito = StorageService.isLoggedInUser();
-		
+
 		if (isGuest && !isCognito) {
 			setTimeout(() => {
 				setShowGuestSigninModal(true);

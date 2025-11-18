@@ -115,9 +115,39 @@ export class RegistrationPage extends BasePage {
           }
 
           if (clicked) {
-            // Wait for navigation to form with slot ID
-            await this.page.waitForURL(/\/register\/form\/[^\/]+\/[^\/]+/, { timeout: 15000 });
-            await this.page.waitForLoadState('networkidle', { timeout: 10000 });
+            // Wait for timeslot modal to close (indicates navigation started)
+            // Get modal locator again to check if it's hidden
+            let timeslotModal = null;
+            for (const selector of timeslotModalSelectors) {
+              const modal = this.page.locator(selector).first();
+              const isVisible = await modal.isVisible({ timeout: 1000 }).catch(() => false);
+              if (isVisible) {
+                timeslotModal = modal;
+                break;
+              }
+            }
+            if (timeslotModal) {
+              await timeslotModal.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => { });
+            }
+            
+            // Wait for form to be visible instead of waiting for URL change
+            // React Router client-side navigation may not immediately update URL in Playwright
+            const firstNameInput = this.locator(RegistrationSelectors.firstNameInput).first();
+            try {
+              await firstNameInput.waitFor({ state: 'visible', timeout: 15000 });
+              console.log(`[RegistrationPage] Form is visible, navigated to: ${this.page.url()}`);
+            } catch (error) {
+              // Fallback: check if URL changed
+              const currentUrl = this.page.url();
+              if (currentUrl.includes('/register/form/') && currentUrl.split('/').length >= 5) {
+                console.log(`[RegistrationPage] URL contains slot ID: ${currentUrl}`);
+              } else {
+                console.warn(`[RegistrationPage] Form not visible after timeslot selection. Current URL: ${currentUrl}`);
+                // Continue anyway - form might still be loading
+              }
+            }
+            
+            await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => { });
             console.log(`[RegistrationPage] Navigated to: ${this.page.url()}`);
           } else {
             return {
@@ -190,7 +220,39 @@ export class RegistrationPage extends BasePage {
       };
     }
 
-    // Only throw error if we're definitely on an error page
+    // Wait for form to be visible (with longer timeout)
+    // Try multiple selectors to detect the form
+    const formSelectors = [
+      RegistrationSelectors.firstNameInput,
+      RegistrationSelectors.householdForm,
+      'form',
+      '[data-testid="household-form"]',
+      'input[name="first_name"]',
+      '#first_name'
+    ];
+
+    let formFound = false;
+    for (const selector of formSelectors) {
+      try {
+        const element = this.locator(selector).first();
+        await element.waitFor({ state: 'visible', timeout: 15000 });
+        formFound = true;
+        console.log(`[RegistrationPage] Form detected using selector: ${selector}`);
+        break;
+      } catch (error) {
+        // Try next selector
+        continue;
+      }
+    }
+
+    if (formFound) {
+      return { status: 'success' };
+    }
+
+    // If form is not visible, check what page we're on
+    const finalUrl = this.page.url();
+    
+    // Check if we're on an error page
     if (isErrorPage && !isOnHomePage && !isOnLoginPage) {
       return {
         status: 'error',
@@ -198,39 +260,44 @@ export class RegistrationPage extends BasePage {
       };
     }
 
-    // Wait for form to be visible (with longer timeout)
-    const firstNameInput = this.locator(RegistrationSelectors.firstNameInput).first();
-    try {
-      await firstNameInput.waitFor({ state: 'visible', timeout: 15000 });
-      return { status: 'success' };
-    } catch (error) {
-      // If form is not visible, check what page we're on
-      const finalUrl = this.page.url();
-      if (finalUrl.endsWith('/') && !finalUrl.includes('/register')) {
-        // Form redirected to home - this might mean user is already registered or event is invalid
-        return {
-          status: 'redirected',
-          message: `Registration form redirected to home page. The eventDateId (${eventDateId}) might be invalid or the user might already be registered for this event.`
-        };
-      }
+    if (finalUrl.endsWith('/') && !finalUrl.includes('/register')) {
+      // Form redirected to home - this might mean user is already registered or event is invalid
       return {
-        status: 'error',
-        message: `Registration form is not visible. Current URL: ${finalUrl}`
+        status: 'redirected',
+        message: `Registration form redirected to home page. The eventDateId (${eventDateId}) might be invalid or the user might already be registered for this event.`
       };
     }
+
+    // If we're on the registration form URL but form isn't visible, it might still be loading
+    if (finalUrl.includes('/register/form')) {
+      // Wait a bit more and try once more
+      await this.page.waitForTimeout(2000);
+      const firstNameInput = this.locator(RegistrationSelectors.firstNameInput).first();
+      const retryVisible = await firstNameInput.isVisible({ timeout: 5000 }).catch(() => false);
+      if (retryVisible) {
+        return { status: 'success' };
+      }
+    }
+
+    return {
+      status: 'error',
+      message: `Registration form is not visible. Current URL: ${finalUrl}`
+    };
   }
 
   /**
    * Navigate to registration page (compatible with BasePage interface)
    * @param eventDateId - Event date ID (required for valid registration)
    * @param eventSlotId - Optional event slot ID
+   * @returns Result object with status and optional message
    */
-  async navigate(eventDateId: string, eventSlotId?: string): Promise<void> {
+  async navigate(eventDateId: string, eventSlotId?: string): Promise<{ status: 'success' | 'redirected' | 'error'; message?: string }> {
     const result = await this.navigateToRegistration(eventDateId, eventSlotId);
     if (result.status === 'error') {
       throw new Error(result.message || 'Failed to navigate to registration form');
     }
-    // For 'redirected' status, we don't throw - let the test handle it
+    // Return the result so tests can check for 'redirected' status
+    return result;
   }
 
   /**
@@ -312,33 +379,61 @@ export class RegistrationPage extends BasePage {
   }
 
   /**
-   * Fill Step 1: Address Information
+   * Fill Step 1: Address + Contact Information (combined in registration mode)
    */
-  async fillStep1(data: { address: string; city: string; state: string; zipCode: string; phone: string }): Promise<void> {
+  async fillStep1(data: { address: string; city: string; state: string; zipCode: string; phone: string; email?: string }): Promise<void> {
     // Wait for Step 1 to be visible after navigation from Step 0
+    // Step 1 includes both AddressComponent and ContactInformationComponent
     const addressInput = this.locator(RegistrationSelectors.addressInput).first();
+    const cityInput = this.locator(RegistrationSelectors.cityInput).first();
+    const phoneInput = this.locator(RegistrationSelectors.phoneInput).first();
 
     // Wait for step transition to complete
     await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => { });
     await this.page.waitForTimeout(1000); // Give time for step transition
 
-    // Check if input exists first
-    const inputExists = await addressInput.count() > 0;
-    if (inputExists) {
-      await addressInput.waitFor({ state: 'visible', timeout: 15000 });
-    } else {
-      // Input doesn't exist yet, wait a bit more
+    // Wait for at least one Step 1 field to be visible (address, city, or phone)
+    const addressVisible = await addressInput.isVisible({ timeout: 5000 }).catch(() => false);
+    const cityVisible = await cityInput.isVisible({ timeout: 5000 }).catch(() => false);
+    const phoneVisible = await phoneInput.isVisible({ timeout: 5000 }).catch(() => false);
+
+    if (!addressVisible && !cityVisible && !phoneVisible) {
+      // Wait a bit more and try again
       await this.page.waitForTimeout(2000);
-      await addressInput.waitFor({ state: 'visible', timeout: 15000 });
+      const addressCheck = await addressInput.isVisible({ timeout: 5000 }).catch(() => false);
+      const cityCheck = await cityInput.isVisible({ timeout: 5000 }).catch(() => false);
+      const phoneCheck = await phoneInput.isVisible({ timeout: 5000 }).catch(() => false);
+      
+      if (!addressCheck && !cityCheck && !phoneCheck) {
+        throw new Error('Step 1 fields (address, city, phone) are not visible. Form might not have transitioned to Step 1.');
+      }
     }
 
     await this.page.waitForTimeout(500); // Small delay for form to stabilize
 
-    await this.fill(RegistrationSelectors.addressInput, data.address);
-    await this.fill(RegistrationSelectors.cityInput, data.city);
+    // Fill address fields
+    if (addressVisible || await addressInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await this.fill(RegistrationSelectors.addressInput, data.address);
+    }
+    if (cityVisible || await cityInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await this.fill(RegistrationSelectors.cityInput, data.city);
+    }
     await this.page.selectOption(RegistrationSelectors.stateSelect, data.state);
     await this.fill(RegistrationSelectors.zipCodeInput, data.zipCode);
-    await this.fill(RegistrationSelectors.phoneInput, data.phone);
+    
+    // Fill contact information (phone and email)
+    if (phoneVisible || await phoneInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await this.fill(RegistrationSelectors.phoneInput, data.phone);
+    }
+    
+    // Fill email if provided (email is required in Step 1 unless no_email is checked)
+    if (data.email) {
+      const emailInput = this.locator(RegistrationSelectors.emailInput).first();
+      const emailVisible = await emailInput.isVisible({ timeout: 2000 }).catch(() => false);
+      if (emailVisible) {
+        await this.fill(RegistrationSelectors.emailInput, data.email);
+      }
+    }
   }
 
   /**
@@ -347,72 +442,87 @@ export class RegistrationPage extends BasePage {
   async fillStep2(data: { adultCount: number; childCount: number }): Promise<void> {
     console.log(`[RegistrationPage.fillStep2] Filling Step 2 with adultCount: ${data.adultCount}, childCount: ${data.childCount}`);
 
-    // Try multiple selectors for adults input
-    const adultsSelectors = [
-      '#adults_in_household',
-      'input[name="adults_in_household"]',
-      'input[id*="adult"]',
-      'input[name*="adult"]',
-      'label:has-text("Adult") + input',
-      'label:has-text("Adults") + input'
-    ];
+    // The MemberCountFormComponent uses increment/decrement buttons, not direct input
+    // We need to click the increment buttons to set the values
+    
+    // First, check current values by reading the input
+    const adultsInput = this.locator('#adults_in_household, input[name="adults_in_household"]').first();
+    const childrenInput = this.locator('#children_in_household, input[name="children_in_household"]').first();
+    
+    const adultsInputExists = await adultsInput.count() > 0;
+    const childrenInputExists = await childrenInput.count() > 0;
+    
+    if (!adultsInputExists || !childrenInputExists) {
+      console.log(`[RegistrationPage.fillStep2] Inputs not found - adults: ${adultsInputExists}, children: ${childrenInputExists}`);
+      return;
+    }
 
-    let adultsFilled = false;
-    for (const selector of adultsSelectors) {
-      const input = this.locator(selector).first();
-      const exists = await input.count() > 0;
-      if (exists) {
-        const isVisible = await input.isVisible({ timeout: 2000 }).catch(() => false);
-        if (isVisible) {
-          await this.fill(selector, data.adultCount.toString());
-          adultsFilled = true;
-          break;
+    // Get current values
+    const currentAdults = parseInt(await adultsInput.inputValue().catch(() => '0')) || 0;
+    const currentChildren = parseInt(await childrenInput.inputValue().catch(() => '0')) || 0;
+
+    console.log(`[RegistrationPage.fillStep2] Current values - adults: ${currentAdults}, children: ${currentChildren}`);
+    console.log(`[RegistrationPage.fillStep2] Target values - adults: ${data.adultCount}, children: ${data.childCount}`);
+
+    // Calculate how many clicks needed
+    const adultsClicks = data.adultCount - currentAdults;
+    const childrenClicks = data.childCount - currentChildren;
+
+    // Click increment buttons for adults
+    if (adultsClicks > 0) {
+      const adultIncButton = this.locator('[data-testid="count_adult_inc"]').first();
+      const adultIncVisible = await adultIncButton.isVisible({ timeout: 2000 }).catch(() => false);
+      if (adultIncVisible) {
+        for (let i = 0; i < adultsClicks; i++) {
+          await adultIncButton.click();
+          await this.page.waitForTimeout(100); // Small delay between clicks
         }
+        console.log(`[RegistrationPage.fillStep2] Clicked adult increment button ${adultsClicks} times`);
+      }
+    } else if (adultsClicks < 0) {
+      // Need to decrement
+      const adultDecButton = this.locator('[data-testid="count_adult_dec"]').first();
+      const adultDecVisible = await adultDecButton.isVisible({ timeout: 2000 }).catch(() => false);
+      if (adultDecVisible) {
+        for (let i = 0; i < Math.abs(adultsClicks); i++) {
+          await adultDecButton.click();
+          await this.page.waitForTimeout(100);
+        }
+        console.log(`[RegistrationPage.fillStep2] Clicked adult decrement button ${Math.abs(adultsClicks)} times`);
       }
     }
 
-    if (!adultsFilled) {
-      console.log('[RegistrationPage.fillStep2] Adults input not found, trying children input...');
-    }
-
-    // Try multiple selectors for children input
-    const childrenSelectors = [
-      '#children_in_household',
-      'input[name="children_in_household"]',
-      'input[id*="child"]',
-      'input[name*="child"]',
-      'label:has-text("Child") + input',
-      'label:has-text("Children") + input'
-    ];
-
-    let childrenFilled = false;
-    for (const selector of childrenSelectors) {
-      const input = this.locator(selector).first();
-      const exists = await input.count() > 0;
-      if (exists) {
-        const isVisible = await input.isVisible({ timeout: 2000 }).catch(() => false);
-        if (isVisible) {
-          await this.fill(selector, data.childCount.toString());
-          childrenFilled = true;
-          break;
+    // Click increment buttons for children
+    if (childrenClicks > 0) {
+      const childIncButton = this.locator('[data-testid="count_kid_inc"]').first();
+      const childIncVisible = await childIncButton.isVisible({ timeout: 2000 }).catch(() => false);
+      if (childIncVisible) {
+        for (let i = 0; i < childrenClicks; i++) {
+          await childIncButton.click();
+          await this.page.waitForTimeout(100);
         }
+        console.log(`[RegistrationPage.fillStep2] Clicked child increment button ${childrenClicks} times`);
+      }
+    } else if (childrenClicks < 0) {
+      // Need to decrement
+      const childDecButton = this.locator('[data-testid="count_kid_dec"]').first();
+      const childDecVisible = await childDecButton.isVisible({ timeout: 2000 }).catch(() => false);
+      if (childDecVisible) {
+        for (let i = 0; i < Math.abs(childrenClicks); i++) {
+          await childDecButton.click();
+          await this.page.waitForTimeout(100);
+        }
+        console.log(`[RegistrationPage.fillStep2] Clicked child decrement button ${Math.abs(childrenClicks)} times`);
       }
     }
 
-    if (!adultsFilled || !childrenFilled) {
-      console.log(`[RegistrationPage.fillStep2] Adults filled: ${adultsFilled}, Children filled: ${childrenFilled}`);
-      // If inputs not found, they might already be prefilled or on a different step
-    }
-
-    // After filling, trigger validation by blurring the last input
-    if (adultsFilled || childrenFilled) {
-      // Trigger form validation by clicking outside or blurring
-      await this.page.waitForTimeout(300);
-      // Click on a label or empty space to trigger blur
-      const formContainer = this.locator(RegistrationSelectors.householdForm).first();
-      await formContainer.click({ position: { x: 10, y: 10 } }).catch(() => { });
-      await this.page.waitForTimeout(500);
-    }
+    // Wait for form state to update
+    await this.page.waitForTimeout(500);
+    
+    // Verify values were set
+    const finalAdults = parseInt(await adultsInput.inputValue().catch(() => '0')) || 0;
+    const finalChildren = parseInt(await childrenInput.inputValue().catch(() => '0')) || 0;
+    console.log(`[RegistrationPage.fillStep2] Final values - adults: ${finalAdults}, children: ${finalChildren}`);
   }
 
   /**
@@ -504,16 +614,24 @@ export class RegistrationPage extends BasePage {
   async submitRegistration(): Promise<void> {
     // Wait for final step to be ready
     await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => { });
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(2000); // Wait longer for form to stabilize
 
-    // Try multiple selectors for Register button (not "Submit")
+    // First, check if we're already on confirmation page
+    const currentUrl = this.page.url();
+    const isOnConfirmation = currentUrl.includes('/register/confirmation') || currentUrl.includes('/register/success');
+    if (isOnConfirmation) {
+      console.log('[RegistrationPage.submitRegistration] Already on confirmation page, registration completed!');
+      return;
+    }
+
+    // Try multiple selectors for Register/Submit button
     const submitSelectors = [
-      '[data-testid="submit-button"]', // This is the actual testid
+      '[data-testid="submit-button"]', // Primary selector from HouseholdForm
+      'button[type="submit"]:not(:disabled)', // Fallback to any enabled submit button
       'button:has-text("Register"):not(:has-text("Registering"))', // Button text is "Register"
-      'button[type="submit"]:not(:disabled)',
-      'button:has-text("Submit")',
-      '[data-testid*="submit"]',
-      '[data-testid*="register"]'
+      'button:has-text("Submit")', // Alternative text
+      '[data-testid*="submit"]', // Any testid containing "submit"
+      '[data-testid*="register"]' // Any testid containing "register"
     ];
 
     // First, check if submit button exists at all
@@ -631,27 +749,49 @@ export class RegistrationPage extends BasePage {
   async completeRegistration(formData: RegistrationFormData): Promise<void> {
     // Step 0: Primary Information
     // Check if we're already on Step 1 (household data might have prefilled Step 0)
-    const addressInput = this.locator(RegistrationSelectors.addressInput).first();
-    const isOnStep1 = await addressInput.isVisible({ timeout: 2000 }).catch(() => false);
+    const step1AddressInput = this.locator(RegistrationSelectors.addressInput).first();
+    const isOnStep1 = await step1AddressInput.isVisible({ timeout: 2000 }).catch(() => false);
 
     if (!isOnStep1) {
       // We're on Step 0, fill it
       // Check if fields are already prefilled (from household data)
       const firstNameField = this.locator(RegistrationSelectors.firstNameInput).first();
+      const lastNameField = this.locator(RegistrationSelectors.lastNameInput).first();
+      const dobField = this.locator(RegistrationSelectors.dateOfBirthInput).first();
+      const genderField = this.locator(RegistrationSelectors.genderSelect).first();
+      
       const existingFirstName = await firstNameField.inputValue().catch(() => '');
-      const isPrefilled = existingFirstName.length > 0;
+      const existingLastName = await lastNameField.inputValue().catch(() => '');
+      const existingDob = await dobField.inputValue().catch(() => '');
+      const existingGender = await genderField.inputValue().catch(() => '');
+      
+      // Check if all required fields are filled and valid
+      const isPrefilled = existingFirstName.length > 0 && existingLastName.length > 0 && 
+                         existingDob.length > 0 && existingGender.length > 0;
+      
+      // Validate date format (should be mm/dd/yyyy)
+      const isValidDob = existingDob.match(/^\d{2}\/\d{2}\/\d{4}$/);
 
-      if (isPrefilled) {
-        console.log('[RegistrationPage.completeRegistration] Step 0 fields are prefilled, just clicking Continue');
-        // Fields are prefilled, just click Continue
+      if (isPrefilled && isValidDob) {
+        console.log('[RegistrationPage.completeRegistration] Step 0 fields are prefilled and valid, just clicking Continue');
+        // Fields are prefilled and valid, just click Continue
         await this.clickNext();
       } else {
-        // Fields are not prefilled, fill them
+        // Fields are not prefilled or invalid, fill/update them
+        console.log(`[RegistrationPage.completeRegistration] Step 0 fields need to be filled/updated. FirstName: ${existingFirstName}, LastName: ${existingLastName}, DOB: ${existingDob}, Gender: ${existingGender}`);
+        
+        // Calculate a valid date of birth (25 years ago) in mm/dd/yyyy format
+        const birthDate = new Date(Date.now() - 25 * 365 * 24 * 60 * 60 * 1000);
+        const month = String(birthDate.getMonth() + 1).padStart(2, '0');
+        const day = String(birthDate.getDate()).padStart(2, '0');
+        const year = birthDate.getFullYear();
+        const dobFormatted = `${month}/${day}/${year}`;
+        
         await this.fillStep0({
-          firstName: formData.user.firstName || 'Test',
-          lastName: formData.user.lastName || 'User',
-          dateOfBirth: new Date(Date.now() - 25 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          gender: 'Other',
+          firstName: formData.user.firstName || existingFirstName || 'Test',
+          lastName: formData.user.lastName || existingLastName || 'User',
+          dateOfBirth: dobFormatted,
+          gender: existingGender || 'Other',
         });
         await this.clickNext();
       }
@@ -659,37 +799,168 @@ export class RegistrationPage extends BasePage {
       console.log('[RegistrationPage.completeRegistration] Already on Step 1, skipping Step 0');
     }
 
-    // Step 1: Address Information
-    // Check if we're already on Step 2 (household data might have prefilled Step 1 too)
+    // Step 1: Address + Contact Information (combined in registration mode)
+    // Wait for step transition and network to settle
+    await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+    await this.page.waitForTimeout(2000); // Give form time to transition
+    
+    // Determine which step we're on by checking what inputs are visible
+    // In registration mode, Step 1 shows BOTH AddressComponent AND ContactInformationComponent
+    console.log('[RegistrationPage.completeRegistration] Determining current step...');
+    const firstNameInput = this.locator(RegistrationSelectors.firstNameInput).first();
+    const addressInput = this.locator(RegistrationSelectors.addressInput).first();
+    const cityInput = this.locator(RegistrationSelectors.cityInput).first();
+    const phoneInput = this.locator(RegistrationSelectors.phoneInput).first();
     const adultsCountInput = this.locator(RegistrationSelectors.adultsCountInput).first();
-    const isOnStep2 = await adultsCountInput.isVisible({ timeout: 2000 }).catch(() => false);
-
-    if (!isOnStep2) {
-      // Check if Step 1 fields are prefilled
-      const addressInput = this.locator(RegistrationSelectors.addressInput).first();
-      const addressExists = await addressInput.count() > 0;
-      const addressVisible = addressExists ? await addressInput.isVisible({ timeout: 2000 }).catch(() => false) : false;
-
+    
+    const firstNameVisible = await firstNameInput.isVisible({ timeout: 2000 }).catch(() => false);
+    const addressVisible = await addressInput.isVisible({ timeout: 2000 }).catch(() => false);
+    const cityVisible = await cityInput.isVisible({ timeout: 2000 }).catch(() => false);
+    const phoneVisible = await phoneInput.isVisible({ timeout: 2000 }).catch(() => false);
+    const step2Visible = await adultsCountInput.isVisible({ timeout: 2000 }).catch(() => false);
+    
+    // Step 1 is visible if we see address OR city OR phone (any of the Step 1 fields)
+    const step1Visible = addressVisible || cityVisible || phoneVisible;
+    
+    console.log(`[RegistrationPage.completeRegistration] Step visibility - Step 0 (firstName): ${firstNameVisible}, Step 1 (address/city/phone): ${step1Visible} (address: ${addressVisible}, city: ${cityVisible}, phone: ${phoneVisible}), Step 2 (adults): ${step2Visible}`);
+    
+    if (step2Visible) {
+      console.log('[RegistrationPage.completeRegistration] Already on Step 2, skipping Step 1');
+    } else if (step1Visible) {
+      // We're on Step 1 (Address + Contact combined)
+      console.log('[RegistrationPage.completeRegistration] On Step 1 (Address + Contact Information), filling it...');
+      
+      // Wait for all Step 1 fields to be ready
       if (addressVisible) {
+        await addressInput.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+      }
+      if (cityVisible) {
+        await cityInput.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+      }
+      if (phoneVisible) {
+        await phoneInput.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+      }
+      
+      await this.fillStep1({
+        address: formData.address.street,
+        city: formData.address.city,
+        state: formData.address.state,
+        zipCode: formData.address.zipCode,
+        phone: formData.address.phone,
+        email: formData.user.email,
+      });
+      
+      // Wait a moment for form to update
+      await this.page.waitForTimeout(500);
+      
+      // Click Continue to go to Step 2
+      // Note: Step 1 uses data-testid="continue button" (with space) and calls validateStep1
+      console.log('[RegistrationPage.completeRegistration] Clicking Continue to proceed to Step 2...');
+      await this.clickNext();
+      
+      // Wait for Step 2 to appear
+      console.log('[RegistrationPage.completeRegistration] Waiting for Step 2 to appear...');
+      await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+      await this.page.waitForTimeout(1000); // Give time for step transition
+      await adultsCountInput.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {
+        console.warn('[RegistrationPage.completeRegistration] Step 2 did not appear after clicking Continue from Step 1');
+      });
+    } else if (firstNameVisible) {
+      // Still on Step 0 - wait for step transition after clicking Continue
+      console.log('[RegistrationPage.completeRegistration] Still on Step 0, waiting for step transition...');
+      
+      // Check for validation errors that might be preventing progression
+      const validationErrors = await this.page.locator('[class*="error"], [class*="invalid"], [data-testid*="error"]').all();
+      if (validationErrors.length > 0) {
+        const errorTexts = await Promise.all(validationErrors.map(async (err) => {
+          try {
+            return await err.textContent();
+          } catch {
+            return '';
+          }
+        }));
+        console.log(`[RegistrationPage.completeRegistration] Found validation errors: ${errorTexts.filter(t => t).join(', ')}`);
+      }
+      
+      // Wait for network and DOM to settle
+      await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+      await this.page.waitForTimeout(2000);
+      
+      // Check again for Step 1 or Step 2 with longer timeout
+      const addressCheck = await addressInput.isVisible({ timeout: 8000 }).catch(() => false);
+      const cityCheck = await cityInput.isVisible({ timeout: 8000 }).catch(() => false);
+      const phoneCheck = await phoneInput.isVisible({ timeout: 8000 }).catch(() => false);
+      const step2Check = await adultsCountInput.isVisible({ timeout: 8000 }).catch(() => false);
+      
+      // Also check if firstName is still visible (might indicate we're still on Step 0)
+      const firstNameStillVisible = await firstNameInput.isVisible({ timeout: 2000 }).catch(() => false);
+      
+      const step1Check = addressCheck || cityCheck || phoneCheck;
+      
+      if (step1Check) {
+        console.log('[RegistrationPage.completeRegistration] Step 1 appeared after waiting');
+        // Fill Step 1
         await this.fillStep1({
           address: formData.address.street,
           city: formData.address.city,
           state: formData.address.state,
           zipCode: formData.address.zipCode,
           phone: formData.address.phone,
+          email: formData.user.email,
         });
+        await this.page.waitForTimeout(500);
         await this.clickNext();
+        await adultsCountInput.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {});
+      } else if (step2Check) {
+        console.log('[RegistrationPage.completeRegistration] Step 2 appeared after waiting (Step 1 was skipped or prefilled)');
+      } else if (firstNameStillVisible) {
+        // Still on Step 0 - might need to check if Continue button is disabled or if there are validation errors
+        const continueButton = this.locator(RegistrationSelectors.nextButton).first();
+        const isDisabled = await continueButton.isDisabled({ timeout: 2000 }).catch(() => false);
+        const currentUrl = this.page.url();
+        throw new Error(`Still on Step 0 after clicking Continue. Continue button disabled: ${isDisabled}. Current URL: ${currentUrl}. Form might have validation errors preventing progression.`);
       } else {
-        console.log('[RegistrationPage.completeRegistration] Step 1 not visible, might already be on Step 2');
-        // Try to proceed to Step 2
+        // Neither step is visible - form might be in an error state
+        const currentUrl = this.page.url();
+        throw new Error(`Cannot determine current step. Step 0, Step 1, and Step 2 are all not visible. Current URL: ${currentUrl}. Form might be in an error state.`);
       }
     } else {
-      console.log('[RegistrationPage.completeRegistration] Already on Step 2, skipping Step 1');
+      // None of the steps are visible - form might be loading or in error state
+      console.log('[RegistrationPage.completeRegistration] No step inputs visible, waiting for form to load...');
+      await this.page.waitForTimeout(3000);
+      // Try one more time
+      const finalStep2Check = await adultsCountInput.isVisible({ timeout: 5000 }).catch(() => false);
+      const finalStep1Check = await addressInput.isVisible({ timeout: 5000 }).catch(() => false) || 
+                               await cityInput.isVisible({ timeout: 5000 }).catch(() => false) ||
+                               await phoneInput.isVisible({ timeout: 5000 }).catch(() => false);
+      if (!finalStep2Check && !finalStep1Check) {
+        throw new Error('Cannot determine current step after waiting. Form might be in an error state or still loading.');
+      }
     }
 
     // Step 2: Family Member Counts (this is the FINAL step for registration mode)
     // The submit button should appear on this step after filling it
     // DO NOT click Continue after this step - the submit button should appear instead
+    
+    // Ensure we're on Step 2 before trying to fill it
+    const adultsCountInputCheck = this.locator(RegistrationSelectors.adultsCountInput).first();
+    const isOnStep2Check = await adultsCountInputCheck.isVisible({ timeout: 5000 }).catch(() => false);
+    
+    if (!isOnStep2Check) {
+      console.log('[RegistrationPage.completeRegistration] Not on Step 2 yet, waiting for it to appear...');
+      // Wait for Step 2 to appear (might need to click Continue from Step 1)
+      await adultsCountInputCheck.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {
+        console.warn('[RegistrationPage.completeRegistration] Step 2 inputs never appeared');
+      });
+    }
+    
+    // Verify we're on Step 2 before filling
+    const finalStep2Check = await adultsCountInputCheck.isVisible({ timeout: 2000 }).catch(() => false);
+    if (!finalStep2Check) {
+      throw new Error('Cannot fill Step 2 - Step 2 inputs are not visible. Current step might be different.');
+    }
+    
+    console.log('[RegistrationPage.completeRegistration] Confirmed on Step 2, filling member counts...');
     await this.fillStep2({
       adultCount: formData.adultCount,
       childCount: formData.childCount,

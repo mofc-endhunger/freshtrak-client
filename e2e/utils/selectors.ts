@@ -60,16 +60,17 @@ export const RegistrationSelectors = {
   dateOfBirthInput: '[data-testid="date-of-birth-input"], #date_of_birth',
   genderSelect: '[data-testid="gender-select"], #gender, select[name="gender"]',
   
-  // Step 1: Address Information (using id attributes)
-  addressInput: '#address_line_1, input[name="address_line_1"]',
-  addressLine2Input: '#address_line_2, input[name="address_line_2"]',
-  cityInput: '#city, input[name="city"]',
+  // Step 1: Address Information (using id attributes and data-testid)
+  // Note: In registration mode, Step 1 combines Address + Contact components
+  addressInput: '[data-testid="address-line-1-input"], #address_line_1, input[name="address_line_1"], input[id="address_line_1"]',
+  addressLine2Input: '[data-testid="address-line-2-input"], #address_line_2, input[name="address_line_2"]',
+  cityInput: '[data-testid="city-input"], #city, input[name="city"]',
   stateSelect: '#state, select[name="state"]',
-  zipCodeInput: '#zip_code, input[name="zip_code"]',
+  zipCodeInput: '[data-testid="zip-code-input"], #zip_code, input[name="zip_code"]',
   
-  // Step 2: Contact Information
+  // Step 1 also includes Contact Information (phone and email are on same step in registration mode)
   phoneInput: '#phone, input[name="phone"]',
-  emailInput: '#email, input[name="email"]',
+  emailInput: '[data-testid="email-input"], #email, input[name="email"]',
   noPhoneCheckbox: '#no_phone_number',
   noEmailCheckbox: '#no_email',
   

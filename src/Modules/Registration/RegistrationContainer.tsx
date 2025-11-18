@@ -155,9 +155,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	useEffect(() => {
 		const token = StorageService.getUserToken();
 		const userProfile = StorageService.getGuestUser();
-		setUserToken(
-			token || (userProfile as any)?.token || undefined
-		);
+		setUserToken(token || (userProfile as any)?.token || undefined);
 
 		// Only proceed if we're not in an error state
 		if (!isError && !pageError) {
@@ -175,9 +173,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			const isGuestAuthenticated = StorageService.isGuestUser();
 
 			const isUserAuthenticated =
-				token ||
-				isGuestAuthenticated ||
-				isCognitoSignedIn;
+				token || isGuestAuthenticated || isCognitoSignedIn;
 
 			if (!isUserAuthenticated) {
 				setShowAuthModal(true);
@@ -194,8 +190,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					// Cognito user - create user object from cognitoUser data
 					try {
 						const cognitoUserObj = {
-							first_name:
-								cognitoUser.name?.split(" ")[0] || "",
+							first_name: cognitoUser.name?.split(" ")[0] || "",
 							last_name:
 								cognitoUser.name
 									?.split(" ")

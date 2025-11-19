@@ -19,10 +19,8 @@ phases:
       - echo "SOURCE VERSION: $CODEBUILD_SOURCE_VERSION"
       - echo "RESOLVED VERSION: $CODEBUILD_RESOLVED_SOURCE_VERSION"
       - echo "Building Docker image..."
-
       # Build with unique build number (works for prod/beta and dev)
       - docker build -t $IMAGE:$CODEBUILD_BUILD_NUMBER --target $TARGET .
-
       # -------------------------
       # PROD / BETA TAGGING
       # -------------------------
@@ -32,7 +30,6 @@ phases:
           docker tag $IMAGE:$CODEBUILD_BUILD_NUMBER $REPOSITORY/$IMAGE:$IMAGE_TAG
           docker tag $IMAGE:$CODEBUILD_BUILD_NUMBER $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER
         fi
-
       # -------------------------
       # DEV TAGGING (branch-shortSHA)
       # -------------------------
@@ -51,7 +48,6 @@ phases:
     on-failure: ABORT
     commands:
       - echo "Starting post-build phase..."
-
       # -------------------------
       # PUSH BETA/PROD TAGS
       # -------------------------
@@ -60,10 +56,8 @@ phases:
           echo "Pushing prod/beta tags..."
           docker push $REPOSITORY/$IMAGE:$IMAGE_TAG
           docker push $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER
-          printf '[{"name":"app","imageUri":"%s"}]' \
-            $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER > imagedefinitions.json
+          printf '[{"name":"app","imageUri":"%s"}]' $REPOSITORY/$IMAGE:$CODEBUILD_BUILD_NUMBER > imagedefinitions.json
         fi
-
       # -------------------------
       # PUSH DEV TAG
       # -------------------------
@@ -72,8 +66,7 @@ phases:
           DEV_TAG=$(cat DEV_TAG.txt)
           echo "Pushing dev tag: $DEV_TAG"
           docker push $REPOSITORY/$IMAGE:$DEV_TAG
-          printf '[{"name":"app","imageUri":"%s"}]' \
-            $REPOSITORY/$IMAGE:$DEV_TAG > imagedefinitions.json
+          printf '[{"name":"app","imageUri":"%s"}]' $REPOSITORY/$IMAGE:$DEV_TAG > imagedefinitions.json
         fi
 
 artifacts:

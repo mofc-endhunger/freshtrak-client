@@ -84,14 +84,46 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		isLoadingUserData: false, // Parent component handles loading state
 	});
 
-	// Utility function to convert date from yyyy-mm-dd to mm/dd/yyyy
+	// Utility function to convert date to MM / DD / YYYY format
+	// Handles both yyyy-mm-dd and mm/dd/yyyy input formats
 	const convertDateFormat = (dateString: string): string => {
 		if (!dateString || dateString === "1900-01-01") {
 			return "";
 		}
 
 		try {
-			const [year, month, day] = dateString.split("-").map(Number);
+			let year: number, month: number, day: number;
+
+			// Check if date is in yyyy-mm-dd format
+			if (
+				dateString.includes("-") &&
+				dateString.split("-").length === 3
+			) {
+				[year, month, day] = dateString.split("-").map(Number);
+			}
+			// Check if date is already in mm/dd/yyyy or mm / dd / yyyy format
+			else if (dateString.includes("/")) {
+				const parts = dateString.split("/").map((part) => part.trim());
+				if (parts.length === 3) {
+					// Determine format: if first part is > 12, it's yyyy/mm/dd, else mm/dd/yyyy
+					if (parseInt(parts[0]) > 12) {
+						// yyyy/mm/dd format
+						year = parseInt(parts[0]);
+						month = parseInt(parts[1]);
+						day = parseInt(parts[2]);
+					} else {
+						// mm/dd/yyyy format
+						month = parseInt(parts[0]);
+						day = parseInt(parts[1]);
+						year = parseInt(parts[2]);
+					}
+				} else {
+					return "";
+				}
+			} else {
+				return "";
+			}
+
 			if (isNaN(year) || isNaN(month) || isNaN(day)) {
 				return "";
 			}
@@ -111,7 +143,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			const dayStr = String(day).padStart(2, "0");
 			const yearStr = String(year);
 
-			return `${monthStr}/${dayStr}/${yearStr}`;
+			// Return in MM / DD / YYYY format (with spaces around slashes)
+			return `${monthStr} / ${dayStr} / ${yearStr}`;
 		} catch (error) {
 			return "";
 		}

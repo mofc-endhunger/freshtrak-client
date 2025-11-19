@@ -183,7 +183,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	// Step navigation handlers
 	const continueHandler = (values: Partial<RegistrationFormData>): void => {
-		setState(prev => ({
+		setState((prev) => ({
 			...prev,
 			formValues: { ...prev.formValues, ...values },
 		}));
@@ -191,7 +191,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		// Handle different step flows based on mode
 		if (mode === "registration") {
 			// Registration mode: simple linear flow
-			setState(prev => ({ ...prev, formStep: prev.formStep + 1 }));
+			setState((prev) => ({ ...prev, formStep: prev.formStep + 1 }));
 		} else {
 			// Household setup mode: complex flow with conditional steps
 			if (state.formStep === HouseholdFormStep.MEMBER_COUNT) {
@@ -201,16 +201,16 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 				const hasAdditionalMembers =
 					seniorCount > 0 || adultCount > 0 || childCount > 0;
-				setState(prev => ({ ...prev, hasAdditionalMembers }));
+				setState((prev) => ({ ...prev, hasAdditionalMembers }));
 
 				if (hasAdditionalMembers) {
-					setState(prev => ({
+					setState((prev) => ({
 						...prev,
 						formStep: HouseholdFormStep.FAMILY_MEMBER_DETAILS,
 					}));
 					return;
 				} else {
-					setState(prev => ({
+					setState((prev) => ({
 						...prev,
 						formStep: HouseholdFormStep.CONTACT,
 					}));
@@ -222,7 +222,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			// (The navigation buttons will handle submission at this step)
 
 			// Default behavior for other steps
-			setState(prev => ({ ...prev, formStep: prev.formStep + 1 }));
+			setState((prev) => ({ ...prev, formStep: prev.formStep + 1 }));
 		}
 	};
 
@@ -230,7 +230,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		if (mode === "householdSetup") {
 			// Handle navigation from family member details step
 			if (state.formStep === HouseholdFormStep.FAMILY_MEMBER_DETAILS) {
-				setState(prev => ({
+				setState((prev) => ({
 					...prev,
 					formStep: HouseholdFormStep.MEMBER_COUNT,
 				}));
@@ -240,12 +240,12 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			// Handle navigation from contact information step
 			if (state.formStep === HouseholdFormStep.CONTACT) {
 				if (state.hasAdditionalMembers) {
-					setState(prev => ({
+					setState((prev) => ({
 						...prev,
 						formStep: HouseholdFormStep.FAMILY_MEMBER_DETAILS,
 					}));
 				} else {
-					setState(prev => ({
+					setState((prev) => ({
 						...prev,
 						formStep: HouseholdFormStep.MEMBER_COUNT,
 					}));
@@ -255,14 +255,14 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		}
 
 		// Default behavior for other steps
-		setState(prev => ({ ...prev, formStep: prev.formStep - 1 }));
+		setState((prev) => ({ ...prev, formStep: prev.formStep - 1 }));
 	};
 
 	const handleFamilyMembersComplete = (
 		members: HouseholdMember[],
 		counts: HouseholdCounts
 	): void => {
-		setState(prev => ({
+		setState((prev) => ({
 			...prev,
 			familyMembers: members,
 			householdCounts: counts,
@@ -271,7 +271,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	};
 
 	const handleFamilyMembersSkip = (counts: HouseholdCounts): void => {
-		setState(prev => ({
+		setState((prev) => ({
 			...prev,
 			householdCounts: counts,
 			formStep: HouseholdFormStep.CONTACT,
@@ -282,7 +282,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	const handleSlotChange = (
 		e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
 	): void => {
-		setState(prev => ({ ...prev, selectedSlotId: e.target.value }));
+		setState((prev) => ({ ...prev, selectedSlotId: e.target.value }));
 	};
 
 	// Validation handler for registration mode step 1
@@ -302,11 +302,11 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		const res: boolean = await trigger(field_array);
 		if (res) {
 			const values: RegistrationFormData = getValues();
-			setState(prev => ({
+			setState((prev) => ({
 				...prev,
 				formValues: { ...prev.formValues, ...values },
 			}));
-			setState(prev => ({ ...prev, formStep: prev.formStep + 1 }));
+			setState((prev) => ({ ...prev, formStep: prev.formStep + 1 }));
 		}
 	};
 
@@ -314,7 +314,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	const handleFormSubmit = async (
 		data: RegistrationFormData
 	): Promise<void> => {
-		setState(prev => ({ ...prev, isSubmitting: true }));
+		setState((prev) => ({ ...prev, isSubmitting: true }));
 		try {
 			// Get all current form values
 			const allFormValues = getValues();
@@ -338,7 +338,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 				// Add family members and counts
 				if (state.familyMembers.length > 0) {
-					data.family_members = state.familyMembers.map(member => ({
+					data.family_members = state.familyMembers.map((member) => ({
 						first_name: member.first_name,
 						last_name: member.last_name,
 						middle_name: member.middle_name,
@@ -363,7 +363,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		} catch (error) {
 			console.error("Form submission error:", error);
 		} finally {
-			setState(prev => ({ ...prev, isSubmitting: false }));
+			setState((prev) => ({ ...prev, isSubmitting: false }));
 		}
 	};
 
@@ -383,7 +383,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			"state",
 			"zip_code",
 		];
-		keys.forEach(key => {
+		keys.forEach((key) => {
 			if (data[key] !== undefined) {
 				(data as any)[key] = sanitizeString(data[key]);
 			}
@@ -430,8 +430,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	// Progress indicator component
 	const ProgressIndicator = (): JSX.Element => {
 		const steps = modeConfig.steps
-			.filter(step => step.isVisible)
-			.map(step => step.title);
+			.filter((step) => step.isVisible)
+			.map((step) => step.title);
 
 		// Add family member details step if there are additional members in household mode
 		if (
@@ -781,7 +781,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	// Loading state
 	if (state.isSubmitting) {
-		return <LoadingSpinner />;
+		return <LoadingSpinner size="large" className="m-auto h-screen" />;
 	}
 
 	// Determine if this is the final step

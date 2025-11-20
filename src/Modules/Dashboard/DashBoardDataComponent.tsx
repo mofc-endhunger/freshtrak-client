@@ -66,8 +66,8 @@ const DashBoardDataComponent: React.FC<DashBoardDataComponentProps> = () => {
 	};
 
 	return (
-		<div className="container mx-auto pt-24 pb-24">
-			<div className="min-h-[130px] bg-white rounded-lg shadow-md -mt-56 mb-12 mx-auto p-8 text-left sm:w-full sm:min-w-auto sm:p-6 sm:-mt-36 md:w-11/12 md:min-w-auto lg:min-w-[600px] lg:w-auto lg:max-w-[900px]">
+		<div className="container mx-auto pt-24 pb-24 px-4 sm:px-6 lg:px-8">
+			<div className="min-h-[130px] bg-white rounded-lg shadow-md -mt-40 sm:-mt-52 mb-12 mx-auto p-4 sm:p-6 md:p-8 text-left w-full sm:w-full sm:min-w-auto md:w-11/12 md:min-w-auto lg:min-w-[600px] lg:w-auto lg:max-w-[900px]">
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<SearchComponent
 						register={register}

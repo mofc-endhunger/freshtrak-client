@@ -209,7 +209,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 				/>
 			)}
 			{event && (
-				<div className="mt-4 max-w-6xl mx-auto px-4">
+				<div className="mt-20 max-w-6xl mx-auto px-4">
 					<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 register-confirmation">
 						<h1 className="big-title med-title mt-5 mb-5 mobile-mb">
 							You're Registered

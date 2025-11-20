@@ -474,7 +474,7 @@ const AccountPage: React.FC = () => {
 									householdData.members.length > 0 && (
 										<Card>
 											<CardHeader>
-												<div className="flex items-center justify-between">
+												<div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center justify-between">
 													<div>
 														<CardTitle className="flex items-center">
 															<Users className="mr-2 h-5 w-5" />

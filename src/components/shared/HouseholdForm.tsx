@@ -448,6 +448,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			type="button"
 			onClick={previousHandler}
 			variant="highlight"
+			className="w-full sm:w-auto sm:min-w-48"
 			data-testid="previous button"
 		>
 			Previous
@@ -455,7 +456,12 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	);
 
 	const CancelButton = (): JSX.Element => (
-		<Button type="button" variant="highlightOutline" onClick={onCancel}>
+		<Button
+			type="button"
+			variant="highlightOutline"
+			onClick={onCancel}
+			className="w-full sm:w-auto sm:min-w-48"
+		>
 			{cancelButtonText || modeConfig.cancelButtonText}
 		</Button>
 	);
@@ -475,40 +481,112 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			steps.splice(3, 0, "Family Member Details");
 		}
 
+		const currentStepIndex = state.formStep;
+		const totalSteps = steps.length;
+		const progressPercentage = ((currentStepIndex + 1) / totalSteps) * 100;
+
+		// Helper function to get abbreviated step title for mobile
+		const getAbbreviatedTitle = (title: string): string => {
+			const abbreviations: Record<string, string> = {
+				"Your Details": "Details",
+				"Your Address Details": "Address",
+				"Your Family Details": "Family",
+				"Contact Information": "Contact",
+				"Family Member Details": "Members",
+			};
+			return abbreviations[title] || title;
+		};
+
 		return (
 			<div className="mb-8">
-				<div className="flex justify-center items-center space-x-2 py-4">
-					{steps.map((step, index) => (
-						<div key={index} className="flex items-center">
+				{/* Step X of Y indicator */}
+				<div className="text-center mb-4">
+					<span className="text-sm font-medium text-gray-600">
+						Step {currentStepIndex + 1} of {totalSteps}
+					</span>
+				</div>
+
+				{/* Progress bar */}
+				<div className="mb-6">
+					<div className="w-full bg-gray-200 rounded-full h-2">
+						<div
+							className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+							style={{ width: `${progressPercentage}%` }}
+							role="progressbar"
+							aria-valuenow={currentStepIndex + 1}
+							aria-valuemin={1}
+							aria-valuemax={totalSteps}
+							aria-label={`Step ${
+								currentStepIndex + 1
+							} of ${totalSteps}`}
+						/>
+					</div>
+				</div>
+
+				{/* Step indicators - Vertical on mobile, horizontal on desktop */}
+				<div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-2 py-4">
+					{steps.map((step, index) => {
+						const isActive = index === currentStepIndex;
+						const isCompleted = index < currentStepIndex;
+
+						return (
 							<div
-								className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-									index <= state.formStep
-										? "bg-blue-600 text-white"
-										: "bg-gray-200 text-gray-500"
-								}`}
+								key={index}
+								className="flex items-center w-full sm:w-auto"
 							>
-								{index + 1}
+								{/* Step circle and label - Mobile: full width, Desktop: inline */}
+								<div className="flex items-center flex-1 sm:flex-initial">
+									<div
+										className={`min-w-[44px] min-h-[44px] sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-medium transition-all duration-200 ${
+											isActive
+												? "bg-blue-600 text-white ring-4 ring-blue-200 scale-110"
+												: isCompleted
+												? "bg-blue-600 text-white"
+												: "bg-gray-200 text-gray-500"
+										}`}
+										role="status"
+										aria-current={
+											isActive ? "step" : undefined
+										}
+										aria-label={`Step ${
+											index + 1
+										}: ${step}`}
+									>
+										{index + 1}
+									</div>
+									<span
+										className={`ml-3 sm:ml-2 text-sm sm:text-sm font-medium flex-1 sm:flex-initial ${
+											isActive
+												? "text-blue-600 font-semibold"
+												: isCompleted
+												? "text-blue-600"
+												: "text-gray-400"
+										}`}
+									>
+										{/* Show abbreviated on mobile, full on desktop */}
+										<span className="sm:hidden">
+											{getAbbreviatedTitle(step)}
+										</span>
+										<span className="hidden sm:inline">
+											{step}
+										</span>
+									</span>
+								</div>
+
+								{/* Connector line - Hidden on mobile, shown on desktop */}
+								{index < steps.length - 1 && (
+									<div
+										className={`hidden sm:block w-8 h-0.5 mx-2 transition-colors duration-200 ${
+											isCompleted
+												? "bg-blue-600"
+												: "bg-gray-200"
+										}`}
+										aria-hidden="true"
+									/>
+								)}
 							</div>
-							<span
-								className={`ml-2 text-sm font-medium ${
-									index <= state.formStep
-										? "text-blue-600"
-										: "text-gray-400"
-								}`}
-							>
-								{step}
-							</span>
-							{index < steps.length - 1 && (
-								<div
-									className={`w-8 h-0.5 mx-2 ${
-										index < state.formStep
-											? "bg-blue-600"
-											: "bg-gray-200"
-									}`}
-								/>
-							)}
-						</div>
-					))}
+						);
+					})}
 				</div>
 			</div>
 		);
@@ -548,13 +626,13 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 								watch={watchField}
 								setValue={setValue}
 							/>
-							<div className="flex mt-8">
+							<div className="flex flex-col sm:flex-row gap-4 sm:gap-0 mt-8">
 								<PreviousButton />
 								<Button
 									type="button"
 									onClick={validateStep1}
 									variant="highlight"
-									className="ml-5"
+									className="w-full sm:w-auto sm:ml-5 sm:min-w-48"
 									data-testid="continue button"
 								>
 									Continue
@@ -860,21 +938,21 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 					)}
 
 					{/* Form */}
-					<div className="bg-white rounded-lg shadow-md p-6">
+					<div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
 						<form onSubmit={handleSubmit(handleFormSubmit)}>
 							{renderFormStep()}
 
 							{/* Navigation buttons - show in household setup mode OR registration mode final step */}
 							{(mode === "householdSetup" || isFinalStep) && (
-								<div className="flex justify-between mt-8">
-									<div>
+								<div className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-0 mt-8">
+									<div className="w-full sm:w-auto">
 										{state.formStep > 0 &&
 											state.formStep !==
 												HouseholdFormStep.FAMILY_MEMBER_DETAILS && (
 												<PreviousButton />
 											)}
 									</div>
-									<div className="flex space-x-4">
+									<div className="flex flex-col sm:flex-row gap-4 sm:space-x-4 w-full sm:w-auto">
 										{mode === "householdSetup" && (
 											<CancelButton />
 										)}
@@ -891,6 +969,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 														);
 													}}
 													variant="highlight"
+													className="w-full sm:w-auto sm:min-w-48"
 													data-testid="continue-button"
 												>
 													Continue
@@ -904,6 +983,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 													state.isSubmitting
 												}
 												variant="highlight"
+												className="w-full sm:w-auto sm:min-w-48"
 												data-testid="submit-button"
 											>
 												{state.isSubmitting

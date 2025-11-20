@@ -50,18 +50,18 @@ const HeaderDataComponent: React.FC<HeaderDataComponentProps> = () => {
 	return (
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
 			<div className="flex flex-col items-center justify-center h-full">
-				<div className="w-full sm:w-[95%] md:w-[80%] lg:w-[85%] xl:w-[80%] max-w-4xl">
+				<div className="w-full sm:w-[95%] md:w-[80%] lg:w-[85%] xl:w-[80%] max-w-4xl px-2 sm:px-0">
 					{isSearchResultsPage ? (
-						<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight">
+						<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight break-words mb-10">
 							{localization.resource_zip_code} {zip}
 						</h1>
 					) : isLoginPage ? (
 						<>
-							<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight">
+							<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight break-words">
 								Welcome
 							</h1>
 							<p
-								className="text-center text-white font-varela text-[0.9rem] sm:text-[1.2rem] mt-4"
+								className="text-center text-white font-varela text-[0.9rem] sm:text-[1.2rem] mt-4 break-words px-2"
 								data-testid="subtext-on-header"
 							>
 								Create a username and password to create
@@ -70,11 +70,11 @@ const HeaderDataComponent: React.FC<HeaderDataComponentProps> = () => {
 						</>
 					) : (
 						<>
-							<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight">
+							<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight break-words">
 								{localization.home_freshtrack}
 							</h1>
 							<p
-								className="text-center text-secondary font-varela text-[0.9rem] sm:text-[1.2rem] mt-4"
+								className="text-center text-secondary font-varela text-[0.9rem] sm:text-[1.2rem] mt-4 break-words px-2 sm:px-0"
 								data-testid="subtext-on-header"
 							>
 								{localization.home_header_component}

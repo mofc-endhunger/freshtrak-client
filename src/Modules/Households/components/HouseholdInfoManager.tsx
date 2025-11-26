@@ -47,14 +47,15 @@ import {
 import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 import { Household, LanguagePreference } from "../types/household.types";
 import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegration";
+import localization from "../../Localization/LocalizationComponent";
 
-// Form validation schema
-const householdInfoSchema = z.object({
-	address_line_1: z.string().min(1, "Address is required"),
+// Form validation schema - using function to access localization
+const getHouseholdInfoSchema = () => z.object({
+	address_line_1: z.string().min(1, localization.error_street_address_required),
 	address_line_2: z.string().optional(),
-	city: z.string().min(1, "City is required"),
-	state: z.string().min(1, "State is required"),
-	zip_code: z.string().min(5, "ZIP code must be at least 5 characters"),
+	city: z.string().min(1, localization.error_city_required),
+	state: z.string().min(1, localization.error_state_required),
+	zip_code: z.string().min(5, localization.error_zip_code_min_length),
 	preferred_language: z
 		.string()
 		.refine(
@@ -71,7 +72,7 @@ const householdInfoSchema = z.object({
 					"ko",
 					"ar",
 				].includes(val),
-			{ message: "Please select a valid language" }
+			{ message: localization.error_please_select_valid_language }
 		),
 	notes: z.string().optional(),
 });
@@ -109,7 +110,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 		watch,
 		setValue,
 	} = useForm<HouseholdInfoFormData>({
-		resolver: zodResolver(householdInfoSchema),
+		resolver: zodResolver(getHouseholdInfoSchema()),
 		defaultValues: {
 			address_line_1: household.address_line_1,
 			address_line_2: household.address_line_2 || "",
@@ -130,16 +131,16 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 
 	// Language options
 	const languageOptions = [
-		{ value: "en", label: "English" },
-		{ value: "es", label: "Español" },
-		{ value: "fr", label: "Français" },
-		{ value: "de", label: "Deutsch" },
-		{ value: "it", label: "Italiano" },
-		{ value: "pt", label: "Português" },
-		{ value: "zh", label: "中文" },
-		{ value: "ja", label: "日本語" },
-		{ value: "ko", label: "한국어" },
-		{ value: "ar", label: "العربية" },
+		{ value: "en", label: localization.option_language_english },
+		{ value: "es", label: localization.option_language_spanish },
+		{ value: "fr", label: localization.option_language_french },
+		{ value: "de", label: localization.option_language_german },
+		{ value: "it", label: localization.option_language_italian },
+		{ value: "pt", label: localization.option_language_portuguese },
+		{ value: "zh", label: localization.option_language_chinese },
+		{ value: "ja", label: localization.option_language_japanese },
+		{ value: "ko", label: localization.option_language_korean },
+		{ value: "ar", label: localization.option_language_arabic },
 	];
 
 	const handleEdit = () => {
@@ -173,7 +174,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 		try {
 			const householdId = getHouseholdId();
 			if (!householdId) {
-				throw new Error("Household ID not found");
+				throw new Error(localization.error_household_id_not_found);
 			}
 
 			// Get current household data from /users/me to ensure we have complete object
@@ -219,7 +220,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 			setError(
 				err instanceof Error
 					? err.message
-					: "Failed to update household information"
+					: localization.error_failed_to_update_household
 			);
 			// Rollback optimistic update
 			reset();
@@ -235,16 +236,16 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				<CardHeader>
 					<CardTitle className="flex items-center space-x-2">
 						<MapPin className="w-5 h-5 text-highlight" />
-						<span>Address Information</span>
+						<span>{localization.header_address_information}</span>
 					</CardTitle>
 					<CardDescription>
-						Primary household address for deliveries and services
+						{localization.subtitle_primary_address}
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					<div>
 						<Label className="text-sm font-medium text-gray-600">
-							Address
+							{localization.label_address}
 						</Label>
 						<p className="text-gray-900">
 							{household.address_line_1}
@@ -259,19 +260,19 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 						<div>
 							<Label className="text-sm font-medium text-gray-600">
-								City
+								{localization.label_city}
 							</Label>
 							<p className="text-gray-900">{household.city}</p>
 						</div>
 						<div>
 							<Label className="text-sm font-medium text-gray-600">
-								State
+								{localization.label_state}
 							</Label>
 							<p className="text-gray-900">{household.state}</p>
 						</div>
 						<div>
 							<Label className="text-sm font-medium text-gray-600">
-								ZIP Code
+								{localization.label_zip_code}
 							</Label>
 							<p className="text-gray-900">
 								{household.zip_code}
@@ -286,16 +287,16 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				<CardHeader>
 					<CardTitle className="flex items-center space-x-2">
 						<Globe className="w-5 h-5 text-highlight" />
-						<span>Language Preference</span>
+						<span>{localization.header_language_preference}</span>
 					</CardTitle>
 					<CardDescription>
-						Preferred language for communications and services
+						{localization.subtitle_preferred_language_comm}
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div>
 						<Label className="text-sm font-medium text-gray-600">
-							Preferred Language
+							{localization.label_preferred_language}
 						</Label>
 						<p className="text-gray-900">
 							{languageOptions.find(
@@ -313,10 +314,10 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					<CardHeader>
 						<CardTitle className="flex items-center space-x-2">
 							<FileText className="w-5 h-5 text-highlight" />
-							<span>Household Notes</span>
+							<span>{localization.header_household_notes}</span>
 						</CardTitle>
 						<CardDescription>
-							Additional information about the household
+							{localization.subtitle_additional_info}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -335,7 +336,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					className="flex items-center space-x-2"
 				>
 					<Edit3 className="w-4 h-4" />
-					<span>Edit Information</span>
+					<span>{localization.button_edit_information}</span>
 				</Button>
 			</div>
 		</div>
@@ -348,15 +349,15 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				<CardHeader>
 					<CardTitle className="flex items-center space-x-2">
 						<MapPin className="w-5 h-5 text-highlight" />
-						<span>Address Information</span>
+						<span>{localization.header_address_information}</span>
 					</CardTitle>
 					<CardDescription>
-						Update the primary household address
+						{localization.subtitle_update_address}
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div>
-						<Label htmlFor="address_line_1">Address Line 1 *</Label>
+						<Label htmlFor="address_line_1">{localization.label_address_line_1}</Label>
 						<Input
 							id="address_line_1"
 							{...register("address_line_1")}
@@ -372,17 +373,17 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					</div>
 
 					<div>
-						<Label htmlFor="address_line_2">Address Line 2</Label>
+						<Label htmlFor="address_line_2">{localization.label_address_line_2}</Label>
 						<Input
 							id="address_line_2"
 							{...register("address_line_2")}
-							placeholder="Apartment, suite, unit, etc."
+							placeholder={localization.placeholder_apartment_suite_unit}
 						/>
 					</div>
 
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 						<div>
-							<Label htmlFor="city">City *</Label>
+							<Label htmlFor="city">{localization.label_city_required}</Label>
 							<Input
 								id="city"
 								{...register("city")}
@@ -395,7 +396,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 							)}
 						</div>
 						<div>
-							<Label htmlFor="state">State *</Label>
+							<Label htmlFor="state">{localization.label_state_required}</Label>
 							<Input
 								id="state"
 								{...register("state")}
@@ -408,7 +409,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 							)}
 						</div>
 						<div>
-							<Label htmlFor="zip_code">ZIP Code *</Label>
+							<Label htmlFor="zip_code">{localization.label_zip_code_required}</Label>
 							<Input
 								id="zip_code"
 								{...register("zip_code")}
@@ -431,16 +432,16 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				<CardHeader>
 					<CardTitle className="flex items-center space-x-2">
 						<Globe className="w-5 h-5 text-highlight" />
-						<span>Language Preference</span>
+						<span>{localization.header_language_preference}</span>
 					</CardTitle>
 					<CardDescription>
-						Select the preferred language for communications
+						{localization.subtitle_select_language_comm}
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div>
 						<Label htmlFor="preferred_language">
-							Preferred Language *
+							{localization.label_preferred_language_required}
 						</Label>
 						<Select
 							value={watchedValues.preferred_language}
@@ -458,7 +459,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 										: ""
 								}
 							>
-								<SelectValue placeholder="Select a language" />
+								<SelectValue placeholder={localization.placeholder_select_a_language} />
 							</SelectTrigger>
 							<SelectContent>
 								{languageOptions.map(option => (
@@ -485,19 +486,19 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				<CardHeader>
 					<CardTitle className="flex items-center space-x-2">
 						<FileText className="w-5 h-5 text-highlight" />
-						<span>Household Notes</span>
+						<span>{localization.header_household_notes}</span>
 					</CardTitle>
 					<CardDescription>
-						Add any additional information about the household
+						{localization.subtitle_add_additional_info}
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<div>
-						<Label htmlFor="notes">Notes</Label>
+						<Label htmlFor="notes">{localization.label_notes}</Label>
 						<Textarea
 							id="notes"
 							{...register("notes")}
-							placeholder="Enter any additional household information..."
+							placeholder={localization.placeholder_household_notes}
 							rows={4}
 						/>
 					</div>
@@ -510,7 +511,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					<CardContent className="pt-6">
 						<div className="flex items-center space-x-2 text-red-600">
 							<AlertCircle className="w-5 h-5" />
-							<span className="font-medium">Error</span>
+							<span className="font-medium">{localization.text_error}</span>
 						</div>
 						<p className="text-red-600 mt-2">{error}</p>
 					</CardContent>
@@ -525,7 +526,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					variant="outline"
 					disabled={isLoading}
 				>
-					Cancel
+					{localization.button_cancel}
 				</Button>
 				<Button
 					type="submit"
@@ -535,12 +536,12 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					{isLoading ? (
 						<>
 							<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-							Saving...
+							{localization.button_saving}
 						</>
 					) : (
 						<>
 							<Save className="w-4 h-4 mr-2" />
-							Save Changes
+							{localization.button_save_changes}
 						</>
 					)}
 				</Button>
@@ -555,11 +556,10 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				<div>
 					<h2 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
 						<Home className="w-6 h-6 text-highlight" />
-						<span>Household Information</span>
+						<span>{localization.title_household_information}</span>
 					</h2>
 					<p className="text-gray-600 mt-1">
-						Manage your household address, language preferences, and
-						notes
+						{localization.subtitle_manage_household}
 					</p>
 				</div>
 			</div>
@@ -574,23 +574,22 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Discard Changes?</AlertDialogTitle>
+						<AlertDialogTitle>{localization.dialog_discard_changes_title}</AlertDialogTitle>
 						<AlertDialogDescription>
-							You have unsaved changes. Are you sure you want to
-							discard them? This action cannot be undone.
+							{localization.dialog_discard_changes_description}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel
 							onClick={() => setShowConfirmDialog(false)}
 						>
-							Keep Editing
+							{localization.dialog_keep_editing}
 						</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={handleConfirmCancel}
 							className="bg-red-600 hover:bg-red-700"
 						>
-							Discard Changes
+							{localization.dialog_discard_changes}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

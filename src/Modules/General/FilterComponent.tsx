@@ -61,11 +61,11 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 						<div className="flex justify-between items-center">
 							<div className="flex items-center">
 								<span className=" flex flex-row items-center text-[#495057] font-bold text-sm uppercase">
-									<img
-										alt="filter"
-										className="mr-1 w-4 h-4"
-										src={funnelIcon}
-									/>
+								<img
+									alt={localization.alt_filter || "filter"}
+									className="mr-1 w-4 h-4"
+									src={funnelIcon}
+								/>
 									{localization.refine_your_results}
 								</span>
 							</div>
@@ -76,7 +76,7 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 								className="p-1 h-auto bg-[#392947] hover:bg-[#392947]/90"
 							>
 								<img
-									alt="close filter"
+									alt={localization.alt_close_filter || "close filter"}
 									src={closeIcon}
 									className="w-4 h-4"
 								/>
@@ -97,13 +97,13 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 												});
 											}}
 										>
-											<SelectTrigger className="w-full">
-												<SelectValue placeholder="Select distance" />
-											</SelectTrigger>
-											<SelectContent className="bg-white">
-												<SelectItem value="All distances">
-													All distances
-												</SelectItem>
+										<SelectTrigger className="w-full">
+											<SelectValue placeholder={localization.placeholder_select_distance} />
+										</SelectTrigger>
+										<SelectContent className="bg-white">
+											<SelectItem value="All distances">
+												{localization.option_all_distances || "All distances"}
+											</SelectItem>
 												<SelectItem value="3">
 													3 mi
 												</SelectItem>
@@ -141,11 +141,11 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 											}}
 										>
 											<SelectTrigger className="w-full">
-												<SelectValue placeholder="All" />
+												<SelectValue placeholder={localization.option_sort_all} />
 											</SelectTrigger>
 											<SelectContent className="bg-white">
 												<SelectItem value="All">
-													All
+													{localization.option_sort_all}
 												</SelectItem>
 												{serviceCat.data.map(item => (
 													<SelectItem
@@ -182,29 +182,29 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 											}}
 										>
 											<SelectTrigger className="w-full">
-												<SelectValue placeholder="All" />
+												<SelectValue placeholder={localization.option_sort_all} />
 											</SelectTrigger>
 											<SelectContent className="bg-white">
 												<SelectItem value="All">
-													All
+													{localization.option_sort_all}
 												</SelectItem>
 												<SelectItem value="today">
-													Today
+													{localization.option_availability_today || "Today"}
 												</SelectItem>
 												<SelectItem value="tomorrow">
-													Tomorrow
+													{localization.option_availability_tomorrow || "Tomorrow"}
 												</SelectItem>
 												<SelectItem value="this_week">
-													This Week
+													{localization.option_availability_this_week || "This Week"}
 												</SelectItem>
 												<SelectItem value="next_2_weeks">
-													Next 2 Weeks
+													{localization.option_availability_next_2_weeks || "Next 2 Weeks"}
 												</SelectItem>
 												<SelectItem value="this_month">
-													This Month
+													{localization.option_availability_this_month || "This Month"}
 												</SelectItem>
 												<SelectItem value="next_month">
-													Next Month
+													{localization.option_availability_next_month || "Next Month"}
 												</SelectItem>
 											</SelectContent>
 										</Select>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import localization from "../Modules/Localization/LocalizationComponent";
 
 const UseForm = (props, validations, callback, errorToComponent = false) => {
     const [errors, setErrors] = useState({});
@@ -12,11 +13,11 @@ const UseForm = (props, validations, callback, errorToComponent = false) => {
         }
         switch (validator) {
             case "required":
-                return valueLength > 0 ? "" : "This field is required";
+                return valueLength > 0 ? "" : localization.error_field_required;
             case "min":
                 return valueLength >= limit
                     ? ""
-                    : `This value needs to be at least ${limit} characters`;
+                    : localization.error_zip_code_min_length?.replace('ZIP code', 'This value').replace('5', limit.toString()) || `This value needs to be at least ${limit} characters`;
             case "max":
                 return valueLength <= limit
                     ? ""
@@ -26,7 +27,7 @@ const UseForm = (props, validations, callback, errorToComponent = false) => {
                 let errors_address = validAddress.test(value);
                 return errors_address
                     ? ""
-                    : `Enter a valid address`;
+                    : localization.error_street_address_required || "Enter a valid address";
             default:
                 return "";
         }

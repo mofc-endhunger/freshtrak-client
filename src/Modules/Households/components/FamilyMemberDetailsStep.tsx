@@ -24,6 +24,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "../../../components/ui/card";
+import localization from "../../Localization/LocalizationComponent";
 
 interface FamilyMemberDetailsStepProps {
 	members: HouseholdMember[];
@@ -212,11 +213,11 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							{/* First Name */}
 							<div className="space-y-2">
-								<Label htmlFor="first_name">First Name *</Label>
+								<Label htmlFor="first_name">{localization.label_first_name_required}</Label>
 								<Input
 									id="first_name"
 									type="text"
-									placeholder="Enter first name"
+									placeholder={localization.placeholder_enter_first_name}
 									{...register("first_name", {
 										required: "First name is required",
 									})}
@@ -230,11 +231,11 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 
 							{/* Last Name */}
 							<div className="space-y-2">
-								<Label htmlFor="last_name">Last Name *</Label>
+								<Label htmlFor="last_name">{localization.label_last_name_required}</Label>
 								<Input
 									id="last_name"
 									type="text"
-									placeholder="Enter last name"
+									placeholder={localization.placeholder_enter_last_name}
 									{...register("last_name", {
 										required: "Last name is required",
 									})}
@@ -248,18 +249,18 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 
 							{/* Middle Name */}
 							<div className="space-y-2">
-								<Label htmlFor="middle_name">Middle Name</Label>
+								<Label htmlFor="middle_name">{localization.label_middle_name}</Label>
 								<Input
 									id="middle_name"
 									type="text"
-									placeholder="Enter middle name (optional)"
+									placeholder={localization.placeholder_enter_middle_name_optional}
 									{...register("middle_name")}
 								/>
 							</div>
 
 							{/* Gender */}
 							<div className="space-y-2">
-								<Label htmlFor="gender_id">Gender *</Label>
+								<Label htmlFor="gender_id">{localization.label_gender} *</Label>
 								<Select
 									value={
 										watch("gender_id")?.toString() || "1"
@@ -269,16 +270,16 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 									}
 								>
 									<SelectTrigger>
-										<SelectValue placeholder="Select gender" />
+										<SelectValue placeholder={localization.placeholder_select_gender} />
 									</SelectTrigger>
 									<SelectContent className="bg-white">
-										<SelectItem value="1">Male</SelectItem>
+										<SelectItem value="1">{localization.option_gender_male}</SelectItem>
 										<SelectItem value="2">
-											Female
+											{localization.option_gender_female}
 										</SelectItem>
-										<SelectItem value="3">Other</SelectItem>
+										<SelectItem value="3">{localization.option_gender_other}</SelectItem>
 										<SelectItem value="4">
-											Prefer not to say
+											{localization.option_gender_prefer_not_to_say}
 										</SelectItem>
 									</SelectContent>
 								</Select>
@@ -325,7 +326,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 									}
 								>
 									<SelectTrigger>
-										<SelectValue placeholder="Select suffix" />
+										<SelectValue placeholder={localization.placeholder_select_suffix} />
 									</SelectTrigger>
 									<SelectContent className="bg-white">
 										<SelectItem value="none">

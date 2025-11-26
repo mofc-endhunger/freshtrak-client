@@ -10,6 +10,7 @@ import {
 	DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
 import { Settings, LogOut, Home } from "lucide-react";
+import localization from "../../Localization/LocalizationComponent";
 
 /**
  * UserAccountButton - Displays user initials in a rounded button with dropdown menu
@@ -95,7 +96,7 @@ const UserAccountButton: React.FC = () => {
 				<button
 					type="button"
 					className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 flex items-center justify-center"
-					aria-label="User account menu"
+					aria-label={localization.aria_user_account_menu}
 				>
 					{getUserInitials()}
 				</button>

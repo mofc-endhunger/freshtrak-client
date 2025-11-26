@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { CreateHouseholdApiRequest } from "../types/api.types";
 import { useAuth } from "../../Authentication/AuthContext";
+import localization from "../../Localization/LocalizationComponent";
 
 interface HouseholdSetupWizardProps {
 	onComplete: (householdData: CreateHouseholdApiRequest) => void;
@@ -50,39 +51,39 @@ interface WizardStep {
 	completed: boolean;
 }
 
-const WIZARD_STEPS: WizardStep[] = [
+const getWizardSteps = (): WizardStep[] => [
 	{
 		id: "address",
-		title: "Where do you live?",
-		description: "Enter your household address",
+		title: localization.wizard_step_address_title,
+		description: localization.wizard_step_address_description,
 		icon: <MapPin className="w-5 h-5" />,
 		completed: false,
 	},
 	{
 		id: "household_size",
-		title: "How many people live in this household?",
-		description: "Not including yourself",
+		title: localization.wizard_step_household_size_title,
+		description: localization.wizard_step_household_size_description,
 		icon: <Users className="w-5 h-5" />,
 		completed: false,
 	},
 	{
 		id: "personal_info",
-		title: "Tell us about you",
-		description: "First and last name, middle name, suffix",
+		title: localization.wizard_step_personal_info_title,
+		description: localization.wizard_step_personal_info_description,
 		icon: <User className="w-5 h-5" />,
 		completed: false,
 	},
 	{
 		id: "demographics",
-		title: "Demographics",
-		description: "Date of birth, race, and other information",
+		title: localization.wizard_step_demographics_title,
+		description: localization.wizard_step_demographics_description,
 		icon: <Globe className="w-5 h-5" />,
 		completed: false,
 	},
 	{
 		id: "contact",
-		title: "Contact Information",
-		description: "Your contact information",
+		title: localization.wizard_step_contact_title,
+		description: localization.wizard_step_contact_description,
 		icon: <CheckCircle className="w-5 h-5" />,
 		completed: false,
 	},
@@ -134,7 +135,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 
 	// Compute step completion status on each render instead of storing in state
 	const steps = useMemo(() => {
-		return WIZARD_STEPS.map(step => {
+		return getWizardSteps().map(step => {
 			let completed = false;
 
 			switch (step.id) {
@@ -219,14 +220,14 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 					<div className="space-y-4">
 						<div>
 							<Label htmlFor="address_line_1">
-								Street Address *
+								{localization.label_street_address_required}
 							</Label>
 							<Input
 								id="address_line_1"
 								{...register("address_line_1", {
-									required: "Street address is required",
+									required: localization.error_street_address_required,
 								})}
-								placeholder="123 Main Street"
+								placeholder={localization.placeholder_street_address_example}
 							/>
 							{errors.address_line_1 && (
 								<p className="text-sm text-red-600 mt-1">
@@ -237,24 +238,24 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 
 						<div>
 							<Label htmlFor="address_line_2">
-								Apartment, Suite, etc. (Optional)
+								{localization.label_apartment_suite_optional}
 							</Label>
 							<Input
 								id="address_line_2"
 								{...register("address_line_2")}
-								placeholder="Apt 4B"
+								placeholder={localization.placeholder_apartment_example}
 							/>
 						</div>
 
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<Label htmlFor="city">City *</Label>
+								<Label htmlFor="city">{localization.label_city_required}</Label>
 								<Input
 									id="city"
 									{...register("city", {
-										required: "City is required",
+										required: localization.error_city_required,
 									})}
-									placeholder="New York"
+									placeholder={localization.placeholder_city_example}
 								/>
 								{errors.city && (
 									<p className="text-sm text-red-600 mt-1">
@@ -264,13 +265,13 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 							</div>
 
 							<div>
-								<Label htmlFor="state">State *</Label>
+								<Label htmlFor="state">{localization.label_state_required}</Label>
 								<Input
 									id="state"
 									{...register("state", {
-										required: "State is required",
+										required: localization.error_state_required,
 									})}
-									placeholder="NY"
+									placeholder={localization.placeholder_state_code}
 								/>
 								{errors.state && (
 									<p className="text-sm text-red-600 mt-1">
@@ -281,13 +282,13 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 						</div>
 
 						<div>
-							<Label htmlFor="zip_code">ZIP Code *</Label>
+							<Label htmlFor="zip_code">{localization.label_zip_code_required}</Label>
 							<Input
 								id="zip_code"
 								{...register("zip_code", {
-									required: "ZIP code is required",
+									required: localization.error_zip_code_required,
 								})}
-								placeholder="10001"
+								placeholder={localization.placeholder_enter_zip_code}
 							/>
 							{errors.zip_code && (
 								<p className="text-sm text-red-600 mt-1">
@@ -303,8 +304,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 					<div className="space-y-6">
 						<div className="text-center">
 							<p className="text-gray-600 mb-6">
-								How many people live in this household? (Not
-								including yourself)
+								{localization.description_household_size_question}
 							</p>
 						</div>
 
@@ -314,7 +314,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									htmlFor="adult_count"
 									className="text-lg font-medium"
 								>
-									Adults (18-64)
+									{localization.label_adults_18_64}
 								</Label>
 								<Input
 									id="adult_count"
@@ -322,10 +322,10 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									min="0"
 									max="20"
 									{...register("adult_count", {
-										required: "Adult count is required",
+										required: localization.error_adult_count_required,
 										min: {
 											value: 0,
-											message: "Must be 0 or more",
+											message: localization.error_must_be_zero_or_more,
 										},
 									})}
 									className="text-center text-2xl font-bold mt-2"
@@ -342,7 +342,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									htmlFor="child_count"
 									className="text-lg font-medium"
 								>
-									Children (0-17)
+									{localization.label_children_0_17}
 								</Label>
 								<Input
 									id="child_count"
@@ -350,10 +350,10 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									min="0"
 									max="20"
 									{...register("child_count", {
-										required: "Child count is required",
+										required: localization.error_child_count_required,
 										min: {
 											value: 0,
-											message: "Must be 0 or more",
+											message: localization.error_must_be_zero_or_more,
 										},
 									})}
 									className="text-center text-2xl font-bold mt-2"
@@ -370,7 +370,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									htmlFor="senior_count"
 									className="text-lg font-medium"
 								>
-									Seniors (65+)
+									{localization.label_seniors_65}
 								</Label>
 								<Input
 									id="senior_count"
@@ -378,10 +378,10 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									min="0"
 									max="20"
 									{...register("senior_count", {
-										required: "Senior count is required",
+										required: localization.error_senior_count_required,
 										min: {
 											value: 0,
-											message: "Must be 0 or more",
+											message: localization.error_must_be_zero_or_more,
 										},
 									})}
 									className="text-center text-2xl font-bold mt-2"
@@ -396,12 +396,12 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 
 						<div className="text-center mt-6 p-4 bg-blue-50 rounded-lg">
 							<p className="text-sm text-blue-800">
-								<strong>Total Household Size:</strong>{" "}
+								<strong>{localization.label_total_household_size}</strong>{" "}
 								{(Number(watchedValues.adult_count) || 0) +
 									(Number(watchedValues.child_count) || 0) +
 									(Number(watchedValues.senior_count) || 0) +
 									1}{" "}
-								people (including yourself)
+								{localization.label_people_including_yourself}
 							</p>
 						</div>
 					</div>
@@ -412,21 +412,21 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 					<div className="space-y-4">
 						<div className="text-center mb-6">
 							<p className="text-gray-600">
-								Tell us about yourself
+								{localization.header_tell_us_about_yourself}
 							</p>
 						</div>
 
 						<div className="grid grid-cols-2 gap-4">
 							<div>
 								<Label htmlFor="primary_first_name">
-									First Name *
+									{localization.label_first_name_required}
 								</Label>
 								<Input
 									id="primary_first_name"
 									{...register("primary_first_name", {
-										required: "First name is required",
+										required: localization.error_first_name_required,
 									})}
-									placeholder="John"
+									placeholder={localization.placeholder_first_name_example}
 								/>
 								{errors.primary_first_name && (
 									<p className="text-sm text-red-600 mt-1">
@@ -437,14 +437,14 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 
 							<div>
 								<Label htmlFor="primary_last_name">
-									Last Name *
+									{localization.label_last_name_required}
 								</Label>
 								<Input
 									id="primary_last_name"
 									{...register("primary_last_name", {
-										required: "Last name is required",
+										required: localization.error_last_name_required,
 									})}
-									placeholder="Doe"
+									placeholder={localization.placeholder_last_name_example}
 								/>
 								{errors.primary_last_name && (
 									<p className="text-sm text-red-600 mt-1">
@@ -456,13 +456,13 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 
 						<div>
 							<Label htmlFor="primary_date_of_birth">
-								Date of Birth *
+								{localization.label_date_of_birth_required}
 							</Label>
 							<Input
 								id="primary_date_of_birth"
 								type="date"
 								{...register("primary_date_of_birth", {
-									required: "Date of birth is required",
+									required: localization.error_date_of_birth_required,
 								})}
 							/>
 							{errors.primary_date_of_birth && (
@@ -479,13 +479,13 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 					<div className="space-y-4">
 						<div className="text-center mb-6">
 							<p className="text-gray-600">
-								Additional demographic information
+								{localization.header_additional_demographic_info}
 							</p>
 						</div>
 
 						<div className="grid grid-cols-2 gap-4">
 							<div>
-								<Label htmlFor="primary_gender">Gender</Label>
+								<Label htmlFor="primary_gender">{localization.label_gender}</Label>
 								<Select
 									value={watchedValues.primary_gender}
 									onValueChange={value =>
@@ -493,39 +493,39 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									}
 								>
 									<SelectTrigger>
-										<SelectValue placeholder="Select gender" />
+										<SelectValue placeholder={localization.placeholder_select_gender} />
 									</SelectTrigger>
 									<SelectContent className="bg-white border border-gray-300">
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="male"
 										>
-											Male
+											{localization.option_gender_male}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="female"
 										>
-											Female
+											{localization.option_gender_female}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="other"
 										>
-											Other
+											{localization.option_gender_other}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="prefer_not_to_say"
 										>
-											Prefer not to say
+											{localization.option_gender_prefer_not_to_say}
 										</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
 
 							<div>
-								<Label htmlFor="primary_race">Race</Label>
+								<Label htmlFor="primary_race">{localization.label_race}</Label>
 								<Select
 									value={watchedValues.primary_race}
 									onValueChange={value =>
@@ -533,57 +533,56 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									}
 								>
 									<SelectTrigger>
-										<SelectValue placeholder="Select race" />
+										<SelectValue placeholder={localization.placeholder_select_race} />
 									</SelectTrigger>
 									<SelectContent className="bg-white border border-gray-300">
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="american_indian"
 										>
-											American Indian or Alaska Native
+											{localization.option_race_american_indian}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="asian"
 										>
-											Asian
+											{localization.option_race_asian}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="black"
 										>
-											Black or African American
+											{localization.option_race_black}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="hispanic"
 										>
-											Hispanic or Latino
+											{localization.option_race_hispanic}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="native_hawaiian"
 										>
-											Native Hawaiian or Other Pacific
-											Islander
+											{localization.option_race_native_hawaiian}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="white"
 										>
-											White
+											{localization.option_race_white}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="other"
 										>
-											Other
+											{localization.option_race_other}
 										</SelectItem>
 										<SelectItem
 											className="hover:bg-gray-500 hover:text-white"
 											value="prefer_not_to_say"
 										>
-											Prefer not to say
+											{localization.option_race_prefer_not_to_say}
 										</SelectItem>
 									</SelectContent>
 								</Select>
@@ -591,7 +590,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 						</div>
 
 						<div>
-							<Label htmlFor="primary_ethnicity">Ethnicity</Label>
+							<Label htmlFor="primary_ethnicity">{localization.label_ethnicity}</Label>
 							<Select
 								value={watchedValues.primary_ethnicity}
 								onValueChange={value =>
@@ -599,26 +598,26 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 								}
 							>
 								<SelectTrigger>
-									<SelectValue placeholder="Select ethnicity" />
+									<SelectValue placeholder={localization.placeholder_select_ethnicity} />
 								</SelectTrigger>
 								<SelectContent className="bg-white border border-gray-300">
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="hispanic"
 									>
-										Hispanic or Latino
+										{localization.option_ethnicity_hispanic}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="non_hispanic"
 									>
-										Not Hispanic or Latino
+										{localization.option_ethnicity_non_hispanic}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="prefer_not_to_say"
 									>
-										Prefer not to say
+										{localization.option_ethnicity_prefer_not_to_say}
 									</SelectItem>
 								</SelectContent>
 							</Select>
@@ -626,7 +625,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 
 						<div>
 							<Label htmlFor="preferred_language">
-								Preferred Language *
+								{localization.label_preferred_language_required}
 							</Label>
 							<Select
 								value={watchedValues.preferred_language}
@@ -635,80 +634,80 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 								}
 							>
 								<SelectTrigger>
-									<SelectValue placeholder="Select language" />
+									<SelectValue placeholder={localization.placeholder_select_language} />
 								</SelectTrigger>
 								<SelectContent className="bg-white border border-gray-300">
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="en"
 									>
-										English
+										{localization.option_language_english}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="es"
 									>
-										Spanish
+										{localization.option_language_spanish}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="fr"
 									>
-										French
+										{localization.option_language_french}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="de"
 									>
-										German
+										{localization.option_language_german}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="it"
 									>
-										Italian
+										{localization.option_language_italian}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="pt"
 									>
-										Portuguese
+										{localization.option_language_portuguese}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="zh"
 									>
-										Chinese
+										{localization.option_language_chinese}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="ja"
 									>
-										Japanese
+										{localization.option_language_japanese}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="ko"
 									>
-										Korean
+										{localization.option_language_korean}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="ar"
 									>
-										Arabic
+										{localization.option_language_arabic}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="hi"
 									>
-										Hindi
+										{localization.option_language_hindi}
 									</SelectItem>
 									<SelectItem
 										className="hover:bg-gray-500 hover:text-white"
 										value="other"
 									>
-										Other
+										{localization.option_language_other}
 									</SelectItem>
 								</SelectContent>
 							</Select>
@@ -720,20 +719,20 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 				return (
 					<div className="space-y-4">
 						<div className="text-center mb-6">
-							<p className="text-gray-600">Contact information</p>
+							<p className="text-gray-600">{localization.header_contact_information}</p>
 						</div>
 
 						<div>
 							<Label htmlFor="primary_email">
-								Email Address *
+								{localization.label_email_address_required}
 							</Label>
 							<Input
 								id="primary_email"
 								type="email"
 								{...register("primary_email", {
-									required: "Email is required",
+									required: localization.error_email_required,
 								})}
-								placeholder="john@example.com"
+								placeholder={localization.placeholder_email_example}
 							/>
 							{errors.primary_email && (
 								<p className="text-sm text-red-600 mt-1">
@@ -744,15 +743,15 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 
 						<div>
 							<Label htmlFor="primary_phone">
-								Phone Number *
+								{localization.label_phone_number_required}
 							</Label>
 							<Input
 								id="primary_phone"
 								type="tel"
 								{...register("primary_phone", {
-									required: "Phone number is required",
+									required: localization.error_phone_number_required,
 								})}
-								placeholder="(555) 123-4567"
+								placeholder={localization.placeholder_phone_example}
 							/>
 							{errors.primary_phone && (
 								<p className="text-sm text-red-600 mt-1">
@@ -768,7 +767,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 					<div className="space-y-6">
 						<div className="bg-gray-50 rounded-lg p-4">
 							<h3 className="font-semibold text-gray-900 mb-3">
-								Address Information
+								{localization.header_address_information}
 							</h3>
 							<div className="text-sm text-gray-700">
 								<p>{watchedValues.address_line_1}</p>
@@ -784,7 +783,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 
 						<div className="bg-gray-50 rounded-lg p-4">
 							<h3 className="font-semibold text-gray-900 mb-3">
-								Primary Contact
+								{localization.header_primary_contact}
 							</h3>
 							<div className="text-sm text-gray-700">
 								<p>
@@ -798,21 +797,21 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									<p>{watchedValues.primary_phone}</p>
 								)}
 								<p>
-									Born: {watchedValues.primary_date_of_birth}
+									{localization.label_born} {watchedValues.primary_date_of_birth}
 								</p>
 							</div>
 						</div>
 
 						<div className="bg-gray-50 rounded-lg p-4">
 							<h3 className="font-semibold text-gray-900 mb-3">
-								Preferences
+								{localization.header_preferences}
 							</h3>
 							<div className="text-sm text-gray-700">
 								<p>
-									Language: {watchedValues.preferred_language}
+									{localization.label_language} {watchedValues.preferred_language}
 								</p>
 								{watchedValues.notes && (
-									<p>Notes: {watchedValues.notes}</p>
+									<p>{localization.label_notes_colon} {watchedValues.notes}</p>
 								)}
 							</div>
 						</div>
@@ -837,11 +836,10 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 				<CardHeader>
 					<CardTitle className="flex items-center space-x-2">
 						<Home className="w-6 h-6 text-highlight" />
-						<span>Set Up Your Household</span>
+						<span>{localization.title_set_up_household}</span>
 					</CardTitle>
 					<CardDescription>
-						Complete your household profile to get personalized
-						services and easier event registration.
+						{localization.subtitle_complete_household_profile}
 					</CardDescription>
 				</CardHeader>
 
@@ -906,7 +904,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 								className="flex items-center space-x-2"
 							>
 								<ArrowLeft className="w-4 h-4" />
-								<span>Previous</span>
+								<span>{localization.button_previous}</span>
 							</Button>
 
 							<div className="flex space-x-2">
@@ -915,7 +913,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									variant="outline"
 									onClick={onCancel}
 								>
-									Cancel
+									{localization.button_cancel}
 								</Button>
 
 								{isLastStep ? (
@@ -925,8 +923,8 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 										className="bg-highlight text-white min-h-12 uppercase min-w-48"
 									>
 										{isSubmitting
-											? "Creating..."
-											: "Create Household"}
+											? localization.button_creating
+											: localization.button_create_household}
 									</Button>
 								) : (
 									<Button
@@ -935,7 +933,7 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 										disabled={!canProceed()}
 										className="flex items-center space-x-2"
 									>
-										<span>Next</span>
+										<span>{localization.button_next}</span>
 										<ArrowRight className="w-4 h-4" />
 									</Button>
 								)}

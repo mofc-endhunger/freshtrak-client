@@ -134,7 +134,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 										) => setAddress(e.target.value)}
 										className="mt-1"
 										id="street"
-										placeholder="Type Address"
+										placeholder={localization.placeholder_type_address}
 									/>
 								</div>
 							)}

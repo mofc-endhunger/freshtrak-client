@@ -212,7 +212,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 				<div className="mt-4 max-w-6xl mx-auto px-4">
 					<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 register-confirmation">
 						<h1 className="big-title med-title mt-5 mb-5 mobile-mb">
-							You're Registered
+							{localization.title_youre_registered}
 						</h1>
 						<h4>
 							<b> {event.agencyName} </b>
@@ -234,13 +234,13 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 						</div>
 						<div className="mt-5">
 							<h2>
-								Your Confirmation Number:{" "}
+								{localization.header_your_confirmation_number}{" "}
 								<b> {identification_code.toUpperCase()} </b>
 							</h2>
 							<br />
 						</div>
 						<div className="relative">
-							<h2>Your QR Code:</h2>
+							<h2>{localization.header_your_qr_code}</h2>
 							<div className="relative flex justify-center p-4 bg-white">
 								<div className="flex justify-center p-4 bg-white">
 									<QRCode
@@ -259,8 +259,8 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 										variant="outline"
 										size="icon"
 										className="bg-white hover:bg-gray-50"
-										title="Print"
-										aria-label="Print confirmation"
+										title={localization.button_print}
+										aria-label={localization.aria_print_confirmation}
 									>
 										<Printer className="h-4 w-4" />
 									</Button>
@@ -269,8 +269,8 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 										variant="outline"
 										size="icon"
 										className="bg-white hover:bg-gray-50"
-										title="Save"
-										aria-label="Save confirmation"
+										title={localization.button_save}
+										aria-label={localization.aria_save_confirmation}
 									>
 										<Download className="h-4 w-4" />
 									</Button>
@@ -292,10 +292,10 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 							</Card>
 						)}
 						<h5 className="mb-4">
-							<b> Your Information </b>
+							<b> {localization.header_your_information} </b>
 						</h5>
 						<div className="mb-2">
-							<h6 className="mb-4">HEAD OF HOUSEHOLD</h6>
+							<h6 className="mb-4">{localization.header_head_of_household}</h6>
 							{first_name} {middle_name} {last_name} {suffix}{" "}
 							<br />
 							{address_line_1} <br />
@@ -309,7 +309,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 							event.eventDetails.length > 0 && (
 								<>
 									<h5>
-										<b> Additional Location Information </b>
+										<b> {localization.header_additional_location_information} </b>
 									</h5>
 									<p className="mb-5">{event.eventDetails}</p>
 								</>
@@ -322,7 +322,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 									variant="highlight"
 									data-testid="continue button"
 								>
-									Back To Home
+									{localization.button_back_to_home}
 								</Button>
 							</div>
 						</Link>
@@ -338,10 +338,10 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 				<DialogContent className="sm:max-w-md bg-white border border-gray-200 text-gray-900">
 					<DialogHeader>
 						<DialogTitle className="text-center text-gray-900">
-							Create Account
+							{localization.dialog_create_account_title}
 						</DialogTitle>
 						<DialogDescription className="text-center text-gray-600">
-							{localization.guest_signin_prompt}
+							{localization.dialog_create_account_description}
 						</DialogDescription>
 					</DialogHeader>
 					<div className="flex flex-col space-y-3 mt-4">

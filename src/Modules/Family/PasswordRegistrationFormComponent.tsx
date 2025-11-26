@@ -42,7 +42,7 @@ const PasswordRegistrationFormComponent = forwardRef<
 						errors?.email &&
 							"border-red-500 focus:border-red-500 focus:ring-red-500"
 					)}
-					placeholder="Enter your email address"
+					placeholder={localization.placeholder_enter_email}
 				/>
 				<p className="text-sm text-gray-500">
 					No Email?{" "}
@@ -81,7 +81,7 @@ const PasswordRegistrationFormComponent = forwardRef<
 						errors?.password &&
 							"border-red-500 focus:border-red-500 focus:ring-red-500"
 					)}
-					placeholder="Enter your password"
+					placeholder={localization.placeholder_enter_password}
 				/>
 				{errors?.password && (
 					<span className="text-sm text-red-600">
@@ -118,7 +118,7 @@ const PasswordRegistrationFormComponent = forwardRef<
 						errors?.password_confirm &&
 							"border-red-500 focus:border-red-500 focus:ring-red-500"
 					)}
-					placeholder="Confirm your password"
+					placeholder={localization.placeholder_confirm_password}
 				/>
 				{errors?.password_confirm && (
 					<span className="text-sm text-red-600">

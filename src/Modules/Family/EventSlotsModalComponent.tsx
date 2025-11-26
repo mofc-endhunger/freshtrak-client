@@ -21,6 +21,7 @@ import { UsersMeResponse } from "../Households/types/api.types";
 import { useAuth } from "../Authentication/AuthContext";
 
 import { Event } from "./types/family.types";
+import localization from "../Localization/LocalizationComponent";
 
 // Transform household data to user data format expected by confirmation page
 const transformHouseholdDataToUserData = (
@@ -340,9 +341,9 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		<Fragment>
 			<Dialog open={show} onOpenChange={setShow}>
 				<VisuallyHidden>
-					<DialogTitle>Choose Time Slot</DialogTitle>
+					<DialogTitle>{localization.dialog_choose_time_slot_title || "Choose Time Slot"}</DialogTitle>
 					<DialogDescription>
-						Select an available time slot for your registration.
+						{localization.dialog_choose_time_slot_description || "Select an available time slot for your registration."}
 					</DialogDescription>
 				</VisuallyHidden>
 				<DialogContent className="sm:max-w-md bg-highlight border-none text-white">
@@ -359,19 +360,19 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 									className="w-6 h-6"
 								/>
 							</span>
-							Choose Time Slot
+							{localization.dialog_choose_time_slot_title || "Choose Time Slot"}
 						</DialogTitle>
 						<DialogDescription id="timeslot-modal-description">
-							Select an available time slot for your registration.
+							{localization.dialog_choose_time_slot_description || "Select an available time slot for your registration."}
 						</DialogDescription>
 					</DialogHeader>
 					<div className="container py-4">
 						{isLoading ? (
-							<div
-								className="flex justify-center py-4"
-								role="status"
-								aria-label="Loading time slots"
-							>
+						<div
+							className="flex justify-center py-4"
+							role="status"
+							aria-label={localization.aria_loading_time_slots}
+						>
 								<LoadingSpinner size="medium" />
 							</div>
 						) : (

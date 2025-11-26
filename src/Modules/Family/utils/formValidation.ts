@@ -1,6 +1,7 @@
 // Form Validation Utility Functions with TypeScript Types
 
 import { FieldError, FieldErrors, UseFormRegister, UseFormWatch, UseFormSetValue, UseFormGetValues, UseFormTrigger } from 'react-hook-form';
+import localization from '../../Localization/LocalizationComponent';
 
 // Types for form validation
 export interface ValidationResult {
@@ -58,20 +59,28 @@ export const VALIDATION_PATTERNS = {
   ALPHA_ONLY: /^[a-zA-Z\s]+$/,
 } as const;
 
-// Error messages
-export const ERROR_MESSAGES = {
-  REQUIRED: 'This field is required',
-  INVALID_EMAIL: 'Please enter a valid email address',
-  INVALID_PHONE: 'Please enter a valid phone number',
-  INVALID_ZIP: 'Please enter a valid ZIP code',
-  INVALID_PASSWORD: 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character',
+// Error messages - using function to access localization dynamically
+export const getErrorMessage = () => ({
+  REQUIRED: localization.error_field_required,
+  INVALID_EMAIL: localization.error_please_enter_valid_email,
+  INVALID_PHONE: localization.error_phone_number_required || localization.error_please_enter_valid_email.replace('email', 'phone number'),
+  INVALID_ZIP: localization.error_zip_code_required || localization.error_please_enter_valid_email.replace('email', 'ZIP code'),
+  INVALID_PASSWORD: localization.error_password_required || 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character',
   PASSWORDS_MISMATCH: 'Passwords do not match',
-  MIN_LENGTH: (field: string, min: number) => `${field} must be at least ${min} characters`,
+  MIN_LENGTH: (field: string, min: number) => {
+    if (field.toLowerCase() === 'zip code' || field.toLowerCase() === 'zip') {
+      return localization.error_zip_code_min_length || `${field} must be at least ${min} characters`;
+    }
+    return `${field} must be at least ${min} characters`;
+  },
   MAX_LENGTH: (field: string, max: number) => `${field} cannot exceed ${max} characters`,
-  INVALID_AGE: 'Please enter a valid age',
-  INVALID_NAME: 'Please enter a valid name',
-  INVALID_FORMAT: (field: string) => `Please enter a valid ${field}`,
-} as const;
+  INVALID_AGE: localization.error_please_enter_valid_date || 'Please enter a valid age',
+  INVALID_NAME: localization.error_field_required || 'Please enter a valid name',
+  INVALID_FORMAT: (field: string) => localization.error_please_enter_valid_email.replace('email address', field) || `Please enter a valid ${field}`,
+});
+
+// Legacy ERROR_MESSAGES for backward compatibility - now uses function
+export const ERROR_MESSAGES = getErrorMessage();
 
 /**
  * Validates if a field is required and not empty
@@ -260,9 +269,10 @@ export const validateAge = (age: number | string): ValidationResult => {
   }
 
   if (numAge < VALIDATION_CONSTANTS.MIN_AGE || numAge > VALIDATION_CONSTANTS.MAX_AGE) {
+    const errorMsg = localization.error_age_range?.replace('{min}', VALIDATION_CONSTANTS.MIN_AGE.toString()).replace('{max}', VALIDATION_CONSTANTS.MAX_AGE.toString()) || `Age must be between ${VALIDATION_CONSTANTS.MIN_AGE} and ${VALIDATION_CONSTANTS.MAX_AGE}`;
     return {
       isValid: false,
-      error: `Age must be between ${VALIDATION_CONSTANTS.MIN_AGE} and ${VALIDATION_CONSTANTS.MAX_AGE}`,
+      error: errorMsg,
       field: 'age',
     };
   }

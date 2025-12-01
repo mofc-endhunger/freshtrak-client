@@ -21,6 +21,7 @@ import {
 	DialogTitle,
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
+import localization from "../Localization/LocalizationComponent";
 
 /**
  * AuthenticationModal - Main authentication interface component
@@ -303,11 +304,18 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 					{showGuestLogin &&
 						currentTab !== "confirm" &&
 						currentTab !== "loading" && (
-							<div className="mt-6 pt-4 border-t border-gray-200">
-								<div className="text-center">
-									<p className="text-sm text-gray-600 mb-3">
-										Or continue as a guest
-									</p>
+							<div className="mt-6 pt-4">
+								<div className="relative">
+									<div className="absolute inset-0 flex items-center">
+										<div className="w-full border-t border-gray-200"></div>
+									</div>
+									<div className="relative flex justify-center text-sm">
+										<span className="px-2 bg-white text-gray-500">
+											{localization.or}
+										</span>
+									</div>
+								</div>
+								<div className="text-center mt-4">
 									<Button
 										variant="outline"
 										onClick={onGuestLogin}

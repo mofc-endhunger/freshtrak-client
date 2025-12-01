@@ -721,6 +721,7 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Registration failed",
 		error_unexpected_registration:
 			"An unexpected error occurred during registration",
+		or: "OR",
 	},
 
 	spa: {
@@ -1441,6 +1442,7 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Error en el registro",
 		error_unexpected_registration:
 			"Ocurrió un error inesperado durante el registro",
+		or: "O",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -2161,6 +2163,7 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Diiwaangelintu waa fashilantay",
 		error_unexpected_registration:
 			"Qalad aan la filayn ayaa dhacay markii la diiwaangelinayay",
+		or: "AMA",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -2887,6 +2890,7 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Регистрация не удалась",
 		error_unexpected_registration:
 			"Произошла непредвиденная ошибка во время регистрации",
+		or: "ИЛИ",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -3589,6 +3593,7 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Kayıt başarısız",
 		error_unexpected_registration:
 			"Kayıt sırasında beklenmeyen bir hata oluştu",
+		or: "VEYA",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -4271,6 +4276,7 @@ let localization = new LocalizedStrings({
 			"فشل تحميل معلومات الأسرة. يرجى المحاولة مرة أخرى.",
 		error_registration_failed: "فشل التسجيل",
 		error_unexpected_registration: "حدث خطأ غير متوقع أثناء التسجيل",
+		or: "أو",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -4929,6 +4935,7 @@ let localization = new LocalizedStrings({
 		error_failed_load_household: "加载家庭信息失败。请重试。",
 		error_registration_failed: "注册失败",
 		error_unexpected_registration: "注册期间发生意外错误",
+		or: "或",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -5629,6 +5636,7 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "पंजीकरण विफल",
 		error_unexpected_registration:
 			"पंजीकरण के दौरान एक अप्रत्याशित त्रुटि हुई",
+		or: "या",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -6336,6 +6344,7 @@ let localization = new LocalizedStrings({
 			"घरपरिवारको जानकारी लोड गर्न असफल। कृपया पुनः प्रयास गर्नुहोस्।",
 		error_registration_failed: "दर्ता असफल",
 		error_unexpected_registration: "दर्ताको क्रममा अप्रत्याशित त्रुटि भयो",
+		or: "वा",
 	},
 });
 

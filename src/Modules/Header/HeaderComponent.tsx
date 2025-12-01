@@ -8,7 +8,6 @@ import localization from "../Localization/LocalizationComponent";
 import { setCurrentLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
 import { useAuth } from "../Authentication/AuthContext";
-import { validateToken } from "../../Utils/TokenUtils";
 import { StorageService } from "../../Utils/StorageService";
 import { Button } from "../../components/ui/button";
 import {
@@ -201,11 +200,11 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 								to={RENDER_URL.ROOT_URL}
 								className="flex items-center"
 							>
-							<img
-								src={mainLogo}
-								alt={localization.alt_freshtrak_logo}
-								className="h-6 md:h-8 w-auto"
-							/>
+								<img
+									src={mainLogo}
+									alt={localization.alt_freshtrak_logo}
+									className="h-6 md:h-8 w-auto"
+								/>
 							</Link>
 						</div>
 
@@ -243,7 +242,9 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 								<DialogTrigger asChild>
 									<button
 										className="md:hidden text-white p-2 hover:bg-white/10 rounded-md transition-colors"
-										aria-label={localization.aria_open_mobile_menu}
+										aria-label={
+											localization.aria_open_mobile_menu
+										}
 									>
 										<svg
 											className="w-6 h-6"

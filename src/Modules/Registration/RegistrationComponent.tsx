@@ -28,7 +28,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 			event={event}
 			disabled={disabled}
 			title={localization.title_event_registration}
-			subtitle={localization.description_complete_registration}
+			subtitle={localization.subtitle_complete_registration}
 			submitButtonText={localization.button_register}
 			cancelButtonText={localization.button_cancel}
 		/>

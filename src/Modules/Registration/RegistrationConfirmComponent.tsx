@@ -135,7 +135,6 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 		last_name = "",
 		suffix = "",
 		address_line_1 = "",
-		address_line_2 = "",
 		city = "",
 		zip_code = "",
 		state = "",
@@ -260,7 +259,9 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 										size="icon"
 										className="bg-white hover:bg-gray-50"
 										title={localization.button_print}
-										aria-label={localization.aria_print_confirmation}
+										aria-label={
+											localization.aria_print_confirmation
+										}
 									>
 										<Printer className="h-4 w-4" />
 									</Button>
@@ -270,7 +271,9 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 										size="icon"
 										className="bg-white hover:bg-gray-50"
 										title={localization.button_save}
-										aria-label={localization.aria_save_confirmation}
+										aria-label={
+											localization.aria_save_confirmation
+										}
 									>
 										<Download className="h-4 w-4" />
 									</Button>
@@ -295,11 +298,12 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 							<b> {localization.header_your_information} </b>
 						</h5>
 						<div className="mb-2">
-							<h6 className="mb-4">{localization.header_head_of_household}</h6>
+							<h6 className="mb-4">
+								{localization.header_head_of_household}
+							</h6>
 							{first_name} {middle_name} {last_name} {suffix}{" "}
 							<br />
 							{address_line_1} <br />
-							{address_line_2} <br />
 							{city} {state} <br />
 							{zip_code} <br />
 							{formatPhoneNumber(phone)} <br />
@@ -309,7 +313,12 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 							event.eventDetails.length > 0 && (
 								<>
 									<h5>
-										<b> {localization.header_additional_location_information} </b>
+										<b>
+											{" "}
+											{
+												localization.header_additional_location_information
+											}{" "}
+										</b>
 									</h5>
 									<p className="mb-5">{event.eventDetails}</p>
 								</>

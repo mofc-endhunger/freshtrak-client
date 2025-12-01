@@ -3,6 +3,9 @@ import LocalizedStrings from "react-localization";
 let localization = new LocalizedStrings({
 	en: {
 		home_freshtrack: "FreshTrak is here to help!",
+		title_welcome: "Welcome",
+		description_create_account_username_password:
+			"Create a username and password to create FreshTrak account.",
 		home_stay: "Stay Up to Date",
 		home_findfood: "Find Food",
 		home_comming_soon:
@@ -138,11 +141,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "Complete Setup",
 		button_setup_now: "Setup Now",
 		button_setup_later: "Setup Later",
+		button_set_up_household: "Set Up Household",
+		button_maybe_later: "Maybe Later",
+		button_update_household: "Update Household",
+		button_add_address_information: "Add Address Information",
 		button_keep_editing: "Keep Editing",
 		button_discard_changes: "Discard Changes",
 		button_next_member: "Next Member",
+		button_skip_step: "Skip This Step",
 		button_view_details: "View Details",
 		button_hide_details: "Hide details",
+		button_reserve_time: "Reserve Time",
+		button_rsvp: "RSVP",
+		button_get_directions: "Get Directions",
 		button_registering: "Registering...",
 		button_signing_in: "Signing In...",
 		button_saving: "Saving...",
@@ -184,6 +195,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "Zip Code",
 		label_zip_code_required: "ZIP Code *",
 		label_address: "Address",
+		label_address_colon: "Address:",
+		label_location: "Location:",
+		label_phone_colon: "Phone:",
+		label_email_colon: "Email:",
+		label_age: "Age:",
+		label_gender_colon: "Gender:",
+		label_language_colon: "Language:",
+		label_status_colon: "Status:",
+		label_account_created: "Account Created",
+		label_account_status: "Account Status",
 		label_phone_number: "Phone Number",
 		label_phone_number_required: "Phone Number *",
 		label_email_address: "Email Address",
@@ -260,7 +281,16 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "Event Registration",
 		title_set_up_household: "Set Up Your Household",
+		title_your_details: "Your Details",
+		title_your_address_details: "Your Address Details",
+		title_your_family_details: "Your Family Details",
+		title_contact_information: "Contact Information",
+		title_family_member_details: "Family Member Details",
 		title_household_information: "Household Information",
+		title_account_settings: "Account Settings",
+		title_profile_information: "Profile Information",
+		title_household_members: "Household Members",
+		title_complete_household_setup: "Complete Your Household Setup",
 		title_youre_registered: "You're Registered",
 		title_create_account: "Create Account",
 		title_confirm_account: "Confirm Account",
@@ -335,8 +365,23 @@ let localization = new LocalizedStrings({
 		description_fallback_language:
 			"Used when a member's preferred language is not available",
 		description_dont_have_account: "Don't have an account?",
+		description_already_have_account: "Already have an account?",
+		description_remember_password: "Remember your password?",
 		description_sign_in_create_account:
 			"Sign in or create an account to save time in the future",
+		description_manage_account_household:
+			"Manage your account information and household details",
+		description_personal_account_details: "Your personal account details",
+		description_household_address_contact:
+			"Your household address and contact details",
+		description_family_members_household:
+			"Family members in your household",
+		description_noticed_family_members:
+			"We noticed that you added family members, tell us about each one",
+		description_provide_details_family_member:
+			"Please provide details for each family member",
+		description_skipped_setup_prompt:
+			"You skipped the household setup earlier. Complete it now to get personalized services and easier event registration.",
 		description_registering_advance: "Registering in advance is",
 		description_by_registering:
 			"By registering now, you can save time on-site and make the check-in process smoother for you and our volunteers.",
@@ -427,7 +472,8 @@ let localization = new LocalizedStrings({
 		status_error: "Error",
 		status_warning: "Warning",
 		status_info: "Info",
-		status_operation_completed_successfully: "Operation completed successfully",
+		status_operation_completed_successfully:
+			"Operation completed successfully",
 		button_continue_as_guest: "Continue as Guest",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
@@ -606,6 +652,14 @@ let localization = new LocalizedStrings({
 
 		// ADDITIONAL UI TEXT
 		text_no_household_info_available: "No household information available.",
+		text_member_since: "Member since",
+		text_not_available: "Not available",
+		text_invalid_date: "Invalid date",
+		text_of: "of",
+		text_no_address_information_available:
+			"No address information available",
+		text_head_of_household: "Head of Household",
+		text_freshtrak_user: "FreshTrak User",
 		title_resource_events: "Resource Events",
 		title_events_today: "Events Today",
 		title_events_next_7_days: "Events for Next 7 days",
@@ -633,7 +687,17 @@ let localization = new LocalizedStrings({
 
 		// ADDITIONAL UI TEXT
 		text_no_events_scheduled: "No Events Currently Scheduled",
+		text_no_food_banks_found: "No Food Banks found within the zip code",
+		text_food_bank_serving_zip_code: "Food bank serving zip code [{zip}]",
+		text_food_banks_serving_zip_code: "Food banks serving zip code [{zip}]",
 		text_sort_by: "Sort by",
+		label_service_area_limitations: "Service Area Limitations:",
+		text_information: "Information",
+		text_rsvp_optional_for_event: "RSVP is optional for this event",
+		text_rsvp_required_for_event: "RSVP is required for this event",
+		text_already_registered: "Already Registered",
+		text_optional: "optional",
+		text_required: "required",
 		text_recommended: "Recommended",
 		text_all: "All",
 		text_loading: "Loading...",
@@ -641,10 +705,29 @@ let localization = new LocalizedStrings({
 		text_success: "Success",
 		text_warning: "Warning",
 		text_info: "Info",
+		sr_available_time_slots_registration:
+			"Available time slots for registration",
+		text_slot: "slot",
+		text_slots: "slots",
+		text_available: "available",
+		button_go_back: "Go Back",
+		button_save_and_continue: "Save and Continue",
+		sr_return_previous_without_slot:
+			"Return to the previous page without selecting a time slot.",
+		sr_proceed_registration_selected_slot:
+			"Proceed with registration using the selected time slot.",
+		error_failed_load_household:
+			"Failed to load household information. Please try again.",
+		error_registration_failed: "Registration failed",
+		error_unexpected_registration:
+			"An unexpected error occurred during registration",
 	},
 
 	spa: {
 		home_freshtrack: "FreshTrak está aquí para ayudar!",
+		title_welcome: "Bienvenido",
+		description_create_account_username_password:
+			"Crea un nombre de usuario y contraseña para crear una cuenta de FreshTrak.",
 		home_stay: "manténgase al tanto",
 		home_findfood: "Encontrar comida",
 		home_comming_soon:
@@ -781,11 +864,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "Completar Configuración",
 		button_setup_now: "Configurar Ahora",
 		button_setup_later: "Configurar Más Tarde",
+		button_set_up_household: "Configurar Hogar",
+		button_maybe_later: "Tal Vez Más Tarde",
+		button_update_household: "Actualizar Hogar",
+		button_add_address_information: "Agregar Información de Dirección",
 		button_keep_editing: "Seguir Editando",
 		button_discard_changes: "Descartar Cambios",
 		button_next_member: "Siguiente Miembro",
+		button_skip_step: "Omitir Este Paso",
 		button_view_details: "Ver Detalles",
 		button_hide_details: "Ocultar detalles",
+		button_reserve_time: "Reservar Hora",
+		button_rsvp: "RSVP",
+		button_get_directions: "Obtener Direcciones",
 		button_registering: "Registrando...",
 		button_signing_in: "Iniciando Sesión...",
 		button_saving: "Guardando...",
@@ -827,6 +918,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "Código Postal",
 		label_zip_code_required: "Código Postal *",
 		label_address: "Dirección",
+		label_address_colon: "Dirección:",
+		label_location: "Ubicación:",
+		label_phone_colon: "Teléfono:",
+		label_email_colon: "Correo Electrónico:",
+		label_age: "Edad:",
+		label_gender_colon: "Género:",
+		label_language_colon: "Idioma:",
+		label_status_colon: "Estado:",
+		label_account_created: "Cuenta Creada",
+		label_account_status: "Estado de la Cuenta",
 		label_phone_number: "Número de Teléfono",
 		label_phone_number_required: "Número de Teléfono *",
 		label_email_address: "Correo Electrónico",
@@ -904,7 +1005,16 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "Registro de Evento",
 		title_set_up_household: "Configurar Su Hogar",
+		title_your_details: "Sus Detalles",
+		title_your_address_details: "Detalles de Su Dirección",
+		title_your_family_details: "Detalles de Su Familia",
+		title_contact_information: "Información de Contacto",
+		title_family_member_details: "Detalles de Miembros de la Familia",
 		title_household_information: "Información del Hogar",
+		title_account_settings: "Configuración de Cuenta",
+		title_profile_information: "Información del Perfil",
+		title_household_members: "Miembros del Hogar",
+		title_complete_household_setup: "Complete la Configuración de Su Hogar",
 		title_youre_registered: "¡Estás Registrado!",
 		title_create_account: "Crear Cuenta",
 		title_confirm_account: "Confirmar Cuenta",
@@ -978,8 +1088,24 @@ let localization = new LocalizedStrings({
 		description_fallback_language:
 			"Se usa cuando el idioma preferido de un miembro no está disponible",
 		description_dont_have_account: "¿No tienes una cuenta?",
+		description_already_have_account: "¿Ya tienes una cuenta?",
+		description_remember_password: "¿Recuerdas tu contraseña?",
 		description_sign_in_create_account:
 			"Inicia sesión o crea una cuenta para ahorrar tiempo en el futuro",
+		description_manage_account_household:
+			"Administre la información de su cuenta y los detalles del hogar",
+		description_personal_account_details:
+			"Los detalles de su cuenta personal",
+		description_household_address_contact:
+			"La dirección de su hogar y los detalles de contacto",
+		description_family_members_household:
+			"Miembros de la familia en su hogar",
+		description_noticed_family_members:
+			"Notamos que agregó miembros de la familia, cuéntenos sobre cada uno",
+		description_provide_details_family_member:
+			"Por favor proporcione detalles para cada miembro de la familia",
+		description_skipped_setup_prompt:
+			"Omitió la configuración del hogar anteriormente. Complétela ahora para obtener servicios personalizados y un registro de eventos más fácil.",
 		description_registering_advance: "Registrarse con anticipación es",
 		description_by_registering:
 			"Al registrarse ahora, puede ahorrar tiempo en el sitio y hacer que el proceso de registro sea más fluido para usted y nuestros voluntarios.",
@@ -1079,6 +1205,9 @@ let localization = new LocalizedStrings({
 		status_error: "Error",
 		status_warning: "Advertencia",
 		status_info: "Información",
+		status_operation_completed_successfully:
+			"Operación completada exitosamente",
+		button_continue_as_guest: "Continuar como Invitado",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
 		aria_print_confirmation: "Imprimir confirmación",
@@ -1210,16 +1339,30 @@ let localization = new LocalizedStrings({
 		option_status: "Estado",
 		option_age_group: "Grupo de Edad",
 		option_freshtrak_user: "Usuario de FreshTrak",
+		option_all_distances: "Todas las distancias",
+		option_availability_today: "Hoy",
+		option_availability_tomorrow: "Mañana",
+		option_availability_this_week: "Esta Semana",
+		option_availability_next_2_weeks: "Próximas 2 Semanas",
+		option_availability_this_month: "Este Mes",
+		option_availability_next_month: "Próximo Mes",
 
 		// DIALOG & MODAL TEXT
 		dialog_discard_changes_title: "¿Descartar Cambios?",
 		dialog_create_account_title: "Crear Cuenta",
+		dialog_authentication_title: "Autenticación",
 		dialog_discard_changes_description:
 			"Tiene cambios sin guardar. ¿Está seguro de que desea descartarlos? Esta acción no se puede deshacer.",
 		dialog_create_account_description:
 			"Inicia sesión o crea una cuenta para ahorrar tiempo en el futuro",
 		dialog_keep_editing: "Seguir Editando",
 		dialog_discard_changes: "Descartar Cambios",
+		dialog_use_household_info_title: "¿Usar la información de su hogar?",
+		dialog_use_household_info_description:
+			"Encontramos información del hogar en su cuenta. ¿Le gustaría registrarse usando esta información?",
+		dialog_choose_time_slot_title: "Elegir Franja Horaria",
+		dialog_choose_time_slot_description:
+			"Seleccione una franja horaria disponible para su registro.",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "Términos de Uso de FreshTrak",
@@ -1253,6 +1396,20 @@ let localization = new LocalizedStrings({
 
 		// ADDITIONAL UI TEXT
 		text_no_events_scheduled: "No hay eventos programados actualmente",
+		text_member_since: "Miembro desde",
+		text_not_available: "No disponible",
+		text_invalid_date: "Fecha inválida",
+		text_of: "de",
+		text_no_address_information_available:
+			"No hay información de dirección disponible",
+		text_head_of_household: "Jefe de Hogar",
+		text_freshtrak_user: "Usuario de FreshTrak",
+		text_no_food_banks_found:
+			"No se encontraron bancos de alimentos en el código postal",
+		text_food_bank_serving_zip_code:
+			"Banco de alimentos que atiende el código postal [{zip}]",
+		text_food_banks_serving_zip_code:
+			"Bancos de alimentos que atienden el código postal [{zip}]",
 		text_sort_by: "Ordenar por",
 		text_recommended: "Recomendado",
 		text_all: "Todos",
@@ -1261,9 +1418,35 @@ let localization = new LocalizedStrings({
 		text_success: "Éxito",
 		text_warning: "Advertencia",
 		text_info: "Información",
+		label_service_area_limitations: "Limitaciones del Área de Servicio:",
+		text_information: "Información",
+		text_rsvp_optional_for_event: "RSVP es opcional para este evento",
+		text_rsvp_required_for_event: "RSVP es requerido para este evento",
+		text_already_registered: "Ya Registrado",
+		text_optional: "opcional",
+		text_required: "requerido",
+		sr_available_time_slots_registration:
+			"Franjas horarias disponibles para registro",
+		text_slot: "franja",
+		text_slots: "franjas",
+		text_available: "disponible",
+		button_go_back: "Volver",
+		button_save_and_continue: "Guardar y Continuar",
+		sr_return_previous_without_slot:
+			"Volver a la página anterior sin seleccionar una franja horaria.",
+		sr_proceed_registration_selected_slot:
+			"Continuar con el registro usando la franja horaria seleccionada.",
+		error_failed_load_household:
+			"Error al cargar la información del hogar. Por favor intente de nuevo.",
+		error_registration_failed: "Error en el registro",
+		error_unexpected_registration:
+			"Ocurrió un error inesperado durante el registro",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
+		title_welcome: "Soo dhawoow",
+		description_create_account_username_password:
+			"Abuur magaca isticmaalaha iyo erifka si aad akoon FreshTrak u abuurto.",
 		home_stay: "La Soco Ilaa Taariikhda",
 		home_findfood: "Cunno hel",
 		home_comming_soon:
@@ -1293,6 +1476,9 @@ let localization = new LocalizedStrings({
 		by_distance: "by Maskaxdii Dunid",
 		by_service_catogory: "by Qaybta Adeegga",
 		by_availability: "by Helitaanka",
+		only_reservations: "Ballan Qaadasho Keliya",
+		show_only_reservations:
+			"Muuji dhacdooyinka oo keliya ee ballan qaadasho aqbalaya",
 		register: "Isdiiwaangeli Hada.",
 		save_time: "Waqti Badbaadi.",
 		stay_safe: "Ammaan ahaw",
@@ -1397,11 +1583,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "Dejinta Dhameeyi",
 		button_setup_now: "Hada Deji",
 		button_setup_later: "Ka Dib Deji",
+		button_set_up_household: "Qoyska Deji",
+		button_maybe_later: "Laga Yaabee Ka Dib",
+		button_update_household: "Qoyska Cusbooneysii",
+		button_add_address_information: "Macluumaadka Cinwaanka Ku Dar",
 		button_keep_editing: "Wax ka Beddelka Sii Wadi",
 		button_discard_changes: "Isbeddellada Tirtir",
 		button_next_member: "Xubinta Xiga",
+		button_skip_step: "Tallaabada Iska Dhaaf",
 		button_view_details: "Faahfaahinta Eeg",
 		button_hide_details: "Faahfaahinta Qari",
+		button_reserve_time: "Waqti Kaydi",
+		button_rsvp: "RSVP",
+		button_get_directions: "Jihada Hel",
 		button_registering: "Isdiiwaangelinta...",
 		button_signing_in: "Galitaanka...",
 		button_saving: "Keydinta...",
@@ -1443,6 +1637,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "Lambarka Boostada",
 		label_zip_code_required: "Lambarka Boostada *",
 		label_address: "Cinwaanka",
+		label_address_colon: "Cinwaanka:",
+		label_location: "Goobta:",
+		label_phone_colon: "Taleefanka:",
+		label_email_colon: "Iimaylka:",
+		label_age: "Da'da:",
+		label_gender_colon: "Jinsiga:",
+		label_language_colon: "Luqadda:",
+		label_status_colon: "Xaalada:",
+		label_account_created: "Akoonka La Abuuriyay",
+		label_account_status: "Xaalada Akoonka",
 		label_phone_number: "Lambarka Taleefanka",
 		label_phone_number_required: "Lambarka Taleefanka *",
 		label_email_address: "Cinwaanka Iimaylka",
@@ -1519,7 +1723,16 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "Isdiiwaangelinta Dhacdada",
 		title_set_up_household: "Qoyskaaga Deji",
+		title_your_details: "Faahfaahintaada",
+		title_your_address_details: "Faahfaahinta Cinwaankaaga",
+		title_your_family_details: "Faahfaahinta Qoyskaaga",
+		title_contact_information: "Macluumaadka Xidhiidhka",
+		title_family_member_details: "Faahfaahinta Xubnaha Qoyska",
 		title_household_information: "Macluumaadka Qoyska",
+		title_account_settings: "Dejinta Akoonka",
+		title_profile_information: "Macluumaadka Profile",
+		title_household_members: "Xubnaha Qoyska",
+		title_complete_household_setup: "Dhameeyi Dejinta Qoyskaaga",
 		title_youre_registered: "Waad Isdiiwaangashay!",
 		title_create_account: "Akoon Abuur",
 		title_confirm_account: "Akoon Xaqiiji",
@@ -1595,8 +1808,23 @@ let localization = new LocalizedStrings({
 		description_fallback_language:
 			"Waxaa loo isticmaalaa marka luqadda doorbiday ee xubinta aan la heli karin",
 		description_dont_have_account: "Ma haysatid akoon?",
+		description_already_have_account: "Horey u haysatid akoon?",
+		description_remember_password: "Ma xusuusanaysaa erifkaaga?",
 		description_sign_in_create_account:
 			"Gali ama akoon abuur si aad waqti u badbaadiso mustaqbalka",
+		description_manage_account_household:
+			"Maamul macluumaadka akoonkaaga iyo faahfaahinta qoyska",
+		description_personal_account_details:
+			"Faahfaahinta akoonkaaga shakhsiyeed",
+		description_household_address_contact:
+			"Cinwaanka qoyskaaga iyo faahfaahinta xidhiidhka",
+		description_family_members_household: "Xubnaha qoyska qoyskaaga",
+		description_noticed_family_members:
+			"Waxaan ogaaday inaad xubnaha qoyska ku darsatay, noo sheeg mid kasta",
+		description_provide_details_family_member:
+			"Fadlan noo sii faahfaahinta mid kasta oo ka mid ah xubnaha qoyska",
+		description_skipped_setup_prompt:
+			"Waxaad ka dhaafday dejinta qoyska hore. Hadda dhameeyi si aad adeegyada gaarka ah u hesho iyo isdiiwaangelinta dhacdooyinka oo fudud.",
 		description_registering_advance: "Isdiiwaangelinta hore waa",
 		description_by_registering:
 			"Marka aad isdiiwaangaliso hada, waxaad waqti kuheli kartaa goobta isla markaana samayn kartaa habka isdiiwaangelinta uu ugu fududyahay adiga iyo tabaruceyaasheena.",
@@ -1696,6 +1924,9 @@ let localization = new LocalizedStrings({
 		status_error: "Khalad",
 		status_warning: "Digniin",
 		status_info: "Macluumaad",
+		status_operation_completed_successfully:
+			"Waxqabadka waa dhamaaday si guul leh",
+		button_continue_as_guest: "Sii wad sidii Marti",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
 		aria_print_confirmation: "Xaqiijinta daabac",
@@ -1827,16 +2058,30 @@ let localization = new LocalizedStrings({
 		option_status: "Xaalada",
 		option_age_group: "Kooxda Da'da",
 		option_freshtrak_user: "Isticmaalaha FreshTrak",
+		option_all_distances: "Dhammaan fogaanta",
+		option_availability_today: "Maanta",
+		option_availability_tomorrow: "Berrito",
+		option_availability_this_week: "Toddobaadkan",
+		option_availability_next_2_weeks: "2 Toddobaadka Soo Socda",
+		option_availability_this_month: "Bishan",
+		option_availability_next_month: "Bisha Soo Socota",
 
 		// DIALOG & MODAL TEXT
 		dialog_discard_changes_title: "Isbeddellada Tirtir?",
 		dialog_create_account_title: "Akoon Abuur",
+		dialog_authentication_title: "Xaqiijinta",
 		dialog_discard_changes_description:
 			"Waxaad haysataa isbeddelo aan la keydin. Ma hubtaa inaad tirtirto? Ficilkan dib looma celin karo.",
 		dialog_create_account_description:
 			"Gali ama akoon abuur si aad waqti u badbaadiso mustaqbalka",
 		dialog_keep_editing: "Wax ka Beddelka Sii Wadi",
 		dialog_discard_changes: "Isbeddellada Tirtir",
+		dialog_use_household_info_title: "Macluumaadka guriga isticmaal?",
+		dialog_use_household_info_description:
+			"Waxaan helnay macluumaadka guriga akoonkaaga. Ma jeclaan lahayd inaad isticmaasho macluumaadkan?",
+		dialog_choose_time_slot_title: "Waqti Dooro",
+		dialog_choose_time_slot_description:
+			"Waqti la heli karo u dooro diiwaangelintaada.",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "Shuruudaha Isticmaalka FreshTrak",
@@ -1862,6 +2107,16 @@ let localization = new LocalizedStrings({
 		wizard_step_contact_title: "Macluumaadka Xiriirka",
 		wizard_step_contact_description: "Macluumaadkaaga xiriirka",
 
+		// ADDITIONAL UI TEXT
+		text_member_since: "Xubnaha tan iyo",
+		text_not_available: "Ma heli karo",
+		text_invalid_date: "Taariikh aan sax ahayn",
+		text_of: "ka",
+		text_no_address_information_available:
+			"Ma jiro macluumaadka cinwaanka la heli karo",
+		text_head_of_household: "Madaxa Qoyska",
+		text_freshtrak_user: "Isticmaale FreshTrak",
+
 		// MAP & LOCATION
 		map_unavailable: "Khariidada ma heli karto",
 		map_click_to_view_larger: "Khariidada weyn ka eeg guji",
@@ -1869,6 +2124,12 @@ let localization = new LocalizedStrings({
 
 		// ADDITIONAL UI TEXT
 		text_no_events_scheduled: "Dhacdooyin Majiraan Waqtigaan la qorsheeyay",
+		text_no_food_banks_found:
+			"Ma la helin bankiyada cuntada ee nambarka boostada",
+		text_food_bank_serving_zip_code:
+			"Bankiga cuntada ee nambarka boostada u adeegaya [{zip}]",
+		text_food_banks_serving_zip_code:
+			"Bankiyada cuntada ee nambarka boostada u adeegaya [{zip}]",
 		text_sort_by: "Kala sooc",
 		text_recommended: "La Talinayay",
 		text_all: "Dhammaan",
@@ -1877,9 +2138,35 @@ let localization = new LocalizedStrings({
 		text_success: "Guul",
 		text_warning: "Digniin",
 		text_info: "Macluumaad",
+		label_service_area_limitations: "Xadidka Aagga Adeegga:",
+		text_information: "Macluumaad",
+		text_rsvp_optional_for_event: "RSVP waa ikhtiyaari ah dhacdadan",
+		text_rsvp_required_for_event: "RSVP waa lagama maarmaan ah dhacdadan",
+		text_already_registered: "Horeyba waa diiwaangashay",
+		text_optional: "ikhtiyaari ah",
+		text_required: "lagama maarmaan ah",
+		sr_available_time_slots_registration:
+			"Waqtiyada la heli karo ee diiwaangelinta",
+		text_slot: "waqti",
+		text_slots: "waqtiyada",
+		text_available: "la heli karo",
+		button_go_back: "Dib u Noqo",
+		button_save_and_continue: "Keydi oo Sii Wad",
+		sr_return_previous_without_slot:
+			"Bogga hore u noqo adigoon waqti dooran.",
+		sr_proceed_registration_selected_slot:
+			"Diiwaangelinta u sii wad adoo isticmaalaya waqtiga la dooran.",
+		error_failed_load_household:
+			"Waxaa dhacay qalad markii la soo dejineyay macluumaadka guriga. Fadlan mar kale isku day.",
+		error_registration_failed: "Diiwaangelintu waa fashilantay",
+		error_unexpected_registration:
+			"Qalad aan la filayn ayaa dhacay markii la diiwaangelinayay",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
+		title_welcome: "Добро пожаловать",
+		description_create_account_username_password:
+			"Создайте имя пользователя и пароль для создания аккаунта FreshTrak.",
 		home_stay: "Будьте в курсе",
 		home_findfood: "Найти еду",
 		home_comming_soon:
@@ -1888,15 +2175,15 @@ let localization = new LocalizedStrings({
 			"Введите свой почтовый индекс и подключитесь к ресурсам по доступу к еде в вашем районе.",
 		home_header_component:
 			"Мы здесь, чтобы помочь! Введите свой почтовый индекс, чтобы найти ресурсы по доступу к еде в вашем районе.",
-		home_dashboard: "Подавать больше семьи",
+		home_dashboard: "Помогайте большему количеству семей",
 		home_dashboard_org:
 			"Подготовьте свою организацию к увеличению спроса на продукты питания путем оптимизации регистрации, планирования периодов обслуживания и прогнозирования потребностей. Обслуживайте больше семей - как нынешних, так и новых - в вашем районе.",
 		home_before_footer1:
-			"Зарегистрируйте соседей заранее или, если возможно, назначьте встречу с трансфером, ваша организация может спланировать любое увеличение спроса.",
+			"Зарегистрируйте соседей заранее или, если возможно, назначьте время для получения, ваша организация может спланировать любое увеличение спроса.",
 		home_before_footer2:
-			"Вы публикуете в своем сообществе «события» доступа к еде - от ежедневных часов работы кладовой до всплывающих окон еды - и соседи вводят свой почтовый индекс, чтобы подключиться к ним.",
+			"Вы публикуете в своем сообществе «мероприятия» по доступу к еде — от ежедневных часов работы кладовой до временных мероприятий, посвященных еде, — а соседи вводят свой почтовый индекс, чтобы присоединиться к ним.",
 		home_before_footer3:
-			"Устраните узкое место в распространении с помощью предварительной онлайн-регистрации клиентов. Безопасно обслуживайте больше клиентов!",
+			"Устраните узкие места в дистрибуции с помощью предварительной онлайн-регистрации клиентов. Обслуживайте больше клиентов безопасно!",
 		home_before_footer1_header: "Прогнозировать потребность",
 		home_before_footer2_header: "Подавать еду",
 		home_before_footer3_header: "Быстро двигаться",
@@ -1910,21 +2197,24 @@ let localization = new LocalizedStrings({
 		by_distance: "по расстоянию",
 		by_service_catogory: "по категории услуг",
 		by_availability: "по доступности",
-		register: "Зарегистрируйтесь сейчас.",
+		only_reservations: "Только бронирования",
+		show_only_reservations:
+			"Показать только мероприятия, которые принимают бронирования",
+		register: "Зарегистрироваться сейчас.",
 		save_time: "Экономьте время.",
 		stay_safe: "Оставайтесь в безопасности.",
-		register_who_are_you: "Кто ты",
+		register_who_are_you: "Информация о вас",
 		first_name: "Имя",
-		middle_name: "второе имя",
-		last_name: "фамилия",
+		middle_name: "Второе имя",
+		last_name: "Фамилия",
 		suffix: "Суффикс",
 		dob: "Дата рождения",
 		gender: "Пол",
 		register_where_you_live: "Где вы живете",
 		street_address: "Адрес улицы",
-		lot_suite: "квартира/лот/люкс",
+		lot_suite: "Квартира/лот/люкс",
 		city: "Город",
-		state: "Состояние",
+		state: "Штат",
 		zip_code: "Почтовый Индекс",
 		register_how_to_contact: "Как с Вами связаться",
 		phone_number: "Номер телефона (предпочтительно мобильный)",
@@ -1934,11 +2224,11 @@ let localization = new LocalizedStrings({
 		no_email: "Электронная почта недоступна",
 		email_contact_you:
 			"Можно ли отправлять вам по электронной почте обновления и информацию о вашей регистрации и обновлениях в нашей сети?",
-		register_about_family: "Расскажи нам о своей семье",
+		register_about_family: "Информация о вашей семье",
 		family_count:
 			"Сколько дополнительных членов семьи в каждой возрастной группе? (Не включайте себя)",
 		seniors: "Пожилые люди",
-		adults: "взрослые люди",
+		adults: "Взрослые люди",
 		kids: "Дети",
 		license_plate: "Номерной знак",
 		arrive_disribution:
@@ -2015,11 +2305,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "Завершить настройку",
 		button_setup_now: "Настроить сейчас",
 		button_setup_later: "Настроить позже",
+		button_set_up_household: "Настроить домохозяйство",
+		button_maybe_later: "Может быть, позже",
+		button_update_household: "Обновить домохозяйство",
+		button_add_address_information: "Добавить адресную информацию",
 		button_keep_editing: "Продолжить редактирование",
 		button_discard_changes: "Отменить изменения",
 		button_next_member: "Следующий член",
+		button_skip_step: "Пропустить этот шаг",
 		button_view_details: "Просмотр деталей",
 		button_hide_details: "Скрыть детали",
+		button_reserve_time: "Забронировать время",
+		button_rsvp: "RSVP",
+		button_get_directions: "Получить маршрут",
 		button_registering: "Регистрация...",
 		button_signing_in: "Вход...",
 		button_saving: "Сохранение...",
@@ -2062,6 +2360,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "Почтовый индекс",
 		label_zip_code_required: "Почтовый индекс *",
 		label_address: "Адрес",
+		label_address_colon: "Адрес:",
+		label_location: "Местоположение:",
+		label_phone_colon: "Телефон:",
+		label_email_colon: "Электронная почта:",
+		label_age: "Возраст:",
+		label_gender_colon: "Пол:",
+		label_language_colon: "Язык:",
+		label_status_colon: "Статус:",
+		label_account_created: "Аккаунт создан",
+		label_account_status: "Статус аккаунта",
 		label_phone_number: "Номер телефона",
 		label_phone_number_required: "Номер телефона *",
 		label_email_address: "Адрес электронной почты",
@@ -2138,7 +2446,17 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "Регистрация на мероприятие",
 		title_set_up_household: "Настройте ваше домохозяйство",
+		title_your_details: "Ваши данные",
+		title_your_address_details: "Детали вашего адреса",
+		title_your_family_details: "Детали вашей семьи",
+		title_contact_information: "Контактная информация",
+		title_family_member_details: "Детали членов семьи",
 		title_household_information: "Информация о домохозяйстве",
+		title_account_settings: "Настройки аккаунта",
+		title_profile_information: "Информация профиля",
+		title_household_members: "Члены домохозяйства",
+		title_complete_household_setup:
+			"Завершите настройку вашего домохозяйства",
 		title_youre_registered: "Вы зарегистрированы!",
 		title_create_account: "Создать аккаунт",
 		title_confirm_account: "Подтвердить аккаунт",
@@ -2189,7 +2507,7 @@ let localization = new LocalizedStrings({
 		subtitle_add_additional_info:
 			"Добавить любую дополнительную информацию о домохозяйстве",
 		footer_find_resources: "Найти ресурсы",
-		footer_our_policies: "Наши политики",
+		footer_our_policies: "Наши правила",
 		footer_for_foodbanks_agencies:
 			"Для продовольственных банков и агентств",
 		footer_freshtrak_partner: "FreshTrak: Партнер",
@@ -2213,8 +2531,23 @@ let localization = new LocalizedStrings({
 		description_fallback_language:
 			"Используется, когда предпочитаемый язык члена недоступен",
 		description_dont_have_account: "Нет аккаунта?",
+		description_already_have_account: "Уже есть аккаунт?",
+		description_remember_password: "Помните свой пароль?",
 		description_sign_in_create_account:
 			"Войдите или создайте аккаунт, чтобы сэкономить время в будущем",
+		description_manage_account_household:
+			"Управляйте информацией вашего аккаунта и деталями домохозяйства",
+		description_personal_account_details: "Детали вашего личного аккаунта",
+		description_household_address_contact:
+			"Адрес вашего домохозяйства и контактные данные",
+		description_family_members_household:
+			"Члены семьи в вашем домохозяйстве",
+		description_noticed_family_members:
+			"Мы заметили, что вы добавили членов семьи, расскажите нам о каждом",
+		description_provide_details_family_member:
+			"Пожалуйста, предоставьте детали для каждого члена семьи",
+		description_skipped_setup_prompt:
+			"Вы пропустили настройку домохозяйства ранее. Завершите её сейчас, чтобы получить персонализированные услуги и упростить регистрацию на мероприятия.",
 		description_registering_advance: "Предварительная регистрация - это",
 		description_by_registering:
 			"Регистрируясь сейчас, вы можете сэкономить время на месте и сделать процесс регистрации более плавным для вас и наших волонтеров.",
@@ -2314,6 +2647,8 @@ let localization = new LocalizedStrings({
 		status_error: "Ошибка",
 		status_warning: "Предупреждение",
 		status_info: "Информация",
+		status_operation_completed_successfully: "Операция успешно завершена",
+		button_continue_as_guest: "Продолжить как гость",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
 		aria_print_confirmation: "Печать подтверждения",
@@ -2448,16 +2783,31 @@ let localization = new LocalizedStrings({
 		option_status: "Статус",
 		option_age_group: "Возрастная группа",
 		option_freshtrak_user: "Пользователь FreshTrak",
+		option_all_distances: "Все расстояния",
+		option_availability_today: "Сегодня",
+		option_availability_tomorrow: "Завтра",
+		option_availability_this_week: "На этой неделе",
+		option_availability_next_2_weeks: "Следующие 2 недели",
+		option_availability_this_month: "В этом месяце",
+		option_availability_next_month: "В следующем месяце",
 
 		// DIALOG & MODAL TEXT
 		dialog_discard_changes_title: "Отменить изменения?",
 		dialog_create_account_title: "Создать аккаунт",
+		dialog_authentication_title: "Аутентификация",
 		dialog_discard_changes_description:
 			"У вас есть несохраненные изменения. Вы уверены, что хотите их отменить? Это действие нельзя отменить.",
 		dialog_create_account_description:
 			"Войдите или создайте аккаунт, чтобы сэкономить время в будущем",
 		dialog_keep_editing: "Продолжить редактирование",
 		dialog_discard_changes: "Отменить изменения",
+		dialog_use_household_info_title:
+			"Использовать информацию о вашем домохозяйстве?",
+		dialog_use_household_info_description:
+			"Мы нашли информацию о домохозяйстве в вашем аккаунте. Хотите зарегистрироваться, используя эту информацию?",
+		dialog_choose_time_slot_title: "Выбрать временной слот",
+		dialog_choose_time_slot_description:
+			"Выберите доступный временной слот для вашей регистрации.",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "Условия использования FreshTrak",
@@ -2493,6 +2843,19 @@ let localization = new LocalizedStrings({
 		// ADDITIONAL UI TEXT
 		text_no_events_scheduled:
 			"В настоящее время нет запланированных мероприятий",
+		text_member_since: "Участник с",
+		text_not_available: "Недоступно",
+		text_invalid_date: "Неверная дата",
+		text_of: "из",
+		text_no_address_information_available: "Адресная информация недоступна",
+		text_head_of_household: "Глава домохозяйства",
+		text_freshtrak_user: "Пользователь FreshTrak",
+		text_no_food_banks_found:
+			"Продовольственные банки не найдены в почтовом индексе",
+		text_food_bank_serving_zip_code:
+			"Продовольственный банк, обслуживающий почтовый индекс [{zip}]",
+		text_food_banks_serving_zip_code:
+			"Продовольственные банки, обслуживающие почтовый индекс [{zip}]",
 		text_sort_by: "Сортировать по",
 		text_recommended: "Рекомендуется",
 		text_all: "Все",
@@ -2501,9 +2864,35 @@ let localization = new LocalizedStrings({
 		text_success: "Успешно",
 		text_warning: "Предупреждение",
 		text_info: "Информация",
+		label_service_area_limitations: "Ограничения зоны обслуживания:",
+		text_information: "Информация",
+		text_rsvp_optional_for_event: "RSVP необязателен для этого мероприятия",
+		text_rsvp_required_for_event: "RSVP обязателен для этого мероприятия",
+		text_already_registered: "Уже зарегистрирован",
+		text_optional: "необязательно",
+		text_required: "обязательно",
+		sr_available_time_slots_registration:
+			"Доступные временные слоты для регистрации",
+		text_slot: "слот",
+		text_slots: "слоты",
+		text_available: "доступно",
+		button_go_back: "Назад",
+		button_save_and_continue: "Сохранить и Продолжить",
+		sr_return_previous_without_slot:
+			"Вернуться на предыдущую страницу без выбора временного слота.",
+		sr_proceed_registration_selected_slot:
+			"Продолжить регистрацию, используя выбранный временной слот.",
+		error_failed_load_household:
+			"Не удалось загрузить информацию о домохозяйстве. Пожалуйста, попробуйте снова.",
+		error_registration_failed: "Регистрация не удалась",
+		error_unexpected_registration:
+			"Произошла непредвиденная ошибка во время регистрации",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
+		title_welcome: "Hoş geldiniz",
+		description_create_account_username_password:
+			"FreshTrak hesabı oluşturmak için bir kullanıcı adı ve şifre oluşturun.",
 		home_stay: "Güncel kal",
 		home_findfood: "Yiyecek bul",
 		home_comming_soon:
@@ -2533,6 +2922,9 @@ let localization = new LocalizedStrings({
 		by_distance: "Mesafeye göre",
 		by_service_catogory: "Hizmet Kategorisine göre",
 		by_availability: "Müsaitliğe göre",
+		only_reservations: "Sadece Rezervasyonlar",
+		show_only_reservations:
+			"Sadece rezervasyon kabul eden etkinlikleri göster",
 		register: "Şimdi üye Ol.",
 		save_time: "Zamandan tasarruf.",
 		stay_safe: "Güvende kal.",
@@ -2636,11 +3028,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "Kurulumu Tamamla",
 		button_setup_now: "Şimdi Kur",
 		button_setup_later: "Sonra Kur",
+		button_set_up_household: "Haneyi Kur",
+		button_maybe_later: "Belki Sonra",
+		button_update_household: "Haneyi Güncelle",
+		button_add_address_information: "Adres Bilgisi Ekle",
 		button_keep_editing: "Düzenlemeye Devam Et",
 		button_discard_changes: "Değişiklikleri İptal Et",
 		button_next_member: "Sonraki Üye",
+		button_skip_step: "Bu Adımı Atla",
 		button_view_details: "Detayları Görüntüle",
 		button_hide_details: "Detayları gizle",
+		button_reserve_time: "Zaman Ayır",
+		button_rsvp: "RSVP",
+		button_get_directions: "Yol Tarifi Al",
 		button_registering: "Kaydediliyor...",
 		button_signing_in: "Giriş yapılıyor...",
 		button_saving: "Kaydediliyor...",
@@ -2682,6 +3082,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "Posta Kodu",
 		label_zip_code_required: "Posta Kodu *",
 		label_address: "Adres",
+		label_address_colon: "Adres:",
+		label_location: "Konum:",
+		label_phone_colon: "Telefon:",
+		label_email_colon: "E-posta:",
+		label_age: "Yaş:",
+		label_gender_colon: "Cinsiyet:",
+		label_language_colon: "Dil:",
+		label_status_colon: "Durum:",
+		label_account_created: "Hesap Oluşturuldu",
+		label_account_status: "Hesap Durumu",
 		label_phone_number: "Telefon Numarası",
 		label_phone_number_required: "Telefon Numarası *",
 		label_email_address: "E-posta Adresi",
@@ -2757,7 +3167,16 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "Etkinlik Kaydı",
 		title_set_up_household: "Hanenizi Kurun",
+		title_your_details: "Bilgileriniz",
+		title_your_address_details: "Adres Bilgileriniz",
+		title_your_family_details: "Aile Bilgileriniz",
+		title_contact_information: "İletişim Bilgileri",
+		title_family_member_details: "Aile Üyesi Detayları",
 		title_household_information: "Hane Bilgileri",
+		title_account_settings: "Hesap Ayarları",
+		title_profile_information: "Profil Bilgileri",
+		title_household_members: "Hane Üyeleri",
+		title_complete_household_setup: "Hane Kurulumunuzu Tamamlayın",
 		title_youre_registered: "Kayıt Oldunuz!",
 		title_create_account: "Hesap Oluştur",
 		title_confirm_account: "Hesabı Onayla",
@@ -2826,8 +3245,22 @@ let localization = new LocalizedStrings({
 		description_fallback_language:
 			"Bir üyenin tercih ettiği dil mevcut olmadığında kullanılır",
 		description_dont_have_account: "Hesabınız yok mu?",
+		description_already_have_account: "Zaten hesabınız var mı?",
+		description_remember_password: "Şifrenizi hatırlıyor musunuz?",
 		description_sign_in_create_account:
 			"Gelecekte zaman kazanmak için giriş yapın veya hesap oluşturun",
+		description_manage_account_household:
+			"Hesap bilgilerinizi ve hane detaylarınızı yönetin",
+		description_personal_account_details: "Kişisel hesap bilgileriniz",
+		description_household_address_contact:
+			"Hane adresiniz ve iletişim bilgileriniz",
+		description_family_members_household: "Hanenizdeki aile üyeleri",
+		description_noticed_family_members:
+			"Aile üyeleri eklediğinizi fark ettik, her biri hakkında bize bilgi verin",
+		description_provide_details_family_member:
+			"Lütfen her aile üyesi için detayları sağlayın",
+		description_skipped_setup_prompt:
+			"Daha önce hane kurulumunu atladınız. Kişiselleştirilmiş hizmetler ve daha kolay etkinlik kaydı için şimdi tamamlayın.",
 		description_registering_advance: "Önceden kayıt olmak",
 		description_by_registering:
 			"Şimdi kaydolarak, yerinde zaman kazanabilir ve kayıt sürecini sizin ve gönüllülerimiz için daha sorunsuz hale getirebilirsiniz.",
@@ -2921,6 +3354,8 @@ let localization = new LocalizedStrings({
 		status_error: "Hata",
 		status_warning: "Uyarı",
 		status_info: "Bilgi",
+		status_operation_completed_successfully: "İşlem başarıyla tamamlandı",
+		button_continue_as_guest: "Misafir Olarak Devam Et",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
 		aria_print_confirmation: "Onayı yazdır",
@@ -3052,16 +3487,31 @@ let localization = new LocalizedStrings({
 		option_status: "Durum",
 		option_age_group: "Yaş Grubu",
 		option_freshtrak_user: "FreshTrak Kullanıcısı",
+		option_all_distances: "Tüm mesafeler",
+		option_availability_today: "Bugün",
+		option_availability_tomorrow: "Yarın",
+		option_availability_this_week: "Bu Hafta",
+		option_availability_next_2_weeks: "Önümüzdeki 2 Hafta",
+		option_availability_this_month: "Bu Ay",
+		option_availability_next_month: "Gelecek Ay",
 
 		// DIALOG & MODAL TEXT
 		dialog_discard_changes_title: "Değişiklikleri İptal Et?",
 		dialog_create_account_title: "Hesap Oluştur",
+		dialog_authentication_title: "Kimlik Doğrulama",
 		dialog_discard_changes_description:
 			"Kaydedilmemiş değişiklikleriniz var. İptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
 		dialog_create_account_description:
 			"Gelecekte zaman kazanmak için giriş yapın veya hesap oluşturun",
 		dialog_keep_editing: "Düzenlemeye Devam Et",
 		dialog_discard_changes: "Değişiklikleri İptal Et",
+		dialog_use_household_info_title:
+			"Hane bilgilerinizi kullanmak ister misiniz?",
+		dialog_use_household_info_description:
+			"Hesabınızda hane bilgileri bulduk. Bu bilgileri kullanarak kayıt olmak ister misiniz?",
+		dialog_choose_time_slot_title: "Zaman Dilimi Seç",
+		dialog_choose_time_slot_description:
+			"Kayıt için mevcut bir zaman dilimi seçin.",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "FreshTrak Kullanım Koşulları",
@@ -3086,6 +3536,15 @@ let localization = new LocalizedStrings({
 		wizard_step_contact_title: "İletişim Bilgileri",
 		wizard_step_contact_description: "İletişim bilgileriniz",
 
+		// ADDITIONAL UI TEXT
+		text_member_since: "Üye olunduğu tarih",
+		text_not_available: "Mevcut değil",
+		text_invalid_date: "Geçersiz tarih",
+		text_of: "üzerinden",
+		text_no_address_information_available: "Adres bilgisi mevcut değil",
+		text_head_of_household: "Hane Reisi",
+		text_freshtrak_user: "FreshTrak Kullanıcısı",
+
 		// MAP & LOCATION
 		map_unavailable: "Harita kullanılamıyor",
 		map_click_to_view_larger:
@@ -3094,6 +3553,11 @@ let localization = new LocalizedStrings({
 
 		// ADDITIONAL UI TEXT
 		text_no_events_scheduled: "Şu anda Planlanmış Etkinlik Yok",
+		text_no_food_banks_found: "Posta kodunda Gıda Bankası bulunamadı",
+		text_food_bank_serving_zip_code:
+			"Posta koduna hizmet veren gıda bankası [{zip}]",
+		text_food_banks_serving_zip_code:
+			"Posta koduna hizmet veren gıda bankaları [{zip}]",
 		text_sort_by: "Sırala",
 		text_recommended: "Önerilen",
 		text_all: "Tümü",
@@ -3102,9 +3566,35 @@ let localization = new LocalizedStrings({
 		text_success: "Başarılı",
 		text_warning: "Uyarı",
 		text_info: "Bilgi",
+		label_service_area_limitations: "Hizmet Alanı Kısıtlamaları:",
+		text_information: "Bilgi",
+		text_rsvp_optional_for_event: "Bu etkinlik için RSVP isteğe bağlıdır",
+		text_rsvp_required_for_event: "Bu etkinlik için RSVP zorunludur",
+		text_already_registered: "Zaten Kayıtlı",
+		text_optional: "isteğe bağlı",
+		text_required: "zorunlu",
+		sr_available_time_slots_registration:
+			"Kayıt için mevcut zaman dilimleri",
+		text_slot: "dilim",
+		text_slots: "dilimler",
+		text_available: "mevcut",
+		button_go_back: "Geri Dön",
+		button_save_and_continue: "Kaydet ve Devam Et",
+		sr_return_previous_without_slot:
+			"Zaman dilimi seçmeden önceki sayfaya dön.",
+		sr_proceed_registration_selected_slot:
+			"Seçilen zaman dilimini kullanarak kayıt işlemine devam et.",
+		error_failed_load_household:
+			"Hane bilgileri yüklenemedi. Lütfen tekrar deneyin.",
+		error_registration_failed: "Kayıt başarısız",
+		error_unexpected_registration:
+			"Kayıt sırasında beklenmeyen bir hata oluştu",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
+		title_welcome: "مرحباً",
+		description_create_account_username_password:
+			"قم بإنشاء اسم مستخدم وكلمة مرور لإنشاء حساب FreshTrak.",
 		home_stay: "ابق على اطلاع",
 		home_findfood: "ابحث عن الطعام",
 		home_comming_soon:
@@ -3133,6 +3623,8 @@ let localization = new LocalizedStrings({
 		by_distance: "عن طريق المسافة",
 		by_service_catogory: "حسب فئة الخدمة",
 		by_availability: "حسب التوفر",
+		only_reservations: "الحجوزات فقط",
+		show_only_reservations: "إظهار الأحداث التي تقبل الحجوزات فقط",
 		register: "سجل الان.",
 		save_time: "وفر الوقت.",
 		stay_safe: "ابق آمنًا.",
@@ -3236,11 +3728,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "إكمال الإعداد",
 		button_setup_now: "إعداد الآن",
 		button_setup_later: "إعداد لاحقًا",
+		button_set_up_household: "إعداد الأسرة",
+		button_maybe_later: "ربما لاحقًا",
+		button_update_household: "تحديث الأسرة",
+		button_add_address_information: "إضافة معلومات العنوان",
 		button_keep_editing: "متابعة التعديل",
 		button_discard_changes: "تجاهل التغييرات",
 		button_next_member: "العضو التالي",
+		button_skip_step: "تخطي هذه الخطوة",
 		button_view_details: "عرض التفاصيل",
 		button_hide_details: "إخفاء التفاصيل",
+		button_reserve_time: "حجز الوقت",
+		button_rsvp: "RSVP",
+		button_get_directions: "الحصول على الاتجاهات",
 		button_registering: "جاري التسجيل...",
 		button_signing_in: "جاري تسجيل الدخول...",
 		button_saving: "جاري الحفظ...",
@@ -3282,6 +3782,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "الرمز البريدي",
 		label_zip_code_required: "الرمز البريدي *",
 		label_address: "العنوان",
+		label_address_colon: "العنوان:",
+		label_location: "الموقع:",
+		label_phone_colon: "الهاتف:",
+		label_email_colon: "البريد الإلكتروني:",
+		label_age: "العمر:",
+		label_gender_colon: "الجنس:",
+		label_language_colon: "اللغة:",
+		label_status_colon: "الحالة:",
+		label_account_created: "تم إنشاء الحساب",
+		label_account_status: "حالة الحساب",
 		label_phone_number: "رقم الهاتف",
 		label_phone_number_required: "رقم الهاتف *",
 		label_email_address: "عنوان البريد الإلكتروني",
@@ -3356,7 +3866,16 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "تسجيل الحدث",
 		title_set_up_household: "إعداد أسرتك",
+		title_your_details: "تفاصيلك",
+		title_your_address_details: "تفاصيل عنوانك",
+		title_your_family_details: "تفاصيل عائلتك",
+		title_contact_information: "معلومات الاتصال",
+		title_family_member_details: "تفاصيل أفراد العائلة",
 		title_household_information: "معلومات الأسرة",
+		title_account_settings: "إعدادات الحساب",
+		title_profile_information: "معلومات الملف الشخصي",
+		title_household_members: "أفراد الأسرة",
+		title_complete_household_setup: "أكمل إعداد أسرتك",
 		title_youre_registered: "لقد قمت بالتسجيل!",
 		title_create_account: "إنشاء حساب",
 		title_confirm_account: "تأكيد الحساب",
@@ -3423,8 +3942,21 @@ let localization = new LocalizedStrings({
 		description_fallback_language:
 			"يستخدم عندما تكون اللغة المفضلة للعضو غير متاحة",
 		description_dont_have_account: "ليس لديك حساب؟",
+		description_already_have_account: "هل لديك حساب بالفعل؟",
+		description_remember_password: "هل تتذكر كلمة المرور الخاصة بك؟",
 		description_sign_in_create_account:
 			"سجل الدخول أو أنشئ حسابًا لتوفير الوقت في المستقبل",
+		description_manage_account_household:
+			"إدارة معلومات حسابك وتفاصيل أسرتك",
+		description_personal_account_details: "تفاصيل حسابك الشخصي",
+		description_household_address_contact: "عنوان أسرتك وتفاصيل الاتصال",
+		description_family_members_household: "أفراد العائلة في أسرتك",
+		description_noticed_family_members:
+			"لاحظنا أنك أضفت أفراد العائلة، أخبرنا عن كل واحد منهم",
+		description_provide_details_family_member:
+			"يرجى تقديم تفاصيل لكل فرد من أفراد العائلة",
+		description_skipped_setup_prompt:
+			"لقد تخطيت إعداد الأسرة سابقًا. أكملها الآن للحصول على خدمات مخصصة وتسجيل أحداث أسهل.",
 		description_registering_advance: "التسجيل مقدمًا هو",
 		description_by_registering:
 			"من خلال التسجيل الآن، يمكنك توفير الوقت في الموقع وجعل عملية التسجيل أكثر سلاسة لك وللمتطوعين لدينا.",
@@ -3509,6 +4041,8 @@ let localization = new LocalizedStrings({
 		status_error: "خطأ",
 		status_warning: "تحذير",
 		status_info: "معلومات",
+		status_operation_completed_successfully: "تمت العملية بنجاح",
+		button_continue_as_guest: "المتابعة كضيف",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
 		aria_print_confirmation: "طباعة التأكيد",
@@ -3639,16 +4173,29 @@ let localization = new LocalizedStrings({
 		option_status: "الحالة",
 		option_age_group: "الفئة العمرية",
 		option_freshtrak_user: "مستخدم FreshTrak",
+		option_all_distances: "جميع المسافات",
+		option_availability_today: "اليوم",
+		option_availability_tomorrow: "غداً",
+		option_availability_this_week: "هذا الأسبوع",
+		option_availability_next_2_weeks: "الأسبوعين القادمين",
+		option_availability_this_month: "هذا الشهر",
+		option_availability_next_month: "الشهر القادم",
 
 		// DIALOG & MODAL TEXT
 		dialog_discard_changes_title: "تجاهل التغييرات؟",
 		dialog_create_account_title: "إنشاء حساب",
+		dialog_authentication_title: "المصادقة",
 		dialog_discard_changes_description:
 			"لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد تجاهلها؟ لا يمكن التراجع عن هذا الإجراء.",
 		dialog_create_account_description:
 			"سجل الدخول أو أنشئ حسابًا لتوفير الوقت في المستقبل",
 		dialog_keep_editing: "متابعة التعديل",
 		dialog_discard_changes: "تجاهل التغييرات",
+		dialog_use_household_info_title: "استخدام معلومات أسرتك؟",
+		dialog_use_household_info_description:
+			"وجدنا معلومات الأسرة في حسابك. هل ترغب في التسجيل باستخدام هذه المعلومات؟",
+		dialog_choose_time_slot_title: "اختر الفترة الزمنية",
+		dialog_choose_time_slot_description: "حدد فترة زمنية متاحة لتسجيلك.",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "شروط استخدام FreshTrak",
@@ -3681,7 +4228,20 @@ let localization = new LocalizedStrings({
 		map_close: "إغلاق الخريطة",
 
 		// ADDITIONAL UI TEXT
+		text_member_since: "عضو منذ",
+		text_not_available: "غير متاح",
+		text_invalid_date: "تاريخ غير صالح",
+		text_of: "من",
+		text_no_address_information_available: "معلومات العنوان غير متاحة",
+		text_head_of_household: "رئيس الأسرة",
+		text_freshtrak_user: "مستخدم FreshTrak",
 		text_no_events_scheduled: "لا توجد أحداث مجدولة حاليا",
+		text_no_food_banks_found:
+			"لم يتم العثور على بنوك الطعام في الرمز البريدي",
+		text_food_bank_serving_zip_code:
+			"بنك الطعام الذي يخدم الرمز البريدي [{zip}]",
+		text_food_banks_serving_zip_code:
+			"بنوك الطعام التي تخدم الرمز البريدي [{zip}]",
 		text_sort_by: "ترتيب حسب",
 		text_recommended: "موصى به",
 		text_all: "الكل",
@@ -3690,9 +4250,33 @@ let localization = new LocalizedStrings({
 		text_success: "نجح",
 		text_warning: "تحذير",
 		text_info: "معلومات",
+		label_service_area_limitations: "قيود منطقة الخدمة:",
+		text_information: "معلومات",
+		text_rsvp_optional_for_event: "RSVP اختياري لهذا الحدث",
+		text_rsvp_required_for_event: "RSVP مطلوب لهذا الحدث",
+		text_already_registered: "مسجل بالفعل",
+		text_optional: "اختياري",
+		text_required: "مطلوب",
+		sr_available_time_slots_registration: "الفترات الزمنية المتاحة للتسجيل",
+		text_slot: "فترة",
+		text_slots: "فترات",
+		text_available: "متاح",
+		button_go_back: "رجوع",
+		button_save_and_continue: "حفظ والمتابعة",
+		sr_return_previous_without_slot:
+			"العودة إلى الصفحة السابقة دون تحديد فترة زمنية.",
+		sr_proceed_registration_selected_slot:
+			"المتابعة مع التسجيل باستخدام الفترة الزمنية المحددة.",
+		error_failed_load_household:
+			"فشل تحميل معلومات الأسرة. يرجى المحاولة مرة أخرى.",
+		error_registration_failed: "فشل التسجيل",
+		error_unexpected_registration: "حدث خطأ غير متوقع أثناء التسجيل",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
+		title_welcome: "欢迎",
+		description_create_account_username_password:
+			"创建用户名和密码以创建 FreshTrak 账户。",
 		home_stay: "保持最新",
 		home_findfood: "找食物",
 		home_comming_soon:
@@ -3720,6 +4304,8 @@ let localization = new LocalizedStrings({
 		by_distance: "按距离",
 		by_service_catogory: "按服务类别",
 		by_availability: "按可用性",
+		only_reservations: "仅限预订",
+		show_only_reservations: "仅显示接受预订的活动",
 		register: "现在注册。",
 		save_time: "省时间。",
 		stay_safe: "注意安全。",
@@ -3821,11 +4407,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "完成设置",
 		button_setup_now: "立即设置",
 		button_setup_later: "稍后设置",
+		button_set_up_household: "设置家庭",
+		button_maybe_later: "也许稍后",
+		button_update_household: "更新家庭",
+		button_add_address_information: "添加地址信息",
 		button_keep_editing: "继续编辑",
 		button_discard_changes: "丢弃更改",
 		button_next_member: "下一个成员",
+		button_skip_step: "跳过此步骤",
 		button_view_details: "查看详情",
 		button_hide_details: "隐藏详情",
+		button_reserve_time: "预约时间",
+		button_rsvp: "RSVP",
+		button_get_directions: "获取路线",
 		button_registering: "注册中...",
 		button_signing_in: "登录中...",
 		button_saving: "保存中...",
@@ -3867,6 +4461,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "邮政编码",
 		label_zip_code_required: "邮政编码 *",
 		label_address: "地址",
+		label_address_colon: "地址:",
+		label_location: "位置:",
+		label_phone_colon: "电话:",
+		label_email_colon: "电子邮件:",
+		label_age: "年龄:",
+		label_gender_colon: "性别:",
+		label_language_colon: "语言:",
+		label_status_colon: "状态:",
+		label_account_created: "账户已创建",
+		label_account_status: "账户状态",
 		label_phone_number: "电话号码",
 		label_phone_number_required: "电话号码 *",
 		label_email_address: "电子邮件地址",
@@ -3941,7 +4545,16 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "活动注册",
 		title_set_up_household: "设置您的家庭",
+		title_your_details: "您的详细信息",
+		title_your_address_details: "您的地址详细信息",
+		title_your_family_details: "您的家庭详细信息",
+		title_contact_information: "联系信息",
+		title_family_member_details: "家庭成员详细信息",
 		title_household_information: "家庭信息",
+		title_account_settings: "账户设置",
+		title_profile_information: "个人信息",
+		title_household_members: "家庭成员",
+		title_complete_household_setup: "完成您的家庭设置",
 		title_youre_registered: "您已注册！",
 		title_create_account: "创建账户",
 		title_confirm_account: "确认账户",
@@ -4003,7 +4616,19 @@ let localization = new LocalizedStrings({
 		description_total_household_size: "家庭总人数：{count} 人（包括您）",
 		description_fallback_language: "当成员的首选语言不可用时使用",
 		description_dont_have_account: "没有账户？",
+		description_already_have_account: "已有账户？",
+		description_remember_password: "记得您的密码？",
 		description_sign_in_create_account: "登录或创建账户以在未来节省时间",
+		description_manage_account_household: "管理您的账户信息和家庭详细信息",
+		description_personal_account_details: "您的个人账户详细信息",
+		description_household_address_contact: "您的家庭地址和联系详细信息",
+		description_family_members_household: "您家庭中的家庭成员",
+		description_noticed_family_members:
+			"我们注意到您添加了家庭成员，请告诉我们每个人的信息",
+		description_provide_details_family_member:
+			"请为每个家庭成员提供详细信息",
+		description_skipped_setup_prompt:
+			"您之前跳过了家庭设置。现在完成它以获得个性化服务和更轻松的活动注册。",
 		description_registering_advance: "提前注册是",
 		description_by_registering:
 			"通过立即注册，您可以节省现场时间，并使签到过程对您和我们的志愿者更加顺畅。",
@@ -4082,6 +4707,8 @@ let localization = new LocalizedStrings({
 		status_error: "错误",
 		status_warning: "警告",
 		status_info: "信息",
+		status_operation_completed_successfully: "操作成功完成",
+		button_continue_as_guest: "以访客身份继续",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
 		aria_print_confirmation: "打印确认",
@@ -4212,15 +4839,28 @@ let localization = new LocalizedStrings({
 		option_status: "状态",
 		option_age_group: "年龄组",
 		option_freshtrak_user: "FreshTrak 用户",
+		option_all_distances: "所有距离",
+		option_availability_today: "今天",
+		option_availability_tomorrow: "明天",
+		option_availability_this_week: "本周",
+		option_availability_next_2_weeks: "未来2周",
+		option_availability_this_month: "本月",
+		option_availability_next_month: "下个月",
 
 		// DIALOG & MODAL TEXT
 		dialog_discard_changes_title: "丢弃更改？",
 		dialog_create_account_title: "创建账户",
+		dialog_authentication_title: "身份验证",
 		dialog_discard_changes_description:
 			"您有未保存的更改。您确定要丢弃它们吗？此操作无法撤销。",
 		dialog_create_account_description: "登录或创建账户以在未来节省时间",
 		dialog_keep_editing: "继续编辑",
 		dialog_discard_changes: "丢弃更改",
+		dialog_use_household_info_title: "使用您的家庭信息？",
+		dialog_use_household_info_description:
+			"我们在您的账户中找到了家庭信息。您想使用此信息进行注册吗？",
+		dialog_choose_time_slot_title: "选择时间段",
+		dialog_choose_time_slot_description: "为您的注册选择一个可用的时间段。",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "FreshTrak 使用条款",
@@ -4250,7 +4890,19 @@ let localization = new LocalizedStrings({
 		map_close: "关闭地图",
 
 		// ADDITIONAL UI TEXT
+		text_member_since: "会员自",
+		text_not_available: "不可用",
+		text_invalid_date: "无效日期",
+		text_of: "的",
+		text_no_address_information_available: "地址信息不可用",
+		text_head_of_household: "户主",
+		text_freshtrak_user: "FreshTrak 用户",
 		text_no_events_scheduled: "目前未安排活动",
+		text_no_food_banks_found: "在邮政编码中未找到食品银行",
+		text_food_bank_serving_zip_code:
+			"为邮政编码 [{zip}] 提供服务的食品银行",
+		text_food_banks_serving_zip_code:
+			"为邮政编码 [{zip}] 提供服务的食品银行",
 		text_sort_by: "排序方式",
 		text_recommended: "推荐",
 		text_all: "全部",
@@ -4259,9 +4911,30 @@ let localization = new LocalizedStrings({
 		text_success: "成功",
 		text_warning: "警告",
 		text_info: "信息",
+		label_service_area_limitations: "服务区域限制:",
+		text_information: "信息",
+		text_rsvp_optional_for_event: "此活动的 RSVP 是可选的",
+		text_rsvp_required_for_event: "此活动的 RSVP 是必需的",
+		text_already_registered: "已注册",
+		text_optional: "可选",
+		text_required: "必需",
+		sr_available_time_slots_registration: "可用于注册的时间段",
+		text_slot: "时间段",
+		text_slots: "时间段",
+		text_available: "可用",
+		button_go_back: "返回",
+		button_save_and_continue: "保存并继续",
+		sr_return_previous_without_slot: "返回上一页而不选择时间段。",
+		sr_proceed_registration_selected_slot: "使用所选时间段继续注册。",
+		error_failed_load_household: "加载家庭信息失败。请重试。",
+		error_registration_failed: "注册失败",
+		error_unexpected_registration: "注册期间发生意外错误",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
+		title_welcome: "स्वागत है",
+		description_create_account_username_password:
+			"FreshTrak खाता बनाने के लिए एक उपयोगकर्ता नाम और पासवर्ड बनाएं।",
 		home_stay: "अद्यतन रहना",
 		home_findfood: "भोजन तलाशें",
 		home_comming_soon:
@@ -4291,6 +4964,9 @@ let localization = new LocalizedStrings({
 		by_distance: "दूरी द्वारा",
 		by_service_catogory: "सेवा श्रेणी द्वारा",
 		by_availability: "उपलब्धता द्वारा",
+		only_reservations: "केवल आरक्षण",
+		show_only_reservations:
+			"केवल उन कार्यक्रमों को दिखाएं जो आरक्षण स्वीकार करते हैं",
 		register: "अभी पंजीकरण करें।",
 		save_time: "समय बचाओ।",
 		stay_safe: "सुरक्षित रहें।",
@@ -4394,11 +5070,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "सेटअप पूरा करें",
 		button_setup_now: "अभी सेटअप करें",
 		button_setup_later: "बाद में सेटअप करें",
+		button_set_up_household: "परिवार सेटअप करें",
+		button_maybe_later: "शायद बाद में",
+		button_update_household: "परिवार अपडेट करें",
+		button_add_address_information: "पता जानकारी जोड़ें",
 		button_keep_editing: "संपादन जारी रखें",
 		button_discard_changes: "परिवर्तन त्यागें",
 		button_next_member: "अगला सदस्य",
+		button_skip_step: "इस चरण को छोड़ें",
 		button_view_details: "विवरण देखें",
 		button_hide_details: "विवरण छुपाएं",
+		button_reserve_time: "समय आरक्षित करें",
+		button_rsvp: "RSVP",
+		button_get_directions: "दिशा-निर्देश प्राप्त करें",
 		button_registering: "पंजीकरण हो रहा है...",
 		button_signing_in: "साइन इन हो रहा है...",
 		button_saving: "सहेजा जा रहा है...",
@@ -4440,6 +5124,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "ज़िप कोड",
 		label_zip_code_required: "ज़िप कोड *",
 		label_address: "पता",
+		label_address_colon: "पता:",
+		label_location: "स्थान:",
+		label_phone_colon: "फ़ोन:",
+		label_email_colon: "ईमेल:",
+		label_age: "उम्र:",
+		label_gender_colon: "लिंग:",
+		label_language_colon: "भाषा:",
+		label_status_colon: "स्थिति:",
+		label_account_created: "खाता बनाया गया",
+		label_account_status: "खाता स्थिति",
 		label_phone_number: "फ़ोन नंबर",
 		label_phone_number_required: "फ़ोन नंबर *",
 		label_email_address: "ईमेल पता",
@@ -4515,7 +5209,16 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "इवेंट पंजीकरण",
 		title_set_up_household: "अपना परिवार सेटअप करें",
+		title_your_details: "आपकी जानकारी",
+		title_your_address_details: "आपके पते की जानकारी",
+		title_your_family_details: "आपके परिवार की जानकारी",
+		title_contact_information: "संपर्क जानकारी",
+		title_family_member_details: "परिवार के सदस्यों की जानकारी",
 		title_household_information: "परिवार की जानकारी",
+		title_account_settings: "खाता सेटिंग्स",
+		title_profile_information: "प्रोफ़ाइल जानकारी",
+		title_household_members: "परिवार के सदस्य",
+		title_complete_household_setup: "अपना परिवार सेटअप पूरा करें",
 		title_youre_registered: "आप पंजीकृत हैं!",
 		title_create_account: "खाता बनाएं",
 		title_confirm_account: "खाता पुष्टि करें",
@@ -4585,8 +5288,22 @@ let localization = new LocalizedStrings({
 		description_fallback_language:
 			"जब किसी सदस्य की पसंदीदा भाषा उपलब्ध नहीं होती है तो उपयोग किया जाता है",
 		description_dont_have_account: "खाता नहीं है?",
+		description_already_have_account: "पहले से खाता है?",
+		description_remember_password: "अपना पासवर्ड याद है?",
 		description_sign_in_create_account:
 			"भविष्य में समय बचाने के लिए साइन इन करें या खाता बनाएं",
+		description_manage_account_household:
+			"अपने खाते की जानकारी और परिवार के विवरण प्रबंधित करें",
+		description_personal_account_details: "आपके व्यक्तिगत खाते का विवरण",
+		description_household_address_contact:
+			"आपका परिवार पता और संपर्क विवरण",
+		description_family_members_household: "आपके परिवार में परिवार के सदस्य",
+		description_noticed_family_members:
+			"हमने देखा कि आपने परिवार के सदस्य जोड़े हैं, हमें प्रत्येक के बारे में बताएं",
+		description_provide_details_family_member:
+			"कृपया प्रत्येक परिवार के सदस्य के लिए विवरण प्रदान करें",
+		description_skipped_setup_prompt:
+			"आपने पहले परिवार सेटअप छोड़ दिया था। व्यक्तिगत सेवाएं और आसान इवेंट पंजीकरण के लिए अब इसे पूरा करें।",
 		description_registering_advance: "अग्रिम में पंजीकरण है",
 		description_by_registering:
 			"अब पंजीकरण करके, आप साइट पर समय बचा सकते हैं और आपके और हमारे स्वयंसेवकों के लिए चेक-इन प्रक्रिया को अधिक सुगम बना सकते हैं।",
@@ -4681,6 +5398,8 @@ let localization = new LocalizedStrings({
 		status_error: "त्रुटि",
 		status_warning: "चेतावनी",
 		status_info: "जानकारी",
+		status_operation_completed_successfully: "ऑपरेशन सफलतापूर्वक पूर्ण हुआ",
+		button_continue_as_guest: "अतिथि के रूप में जारी रखें",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
 		aria_print_confirmation: "पुष्टिकरण प्रिंट करें",
@@ -4812,16 +5531,31 @@ let localization = new LocalizedStrings({
 		option_status: "स्थिति",
 		option_age_group: "आयु समूह",
 		option_freshtrak_user: "FreshTrak उपयोगकर्ता",
+		option_all_distances: "सभी दूरियाँ",
+		option_availability_today: "आज",
+		option_availability_tomorrow: "कल",
+		option_availability_this_week: "इस सप्ताह",
+		option_availability_next_2_weeks: "अगले 2 सप्ताह",
+		option_availability_this_month: "इस महीने",
+		option_availability_next_month: "अगले महीने",
 
 		// DIALOG & MODAL TEXT
 		dialog_discard_changes_title: "परिवर्तन त्यागें?",
 		dialog_create_account_title: "खाता बनाएं",
+		dialog_authentication_title: "प्रमाणीकरण",
 		dialog_discard_changes_description:
 			"आपके पास बचाए नहीं गए परिवर्तन हैं। क्या आप वाकई उन्हें त्यागना चाहते हैं? इस कार्रवाई को पूर्ववत नहीं किया जा सकता।",
 		dialog_create_account_description:
 			"भविष्य में समय बचाने के लिए साइन इन करें या खाता बनाएं",
 		dialog_keep_editing: "संपादन जारी रखें",
 		dialog_discard_changes: "परिवर्तन त्यागें",
+		dialog_use_household_info_title:
+			"अपनी परिवार की जानकारी का उपयोग करें?",
+		dialog_use_household_info_description:
+			"हमने आपके खाते में परिवार की जानकारी पाई है। क्या आप इस जानकारी का उपयोग करके पंजीकरण करना चाहेंगे?",
+		dialog_choose_time_slot_title: "समय स्लॉट चुनें",
+		dialog_choose_time_slot_description:
+			"अपने पंजीकरण के लिए एक उपलब्ध समय स्लॉट चुनें।",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "FreshTrak उपयोग की शर्तें",
@@ -4852,7 +5586,19 @@ let localization = new LocalizedStrings({
 		map_close: "नक्शा बंद करें",
 
 		// ADDITIONAL UI TEXT
+		text_member_since: "सदस्य के बाद से",
+		text_not_available: "उपलब्ध नहीं",
+		text_invalid_date: "अमान्य तिथि",
+		text_of: "का",
+		text_no_address_information_available: "पता जानकारी उपलब्ध नहीं",
+		text_head_of_household: "परिवार का मुखिया",
+		text_freshtrak_user: "FreshTrak उपयोगकर्ता",
 		text_no_events_scheduled: "वर्तमान में कोई कार्यक्रम निर्धारित नहीं है",
+		text_no_food_banks_found: "ज़िप कोड के भीतर कोई फूड बैंक नहीं मिला",
+		text_food_bank_serving_zip_code:
+			"ज़िप कोड [{zip}] की सेवा करने वाला फूड बैंक",
+		text_food_banks_serving_zip_code:
+			"ज़िप कोड [{zip}] की सेवा करने वाले फूड बैंक",
 		text_sort_by: "क्रमबद्ध करें",
 		text_recommended: "अनुशंसित",
 		text_all: "सभी",
@@ -4861,9 +5607,34 @@ let localization = new LocalizedStrings({
 		text_success: "सफल",
 		text_warning: "चेतावनी",
 		text_info: "जानकारी",
+		label_service_area_limitations: "सेवा क्षेत्र सीमाएं:",
+		text_information: "जानकारी",
+		text_rsvp_optional_for_event: "इस कार्यक्रम के लिए RSVP वैकल्पिक है",
+		text_rsvp_required_for_event: "इस कार्यक्रम के लिए RSVP आवश्यक है",
+		text_already_registered: "पहले से पंजीकृत",
+		text_optional: "वैकल्पिक",
+		text_required: "आवश्यक",
+		sr_available_time_slots_registration: "पंजीकरण के लिए उपलब्ध समय स्लॉट",
+		text_slot: "स्लॉट",
+		text_slots: "स्लॉट",
+		text_available: "उपलब्ध",
+		button_go_back: "वापस जाएं",
+		button_save_and_continue: "सहेजें और जारी रखें",
+		sr_return_previous_without_slot:
+			"समय स्लॉट चुने बिना पिछले पृष्ठ पर वापस जाएं।",
+		sr_proceed_registration_selected_slot:
+			"चयनित समय स्लॉट का उपयोग करके पंजीकरण के साथ आगे बढ़ें।",
+		error_failed_load_household:
+			"परिवार की जानकारी लोड करने में विफल। कृपया पुनः प्रयास करें।",
+		error_registration_failed: "पंजीकरण विफल",
+		error_unexpected_registration:
+			"पंजीकरण के दौरान एक अप्रत्याशित त्रुटि हुई",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
+		title_welcome: "स्वागत छ",
+		description_create_account_username_password:
+			"FreshTrak खाता बनाउनको लागि प्रयोगकर्ता नाम र पासवर्ड बनाउनुहोस्।",
 		home_stay: "अद्यावधिक रहनुहोस्",
 		home_findfood: "खाना खोज्नुहोस्",
 		home_comming_soon:
@@ -4893,6 +5664,9 @@ let localization = new LocalizedStrings({
 		by_distance: "दूरी बाट",
 		by_service_catogory: "सेवा कोटी द्वारा",
 		by_availability: "उपलब्धता द्वारा",
+		only_reservations: "केवल आरक्षणहरू",
+		show_only_reservations:
+			"केवल ती कार्यक्रमहरू देखाउनुहोस् जुन आरक्षण स्वीकार गर्छन्",
 		register: "अहिले नै दर्ता गर्नुहोस।",
 		save_time: "समयकाे बचत गर।",
 		stay_safe: "सुरक्षित रहनुहोस्।",
@@ -4996,11 +5770,19 @@ let localization = new LocalizedStrings({
 		button_complete_setup: "सेटअप पूरा गर्नुहोस्",
 		button_setup_now: "अहिले सेटअप गर्नुहोस्",
 		button_setup_later: "पछि सेटअप गर्नुहोस्",
+		button_set_up_household: "घरधुरी सेटअप गर्नुहोस्",
+		button_maybe_later: "हुनसक्छ पछि",
+		button_update_household: "घरधुरी अपडेट गर्नुहोस्",
+		button_add_address_information: "ठेगाना जानकारी थप्नुहोस्",
 		button_keep_editing: "सम्पादन जारी राख्नुहोस्",
 		button_discard_changes: "परिवर्तनहरू त्याग्नुहोस्",
 		button_next_member: "अर्को सदस्य",
+		button_skip_step: "यो चरण छोड्नुहोस्",
 		button_view_details: "विवरण हेर्नुहोस्",
 		button_hide_details: "विवरण लुकाउनुहोस्",
+		button_reserve_time: "समय आरक्षण गर्नुहोस्",
+		button_rsvp: "RSVP",
+		button_get_directions: "दिशानिर्देश प्राप्त गर्नुहोस्",
 		button_registering: "दर्ता हुँदैछ...",
 		button_signing_in: "साइन इन हुँदैछ...",
 		button_saving: "बचत हुँदैछ...",
@@ -5042,6 +5824,16 @@ let localization = new LocalizedStrings({
 		label_zip_code: "जिप कोड",
 		label_zip_code_required: "जिप कोड *",
 		label_address: "ठेगाना",
+		label_address_colon: "ठेगाना:",
+		label_location: "स्थान:",
+		label_phone_colon: "फोन:",
+		label_email_colon: "इमेल:",
+		label_age: "उमेर:",
+		label_gender_colon: "लिङ्ग:",
+		label_language_colon: "भाषा:",
+		label_status_colon: "स्थिति:",
+		label_account_created: "खाता सिर्जना भयो",
+		label_account_status: "खाता स्थिति",
 		label_phone_number: "फोन नम्बर",
 		label_phone_number_required: "फोन नम्बर *",
 		label_email_address: "इमेल ठेगाना",
@@ -5120,7 +5912,16 @@ let localization = new LocalizedStrings({
 		// HEADERS & TITLES
 		title_event_registration: "घटना दर्ता",
 		title_set_up_household: "आफ्नो घरधुरी सेटअप गर्नुहोस्",
+		title_your_details: "तपाईंको जानकारी",
+		title_your_address_details: "तपाईंको ठेगानाको जानकारी",
+		title_your_family_details: "तपाईंको परिवारको जानकारी",
+		title_contact_information: "सम्पर्क जानकारी",
+		title_family_member_details: "परिवारका सदस्यहरूको जानकारी",
 		title_household_information: "घरधुरी जानकारी",
+		title_account_settings: "खाता सेटिङहरू",
+		title_profile_information: "प्रोफाइल जानकारी",
+		title_household_members: "घरधुरीका सदस्यहरू",
+		title_complete_household_setup: "आफ्नो घरधुरी सेटअप पूरा गर्नुहोस्",
 		title_youre_registered: "तपाईं दर्ता भएका छन्!",
 		title_create_account: "खाता बनाउनुहोस्",
 		title_confirm_account: "खाता पुष्टि गर्नुहोस्",
@@ -5192,8 +5993,23 @@ let localization = new LocalizedStrings({
 		description_fallback_language:
 			"जब सदस्यको मन पराइएको भाषा उपलब्ध छैन तब प्रयोग गरिन्छ",
 		description_dont_have_account: "खाता छैन?",
+		description_already_have_account: "पहिले नै खाता छ?",
+		description_remember_password: "तपाईंको पासवर्ड सम्झनुहुन्छ?",
 		description_sign_in_create_account:
 			"भविष्यमा समय बचाउन साइन इन गर्नुहोस् वा खाता बनाउनुहोस्",
+		description_manage_account_household:
+			"आफ्नो खाता जानकारी र घरधुरी विवरणहरू व्यवस्थापन गर्नुहोस्",
+		description_personal_account_details: "तपाईंको व्यक्तिगत खाता विवरणहरू",
+		description_household_address_contact:
+			"तपाईंको घरधुरी ठेगाना र सम्पर्क विवरणहरू",
+		description_family_members_household:
+			"तपाईंको घरधुरीमा परिवारका सदस्यहरू",
+		description_noticed_family_members:
+			"हामीले देख्यौं कि तपाईंले परिवारका सदस्यहरू थप्नुभयो, प्रत्येकको बारेमा हामीलाई भन्नुहोस्",
+		description_provide_details_family_member:
+			"कृपया प्रत्येक परिवार सदस्यको लागि विवरणहरू प्रदान गर्नुहोस्",
+		description_skipped_setup_prompt:
+			"तपाईंले पहिले घरधुरी सेटअप छोड्नुभयो। व्यक्तिगत सेवाहरू र सजिलो घटना दर्ताको लागि अहिले यसलाई पूरा गर्नुहोस्।",
 		description_registering_advance: "अग्रिममा दर्ता गर्नु",
 		description_by_registering:
 			"अहिले दर्ता गरेर, तपाईं साइटमा समय बचत गर्न सक्नुहुनेछ र तपाईं र हाम्रा स्वयंसेवकहरूको लागि चेक-इन प्रक्रिया सजिलो बनाउन सक्नुहुन्छ।",
@@ -5288,6 +6104,9 @@ let localization = new LocalizedStrings({
 		status_error: "त्रुटि",
 		status_warning: "चेतावनी",
 		status_info: "जानकारी",
+		status_operation_completed_successfully:
+			"सञ्चालन सफलतापूर्वक पूर्ण भयो",
+		button_continue_as_guest: "अतिथिको रूपमा जारी राख्नुहोस्",
 
 		// ACCESSIBILITY LABELS (ARIA & ALT TEXT)
 		aria_print_confirmation: "पुष्टिकरण प्रिन्ट गर्नुहोस्",
@@ -5419,16 +6238,31 @@ let localization = new LocalizedStrings({
 		option_status: "स्थिति",
 		option_age_group: "उमेर समूह",
 		option_freshtrak_user: "FreshTrak प्रयोगकर्ता",
+		option_all_distances: "सबै दूरीहरू",
+		option_availability_today: "आज",
+		option_availability_tomorrow: "भोलि",
+		option_availability_this_week: "यो हप्ता",
+		option_availability_next_2_weeks: "अर्को २ हप्ता",
+		option_availability_this_month: "यो महिना",
+		option_availability_next_month: "अर्को महिना",
 
 		// DIALOG & MODAL TEXT
 		dialog_discard_changes_title: "परिवर्तनहरू त्याग्नुहोस्?",
 		dialog_create_account_title: "खाता बनाउनुहोस्",
+		dialog_authentication_title: "प्रमाणीकरण",
 		dialog_discard_changes_description:
 			"तपाईंसँग बचत नभएका परिवर्तनहरू छन्। के तपाईं वास्तवमै तिनीहरूलाई त्याग्न चाहनुहुन्छ? यो कार्य पूर्ववत गर्न सकिँदैन।",
 		dialog_create_account_description:
 			"भविष्यमा समय बचाउन साइन इन गर्नुहोस् वा खाता बनाउनुहोस्",
 		dialog_keep_editing: "सम्पादन जारी राख्नुहोस्",
 		dialog_discard_changes: "परिवर्तनहरू त्याग्नुहोस्",
+		dialog_use_household_info_title:
+			"आफ्नो घरधुरीको जानकारी प्रयोग गर्नुहुन्छ?",
+		dialog_use_household_info_description:
+			"हामीले तपाईंको खातामा घरधुरीको जानकारी फेला पार्यौं। के तपाईं यो जानकारी प्रयोग गरेर दर्ता गर्न चाहनुहुन्छ?",
+		dialog_choose_time_slot_title: "समय स्लट छान्नुहोस्",
+		dialog_choose_time_slot_description:
+			"तपाईंको दर्ताको लागि उपलब्ध समय स्लट छान्नुहोस्।",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "FreshTrak प्रयोगका सर्तहरू",
@@ -5460,7 +6294,19 @@ let localization = new LocalizedStrings({
 		map_close: "नक्सा बन्द गर्नुहोस्",
 
 		// ADDITIONAL UI TEXT
+		text_member_since: "सदस्य देखि",
+		text_not_available: "उपलब्ध छैन",
+		text_invalid_date: "अमान्य मिति",
+		text_of: "को",
+		text_no_address_information_available: "ठेगाना जानकारी उपलब्ध छैन",
+		text_head_of_household: "घरधुरीको मुखिया",
+		text_freshtrak_user: "FreshTrak प्रयोगकर्ता",
 		text_no_events_scheduled: "हाल कुनै कार्यक्रमहरू तालिकाबद्ध गरिएको छैन",
+		text_no_food_banks_found: "जिप कोड भित्र कुनै खाना बैंक फेला परेन",
+		text_food_bank_serving_zip_code:
+			"जिप कोड [{zip}] लाई सेवा दिँदैको खाना बैंक",
+		text_food_banks_serving_zip_code:
+			"जिप कोड [{zip}] लाई सेवा दिँदैका खाना बैंकहरू",
 		text_sort_by: "क्रमबद्ध गर्नुहोस्",
 		text_recommended: "सिफारिस गरिएको",
 		text_all: "सबै",
@@ -5469,6 +6315,27 @@ let localization = new LocalizedStrings({
 		text_success: "सफल",
 		text_warning: "चेतावनी",
 		text_info: "जानकारी",
+		label_service_area_limitations: "सेवा क्षेत्र सीमाहरू:",
+		text_information: "जानकारी",
+		text_rsvp_optional_for_event: "यस कार्यक्रमको लागि RSVP वैकल्पिक छ",
+		text_rsvp_required_for_event: "यस कार्यक्रमको लागि RSVP आवश्यक छ",
+		text_already_registered: "पहिले नै दर्ता भएको",
+		text_optional: "वैकल्पिक",
+		text_required: "आवश्यक",
+		sr_available_time_slots_registration: "दर्ताको लागि उपलब्ध समय स्लटहरू",
+		text_slot: "स्लट",
+		text_slots: "स्लटहरू",
+		text_available: "उपलब्ध",
+		button_go_back: "फिर्ता जानुहोस्",
+		button_save_and_continue: "बचत गर्नुहोस् र जारी राख्नुहोस्",
+		sr_return_previous_without_slot:
+			"समय स्लट छाने बिना अघिल्लो पृष्ठमा फिर्ता जानुहोस्।",
+		sr_proceed_registration_selected_slot:
+			"छानिएको समय स्लट प्रयोग गरेर दर्तासँग अगाडि बढ्नुहोस्।",
+		error_failed_load_household:
+			"घरपरिवारको जानकारी लोड गर्न असफल। कृपया पुनः प्रयास गर्नुहोस्।",
+		error_registration_failed: "दर्ता असफल",
+		error_unexpected_registration: "दर्ताको क्रममा अप्रत्याशित त्रुटि भयो",
 	},
 });
 

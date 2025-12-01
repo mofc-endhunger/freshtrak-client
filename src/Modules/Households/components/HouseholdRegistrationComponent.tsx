@@ -166,7 +166,7 @@ const HouseholdRegistrationComponent: React.FC<
 			onCancel={onCancel}
 			prefilledData={prefilledData}
 			title={localization.title_set_up_household}
-			subtitle={localization.description_complete_household_profile}
+			subtitle={localization.subtitle_complete_household_profile}
 			submitButtonText={localization.button_complete_setup}
 			cancelButtonText={localization.button_cancel}
 			currentHouseholdMembers={currentHouseholdMembers}

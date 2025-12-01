@@ -88,10 +88,10 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 							size="sm"
 							className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 							type="button"
-							aria-label={localization.aria_decrease_number_of_seniors}
+							aria-label={localization.aria_decrease_seniors}
 						>
 							<span className="sr-only">
-								{localization.aria_decrease_number_of_seniors}
+								{localization.sr_decrease_seniors}
 							</span>
 							<span
 								aria-hidden="true"
@@ -104,7 +104,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 							className="sr-only"
 							htmlFor="seniors_in_household"
 						>
-							{localization.label_number_of_seniors}
+							{localization.sr_number_seniors}
 						</Label>
 						<Input
 							type="text"
@@ -121,10 +121,10 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 							variant="outline"
 							size="sm"
 							className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
-							aria-label={localization.aria_increase_number_of_seniors}
+							aria-label={localization.aria_increase_seniors}
 						>
 							<span className="sr-only">
-								{localization.aria_increase_number_of_seniors}
+								{localization.sr_increase_seniors}
 							</span>
 							<span
 								aria-hidden="true"
@@ -149,10 +149,10 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						size="sm"
 						className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 						type="button"
-						aria-label={localization.aria_decrease_number_of_adults}
+						aria-label={localization.aria_decrease_adults}
 					>
 						<span className="sr-only">
-							{localization.aria_decrease_number_of_adults}
+							{localization.sr_decrease_adults}
 						</span>
 						<span
 							aria-hidden="true"
@@ -162,7 +162,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						</span>
 					</Button>
 					<Label className="sr-only" htmlFor="adults_in_household">
-						{localization.label_number_of_adults}
+						{localization.sr_number_adults}
 					</Label>
 					<Input
 						type="text"
@@ -179,10 +179,10 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						variant="outline"
 						size="sm"
 						className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
-						aria-label={localization.aria_increase_number_of_adults}
+						aria-label={localization.aria_increase_adults}
 					>
 						<span className="sr-only">
-							{localization.aria_increase_number_of_adults}
+							{localization.sr_increase_adults}
 						</span>
 						<span
 							aria-hidden="true"
@@ -206,9 +206,11 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						size="sm"
 						className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
 						type="button"
-						aria-label={localization.aria_decrease_number_of_children}
+						aria-label={localization.aria_decrease_kids}
 					>
-						<span className="sr-only">{localization.aria_decrease_number_of_children}</span>
+						<span className="sr-only">
+							{localization.sr_decrease_kids}
+						</span>
 						<span
 							aria-hidden="true"
 							className="text-lg font-semibold"
@@ -217,7 +219,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						</span>
 					</Button>
 					<Label className="sr-only" htmlFor="children_in_household">
-						{localization.label_number_of_children}
+						{localization.sr_number_kids}
 					</Label>
 					<Input
 						type="text"
@@ -234,9 +236,11 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
 						variant="outline"
 						size="sm"
 						className="w-8 h-8 rounded-full p-0 flex items-center justify-center bg-text-primary text-white"
-						aria-label={localization.aria_increase_number_of_children}
+						aria-label={localization.aria_increase_kids}
 					>
-						<span className="sr-only">{localization.aria_increase_number_of_children}</span>
+						<span className="sr-only">
+							{localization.sr_increase_kids}
+						</span>
 						<span
 							aria-hidden="true"
 							className="text-lg font-semibold"

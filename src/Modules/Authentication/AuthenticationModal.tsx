@@ -171,15 +171,25 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 			case "signup":
 				return localization.dialog_create_account_title;
 			case "confirm":
-				return localization.dialog_confirm_account_title || "Confirm Account";
+				return (
+					localization.dialog_confirm_account_title ||
+					"Confirm Account"
+				);
 			case "reset":
-				return localization.dialog_reset_password_title || "Reset Password";
+				return (
+					localization.dialog_reset_password_title || "Reset Password"
+				);
 			case "confirmReset":
-				return localization.dialog_confirm_new_password_title || "Confirm New Password";
+				return (
+					localization.dialog_confirm_new_password_title ||
+					"Confirm New Password"
+				);
 			case "loading":
 				return localization.button_processing;
 			default:
-				return localization.dialog_authentication_title || "Authentication";
+				return (
+					localization.dialog_authentication_title || "Authentication"
+				);
 		}
 	};
 
@@ -306,15 +316,12 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 						currentTab !== "loading" && (
 							<div className="mt-6 pt-4 border-t border-gray-200">
 								<div className="text-center">
-									<p className="text-sm text-gray-600 mb-3">
-										Or continue as a guest
-									</p>
 									<Button
 										variant="outline"
 										onClick={onGuestLogin}
 										className="w-full"
 									>
-										Continue as Guest
+										{localization.button_continue_as_guest}
 									</Button>
 								</div>
 							</div>

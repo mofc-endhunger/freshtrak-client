@@ -74,7 +74,8 @@ const StateDropdownComponent: React.FC<StateDropdownProps> = ({
 				htmlFor="state"
 				className="block text-sm font-medium text-gray-700"
 			>
-				State<span className="text-red-500 ml-1">*</span>
+				{localization.state}
+				<span className="text-red-500 ml-1">*</span>
 			</label>
 			<select
 				className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${

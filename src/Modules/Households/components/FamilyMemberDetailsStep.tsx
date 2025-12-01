@@ -161,38 +161,38 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 
 	const getMemberTypeLabel = (index: number): string => {
 		// This is a simplified version - you might want to determine based on age or other criteria
-		return `Family Member ${index + 1}`;
+		return `${localization.title_family_member_details} ${index + 1}`;
 	};
 
 	const getSuffixText = (suffixId: number): string => {
-		const suffixes = {
-			1: "Jr.",
-			2: "Sr.",
-			3: "II",
-			4: "III",
-			5: "IV",
+		const suffixes: Record<number, string> = {
+			1: localization.option_suffix_jr,
+			2: localization.option_suffix_sr,
+			3: localization.option_suffix_ii,
+			4: localization.option_suffix_iii,
+			5: localization.option_suffix_iv,
 		};
-		return suffixes[suffixId as keyof typeof suffixes] || "";
+		return suffixes[suffixId] || "";
 	};
 
 	const getSuffixOptions = () => [
-		{ value: 1, label: "Jr." },
-		{ value: 2, label: "Sr." },
-		{ value: 3, label: "II" },
-		{ value: 4, label: "III" },
-		{ value: 5, label: "IV" },
+		{ value: 1, label: localization.option_suffix_jr },
+		{ value: 2, label: localization.option_suffix_sr },
+		{ value: 3, label: localization.option_suffix_ii },
+		{ value: 4, label: localization.option_suffix_iii },
+		{ value: 5, label: localization.option_suffix_iv },
 	];
 
 	return (
 		<div className="space-y-6">
 			<div className="text-center">
 				<h3 className="text-xl font-semibold text-gray-900 mb-4">
-					We noticed that you added family members, tell us about each
-					one
+					{localization.description_noticed_family_members}
 				</h3>
 				<p className="text-gray-600 mb-6">
-					Please provide details for each family member (
-					{currentMemberIndex + 1} of {members.length})
+					{localization.description_provide_details_family_member} (
+					{currentMemberIndex + 1} {localization.text_of}{" "}
+					{members.length})
 				</p>
 			</div>
 
@@ -204,7 +204,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 				</CardHeader>
 				<CardContent>
 					<form
-						onSubmit={e => {
+						onSubmit={(e) => {
 							e.preventDefault();
 							handleSubmit(onSubmit)();
 						}}
@@ -213,13 +213,18 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							{/* First Name */}
 							<div className="space-y-2">
-								<Label htmlFor="first_name">{localization.label_first_name_required}</Label>
+								<Label htmlFor="first_name">
+									{localization.label_first_name_required}
+								</Label>
 								<Input
 									id="first_name"
 									type="text"
-									placeholder={localization.placeholder_enter_first_name}
+									placeholder={
+										localization.placeholder_enter_first_name
+									}
 									{...register("first_name", {
-										required: "First name is required",
+										required:
+											localization.error_first_name_required,
 									})}
 								/>
 								{errors.first_name && (
@@ -231,13 +236,18 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 
 							{/* Last Name */}
 							<div className="space-y-2">
-								<Label htmlFor="last_name">{localization.label_last_name_required}</Label>
+								<Label htmlFor="last_name">
+									{localization.label_last_name_required}
+								</Label>
 								<Input
 									id="last_name"
 									type="text"
-									placeholder={localization.placeholder_enter_last_name}
+									placeholder={
+										localization.placeholder_enter_last_name
+									}
 									{...register("last_name", {
-										required: "Last name is required",
+										required:
+											localization.error_last_name_required,
 									})}
 								/>
 								{errors.last_name && (
@@ -249,18 +259,24 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 
 							{/* Middle Name */}
 							<div className="space-y-2">
-								<Label htmlFor="middle_name">{localization.label_middle_name}</Label>
+								<Label htmlFor="middle_name">
+									{localization.middle_name}
+								</Label>
 								<Input
 									id="middle_name"
 									type="text"
-									placeholder={localization.placeholder_enter_middle_name_optional}
+									placeholder={
+										localization.placeholder_enter_middle_name_optional
+									}
 									{...register("middle_name")}
 								/>
 							</div>
 
 							{/* Gender */}
 							<div className="space-y-2">
-								<Label htmlFor="gender_id">{localization.label_gender} *</Label>
+								<Label htmlFor="gender_id">
+									{localization.label_gender_required}
+								</Label>
 								<Select
 									value={
 										watch("gender_id")?.toString() || "1"
@@ -270,16 +286,26 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 									}
 								>
 									<SelectTrigger>
-										<SelectValue placeholder={localization.placeholder_select_gender} />
+										<SelectValue
+											placeholder={
+												localization.placeholder_select_gender
+											}
+										/>
 									</SelectTrigger>
 									<SelectContent className="bg-white">
-										<SelectItem value="1">{localization.option_gender_male}</SelectItem>
+										<SelectItem value="1">
+											{localization.option_gender_male}
+										</SelectItem>
 										<SelectItem value="2">
 											{localization.option_gender_female}
 										</SelectItem>
-										<SelectItem value="3">{localization.option_gender_other}</SelectItem>
+										<SelectItem value="3">
+											{localization.option_gender_other}
+										</SelectItem>
 										<SelectItem value="4">
-											{localization.option_gender_prefer_not_to_say}
+											{
+												localization.option_gender_prefer_not_to_say
+											}
 										</SelectItem>
 									</SelectContent>
 								</Select>
@@ -293,13 +319,14 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 							{/* Date of Birth */}
 							<div className="space-y-2">
 								<Label htmlFor="date_of_birth">
-									Date of Birth *
+									{localization.label_date_of_birth_required}
 								</Label>
 								<Input
 									id="date_of_birth"
 									type="date"
 									{...register("date_of_birth", {
-										required: "Date of birth is required",
+										required:
+											localization.error_date_of_birth_required,
 									})}
 								/>
 								{errors.date_of_birth && (
@@ -311,7 +338,9 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 
 							{/* Suffix */}
 							<div className="space-y-2">
-								<Label htmlFor="suffix_id">Suffix</Label>
+								<Label htmlFor="suffix_id">
+									{localization.label_suffix_optional}
+								</Label>
 								<Select
 									value={
 										watch("suffix_id")?.toString() || "none"
@@ -326,13 +355,17 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 									}
 								>
 									<SelectTrigger>
-										<SelectValue placeholder={localization.placeholder_select_suffix} />
+										<SelectValue
+											placeholder={
+												localization.placeholder_select_suffix
+											}
+										/>
 									</SelectTrigger>
 									<SelectContent className="bg-white">
 										<SelectItem value="none">
-											None
+											{localization.option_suffix_none}
 										</SelectItem>
-										{getSuffixOptions().map(option => (
+										{getSuffixOptions().map((option) => (
 											<SelectItem
 												key={option.value}
 												value={option.value.toString()}
@@ -352,7 +385,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 								variant="highlight"
 								onClick={onCancel}
 							>
-								Previous
+								{localization.button_previous}
 							</Button>
 
 							<div className="flex space-x-3">
@@ -361,7 +394,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 									variant="highlightOutline"
 									onClick={handleSkip}
 								>
-									Skip This Step
+									{localization.button_skip_step}
 								</Button>
 
 								<Button
@@ -370,8 +403,8 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 									onClick={() => handleSubmit(onSubmit)()}
 								>
 									{currentMemberIndex < members.length - 1
-										? "Next Member"
-										: "Next"}
+										? localization.button_next_member
+										: localization.button_next}
 								</Button>
 							</div>
 						</div>

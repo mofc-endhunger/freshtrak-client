@@ -13,6 +13,7 @@ import { Button } from "../../components/ui/button";
 import { AuthModalTab, GTMEvent } from "./types/authentication.types";
 import { API_URL } from "../../Utils/Urls";
 import { StorageService } from "../../Utils/StorageService";
+import localization from "../Localization/LocalizationComponent";
 
 /**
  * LoginPage - Full-page login interface with authentication forms
@@ -152,13 +153,15 @@ const LoginPage: React.FC = () => {
 	const getFormTitle = (): string => {
 		switch (currentTab) {
 			case "signin":
-				return "Sign In";
+				return localization.button_sign_in || "Sign In";
 			case "signup":
-				return "Create Account";
+				return localization.button_create_account || "Create Account";
 			case "confirm":
-				return "Confirm Account";
+				return localization.button_confirm_account || "Confirm Account";
 			default:
-				return "Authentication";
+				return (
+					localization.dialog_authentication_title || "Authentication"
+				);
 		}
 	};
 
@@ -185,7 +188,7 @@ const LoginPage: React.FC = () => {
 								onClick={() => switchTab("signin")}
 								className="flex-1"
 							>
-								Sign In
+								{localization.button_sign_in}
 							</Button>
 							<Button
 								variant={
@@ -197,7 +200,7 @@ const LoginPage: React.FC = () => {
 								onClick={() => switchTab("signup")}
 								className="flex-1"
 							>
-								Sign Up
+								{localization.button_sign_up}
 							</Button>
 						</div>
 					)}
@@ -271,9 +274,6 @@ const LoginPage: React.FC = () => {
 						currentTab !== "confirmReset" && (
 							<div className="mt-6 pt-4 border-t border-gray-200">
 								<div className="text-center">
-									<p className="text-sm text-gray-600 mb-3">
-										Or continue as a guest
-									</p>
 									<Button
 										variant="outline"
 										onClick={onGuestLogin}
@@ -286,7 +286,7 @@ const LoginPage: React.FC = () => {
 												<span>Processing...</span>
 											</div>
 										) : (
-											"Continue as Guest"
+											localization.button_continue_as_guest
 										)}
 									</Button>
 								</div>
@@ -301,7 +301,7 @@ const LoginPage: React.FC = () => {
 						onClick={() => navigate(RENDER_URL.ROOT_URL)}
 						className="text-gray-600 hover:text-gray-900"
 					>
-						← Back to Home
+						← {localization.button_back_to_home || "Back to Home"}
 					</Button>
 				</div>
 			</div>

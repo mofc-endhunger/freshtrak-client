@@ -50,34 +50,37 @@ import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegr
 import localization from "../../Localization/LocalizationComponent";
 
 // Form validation schema - using function to access localization
-const getHouseholdInfoSchema = () => z.object({
-	address_line_1: z.string().min(1, localization.error_street_address_required),
-	address_line_2: z.string().optional(),
-	city: z.string().min(1, localization.error_city_required),
-	state: z.string().min(1, localization.error_state_required),
-	zip_code: z.string().min(5, localization.error_zip_code_min_length),
-	preferred_language: z
-		.string()
-		.refine(
-			val =>
-				[
-					"en",
-					"es",
-					"fr",
-					"de",
-					"it",
-					"pt",
-					"zh",
-					"ja",
-					"ko",
-					"ar",
-				].includes(val),
-			{ message: localization.error_please_select_valid_language }
-		),
-	notes: z.string().optional(),
-});
+const getHouseholdInfoSchema = () =>
+	z.object({
+		address_line_1: z
+			.string()
+			.min(1, localization.error_street_address_required),
+		address_line_2: z.string().optional(),
+		city: z.string().min(1, localization.error_city_required),
+		state: z.string().min(1, localization.error_state_required),
+		zip_code: z.string().min(5, localization.error_zip_code_min_length),
+		preferred_language: z
+			.string()
+			.refine(
+				(val) =>
+					[
+						"en",
+						"es",
+						"fr",
+						"de",
+						"it",
+						"pt",
+						"zh",
+						"ja",
+						"ko",
+						"ar",
+					].includes(val),
+				{ message: localization.error_please_select_valid_language }
+			),
+		notes: z.string().optional(),
+	});
 
-type HouseholdInfoFormData = z.infer<typeof householdInfoSchema>;
+type HouseholdInfoFormData = z.infer<ReturnType<typeof getHouseholdInfoSchema>>;
 
 interface HouseholdInfoManagerProps {
 	household: Household;
@@ -300,7 +303,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 						</Label>
 						<p className="text-gray-900">
 							{languageOptions.find(
-								opt =>
+								(opt) =>
 									opt.value === household.preferred_language
 							)?.label || household.preferred_language}
 						</p>
@@ -357,7 +360,9 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div>
-						<Label htmlFor="address_line_1">{localization.label_address_line_1}</Label>
+						<Label htmlFor="address_line_1">
+							{localization.label_address_line_1}
+						</Label>
 						<Input
 							id="address_line_1"
 							{...register("address_line_1")}
@@ -373,17 +378,23 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					</div>
 
 					<div>
-						<Label htmlFor="address_line_2">{localization.label_address_line_2}</Label>
+						<Label htmlFor="address_line_2">
+							{localization.label_address_line_2}
+						</Label>
 						<Input
 							id="address_line_2"
 							{...register("address_line_2")}
-							placeholder={localization.placeholder_apartment_suite_unit}
+							placeholder={
+								localization.placeholder_apartment_suite_unit
+							}
 						/>
 					</div>
 
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 						<div>
-							<Label htmlFor="city">{localization.label_city_required}</Label>
+							<Label htmlFor="city">
+								{localization.label_city_required}
+							</Label>
 							<Input
 								id="city"
 								{...register("city")}
@@ -396,7 +407,9 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 							)}
 						</div>
 						<div>
-							<Label htmlFor="state">{localization.label_state_required}</Label>
+							<Label htmlFor="state">
+								{localization.label_state_required}
+							</Label>
 							<Input
 								id="state"
 								{...register("state")}
@@ -409,7 +422,9 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 							)}
 						</div>
 						<div>
-							<Label htmlFor="zip_code">{localization.label_zip_code_required}</Label>
+							<Label htmlFor="zip_code">
+								{localization.label_zip_code_required}
+							</Label>
 							<Input
 								id="zip_code"
 								{...register("zip_code")}
@@ -445,7 +460,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 						</Label>
 						<Select
 							value={watchedValues.preferred_language}
-							onValueChange={value =>
+							onValueChange={(value) =>
 								setValue(
 									"preferred_language",
 									value as LanguagePreference
@@ -459,10 +474,14 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 										: ""
 								}
 							>
-								<SelectValue placeholder={localization.placeholder_select_a_language} />
+								<SelectValue
+									placeholder={
+										localization.placeholder_select_a_language
+									}
+								/>
 							</SelectTrigger>
 							<SelectContent>
-								{languageOptions.map(option => (
+								{languageOptions.map((option) => (
 									<SelectItem
 										key={option.value}
 										value={option.value}
@@ -494,11 +513,15 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				</CardHeader>
 				<CardContent>
 					<div>
-						<Label htmlFor="notes">{localization.label_notes}</Label>
+						<Label htmlFor="notes">
+							{localization.label_notes}
+						</Label>
 						<Textarea
 							id="notes"
 							{...register("notes")}
-							placeholder={localization.placeholder_household_notes}
+							placeholder={
+								localization.placeholder_household_notes
+							}
 							rows={4}
 						/>
 					</div>
@@ -511,7 +534,9 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 					<CardContent className="pt-6">
 						<div className="flex items-center space-x-2 text-red-600">
 							<AlertCircle className="w-5 h-5" />
-							<span className="font-medium">{localization.text_error}</span>
+							<span className="font-medium">
+								{localization.text_error}
+							</span>
 						</div>
 						<p className="text-red-600 mt-2">{error}</p>
 					</CardContent>
@@ -574,7 +599,9 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 			>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>{localization.dialog_discard_changes_title}</AlertDialogTitle>
+						<AlertDialogTitle>
+							{localization.dialog_discard_changes_title}
+						</AlertDialogTitle>
 						<AlertDialogDescription>
 							{localization.dialog_discard_changes_description}
 						</AlertDialogDescription>

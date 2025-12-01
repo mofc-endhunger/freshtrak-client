@@ -1,6 +1,5 @@
 // Form Validation Utility Functions with TypeScript Types
 
-import { FieldError, FieldErrors, UseFormRegister, UseFormWatch, UseFormSetValue, UseFormGetValues, UseFormTrigger } from 'react-hook-form';
 import localization from '../../Localization/LocalizationComponent';
 
 // Types for form validation
@@ -269,7 +268,7 @@ export const validateAge = (age: number | string): ValidationResult => {
   }
 
   if (numAge < VALIDATION_CONSTANTS.MIN_AGE || numAge > VALIDATION_CONSTANTS.MAX_AGE) {
-    const errorMsg = localization.error_age_range?.replace('{min}', VALIDATION_CONSTANTS.MIN_AGE.toString()).replace('{max}', VALIDATION_CONSTANTS.MAX_AGE.toString()) || `Age must be between ${VALIDATION_CONSTANTS.MIN_AGE} and ${VALIDATION_CONSTANTS.MAX_AGE}`;
+    const errorMsg = `Age must be between ${VALIDATION_CONSTANTS.MIN_AGE} and ${VALIDATION_CONSTANTS.MAX_AGE}`;
     return {
       isValid: false,
       error: errorMsg,
@@ -347,8 +346,6 @@ export const validateFormData = (
 
   for (const [fieldName, rules] of Object.entries(config)) {
     const value = formData[fieldName];
-    let isValid = true;
-    let error = '';
 
     // Check required
     if (rules.required && (typeof rules.required === 'boolean' ? rules.required : true)) {

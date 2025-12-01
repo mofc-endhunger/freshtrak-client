@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { selectZip } from "../../Store/Search/searchSlice";
 import FoodbankTextComponent from "../General/FoodbankTextComponent";
 import HouseHoldEligibilityComponent from "../General/HouseHoldEligibilityComponent";
+import localization from "../Localization/LocalizationComponent";
 
 interface FoodbankText {
 	text: string;
@@ -50,18 +51,24 @@ const ResourceListComponent: React.FC<ResourceListComponentProps> = ({
 	const foodBankDisplay = (): string => {
 		switch (foodBankArray.length) {
 			case 0:
-				return "No Food Banks found within the zip code";
+				return localization.text_no_food_banks_found;
 			case 1:
-				return `Food bank serving zip code [${searchedZip}]`;
+				return localization.text_food_bank_serving_zip_code.replace(
+					"{zip}",
+					searchedZip || ""
+				);
 			default:
-				return `Food banks serving zip code [${searchedZip}]`;
+				return localization.text_food_banks_serving_zip_code.replace(
+					"{zip}",
+					searchedZip || ""
+				);
 		}
 	};
 
 	React.useEffect(() => {
 		if (dataToChild) {
 			const { foodbanks } = dataToChild;
-			let foodBankArray: FoodbankData[] = foodbanks.map(foodbank => {
+			let foodBankArray: FoodbankData[] = foodbanks.map((foodbank) => {
 				return { foodbank };
 			});
 			setFoodBankArray(foodBankArray);
@@ -94,7 +101,9 @@ const ResourceListComponent: React.FC<ResourceListComponentProps> = ({
 								<div className="flex items-center">
 									<span className="h-8">
 										<img
-											alt="logo"
+											alt={
+												localization.alt_logo || "logo"
+											}
 											src={logo}
 											className="max-h-full"
 										/>

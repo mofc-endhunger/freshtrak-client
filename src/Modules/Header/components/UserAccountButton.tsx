@@ -120,7 +120,7 @@ const UserAccountButton: React.FC = () => {
 							<p className="text-sm font-medium text-gray-900 truncate">
 								{user.name && user.name !== user.email
 									? user.name
-									: "User"}
+									: localization.menu_user}
 							</p>
 							<p className="text-xs text-gray-500 truncate">
 								{user.email}
@@ -135,7 +135,7 @@ const UserAccountButton: React.FC = () => {
 					className="cursor-pointer hover:bg-gray-50"
 				>
 					<Home className="mr-2 h-4 w-4" />
-					<span>Home</span>
+					<span>{localization.menu_home}</span>
 				</DropdownMenuItem>
 
 				<DropdownMenuItem
@@ -143,7 +143,7 @@ const UserAccountButton: React.FC = () => {
 					className="cursor-pointer hover:bg-gray-50"
 				>
 					<Settings className="mr-2 h-4 w-4" />
-					<span>Account Settings</span>
+					<span>{localization.title_account_settings}</span>
 				</DropdownMenuItem>
 
 				<DropdownMenuSeparator />
@@ -153,7 +153,7 @@ const UserAccountButton: React.FC = () => {
 					className="cursor-pointer hover:bg-gray-50 text-red-600 focus:text-red-600"
 				>
 					<LogOut className="mr-2 h-4 w-4" />
-					<span>Sign Out</span>
+					<span>{localization.button_sign_out}</span>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

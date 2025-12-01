@@ -161,6 +161,10 @@ let localization = new LocalizedStrings({
 		button_searching: "Searching...",
 		button_processing: "Processing...",
 
+		// MENU ITEMS
+		menu_home: "Home",
+		menu_user: "User",
+
 		// FORM LABELS & FIELD NAMES
 		label_email: "Email",
 		label_password: "Password",
@@ -885,6 +889,10 @@ let localization = new LocalizedStrings({
 		button_searching: "Buscando...",
 		button_processing: "Procesando...",
 
+		// MENU ITEMS
+		menu_home: "Inicio",
+		menu_user: "Usuario",
+
 		// FORM LABELS & FIELD NAMES
 		label_email: "Correo Electrónico",
 		label_password: "Contraseña",
@@ -1604,6 +1612,10 @@ let localization = new LocalizedStrings({
 		button_creating: "Abuurista...",
 		button_searching: "Raadinta...",
 		button_processing: "Hagitaanka...",
+
+		// MENU ITEMS
+		menu_home: "Guriga",
+		menu_user: "Isticmaale",
 
 		// FORM LABELS & FIELD NAMES
 		label_email: "Iimaylka",
@@ -2327,6 +2339,10 @@ let localization = new LocalizedStrings({
 		button_creating: "Создание...",
 		button_searching: "Поиск...",
 		button_processing: "Обработка...",
+
+		// MENU ITEMS
+		menu_home: "Главная",
+		menu_user: "Пользователь",
 
 		// FORM LABELS & FIELD NAMES
 		label_email: "Электронная почта",
@@ -3052,6 +3068,10 @@ let localization = new LocalizedStrings({
 		button_searching: "Aranıyor...",
 		button_processing: "İşleniyor...",
 
+		// MENU ITEMS
+		menu_home: "Ana Sayfa",
+		menu_user: "Kullanıcı",
+
 		// FORM LABELS & FIELD NAMES
 		label_email: "E-posta",
 		label_password: "Şifre",
@@ -3753,6 +3773,10 @@ let localization = new LocalizedStrings({
 		button_searching: "جاري البحث...",
 		button_processing: "جاري المعالجة...",
 
+		// MENU ITEMS
+		menu_home: "الرئيسية",
+		menu_user: "المستخدم",
+
 		// FORM LABELS & FIELD NAMES
 		label_email: "البريد الإلكتروني",
 		label_password: "كلمة المرور",
@@ -4433,6 +4457,10 @@ let localization = new LocalizedStrings({
 		button_searching: "搜索中...",
 		button_processing: "处理中...",
 
+		// MENU ITEMS
+		menu_home: "首页",
+		menu_user: "用户",
+
 		// FORM LABELS & FIELD NAMES
 		label_email: "电子邮件",
 		label_password: "密码",
@@ -5096,6 +5124,10 @@ let localization = new LocalizedStrings({
 		button_creating: "बनाया जा रहा है...",
 		button_searching: "खोजा जा रहा है...",
 		button_processing: "प्रसंस्करण हो रहा है...",
+
+		// MENU ITEMS
+		menu_home: "होम",
+		menu_user: "उपयोगकर्ता",
 
 		// FORM LABELS & FIELD NAMES
 		label_email: "ईमेल",
@@ -5797,6 +5829,10 @@ let localization = new LocalizedStrings({
 		button_creating: "सिर्जना हुँदैछ...",
 		button_searching: "खोज हुँदैछ...",
 		button_processing: "प्रक्रिया हुँदैछ...",
+
+		// MENU ITEMS
+		menu_home: "घर",
+		menu_user: "प्रयोगकर्ता",
 
 		// FORM LABELS & FIELD NAMES
 		label_email: "इमेल",

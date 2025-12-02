@@ -82,6 +82,8 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Sign In / Create Account",
 		account_loading_message: "Please wait while we retrieve your data",
 		or: "OR",
+		password_complexity_requirements:
+			"Make your password at least 8 characters long with at least one capital letter and one special character. Pick something only you would guess — mixing letters, numbers, and symbols to make it stronger.",
 	},
 
 	spa: {
@@ -166,6 +168,8 @@ let localization = new LocalizedStrings({
 		account_loading_message:
 			"Por favor espere mientras recuperamos sus datos",
 		or: "O",
+		password_complexity_requirements:
+			"Haga que su contraseña tenga al menos 8 caracteres con al menos una letra mayúscula y un carácter especial. Elija algo que solo usted adivinaría: mezcle letras, números y símbolos para hacerla más fuerte.",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -246,6 +250,8 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Gali / Samee Akoon",
 		account_loading_message: "Fadlan sug inta aan ku soo celinno xogtaada",
 		or: "AMA",
+		password_complexity_requirements:
+			"Samee erifkaaga ugu yaraan 8 xaraf ah oo ugu yaraan hal xaraf weyn iyo hal calaamad gaar ah. Dooro waxaad uun u malayn lahayd — isku dar xarfaha, tirooyinka, iyo calaamadaha si aad ugu xoogaysato.",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -328,6 +334,8 @@ let localization = new LocalizedStrings({
 		account_loading_message:
 			"Пожалуйста, подождите, пока мы получим ваши данные",
 		or: "ИЛИ",
+		password_complexity_requirements:
+			"Сделайте свой пароль длиной не менее 8 символов с хотя бы одной заглавной буквой и одним специальным символом. Выберите то, что угадаете только вы — смешивая буквы, цифры и символы, чтобы сделать его сильнее.",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -407,6 +415,8 @@ let localization = new LocalizedStrings({
 			"Gelecekte zaman kazanmak için giriş yapın veya hesap oluşturun",
 		guest_signin_button: "Giriş Yap / Hesap Oluştur",
 		or: "VEYA",
+		password_complexity_requirements:
+			"Şifrenizi en az 8 karakter uzunluğunda, en az bir büyük harf ve bir özel karakter içerecek şekilde yapın. Sadece sizin tahmin edebileceğiniz bir şey seçin — harfleri, sayıları ve sembolleri karıştırarak daha güçlü hale getirin.",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -485,6 +495,8 @@ let localization = new LocalizedStrings({
 			"سجل الدخول أو أنشئ حسابًا لتوفير الوقت في المستقبل",
 		guest_signin_button: "تسجيل الدخول / إنشاء حساب",
 		or: "أو",
+		password_complexity_requirements:
+			"اجعل كلمة المرور الخاصة بك بطول 8 أحرف على الأقل مع حرف كبير واحد على الأقل ورمز خاص واحد. اختر شيئًا لن تخمنه إلا أنت — اخلط الأحرف والأرقام والرموز لجعله أقوى.",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -560,6 +572,8 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt: "登录或创建账户以在未来节省时间",
 		guest_signin_button: "登录 / 创建账户",
 		or: "或",
+		password_complexity_requirements:
+			"使您的密码至少8个字符长，至少包含一个大写字母和一个特殊字符。选择只有您能猜到的东西——混合字母、数字和符号使其更强大。",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -639,6 +653,8 @@ let localization = new LocalizedStrings({
 			"भविष्य में समय बचाने के लिए साइन इन करें या खाता बनाएं",
 		guest_signin_button: "साइन इन / खाता बनाएं",
 		or: "या",
+		password_complexity_requirements:
+			"अपना पासवर्ड कम से कम 8 अक्षर लंबा बनाएं जिसमें कम से कम एक बड़ा अक्षर और एक विशेष वर्ण हो। कुछ ऐसा चुनें जो केवल आप अनुमान लगाएंगे — इसे मजबूत बनाने के लिए अक्षरों, संख्याओं और प्रतीकों को मिलाएं।",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -718,6 +734,8 @@ let localization = new LocalizedStrings({
 			"भविष्यमा समय बचाउन साइन इन गर्नुहोस् वा खाता बनाउनुहोस्",
 		guest_signin_button: "साइन इन / खाता बनाउनुहोस्",
 		or: "वा",
+		password_complexity_requirements:
+			"तपाईंको पासवर्ड कम्तिमा ८ वर्ण लामो बनाउनुहोस् जसमा कम्तिमा एक ठूलो अक्षर र एक विशेष वर्ण हुनुपर्छ। केवल तपाईंले अनुमान लगाउने कुरा छान्नुहोस् — यसलाई बलियो बनाउन अक्षरहरू, संख्याहरू र प्रतीकहरू मिलाउनुहोस्।",
 	},
 });
 

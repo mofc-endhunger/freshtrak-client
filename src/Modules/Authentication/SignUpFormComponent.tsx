@@ -7,6 +7,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useAuth } from "./AuthContext";
 import { SignUpFormData } from "./types/authentication.types";
+import localization from "../Localization/LocalizationComponent";
 
 // Validation schema for signup form
 const signUpSchema = z
@@ -111,6 +112,9 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 					{...register("password")}
 					className={errors.password ? "border-red-500" : ""}
 				/>
+				<p className="text-xs text-gray-600 mt-1">
+					{localization.password_complexity_requirements}
+				</p>
 				{errors.password && (
 					<p className="text-sm text-red-500">
 						{errors.password.message}

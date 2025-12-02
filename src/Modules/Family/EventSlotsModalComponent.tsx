@@ -43,7 +43,7 @@ const transformHouseholdDataToUserData = (
 	// Extract head of household from members array
 	const headOfHousehold =
 		householdData.members?.find(
-			member => member.is_head_of_household === 1
+			(member) => member.is_head_of_household === 1
 		) || householdData.members?.[0];
 
 	// Parse household name to get first and last name
@@ -115,6 +115,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	const handleShow = () => setShow(true);
 
 	const backHome = () => {
+		setShow(false);
 		navigate(-1);
 	};
 
@@ -124,7 +125,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			return acc;
 		}, [] as EventSlot[]);
 
-		return event_slots.find(event_slot => {
+		return event_slots.find((event_slot) => {
 			return (
 				parseInt(event_slot_id) === parseInt(event_slot.event_slot_id)
 			);
@@ -199,7 +200,9 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	};
 
 	// Check if error message indicates "already registered"
-	const isAlreadyRegisteredError = (errorMessage: string | null | undefined): boolean => {
+	const isAlreadyRegisteredError = (
+		errorMessage: string | null | undefined
+	): boolean => {
 		if (!errorMessage) {
 			return false;
 		}
@@ -266,14 +269,20 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			}
 		} catch (error: any) {
 			console.error("Household registration error:", error);
-			
+
 			// Check if the error response indicates "already registered"
-			const errorMessage = error?.response?.data?.message || 
-				error?.message || 
+			const errorMessage =
+				error?.response?.data?.message ||
+				error?.message ||
 				"An unexpected error occurred during registration";
-			
-			if (isAlreadyRegisteredError(errorMessage) || 
-				(error?.response?.data && isAlreadyRegisteredError(JSON.stringify(error.response.data)))) {
+
+			if (
+				isAlreadyRegisteredError(errorMessage) ||
+				(error?.response?.data &&
+					isAlreadyRegisteredError(
+						JSON.stringify(error.response.data)
+					))
+			) {
 				// Redirect to already registered page
 				setShowHouseholdModal(false);
 				setShow(false);
@@ -345,7 +354,11 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 						Select an available time slot for your registration.
 					</DialogDescription>
 				</VisuallyHidden>
-				<DialogContent className="sm:max-w-md bg-highlight border-none text-white">
+				<DialogContent
+					className="sm:max-w-md bg-highlight border-none text-white"
+					onPointerDownOutside={(e) => e.preventDefault()}
+					onEscapeKeyDown={(e) => e.preventDefault()}
+				>
 					<DialogHeader>
 						<DialogTitle
 							id="timeslot-modal-title"
@@ -384,7 +397,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 								</legend>
 								{eventHour.map((item, index) =>
 									item.event_slots
-										.filter(e => e.open_slots > 0)
+										.filter((e) => e.open_slots > 0)
 										.map((e, i) => {
 											const radioId = `time_slot_${e.event_slot_id}`;
 											return (

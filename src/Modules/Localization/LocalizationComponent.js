@@ -82,6 +82,16 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Sign In / Create Account",
 		account_loading_message: "Please wait while we retrieve your data",
 		or: "OR",
+		household_warning_title: "Lose Current Progress?",
+		household_warning_description:
+			"Setting up your household now will take you away from event registration. You'll need to start registration again. Continue with household setup?",
+		household_warning_cancel: "No, Continue Registration",
+		household_warning_confirm: "Yes, Set Up Household",
+		household_complete_profile_title: "Complete Your Profile",
+		household_complete_profile_description:
+			"Set up your household for personalized services and easier event registration.",
+		household_setup_now: "Set Up Now",
+		household_later: "Later",
 	},
 
 	spa: {
@@ -166,6 +176,16 @@ let localization = new LocalizedStrings({
 		account_loading_message:
 			"Por favor espere mientras recuperamos sus datos",
 		or: "O",
+		household_warning_title: "¿Perder el Progreso Actual?",
+		household_warning_description:
+			"Configurar su hogar ahora lo alejará del registro de eventos. Tendrá que comenzar el registro nuevamente. ¿Continuar con la configuración del hogar?",
+		household_warning_cancel: "No, Continuar Registro",
+		household_warning_confirm: "Sí, Configurar Hogar",
+		household_complete_profile_title: "Complete Su Perfil",
+		household_complete_profile_description:
+			"Configure su hogar para servicios personalizados y registro de eventos más fácil.",
+		household_setup_now: "Configurar Ahora",
+		household_later: "Más Tarde",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -246,6 +266,16 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Gali / Samee Akoon",
 		account_loading_message: "Fadlan sug inta aan ku soo celinno xogtaada",
 		or: "AMA",
+		household_warning_title: "Halkaad Hadda Jirto Ma Dhumaysaa?",
+		household_warning_description:
+			"Guryahaaga hadda u diyaarinta ayaa kaa siin doonta diiwaangelinta dhacdooyinka. Waa inaad dib u bilaabtaa diiwaangelinta. Ma sii wadaysaa diyaarinta guryaha?",
+		household_warning_cancel: "Maya, Sii Diiwaangelinta",
+		household_warning_confirm: "Haa, Diyaari Guryaha",
+		household_complete_profile_title: "Buuxi Profile-kaaga",
+		household_complete_profile_description:
+			"Guryahaaga u diyaari adeegyada gaarka ah iyo diiwaangelinta dhacdooyinka oo fudud.",
+		household_setup_now: "Hadda U Diyaari",
+		household_later: "Dambe",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -328,6 +358,16 @@ let localization = new LocalizedStrings({
 		account_loading_message:
 			"Пожалуйста, подождите, пока мы получим ваши данные",
 		or: "ИЛИ",
+		household_warning_title: "Потерять Текущий Прогресс?",
+		household_warning_description:
+			"Настройка вашего домохозяйства сейчас отвлечет вас от регистрации на мероприятие. Вам нужно будет начать регистрацию заново. Продолжить настройку домохозяйства?",
+		household_warning_cancel: "Нет, Продолжить Регистрацию",
+		household_warning_confirm: "Да, Настроить Домохозяйство",
+		household_complete_profile_title: "Завершите Ваш Профиль",
+		household_complete_profile_description:
+			"Настройте ваше домохозяйство для персонализированных услуг и более простой регистрации на мероприятия.",
+		household_setup_now: "Настроить Сейчас",
+		household_later: "Позже",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -407,6 +447,16 @@ let localization = new LocalizedStrings({
 			"Gelecekte zaman kazanmak için giriş yapın veya hesap oluşturun",
 		guest_signin_button: "Giriş Yap / Hesap Oluştur",
 		or: "VEYA",
+		household_warning_title: "Mevcut İlerlemeyi Kaybet?",
+		household_warning_description:
+			"Şimdi hanenizi ayarlamak sizi etkinlik kaydından uzaklaştıracak. Kayıt işlemini tekrar başlatmanız gerekecek. Hane kurulumuna devam edilsin mi?",
+		household_warning_cancel: "Hayır, Kayda Devam Et",
+		household_warning_confirm: "Evet, Haneyi Ayarla",
+		household_complete_profile_title: "Profilinizi Tamamlayın",
+		household_complete_profile_description:
+			"Kişiselleştirilmiş hizmetler ve daha kolay etkinlik kaydı için hanenizi ayarlayın.",
+		household_setup_now: "Şimdi Ayarla",
+		household_later: "Daha Sonra",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -485,6 +535,16 @@ let localization = new LocalizedStrings({
 			"سجل الدخول أو أنشئ حسابًا لتوفير الوقت في المستقبل",
 		guest_signin_button: "تسجيل الدخول / إنشاء حساب",
 		or: "أو",
+		household_warning_title: "فقدان التقدم الحالي؟",
+		household_warning_description:
+			"إعداد أسرتك الآن سيبعدك عن تسجيل الحدث. ستحتاج إلى بدء التسجيل مرة أخرى. متابعة إعداد الأسرة؟",
+		household_warning_cancel: "لا، متابعة التسجيل",
+		household_warning_confirm: "نعم، إعداد الأسرة",
+		household_complete_profile_title: "أكمل ملفك الشخصي",
+		household_complete_profile_description:
+			"قم بإعداد أسرتك للحصول على خدمات مخصصة وتسجيل أحداث أسهل.",
+		household_setup_now: "إعداد الآن",
+		household_later: "لاحقاً",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -560,6 +620,16 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt: "登录或创建账户以在未来节省时间",
 		guest_signin_button: "登录 / 创建账户",
 		or: "或",
+		household_warning_title: "丢失当前进度？",
+		household_warning_description:
+			"现在设置您的家庭将使您离开活动注册。您需要重新开始注册。继续设置家庭？",
+		household_warning_cancel: "不，继续注册",
+		household_warning_confirm: "是，设置家庭",
+		household_complete_profile_title: "完成您的个人资料",
+		household_complete_profile_description:
+			"设置您的家庭以获得个性化服务和更轻松的活动注册。",
+		household_setup_now: "立即设置",
+		household_later: "稍后",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -639,6 +709,16 @@ let localization = new LocalizedStrings({
 			"भविष्य में समय बचाने के लिए साइन इन करें या खाता बनाएं",
 		guest_signin_button: "साइन इन / खाता बनाएं",
 		or: "या",
+		household_warning_title: "वर्तमान प्रगति खो दें?",
+		household_warning_description:
+			"अभी अपने परिवार को सेट अप करने से आप इवेंट पंजीकरण से दूर हो जाएंगे। आपको फिर से पंजीकरण शुरू करना होगा। परिवार सेटअप जारी रखें?",
+		household_warning_cancel: "नहीं, पंजीकरण जारी रखें",
+		household_warning_confirm: "हाँ, परिवार सेट करें",
+		household_complete_profile_title: "अपना प्रोफ़ाइल पूरा करें",
+		household_complete_profile_description:
+			"व्यक्तिगत सेवाओं और आसान इवेंट पंजीकरण के लिए अपने परिवार को सेट अप करें।",
+		household_setup_now: "अभी सेट करें",
+		household_later: "बाद में",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -718,6 +798,16 @@ let localization = new LocalizedStrings({
 			"भविष्यमा समय बचाउन साइन इन गर्नुहोस् वा खाता बनाउनुहोस्",
 		guest_signin_button: "साइन इन / खाता बनाउनुहोस्",
 		or: "वा",
+		household_warning_title: "हालको प्रगति हराउनुहुन्छ?",
+		household_warning_description:
+			"अहिले तपाईंको घर सेट अप गर्दा तपाईंलाई घटना दर्ताबाट टाढा लैजानेछ। तपाईंले फेरि दर्ता सुरु गर्नुपर्नेछ। घर सेटअप जारी राख्नुहुन्छ?",
+		household_warning_cancel: "होइन, दर्ता जारी राख्नुहोस्",
+		household_warning_confirm: "हो, घर सेट अप गर्नुहोस्",
+		household_complete_profile_title: "तपाईंको प्रोफाइल पूरा गर्नुहोस्",
+		household_complete_profile_description:
+			"व्यक्तिगत सेवाहरू र सजिलो घटना दर्ताको लागि तपाईंको घर सेट अप गर्नुहोस्।",
+		household_setup_now: "अहिले सेट अप गर्नुहोस्",
+		household_later: "पछि",
 	},
 });
 

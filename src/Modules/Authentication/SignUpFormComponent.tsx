@@ -16,7 +16,7 @@ const signUpSchema = z
 		confirmPassword: z.string(),
 		name: z.string().min(1, "Name is required"),
 	})
-	.refine(data => data.password === data.confirmPassword, {
+	.refine((data) => data.password === data.confirmPassword, {
 		message: "Passwords don't match",
 		path: ["confirmPassword"],
 	});
@@ -24,6 +24,7 @@ const signUpSchema = z
 interface SignUpFormComponentProps {
 	onSuccess?: (email: string) => void;
 	onError?: (error: string) => void;
+	onUnverifiedUserExists?: (email: string) => Promise<void>;
 	onSwitchToSignIn?: () => void;
 }
 
@@ -40,6 +41,7 @@ interface SignUpFormComponentProps {
 const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 	onSuccess,
 	onError,
+	onUnverifiedUserExists,
 	onSwitchToSignIn,
 }) => {
 	const { signUp, isLoading } = useAuth();
@@ -62,7 +64,41 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 			onSuccess?.(data.email);
 		} catch (error: any) {
 			console.error("Signup error:", error);
-			onError?.(error.message || "Failed to create account");
+			console.error("Signup error details:", {
+				name: error.name,
+				code: error.code,
+				message: error.message,
+				isUnverifiedUser: error.isUnverifiedUser,
+				fullError: error,
+			});
+
+			const errorMessage = error.message || "Failed to create account";
+
+			// Check if error indicates unverified user exists
+			// Check multiple error properties to catch all possible formats
+			const isUnverifiedUserError =
+				error.isUnverifiedUser === true ||
+				error.name === "UsernameExistsException" ||
+				error.name === "AliasExistsException" ||
+				error.code === "UsernameExistsException" ||
+				error.code === "AliasExistsException" ||
+				errorMessage.includes("UsernameExistsException") ||
+				errorMessage.includes("AliasExistsException") ||
+				errorMessage.includes(
+					"An account with the given email already exists"
+				) ||
+				errorMessage.includes("User already exists") ||
+				errorMessage.toLowerCase().includes("username exists") ||
+				errorMessage.toLowerCase().includes("email already exists") ||
+				errorMessage.toLowerCase().includes("alias exists");
+
+			if (isUnverifiedUserError && onUnverifiedUserExists) {
+				// Handle unverified user scenario - switch to confirmation tab
+				await onUnverifiedUserExists(data.email);
+			} else {
+				// Handle other errors normally
+				onError?.(errorMessage);
+			}
 		} finally {
 			setIsSubmitting(false);
 		}

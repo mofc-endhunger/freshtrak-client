@@ -16,7 +16,7 @@ const confirmSignUpSchema = z.object({
 
 interface ConfirmSignUpFormComponentProps {
 	email?: string;
-	onSuccess?: () => void;
+	onSuccess?: () => void | Promise<void>;
 	onError?: (error: string) => void;
 	onResendCode?: () => void;
 	onBackToSignUp?: () => void;
@@ -60,7 +60,10 @@ const ConfirmSignUpFormComponent: React.FC<ConfirmSignUpFormComponentProps> = ({
 			setIsSubmitting(true);
 			await confirmSignUp(data.email, data.code);
 			reset();
-			onSuccess?.();
+			const result = onSuccess?.();
+			if (result instanceof Promise) {
+				await result;
+			}
 		} catch (error: any) {
 			console.error("Confirmation error:", error);
 			onError?.(error.message || "Failed to confirm account");

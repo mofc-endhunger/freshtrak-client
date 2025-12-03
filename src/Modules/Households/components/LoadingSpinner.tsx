@@ -7,6 +7,7 @@ import React from "react";
 import { Loader2, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
+import localization from "../../Localization/LocalizationComponent";
 
 interface LoadingSpinnerProps {
 	size?: "sm" | "md" | "lg";
@@ -48,7 +49,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 			<LoadingSpinner size="sm" />
 			<div className="flex-1">
 				<p className="text-sm text-gray-600">
-					{operation || "Loading..."}
+					{operation || localization.loading_loading}
 				</p>
 				{progress !== undefined && (
 					<div className="w-full bg-gray-200 rounded-full h-2 mt-1">
@@ -86,7 +87,7 @@ export const LoadingCard: React.FC<LoadingCardProps> = ({
 						<LoadingSpinner size="lg" />
 						<div className="text-center">
 							<p className="text-lg font-medium text-gray-900">
-								{operation || "Loading..."}
+								{operation || localization.loading_loading}
 							</p>
 							{progress !== undefined && (
 								<div className="w-64 bg-gray-200 rounded-full h-2 mt-3">
@@ -125,7 +126,7 @@ interface LoadingButtonProps {
 
 export const LoadingButton: React.FC<LoadingButtonProps> = ({
 	isLoading,
-	loadingText = "Loading...",
+	loadingText = localization.loading_loading,
 	children,
 	onClick,
 	disabled,
@@ -201,11 +202,11 @@ export const OperationStatus: React.FC<OperationStatusProps> = ({
 	const getMessage = () => {
 		switch (status) {
 			case "loading":
-				return operation ? `${operation}...` : "Loading...";
+				return operation ? `${operation}...` : localization.loading_loading;
 			case "success":
-				return successMessage || "Operation completed successfully";
+				return successMessage || localization.status_operation_completed_successfully || "Operation completed successfully";
 			case "error":
-				return errorMessage || "An error occurred";
+				return errorMessage || localization.error_something_went_wrong;
 			default:
 				return "";
 		}
@@ -227,7 +228,7 @@ export const OperationStatus: React.FC<OperationStatusProps> = ({
 					className="flex items-center space-x-1"
 				>
 					<RefreshCw className="w-3 h-3" />
-					<span>Retry</span>
+					<span>{localization.button_retry || "Retry"}</span>
 				</Button>
 			)}
 		</div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, forwardRef } from "react";
+import localization from "../Localization/LocalizationComponent";
 
 interface GooglePlacesAutocompleteProps {
 	value: string;
@@ -65,7 +66,7 @@ const GooglePlacesAutocomplete = forwardRef<
 		value,
 		onChange,
 		onSelect,
-		placeholder = "Type Address",
+		placeholder = localization.placeholder_type_address,
 		className = "form-control",
 		id,
 		name,
@@ -300,7 +301,7 @@ const GooglePlacesAutocomplete = forwardRef<
 
 			{showSuggestions && suggestions.length > 0 && (
 				<div className="suggestions-container">
-					{suggestions.map(suggestion => (
+					{suggestions.map((suggestion) => (
 						<div
 							key={suggestion.place_id}
 							className="suggestion-item"

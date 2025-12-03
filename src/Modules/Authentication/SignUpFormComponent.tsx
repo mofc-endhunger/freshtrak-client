@@ -7,6 +7,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useAuth } from "./AuthContext";
 import { SignUpFormData } from "./types/authentication.types";
+import localization from "../Localization/LocalizationComponent";
 
 // Validation schema for signup form
 const signUpSchema = z
@@ -107,11 +108,11 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 			<div className="space-y-2">
-				<Label htmlFor="name">Name</Label>
+				<Label htmlFor="name">{localization.label_name}</Label>
 				<Input
 					id="name"
 					type="text"
-					placeholder="Enter your name"
+					placeholder={localization.placeholder_enter_name}
 					{...register("name")}
 					className={errors.name ? "border-red-500" : ""}
 				/>
@@ -123,11 +124,11 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor="email">Email</Label>
+				<Label htmlFor="email">{localization.label_email}</Label>
 				<Input
 					id="email"
 					type="email"
-					placeholder="Enter your email"
+					placeholder={localization.placeholder_enter_email}
 					{...register("email")}
 					className={errors.email ? "border-red-500" : ""}
 				/>
@@ -139,11 +140,11 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor="password">Password</Label>
+				<Label htmlFor="password">{localization.label_password}</Label>
 				<Input
 					id="password"
 					type="password"
-					placeholder="Enter your password"
+					placeholder={localization.placeholder_enter_password}
 					{...register("password")}
 					className={errors.password ? "border-red-500" : ""}
 				/>
@@ -155,11 +156,13 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor="confirmPassword">Confirm Password</Label>
+				<Label htmlFor="confirmPassword">
+					{localization.label_confirm_password}
+				</Label>
 				<Input
 					id="confirmPassword"
 					type="password"
-					placeholder="Confirm your password"
+					placeholder={localization.placeholder_confirm_password}
 					{...register("confirmPassword")}
 					className={errors.confirmPassword ? "border-red-500" : ""}
 				/>
@@ -179,23 +182,23 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 					{isSubmitting || isLoading ? (
 						<div className="flex items-center justify-center space-x-2">
 							<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-							<span>Creating Account...</span>
+							<span>{localization.button_creating}...</span>
 						</div>
 					) : (
-						"Create Account"
+						localization.button_create_account
 					)}
 				</Button>
 
 				{onSwitchToSignIn && (
 					<div className="text-center">
 						<p className="text-sm text-gray-600">
-							Already have an account?{" "}
+							{localization.description_already_have_account}{" "}
 							<button
 								type="button"
 								onClick={onSwitchToSignIn}
 								className="text-primary hover:underline font-medium"
 							>
-								Sign In
+								{localization.button_sign_in || "Sign In"}
 							</button>
 						</p>
 					</div>

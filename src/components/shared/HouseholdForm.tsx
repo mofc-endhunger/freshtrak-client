@@ -33,11 +33,12 @@ import {
 	HouseholdFormProps,
 	HouseholdFormState,
 	HouseholdFormStep,
-	REGISTRATION_MODE_CONFIG,
-	HOUSEHOLD_SETUP_MODE_CONFIG,
+	getRegistrationModeConfig,
+	getHouseholdSetupModeConfig,
 	DEFAULT_FORM_STATE,
 	FormModeConfig,
 } from "./types/household-form.types";
+import localization from "../../Modules/Localization/LocalizationComponent";
 
 const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	mode,
@@ -59,8 +60,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	// Get mode configuration
 	const modeConfig: FormModeConfig = useMemo(() => {
 		return mode === "registration"
-			? REGISTRATION_MODE_CONFIG
-			: HOUSEHOLD_SETUP_MODE_CONFIG;
+			? getRegistrationModeConfig()
+			: getHouseholdSetupModeConfig();
 	}, [mode]);
 
 	// Form setup
@@ -450,7 +451,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			variant="highlight"
 			data-testid="previous button"
 		>
-			Previous
+			{localization.button_previous}
 		</Button>
 	);
 
@@ -470,9 +471,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		if (
 			mode === "householdSetup" &&
 			state.hasAdditionalMembers &&
-			!steps.includes("Family Member Details")
+			!steps.includes(localization.title_family_member_details)
 		) {
-			steps.splice(3, 0, "Family Member Details");
+			steps.splice(3, 0, localization.title_family_member_details);
 		}
 
 		return (
@@ -557,7 +558,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 									className="ml-5"
 									data-testid="continue button"
 								>
-									Continue
+									{localization.button_continue}
 								</Button>
 							</div>
 						</Fragment>
@@ -635,7 +636,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 															}
 															className="text-red-600 hover:text-red-700 hover:bg-red-50"
 														>
-															Remove
+															{
+																localization.button_delete
+															}
 														</Button>
 													)}
 												</div>
@@ -893,7 +896,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 													variant="highlight"
 													data-testid="continue-button"
 												>
-													Continue
+													{
+														localization.button_continue
+													}
 												</Button>
 											)}
 										{isFinalStep && (
@@ -908,8 +913,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 											>
 												{state.isSubmitting
 													? mode === "registration"
-														? "Registering..."
-														: "Creating..."
+														? localization.button_registering
+														: localization.button_creating
 													: submitButtonText ||
 													  modeConfig.submitButtonText}
 											</Button>

@@ -197,13 +197,15 @@ const LoginPage: React.FC = () => {
 	const getFormTitle = (): string => {
 		switch (currentTab) {
 			case "signin":
-				return "Sign In";
+				return localization.button_sign_in || "Sign In";
 			case "signup":
-				return "Create Account";
+				return localization.button_create_account || "Create Account";
 			case "confirm":
-				return "Confirm Account";
+				return localization.button_confirm_account || "Confirm Account";
 			default:
-				return "Authentication";
+				return (
+					localization.dialog_authentication_title || "Authentication"
+				);
 		}
 	};
 
@@ -230,7 +232,7 @@ const LoginPage: React.FC = () => {
 								onClick={() => switchTab("signin")}
 								className="flex-1"
 							>
-								Sign In
+								{localization.button_sign_in}
 							</Button>
 							<Button
 								variant={
@@ -242,7 +244,7 @@ const LoginPage: React.FC = () => {
 								onClick={() => switchTab("signup")}
 								className="flex-1"
 							>
-								Sign Up
+								{localization.button_sign_up}
 							</Button>
 						</div>
 					)}
@@ -340,7 +342,7 @@ const LoginPage: React.FC = () => {
 												<span>Processing...</span>
 											</div>
 										) : (
-											"Continue as Guest"
+											localization.button_continue_as_guest
 										)}
 									</Button>
 								</div>
@@ -355,7 +357,7 @@ const LoginPage: React.FC = () => {
 						onClick={() => navigate(RENDER_URL.ROOT_URL)}
 						className="text-gray-600 hover:text-gray-900"
 					>
-						← Back to Home
+						← {localization.button_back_to_home || "Back to Home"}
 					</Button>
 				</div>
 			</div>

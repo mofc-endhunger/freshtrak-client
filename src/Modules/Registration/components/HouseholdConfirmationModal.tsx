@@ -12,6 +12,7 @@ import { Button } from "../../../components/ui/button";
 import HouseholdInfoDisplay from "./HouseholdInfoDisplay";
 import { HouseholdConfirmationModalProps } from "../types/household-registration.types";
 import LoadingSpinner from "../../General/LoadingSpinner";
+import localization from "../../Localization/LocalizationComponent";
 
 /**
  * HouseholdConfirmationModal Component
@@ -54,10 +55,9 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 	return (
 		<Dialog open={isOpen} onOpenChange={handleClose}>
 			<VisuallyHidden>
-				<DialogTitle>Use your household information?</DialogTitle>
+				<DialogTitle>{localization.dialog_use_household_info_title || "Use your household information?"}</DialogTitle>
 				<DialogDescription>
-					We found household information on your account. Would you
-					like to register using this information?
+					{localization.dialog_use_household_info_description || "We found household information on your account. Would you like to register using this information?"}
 				</DialogDescription>
 			</VisuallyHidden>
 			<DialogContent
@@ -70,14 +70,13 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 						id="household-modal-title"
 						className="text-xl font-semibold text-gray-900"
 					>
-						Use your household information?
+						{localization.dialog_use_household_info_title || "Use your household information?"}
 					</DialogTitle>
 					<DialogDescription
 						id="household-modal-description"
 						className="text-gray-600"
 					>
-						We found household information on your account. Would
-						you like to register using this information?
+						{localization.dialog_use_household_info_description || "We found household information on your account. Would you like to register using this information?"}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -86,11 +85,11 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 						<div
 							className="flex flex-col items-center justify-center py-8 space-y-4"
 							role="status"
-							aria-label="Processing registration"
+							aria-label={localization.aria_processing_registration}
 						>
 							<LoadingSpinner size="medium" />
 							<p className="text-sm text-gray-600">
-								Processing your registration...
+								{localization.loading_processing_registration}
 							</p>
 						</div>
 					) : error ? (
@@ -102,7 +101,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 							<div className="flex">
 								<div className="ml-3">
 									<h3 className="text-sm font-medium text-red-800">
-										Registration Error
+										{localization.error_title_registration_error || "Registration Error"}
 									</h3>
 									<div className="mt-2 text-sm text-red-700">
 										<p>{error}</p>
@@ -115,7 +114,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 											className="text-red-700 border-red-300 hover:bg-red-50"
 											aria-describedby="error-description"
 										>
-											Review & Update Instead
+											{localization.button_review_update_instead || "Review & Update Instead"}
 										</Button>
 										{/* Take back home button */}
 										<Button
@@ -124,7 +123,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 											onClick={onBackHome}
 											className="text-gray-700 border-gray-300 hover:bg-gray-50"
 										>
-											Back Home
+											{localization.button_back_to_home}
 										</Button>
 									</div>
 								</div>
@@ -138,7 +137,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 					) : (
 						<div className="text-center py-8">
 							<p className="text-sm text-gray-600">
-								No household information available.
+								{localization.text_no_household_info_available || "No household information available."}
 							</p>
 						</div>
 					)}
@@ -153,7 +152,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 						data-testid="review-update-button"
 						aria-describedby="review-button-description"
 					>
-						No, review & update
+						{localization.button_no_review_update || "No, review & update"}
 					</Button>
 					<Button
 						variant="highlight"
@@ -163,7 +162,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 						data-testid="confirm-register-button"
 						aria-describedby="confirm-button-description"
 					>
-						Yes, register
+						{localization.button_yes_register || "Yes, register"}
 					</Button>
 				</DialogFooter>
 

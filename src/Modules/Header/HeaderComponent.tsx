@@ -8,7 +8,6 @@ import localization from "../Localization/LocalizationComponent";
 import { setCurrentLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
 import { useAuth } from "../Authentication/AuthContext";
-import { validateToken } from "../../Utils/TokenUtils";
 import { StorageService } from "../../Utils/StorageService";
 import { Button } from "../../components/ui/button";
 import {
@@ -152,7 +151,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	// Mobile menu sections
 	const mobileMenuSections: MobileMenuSection[] = [
 		{
-			title: "FIND RESOURCES",
+			title: localization.footer_find_resources.toUpperCase(),
 			items: [
 				{
 					text: "About FreshTrak",
@@ -161,10 +160,10 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 			],
 		},
 		{
-			title: "For Foodbanks & Agencies",
+			title: localization.footer_for_foodbanks_agencies,
 			items: [
 				{
-					text: "FreshTrak: Partner",
+					text: localization.footer_freshtrak_partner,
 					url: FRESHTRAK_PARTNERS_URL || "#",
 					isExternal: true,
 					target: "_blank",
@@ -203,7 +202,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 							>
 								<img
 									src={mainLogo}
-									alt="FreshTrak"
+									alt={localization.alt_freshtrak_logo}
 									className="h-6 md:h-8 w-auto"
 								/>
 							</Link>
@@ -223,7 +222,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 												navigate(RENDER_URL.LOGIN_URL)
 											}
 										>
-											LOG IN
+											{localization.button_sign_in.toUpperCase()}
 										</Button>
 									) : (
 										<>
@@ -243,7 +242,9 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 								<DialogTrigger asChild>
 									<button
 										className="md:hidden text-white p-2 hover:bg-white/10 rounded-md transition-colors"
-										aria-label="Open mobile menu"
+										aria-label={
+											localization.aria_open_mobile_menu
+										}
 									>
 										<svg
 											className="w-6 h-6"
@@ -263,7 +264,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 								<DialogContent className="w-[300px] bg-primary text-white border-none">
 									<DialogHeader>
 										<DialogTitle className="text-white">
-											Menu
+											{localization.title_menu}
 										</DialogTitle>
 										<DialogDescription></DialogDescription>
 									</DialogHeader>

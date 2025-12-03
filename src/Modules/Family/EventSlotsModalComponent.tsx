@@ -21,6 +21,7 @@ import { UsersMeResponse } from "../Households/types/api.types";
 import { useAuth } from "../Authentication/AuthContext";
 
 import { Event } from "./types/family.types";
+import localization from "../Localization/LocalizationComponent";
 
 // Transform household data to user data format expected by confirmation page
 const transformHouseholdDataToUserData = (
@@ -169,9 +170,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			}
 		} catch (error) {
 			console.error("Failed to fetch household data:", error);
-			setHouseholdError(
-				"Failed to load household information. Please try again."
-			);
+			setHouseholdError(localization.error_failed_load_household);
 			// Proceed to registration form without prefilled data
 			navigateToRegistration(slot, null);
 		} finally {
@@ -250,7 +249,8 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				setShow(false);
 			} else {
 				// Check for "already registered" error
-				const errorMessage = result.error || "Registration failed";
+				const errorMessage =
+					result.error || localization.error_registration_failed;
 				if (isAlreadyRegisteredError(errorMessage)) {
 					// Redirect to already registered page instead of showing error
 					setShowHouseholdModal(false);
@@ -274,8 +274,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			const errorMessage =
 				error?.response?.data?.message ||
 				error?.message ||
-				"An unexpected error occurred during registration";
-
+				localization.error_unexpected_registration;
 			if (
 				isAlreadyRegisteredError(errorMessage) ||
 				(error?.response?.data &&
@@ -349,9 +348,13 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		<Fragment>
 			<Dialog open={show} onOpenChange={setShow}>
 				<VisuallyHidden>
-					<DialogTitle>Choose Time Slot</DialogTitle>
+					<DialogTitle>
+						{localization.dialog_choose_time_slot_title ||
+							"Choose Time Slot"}
+					</DialogTitle>
 					<DialogDescription>
-						Select an available time slot for your registration.
+						{localization.dialog_choose_time_slot_description ||
+							"Select an available time slot for your registration."}
 					</DialogDescription>
 				</VisuallyHidden>
 				<DialogContent
@@ -372,10 +375,12 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 									className="w-6 h-6"
 								/>
 							</span>
-							Choose Time Slot
+							{localization.dialog_choose_time_slot_title ||
+								"Choose Time Slot"}
 						</DialogTitle>
 						<DialogDescription id="timeslot-modal-description">
-							Select an available time slot for your registration.
+							{localization.dialog_choose_time_slot_description ||
+								"Select an available time slot for your registration."}
 						</DialogDescription>
 					</DialogHeader>
 					<div className="container py-4">
@@ -383,7 +388,9 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 							<div
 								className="flex justify-center py-4"
 								role="status"
-								aria-label="Loading time slots"
+								aria-label={
+									localization.aria_loading_time_slots
+								}
 							>
 								<LoadingSpinner size="medium" />
 							</div>
@@ -393,7 +400,9 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 								aria-labelledby="timeslot-modal-title"
 							>
 								<legend className="sr-only">
-									Available time slots for registration
+									{
+										localization.sr_available_time_slots_registration
+									}
 								</legend>
 								{eventHour.map((item, index) =>
 									item.event_slots
@@ -433,11 +442,13 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 														id={`${radioId}-description`}
 														className="sr-only"
 													>
-														{e.open_slots} slot
+														{e.open_slots}{" "}
 														{e.open_slots !== 1
-															? "s"
-															: ""}{" "}
-														available
+															? localization.text_slots
+															: localization.text_slot}{" "}
+														{
+															localization.text_available
+														}
 													</span>
 												</div>
 											);
@@ -454,7 +465,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 							className="w-full sm:w-auto bg-white text-highlight min-h-12 uppercase"
 							aria-describedby="back-button-description"
 						>
-							Go Back
+							{localization.button_go_back}
 						</Button>
 						<Button
 							type="submit"
@@ -467,18 +478,17 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 							aria-describedby="continue-button-description"
 						>
 							{isLoadingHousehold
-								? "Loading..."
-								: "Save and Continue"}
+								? localization.loading_loading
+								: localization.button_save_and_continue}
 						</Button>
 					</DialogFooter>
 
 					{/* Hidden descriptions for screen readers */}
 					<div id="back-button-description" className="sr-only">
-						Return to the previous page without selecting a time
-						slot.
+						{localization.sr_return_previous_without_slot}
 					</div>
 					<div id="continue-button-description" className="sr-only">
-						Proceed with registration using the selected time slot.
+						{localization.sr_proceed_registration_selected_slot}
 					</div>
 				</DialogContent>
 			</Dialog>

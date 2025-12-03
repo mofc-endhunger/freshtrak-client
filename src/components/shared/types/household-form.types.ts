@@ -3,6 +3,7 @@
 
 import { RegistrationFormData, HouseholdCounts } from "../../../Modules/Registration/types/registration.types";
 import { HouseholdMember } from "../../../Modules/Households/types/household.types";
+import localization from "../../../Modules/Localization/LocalizationComponent";
 
 // ============================================================================
 // CORE COMPONENT TYPES
@@ -113,42 +114,52 @@ export interface FormValidationConfig {
 /**
  * Default configuration for registration mode
  */
-export const REGISTRATION_MODE_CONFIG: FormModeConfig = {
+export const getRegistrationModeConfig = (): FormModeConfig => ({
   mode: "registration",
-  title: "Event Registration",
-  subtitle: "Complete your registration for the upcoming event",
+  title: localization.title_event_registration,
+  subtitle: localization.subtitle_complete_registration,
   showEventSlots: true,
   showFamilyMemberDetails: false,
   showCurrentHouseholdMembers: false,
-  submitButtonText: "Register",
-  cancelButtonText: "Cancel",
+  submitButtonText: localization.button_register,
+  cancelButtonText: localization.button_cancel,
   steps: [
-    { id: 0, title: "Your Details", component: "PrimaryInfo", isVisible: true, isRequired: true },
-    { id: 1, title: "Your Address Details", component: "AddressContact", isVisible: true, isRequired: true },
-    { id: 2, title: "Your Family Details", component: "MemberCount", isVisible: true, isRequired: true },
+    { id: 0, title: localization.title_your_details, component: "PrimaryInfo", isVisible: true, isRequired: true },
+    { id: 1, title: localization.title_your_address_details, component: "AddressContact", isVisible: true, isRequired: true },
+    { id: 2, title: localization.title_your_family_details, component: "MemberCount", isVisible: true, isRequired: true },
   ],
-};
+});
+
+/**
+ * @deprecated Use getRegistrationModeConfig() instead
+ */
+export const REGISTRATION_MODE_CONFIG: FormModeConfig = getRegistrationModeConfig();
 
 /**
  * Default configuration for household setup mode
  */
-export const HOUSEHOLD_SETUP_MODE_CONFIG: FormModeConfig = {
+export const getHouseholdSetupModeConfig = (): FormModeConfig => ({
   mode: "householdSetup",
-  title: "Set Up Your Household",
-  subtitle: "Complete your household profile to get personalized services",
+  title: localization.title_set_up_household,
+  subtitle: localization.subtitle_complete_household_profile,
   showEventSlots: false,
   showFamilyMemberDetails: true,
   showCurrentHouseholdMembers: true,
-  submitButtonText: "Complete Setup",
-  cancelButtonText: "Cancel",
+  submitButtonText: localization.button_complete_setup,
+  cancelButtonText: localization.button_cancel,
   steps: [
-    { id: 0, title: "Your Details", component: "PrimaryInfo", isVisible: true, isRequired: true },
-    { id: 1, title: "Your Address Details", component: "Address", isVisible: true, isRequired: true },
-    { id: 2, title: "Your Family Details", component: "MemberCount", isVisible: true, isRequired: true },
-    { id: 3, title: "Contact Information", component: "Contact", isVisible: true, isRequired: true },
-    { id: 4, title: "Family Member Details", component: "FamilyMemberDetails", isVisible: false, isRequired: false },
+    { id: 0, title: localization.title_your_details, component: "PrimaryInfo", isVisible: true, isRequired: true },
+    { id: 1, title: localization.title_your_address_details, component: "Address", isVisible: true, isRequired: true },
+    { id: 2, title: localization.title_your_family_details, component: "MemberCount", isVisible: true, isRequired: true },
+    { id: 3, title: localization.title_contact_information, component: "Contact", isVisible: true, isRequired: true },
+    { id: 4, title: localization.title_family_member_details, component: "FamilyMemberDetails", isVisible: false, isRequired: false },
   ],
-};
+});
+
+/**
+ * @deprecated Use getHouseholdSetupModeConfig() instead
+ */
+export const HOUSEHOLD_SETUP_MODE_CONFIG: FormModeConfig = getHouseholdSetupModeConfig();
 
 // ============================================================================
 // UTILITY TYPES

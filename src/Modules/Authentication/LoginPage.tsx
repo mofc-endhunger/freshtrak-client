@@ -14,6 +14,7 @@ import { AuthModalTab, GTMEvent } from "./types/authentication.types";
 import { API_URL } from "../../Utils/Urls";
 import { StorageService } from "../../Utils/StorageService";
 import localization from "../Localization/LocalizationComponent";
+import { useAuth } from "./AuthContext";
 
 /**
  * LoginPage - Full-page login interface with authentication forms
@@ -32,6 +33,7 @@ const LoginPage: React.FC = () => {
 	const [resetEmail, setResetEmail] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const navigate = useNavigate();
+	const { resendConfirmationCode } = useAuth();
 
 	/**
 	 * Handles guest login process using API
@@ -98,6 +100,48 @@ const LoginPage: React.FC = () => {
 	};
 
 	/**
+	 * Handles unverified user error - switch to confirmation tab and resend code
+	 */
+	const handleUnverifiedUserError = async (email: string): Promise<void> => {
+		setPendingEmail(email);
+		setCurrentTab("confirm");
+		
+		// Automatically resend confirmation code
+		try {
+			await resendConfirmationCode(email);
+			setErrorMessage(
+				"An account with this email already exists but hasn't been verified. We've sent a new confirmation code to your email."
+			);
+		} catch (error) {
+			console.error("Failed to resend confirmation code:", error);
+			setErrorMessage(
+				"An account with this email already exists but hasn't been verified. Please enter the confirmation code sent to your email, or click 'Resend Code' to receive a new one."
+			);
+		}
+	};
+
+	/**
+	 * Handles unconfirmed user error from sign-in - switch to confirmation tab and resend code
+	 */
+	const handleUnconfirmedUserError = async (email: string): Promise<void> => {
+		setPendingEmail(email);
+		setCurrentTab("confirm");
+		
+		// Automatically resend confirmation code
+		try {
+			await resendConfirmationCode(email);
+			setErrorMessage(
+				"Your account hasn't been verified yet. We've sent a new confirmation code to your email."
+			);
+		} catch (error) {
+			console.error("Failed to resend confirmation code:", error);
+			setErrorMessage(
+				"Your account hasn't been verified yet. Please enter the confirmation code sent to your email, or click 'Resend Code' to receive a new one."
+			);
+		}
+	};
+
+	/**
 	 * Handles successful confirmation - redirect to home or household setup
 	 */
 	const handleConfirmSuccess = (): void => {
@@ -153,13 +197,15 @@ const LoginPage: React.FC = () => {
 	const getFormTitle = (): string => {
 		switch (currentTab) {
 			case "signin":
-				return "Sign In";
+				return localization.button_sign_in || "Sign In";
 			case "signup":
-				return "Create Account";
+				return localization.button_create_account || "Create Account";
 			case "confirm":
-				return "Confirm Account";
+				return localization.button_confirm_account || "Confirm Account";
 			default:
-				return "Authentication";
+				return (
+					localization.dialog_authentication_title || "Authentication"
+				);
 		}
 	};
 
@@ -186,7 +232,7 @@ const LoginPage: React.FC = () => {
 								onClick={() => switchTab("signin")}
 								className="flex-1"
 							>
-								Sign In
+								{localization.button_sign_in}
 							</Button>
 							<Button
 								variant={
@@ -198,7 +244,7 @@ const LoginPage: React.FC = () => {
 								onClick={() => switchTab("signup")}
 								className="flex-1"
 							>
-								Sign Up
+								{localization.button_sign_up}
 							</Button>
 						</div>
 					)}
@@ -223,6 +269,7 @@ const LoginPage: React.FC = () => {
 								<SignInFormComponent
 									onSuccess={handleAuthSuccess}
 									onError={handleAuthError}
+									onUnconfirmedUser={handleUnconfirmedUserError}
 									onSwitchToSignUp={() => switchTab("signup")}
 									onForgotPassword={() => switchTab("reset")}
 								/>
@@ -232,6 +279,7 @@ const LoginPage: React.FC = () => {
 								<SignUpFormComponent
 									onSuccess={handleSignUpSuccess}
 									onError={handleAuthError}
+									onUnverifiedUserExists={handleUnverifiedUserError}
 									onSwitchToSignIn={() => switchTab("signin")}
 								/>
 							)}
@@ -294,7 +342,7 @@ const LoginPage: React.FC = () => {
 												<span>Processing...</span>
 											</div>
 										) : (
-											"Continue as Guest"
+											localization.button_continue_as_guest
 										)}
 									</Button>
 								</div>
@@ -309,7 +357,7 @@ const LoginPage: React.FC = () => {
 						onClick={() => navigate(RENDER_URL.ROOT_URL)}
 						className="text-gray-600 hover:text-gray-900"
 					>
-						← Back to Home
+						← {localization.button_back_to_home || "Back to Home"}
 					</Button>
 				</div>
 			</div>

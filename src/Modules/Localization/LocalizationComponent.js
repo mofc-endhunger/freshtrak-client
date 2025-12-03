@@ -738,6 +738,15 @@ let localization = new LocalizedStrings({
 			"Set up your household for personalized services and easier event registration.",
 		household_setup_now: "Set Up Now",
 		household_later: "Later",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "Family Size",
+		eligibility_dialog_description:
+			"Eligibility requirements based on household size",
+		eligibility_note_prefix: "Note:",
+		eligibility_view_requirements_text:
+			"To view eligibility requirements for our programs click here:",
+		eligibility_view_guidelines_button: "View Eligibility Guidelines",
 	},
 
 	spa: {
@@ -1475,6 +1484,15 @@ let localization = new LocalizedStrings({
 			"Configure su hogar para servicios personalizados y registro de eventos más fácil.",
 		household_setup_now: "Configurar Ahora",
 		household_later: "Más Tarde",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "Tamaño de la familia",
+		eligibility_dialog_description:
+			"Requisitos de elegibilidad basados en el tamaño del hogar",
+		eligibility_note_prefix: "Nota:",
+		eligibility_view_requirements_text:
+			"Para ver los requisitos de elegibilidad para nuestros programas, haga clic aquí:",
+		eligibility_view_guidelines_button: "Ver Pautas de Elegibilidad",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -2212,6 +2230,15 @@ let localization = new LocalizedStrings({
 			"Guryahaaga u diyaari adeegyada gaarka ah iyo diiwaangelinta dhacdooyinka oo fudud.",
 		household_setup_now: "Hadda U Diyaari",
 		household_later: "Dambe",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "Cabbirka qoyska",
+		eligibility_dialog_description:
+			"Shuruudaha u qalma aqoonsiga oo ku salaysan cabbirka qoyska",
+		eligibility_note_prefix: "Ogaysiis:",
+		eligibility_view_requirements_text:
+			"Si aad u aragto shuruudaha u qalma barnaamijyadeena, halkan guji:",
+		eligibility_view_guidelines_button: "Eeg Tilmaamaha U Qalma",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -2955,6 +2982,15 @@ let localization = new LocalizedStrings({
 			"Настройте ваше домохозяйство для персонализированных услуг и более простой регистрации на мероприятия.",
 		household_setup_now: "Настроить Сейчас",
 		household_later: "Позже",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "Размер семьи",
+		eligibility_dialog_description:
+			"Требования к соответствию критериям на основе размера домохозяйства",
+		eligibility_note_prefix: "Примечание:",
+		eligibility_view_requirements_text:
+			"Чтобы просмотреть требования к соответствию критериям для наших программ, нажмите здесь:",
+		eligibility_view_guidelines_button: "Посмотреть правила отбора",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -3674,6 +3710,15 @@ let localization = new LocalizedStrings({
 			"Kişiselleştirilmiş hizmetler ve daha kolay etkinlik kaydı için hanenizi ayarlayın.",
 		household_setup_now: "Şimdi Ayarla",
 		household_later: "Daha Sonra",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "Aile büyüklüğü",
+		eligibility_dialog_description:
+			"Hane halkı büyüklüğüne göre uygunluk gereksinimleri",
+		eligibility_note_prefix: "Not:",
+		eligibility_view_requirements_text:
+			"Programlarımız için uygunluk gereksinimlerini görüntülemek için buraya tıklayın:",
+		eligibility_view_guidelines_button: "Uygunluk Yönergelerini Görüntüle",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -4373,6 +4418,14 @@ let localization = new LocalizedStrings({
 			"قم بإعداد أسرتك للحصول على خدمات مخصصة وتسجيل أحداث أسهل.",
 		household_setup_now: "إعداد الآن",
 		household_later: "لاحقاً",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "حجم عائلي",
+		eligibility_dialog_description: "متطلبات الأهلية بناءً على حجم الأسرة",
+		eligibility_note_prefix: "ملاحظة:",
+		eligibility_view_requirements_text:
+			"لعرض متطلبات الأهلية لبرامجنا، انقر هنا:",
+		eligibility_view_guidelines_button: "عرض إرشادات الأهلية",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -5048,6 +5101,14 @@ let localization = new LocalizedStrings({
 			"设置您的家庭以获得个性化服务和更轻松的活动注册。",
 		household_setup_now: "立即设置",
 		household_later: "稍后",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "家庭裝",
+		eligibility_dialog_description: "基于家庭规模的资格要求",
+		eligibility_note_prefix: "注意：",
+		eligibility_view_requirements_text:
+			"要查看我们计划的资格要求，请点击此处：",
+		eligibility_view_guidelines_button: "查看资格指南",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -5765,6 +5826,15 @@ let localization = new LocalizedStrings({
 			"व्यक्तिगत सेवाओं और आसान इवेंट पंजीकरण के लिए अपने परिवार को सेट अप करें।",
 		household_setup_now: "अभी सेट करें",
 		household_later: "बाद में",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "परिवार का आकार",
+		eligibility_dialog_description:
+			"घरधुरीको आकारको आधारमा योग्यताको आवश्यकताहरू",
+		eligibility_note_prefix: "नोट:",
+		eligibility_view_requirements_text:
+			"हाम्रा कार्यक्रमहरूको लागि योग्यताको आवश्यकताहरू हेर्न यहाँ क्लिक गर्नुहोस्:",
+		eligibility_view_guidelines_button: "योग्यता दिशानिर्देशहरू हेर्नुहोस्",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -6489,6 +6559,15 @@ let localization = new LocalizedStrings({
 			"व्यक्तिगत सेवाहरू र सजिलो घटना दर्ताको लागि तपाईंको घर सेट अप गर्नुहोस्।",
 		household_setup_now: "अहिले सेट अप गर्नुहोस्",
 		household_later: "पछि",
+
+		// ELIGIBILITY COMPONENT
+		eligibility_member_size: "परिवारको आकार",
+		eligibility_dialog_description:
+			"घरधुरीको आकारको आधारमा योग्यताको आवश्यकताहरू",
+		eligibility_note_prefix: "नोट:",
+		eligibility_view_requirements_text:
+			"हाम्रा कार्यक्रमहरूको लागि योग्यताको आवश्यकताहरू हेर्न यहाँ क्लिक गर्नुहोस्:",
+		eligibility_view_guidelines_button: "योग्यता दिशानिर्देशहरू हेर्नुहोस्",
 	},
 });
 

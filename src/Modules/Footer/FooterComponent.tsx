@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { RENDER_URL } from "../../Utils/Urls";
 import { getFormattedAppVersion } from "../../Utils/VersionUtils";
 import config from "../../config";
+import localization from "../Localization/LocalizationComponent";
 
 const FRESHTRAK_PARTNERS_URL = config.FRESHTRAK_PARTNERS_URL;
 
@@ -16,7 +17,7 @@ const FooterComponent: React.FC = () => (
 					<div className="md:col-span-1"></div>
 					<div className="md:col-span-1">
 						<span className="block font-bold text-sm mb-4 text-center md:text-left">
-							Our Policies
+							{localization.footer_our_policies}
 						</span>
 						<ul className="space-y-2 text-center md:text-left">
 							<li>
@@ -24,14 +25,14 @@ const FooterComponent: React.FC = () => (
 									to={RENDER_URL.PRIVACY}
 									className="text-white text-sm underline hover:no-underline"
 								>
-									PrivacyPolicy
+									{localization.footer_privacy_policy}
 								</Link>
 								<br />
 								<Link
 									to={RENDER_URL.TERMS}
 									className="text-white text-sm underline hover:no-underline"
 								>
-									Terms of Use
+									{localization.footer_terms_of_use}
 								</Link>
 							</li>
 						</ul>
@@ -48,7 +49,7 @@ const FooterComponent: React.FC = () => (
           </div> */}
 					<div className="md:col-span-1">
 						<span className="block font-bold text-sm mb-4 text-center md:text-left">
-							For Foodbanks & Agencies
+							{localization.footer_for_foodbanks_agencies}
 						</span>
 						<ul className="space-y-2 text-center md:text-left">
 							<li>
@@ -59,7 +60,7 @@ const FooterComponent: React.FC = () => (
 									className="text-white text-sm underline hover:no-underline"
 								>
 									{" "}
-									FreshTrak: Partner{" "}
+									{localization.footer_freshtrak_partner}{" "}
 								</a>
 							</li>
 						</ul>
@@ -69,7 +70,7 @@ const FooterComponent: React.FC = () => (
 		</div>
 		<div className="pt-2 pb-3 mt-8">
 			<div className="text-center md:text-right">
-				<p className="text-xs">© 2025 FreshTrak</p>
+				<p className="text-xs">{localization.footer_copyright}</p>
 				<p className="text-xs mt-1">{getFormattedAppVersion()}</p>
 			</div>
 		</div>

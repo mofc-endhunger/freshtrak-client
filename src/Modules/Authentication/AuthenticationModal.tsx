@@ -167,19 +167,29 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	const getModalTitle = (): string => {
 		switch (currentTab) {
 			case "signin":
-				return "Sign In";
+				return localization.button_sign_in;
 			case "signup":
-				return "Create Account";
+				return localization.dialog_create_account_title;
 			case "confirm":
-				return "Confirm Account";
+				return (
+					localization.dialog_confirm_account_title ||
+					"Confirm Account"
+				);
 			case "reset":
-				return "Reset Password";
+				return (
+					localization.dialog_reset_password_title || "Reset Password"
+				);
 			case "confirmReset":
-				return "Confirm New Password";
+				return (
+					localization.dialog_confirm_new_password_title ||
+					"Confirm New Password"
+				);
 			case "loading":
-				return "Processing...";
+				return localization.button_processing;
 			default:
-				return "Authentication";
+				return (
+					localization.dialog_authentication_title || "Authentication"
+				);
 		}
 	};
 
@@ -211,7 +221,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 								onClick={() => switchTab("signin")}
 								className="flex-1"
 							>
-								Sign In
+								{localization.button_sign_in}
 							</Button>
 							<Button
 								variant={
@@ -223,7 +233,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 								onClick={() => switchTab("signup")}
 								className="flex-1"
 							>
-								Sign Up
+								{localization.button_sign_up}
 							</Button>
 						</div>
 					)}
@@ -321,7 +331,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 										onClick={onGuestLogin}
 										className="w-full"
 									>
-										Continue as Guest
+										{localization.button_continue_as_guest}
 									</Button>
 								</div>
 							</div>

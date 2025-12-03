@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 
 import { EventNearByComponentProps } from "./types/home.types";
+import localization from "../Localization/LocalizationComponent";
 
 /**
  * EventNearByComponent - Custom accordion component for displaying resource events
@@ -33,7 +34,7 @@ const EventNearByComponent: React.FC<EventNearByComponentProps> = props => {
 	return (
 		<Fragment>
 			<h2 className="font-bold mt-8 sm:mt-12 lg:mt-[60px]">
-				Resource Events
+				{localization.title_resource_events || "Resource Events"}
 			</h2>
 			<div className="space-y-4">
 				{/* Accordion Item 1: Events Today */}
@@ -45,11 +46,11 @@ const EventNearByComponent: React.FC<EventNearByComponentProps> = props => {
 						aria-controls="accordion-content-0"
 					>
 						<span className="font-medium text-gray-900 text-sm sm:text-base">
-							Events Today
+							{localization.title_events_today || "Events Today"}
 						</span>
 						<span
 							role="img"
-							aria-label="expand/collapse"
+							aria-label={localization.aria_expand_collapse}
 							className={`transform transition-transform duration-200 ${
 								isActive("0") ? "rotate-180" : ""
 							}`}
@@ -76,11 +77,11 @@ const EventNearByComponent: React.FC<EventNearByComponentProps> = props => {
 						aria-controls="accordion-content-1"
 					>
 						<span className="font-medium text-gray-900 text-sm sm:text-base">
-							Events for Next 7 days
+							{localization.title_events_next_7_days || "Events for Next 7 days"}
 						</span>
 						<span
 							role="img"
-							aria-label="expand/collapse"
+							aria-label={localization.aria_expand_collapse}
 							className={`transform transition-transform duration-200 ${
 								isActive("1") ? "rotate-180" : ""
 							}`}
@@ -107,11 +108,11 @@ const EventNearByComponent: React.FC<EventNearByComponentProps> = props => {
 						aria-controls="accordion-content-2"
 					>
 						<span className="font-medium text-gray-900 text-sm sm:text-base">
-							Events for Next 30 days
+							{localization.title_events_next_30_days || "Events for Next 30 days"}
 						</span>
 						<span
 							role="img"
-							aria-label="expand/collapse"
+							aria-label={localization.aria_expand_collapse}
 							className={`transform transition-transform duration-200 ${
 								isActive("2") ? "rotate-180" : ""
 							}`}

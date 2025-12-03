@@ -18,6 +18,7 @@ const getSignInSchema = () => z.object({
 interface SignInFormComponentProps {
 	onSuccess?: () => void;
 	onError?: (error: string) => void;
+	onUnconfirmedUser?: (email: string) => Promise<void>;
 	onSwitchToSignUp?: () => void;
 	onForgotPassword?: () => void;
 }
@@ -35,6 +36,7 @@ interface SignInFormComponentProps {
 const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 	onSuccess,
 	onError,
+	onUnconfirmedUser,
 	onSwitchToSignUp,
 	onForgotPassword,
 }) => {
@@ -57,8 +59,36 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 			reset();
 			onSuccess?.();
 		} catch (error: any) {
-			console.error("Signin error:", error);
-			onError?.(error.message || localization.error_failed_to_sign_in);
+			console.error("Signin error details:", {
+				name: error.name,
+				code: error.code,
+				message: error.message,
+				isUnconfirmedUser: error.isUnconfirmedUser,
+				fullError: error,
+			});
+
+			const errorMessage = error.message || "Failed to sign in";
+
+			// Check if error indicates unconfirmed user
+			// Check multiple error properties to catch all possible formats
+			const isUnconfirmedUserError =
+				error.isUnconfirmedUser === true ||
+				error.name === "UserNotConfirmedException" ||
+				error.code === "UserNotConfirmedException" ||
+				errorMessage.includes("UserNotConfirmedException") ||
+				errorMessage.includes("User is not confirmed") ||
+				errorMessage
+					.toLowerCase()
+					.includes("user needs to be confirmed") ||
+				errorMessage.toLowerCase().includes("not confirmed");
+
+			if (isUnconfirmedUserError && onUnconfirmedUser) {
+				// Handle unconfirmed user scenario - switch to confirmation tab
+				await onUnconfirmedUser(data.email);
+			} else {
+				// Handle other errors normally
+				onError?.(errorMessage);
+			}
 		} finally {
 			setIsSubmitting(false);
 		}

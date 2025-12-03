@@ -90,10 +90,156 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			}
 
 			// Use Amplify sign in
-			const result = await signIn({
-				username: email,
-				password,
-			});
+			// Wrap in try-catch to catch errors immediately (including 400 Bad Request)
+			let result;
+			try {
+				result = await signIn({
+					username: email,
+					password,
+				});
+
+				// Check if sign-in actually succeeded
+				if (!result.isSignedIn) {
+					// Sign-in didn't succeed but didn't throw - check nextStep to determine why
+					console.warn(
+						"Sign-in returned but isSignedIn is false:",
+						result
+					);
+
+					// Check if nextStep indicates confirmation is needed
+					const nextStep = result.nextStep;
+					const signInStep = nextStep?.signInStep;
+					const needsConfirmation =
+						signInStep === "CONFIRM_SIGN_IN_WITH_SMS_CODE" ||
+						signInStep === "CONFIRM_SIGN_IN_WITH_TOTP_CODE" ||
+						signInStep === "CONFIRM_SIGN_IN_WITH_EMAIL_CODE" ||
+						(signInStep &&
+							String(signInStep).includes("CONFIRM")) ||
+						(nextStep as any)?.codeDeliveryDetails !== undefined;
+
+					if (needsConfirmation) {
+						const unconfirmedError: any = new Error(
+							"User account is not confirmed. Please verify your email address."
+						);
+						unconfirmedError.name = "UserNotConfirmedException";
+						unconfirmedError.code = "UserNotConfirmedException";
+						unconfirmedError.originalError = result;
+						unconfirmedError.isUnconfirmedUser = true;
+						throw unconfirmedError;
+					}
+
+					// If we can't determine the reason, treat as potential unconfirmed user
+					// (since 400 Bad Request often means unconfirmed user)
+					const unconfirmedError: any = new Error(
+						"User account is not confirmed. Please verify your email address."
+					);
+					unconfirmedError.name = "UserNotConfirmedException";
+					unconfirmedError.code = "UserNotConfirmedException";
+					unconfirmedError.originalError = result;
+					unconfirmedError.isUnconfirmedUser = true;
+					throw unconfirmedError;
+				}
+			} catch (signInError: any) {
+				// Catch sign-in errors immediately to handle unconfirmed users
+				console.error(
+					"SignIn error caught at signIn call:",
+					signInError
+				);
+				console.error("SignIn error structure:", {
+					name: signInError?.name,
+					code: signInError?.code,
+					message: signInError?.message,
+					cause: signInError?.cause,
+					__type: signInError?.__type,
+					underlyingError: signInError?.underlyingError,
+					toString: signInError?.toString(),
+					// Check for AWS Amplify AuthError properties
+					recoverySuggestion: signInError?.recoverySuggestion,
+					underlyingErrorName: signInError?.underlyingError?.name,
+					underlyingErrorMessage:
+						signInError?.underlyingError?.message,
+				});
+
+				// Check for unconfirmed user error in the caught error
+				// AWS Amplify v6 might wrap errors in different ways
+				const errorMessage =
+					signInError?.message ||
+					signInError?.cause?.message ||
+					signInError?.underlyingError?.message ||
+					signInError?.toString() ||
+					"";
+				const errorName =
+					signInError?.name ||
+					signInError?.__type ||
+					signInError?.cause?.name ||
+					signInError?.underlyingError?.name ||
+					"";
+				const errorCode =
+					signInError?.code ||
+					signInError?.cause?.code ||
+					signInError?.underlyingError?.code ||
+					"";
+
+				// Check for HTTP status codes that might indicate unconfirmed user
+				const httpStatus =
+					signInError?.response?.status ||
+					signInError?.status ||
+					signInError?.cause?.status ||
+					signInError?.underlyingError?.status;
+
+				const isUnconfirmedUserError =
+					errorName === "UserNotConfirmedException" ||
+					errorCode === "UserNotConfirmedException" ||
+					signInError?.__type === "UserNotConfirmedException" ||
+					errorMessage.includes("UserNotConfirmedException") ||
+					errorMessage.includes("User is not confirmed") ||
+					errorMessage
+						.toLowerCase()
+						.includes("user needs to be confirmed") ||
+					errorMessage.toLowerCase().includes("not confirmed") ||
+					errorMessage
+						.toLowerCase()
+						.includes("user is not confirmed") ||
+					errorMessage
+						.toLowerCase()
+						.includes("account is not confirmed") ||
+					// 400 Bad Request from Cognito often means unconfirmed user
+					httpStatus === 400 ||
+					(errorMessage.includes("400") &&
+						errorMessage.toLowerCase().includes("bad request"));
+
+				// If we get a 400 error and can't determine it's NOT an unconfirmed user, treat it as such
+				// This is a safety measure - 400 from Cognito sign-in often means unconfirmed user
+				if (
+					httpStatus === 400 &&
+					!errorMessage.toLowerCase().includes("invalid") &&
+					!errorMessage.toLowerCase().includes("incorrect")
+				) {
+					const unconfirmedError: any = new Error(
+						"User account is not confirmed. Please verify your email address."
+					);
+					unconfirmedError.name = "UserNotConfirmedException";
+					unconfirmedError.code = "UserNotConfirmedException";
+					unconfirmedError.originalError = signInError;
+					unconfirmedError.isUnconfirmedUser = true;
+					throw unconfirmedError;
+				}
+
+				if (isUnconfirmedUserError) {
+					const unconfirmedError: any = new Error(
+						errorMessage || "User account is not confirmed"
+					);
+					unconfirmedError.name =
+						errorName || "UserNotConfirmedException";
+					unconfirmedError.code = errorCode;
+					unconfirmedError.originalError = signInError;
+					unconfirmedError.isUnconfirmedUser = true;
+					throw unconfirmedError;
+				}
+
+				// Re-throw the error to be caught by outer catch block
+				throw signInError;
+			}
 
 			// Get access token from Amplify session
 			let accessToken: string | undefined;
@@ -245,6 +391,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			}
 		} catch (error: any) {
 			console.error("Sign in error:", error);
+			console.error("Sign in error full details:", {
+				name: error.name,
+				code: error.code,
+				message: error.message,
+				underlyingError: error.underlyingError,
+				__type: error.__type,
+				toString: error.toString(),
+				fullError: JSON.stringify(
+					error,
+					Object.getOwnPropertyNames(error)
+				),
+			});
+
+			// Check if this is an unconfirmed user error - preserve the original error structure
+			// Check multiple possible error formats from AWS Amplify/Cognito
+			const errorMessage = error.message || error.toString() || "";
+			const errorName = error.name || error.__type || "";
+			const errorCode = error.code || "";
+
+			const isUnconfirmedUserError =
+				errorName === "UserNotConfirmedException" ||
+				errorCode === "UserNotConfirmedException" ||
+				error.__type === "UserNotConfirmedException" ||
+				errorMessage.includes("UserNotConfirmedException") ||
+				errorMessage.includes("User is not confirmed") ||
+				errorMessage
+					.toLowerCase()
+					.includes("user needs to be confirmed") ||
+				errorMessage.toLowerCase().includes("not confirmed") ||
+				errorMessage.toLowerCase().includes("user is not confirmed") ||
+				errorMessage.toLowerCase().includes("account is not confirmed");
+			// If it's an unconfirmed user error, throw a special error that preserves the original structure
+			if (isUnconfirmedUserError) {
+				const unconfirmedError: any = new Error(
+					error.message || "User account is not confirmed"
+				);
+				unconfirmedError.name =
+					error.name || error.__type || "UserNotConfirmedException";
+				unconfirmedError.code = error.code;
+				unconfirmedError.originalError = error;
+				unconfirmedError.isUnconfirmedUser = true;
+				throw unconfirmedError;
+			}
+
 			throw new Error(error.message || "Failed to sign in");
 		} finally {
 			setIsLoading(false);
@@ -283,7 +473,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			StorageService.setItem("pendingUser", pendingUser);
 		} catch (error: any) {
 			console.error("Sign up error:", error);
-			// Provide more user-friendly error messages
+
+			// Check if this is an unverified user error - preserve the original error structure
+			const isUnverifiedUserError =
+				error.name === "UsernameExistsException" ||
+				error.name === "AliasExistsException" ||
+				error.code === "UsernameExistsException" ||
+				error.code === "AliasExistsException" ||
+				error.message?.includes("UsernameExistsException") ||
+				error.message?.includes("AliasExistsException") ||
+				error.message?.includes(
+					"An account with the given email already exists"
+				) ||
+				error.message?.toLowerCase().includes("username exists") ||
+				error.message?.toLowerCase().includes("email already exists");
+
+			// If it's an unverified user error, throw a special error that preserves the original structure
+			if (isUnverifiedUserError) {
+				const unverifiedError: any = new Error(
+					error.message || "An account with this email already exists"
+				);
+				unverifiedError.name = error.name || "UsernameExistsException";
+				unverifiedError.code = error.code;
+				unverifiedError.originalError = error;
+				unverifiedError.isUnverifiedUser = true;
+				throw unverifiedError;
+			}
+
+			// Provide more user-friendly error messages for other errors
 			let errorMessage = "Failed to create account";
 			if (error.message?.includes("name.formatted")) {
 				errorMessage = "Name is required. Please enter your full name.";

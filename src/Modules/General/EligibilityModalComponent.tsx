@@ -46,7 +46,7 @@ const EligibilityModalComponent: React.FC<EligibilityModalComponentProps> = ({
 
 	return (
 		<Dialog open={show} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-lg bg-white">
+			<DialogContent className="bg-white sm:max-w-2xl lg:max-w-4xl">
 				<DialogHeader>
 					<DialogTitle>{header}</DialogTitle>
 					<DialogDescription className="sr-only">
@@ -72,15 +72,15 @@ const EligibilityModalComponent: React.FC<EligibilityModalComponentProps> = ({
 						</div>
 					</div>
 				</div>
-				<div className="overflow-x-auto">
-					<table className="w-full border-collapse">
+				<div className="w-full min-w-0">
+					<table className="w-full border-collapse table-auto">
 						<thead>
 							<tr className="bg-gray-100">
 								{columnData.map((item, i) => (
 									<th
 										key={i}
 										scope="col"
-										className="px-4 py-3 text-left text-sm font-medium text-gray-700"
+										className="px-2 sm:px-4 py-3 text-left text-sm font-medium text-gray-700 break-words"
 									>
 										{item}
 									</th>
@@ -92,7 +92,7 @@ const EligibilityModalComponent: React.FC<EligibilityModalComponentProps> = ({
 								{rowItem.map((row, j) => (
 									<td
 										key={j}
-										className="px-4 py-3 text-sm text-gray-900"
+										className="px-2 sm:px-4 py-3 text-sm text-gray-900 break-words"
 									>
 										{row}
 									</td>

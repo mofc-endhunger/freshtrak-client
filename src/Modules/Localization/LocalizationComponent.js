@@ -740,7 +740,7 @@ let localization = new LocalizedStrings({
 		household_later: "Later",
 
 		// ELIGIBILITY COMPONENT
-		eligibility_member_size: "Member Size",
+		eligibility_member_size: "Family Size",
 		eligibility_dialog_description:
 			"Eligibility requirements based on household size",
 		eligibility_note_prefix: "Note:",
@@ -1486,7 +1486,7 @@ let localization = new LocalizedStrings({
 		household_later: "Más Tarde",
 
 		// ELIGIBILITY COMPONENT
-		eligibility_member_size: "Tamaño del Miembro",
+		eligibility_member_size: "Tamaño de la familia",
 		eligibility_dialog_description:
 			"Requisitos de elegibilidad basados en el tamaño del hogar",
 		eligibility_note_prefix: "Nota:",
@@ -2232,7 +2232,7 @@ let localization = new LocalizedStrings({
 		household_later: "Dambe",
 
 		// ELIGIBILITY COMPONENT
-		eligibility_member_size: "Cabbirka Xubinta",
+		eligibility_member_size: "Cabbirka qoyska",
 		eligibility_dialog_description:
 			"Shuruudaha u qalma aqoonsiga oo ku salaysan cabbirka qoyska",
 		eligibility_note_prefix: "Ogaysiis:",
@@ -3712,7 +3712,7 @@ let localization = new LocalizedStrings({
 		household_later: "Daha Sonra",
 
 		// ELIGIBILITY COMPONENT
-		eligibility_member_size: "Üye Boyutu",
+		eligibility_member_size: "Aile büyüklüğü",
 		eligibility_dialog_description:
 			"Hane halkı büyüklüğüne göre uygunluk gereksinimleri",
 		eligibility_note_prefix: "Not:",
@@ -4420,7 +4420,7 @@ let localization = new LocalizedStrings({
 		household_later: "لاحقاً",
 
 		// ELIGIBILITY COMPONENT
-		eligibility_member_size: "حجم العضو",
+		eligibility_member_size: "حجم عائلي",
 		eligibility_dialog_description: "متطلبات الأهلية بناءً على حجم الأسرة",
 		eligibility_note_prefix: "ملاحظة:",
 		eligibility_view_requirements_text:
@@ -5103,7 +5103,7 @@ let localization = new LocalizedStrings({
 		household_later: "稍后",
 
 		// ELIGIBILITY COMPONENT
-		eligibility_member_size: "成员大小",
+		eligibility_member_size: "家庭裝",
 		eligibility_dialog_description: "基于家庭规模的资格要求",
 		eligibility_note_prefix: "注意：",
 		eligibility_view_requirements_text:
@@ -5828,7 +5828,7 @@ let localization = new LocalizedStrings({
 		household_later: "बाद में",
 
 		// ELIGIBILITY COMPONENT
-		eligibility_member_size: "सदस्य आकार",
+		eligibility_member_size: "परिवार का आकार",
 		eligibility_dialog_description:
 			"घरधुरीको आकारको आधारमा योग्यताको आवश्यकताहरू",
 		eligibility_note_prefix: "नोट:",
@@ -6561,7 +6561,7 @@ let localization = new LocalizedStrings({
 		household_later: "पछि",
 
 		// ELIGIBILITY COMPONENT
-		eligibility_member_size: "सदस्य आकार",
+		eligibility_member_size: "परिवारको आकार",
 		eligibility_dialog_description:
 			"घरधुरीको आकारको आधारमा योग्यताको आवश्यकताहरू",
 		eligibility_note_prefix: "नोट:",

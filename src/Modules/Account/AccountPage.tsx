@@ -22,6 +22,9 @@ import {
 	ArrowLeft,
 	CheckCircle,
 	AlertCircle,
+	MapPin,
+	Phone,
+	Globe,
 } from "lucide-react";
 import { HouseholdCompletionPrompt } from "../Households/components/HouseholdCompletionPrompt";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
@@ -147,7 +150,7 @@ const AccountPage: React.FC = () => {
 
 	const getAccountCreationDate = (): string => {
 		if (!user?.accountCreatedDate) {
-			return "Not available";
+			return localization.text_not_available || "Not available";
 		}
 
 		try {
@@ -159,7 +162,7 @@ const AccountPage: React.FC = () => {
 			});
 		} catch (error) {
 			console.warn("Error formatting account creation date:", error);
-			return "Invalid date";
+			return localization.text_invalid_date || "Invalid date";
 		}
 	};
 
@@ -176,12 +179,12 @@ const AccountPage: React.FC = () => {
 								className="text-gray-600 hover:text-gray-900"
 							>
 								<ArrowLeft className="mr-2 h-4 w-4" />
-								Back to Home
+								{localization.button_back_to_home}
 							</Button>
 						</div>
 
 						<h1 className="text-3xl font-bold text-gray-900">
-							Account Settings
+							{localization.title_account_settings}
 						</h1>
 						{householdData?.members &&
 							householdData.members.length > 0 && (
@@ -191,8 +194,7 @@ const AccountPage: React.FC = () => {
 								</h2>
 							)}
 						<p className="text-gray-600 mt-2">
-							Manage your account information and household
-							details
+							{localization.description_manage_account_household}
 						</p>
 					</div>
 
@@ -218,13 +220,14 @@ const AccountPage: React.FC = () => {
 										</div>
 										<div className="flex-1">
 											<h3 className="text-lg font-medium text-orange-900 mb-2">
-												Complete Your Household Setup
+												{
+													localization.title_complete_household_setup
+												}
 											</h3>
 											<p className="text-orange-700 mb-4">
-												You skipped the household setup
-												earlier. Complete it now to get
-												personalized services and easier
-												event registration.
+												{
+													localization.description_skipped_setup_prompt
+												}
 											</p>
 											<div className="flex space-x-3">
 												<Button
@@ -236,7 +239,8 @@ const AccountPage: React.FC = () => {
 													}}
 													className="bg-orange-600 hover:bg-orange-700 text-white"
 												>
-													Set Up Household
+													{localization.button_set_up_household ||
+														"Set Up Household"}
 												</Button>
 												<Button
 													onClick={() =>
@@ -247,7 +251,9 @@ const AccountPage: React.FC = () => {
 													variant="ghost"
 													className="text-orange-700 hover:text-orange-900"
 												>
-													Maybe Later
+													{
+														localization.button_maybe_later
+													}
 												</Button>
 											</div>
 										</div>
@@ -269,10 +275,14 @@ const AccountPage: React.FC = () => {
 									<CardHeader>
 										<CardTitle className="flex items-center">
 											<User className="mr-2 h-5 w-5" />
-											Profile Information
+											{
+												localization.title_profile_information
+											}
 										</CardTitle>
 										<CardDescription>
-											Your personal account details
+											{
+												localization.description_personal_account_details
+											}
 										</CardDescription>
 									</CardHeader>
 									<CardContent className="space-y-6">
@@ -307,7 +317,9 @@ const AccountPage: React.FC = () => {
 													variant="secondary"
 													className="mt-1"
 												>
-													Member since{" "}
+													{
+														localization.text_member_since
+													}{" "}
 													{getAccountCreationDate()}
 												</Badge>
 											</div>
@@ -322,7 +334,9 @@ const AccountPage: React.FC = () => {
 													<Mail className="h-5 w-5 text-gray-400" />
 													<div>
 														<p className="text-sm font-medium text-gray-900">
-															Email
+															{
+																localization.label_email
+															}
 														</p>
 														<p className="text-sm text-gray-600">
 															{
@@ -336,7 +350,9 @@ const AccountPage: React.FC = () => {
 													<Calendar className="h-5 w-5 text-gray-400" />
 													<div>
 														<p className="text-sm font-medium text-gray-900">
-															Account Created
+															{
+																localization.label_account_created
+															}
 														</p>
 														<p className="text-sm text-gray-600">
 															{getAccountCreationDate()}
@@ -350,14 +366,17 @@ const AccountPage: React.FC = () => {
 													<Home className="h-5 w-5 text-gray-400" />
 													<div>
 														<p className="text-sm font-medium text-gray-900">
-															Account Status
+															{localization.label_account_status ||
+																"Account Status"}
 														</p>
 														<Badge
 															variant="default"
 															className="mt-1"
 														>
 															<CheckCircle className="mr-1 h-3 w-3" />
-															Active
+															{
+																localization.status_active
+															}
 														</Badge>
 													</div>
 												</div>
@@ -372,77 +391,99 @@ const AccountPage: React.FC = () => {
 										<CardHeader>
 											<CardTitle className="flex items-center">
 												<Home className="mr-2 h-5 w-5" />
-												Address Information
+												{localization.header_address_information ||
+													"Address Information"}
 											</CardTitle>
 											<CardDescription>
-												Your household address and
-												contact details
+												{localization.description_household_address_contact ||
+													"Your household address and contact details"}
 											</CardDescription>
 										</CardHeader>
-										<CardContent>
+										<CardContent className="space-y-6">
 											{householdData.address_line_1 ||
 											householdData.city ||
 											householdData.state ||
 											householdData.zip_code ||
 											householdData.phone ||
 											householdData.email ? (
-												<div className="space-y-2">
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 													{householdData.address_line_1 && (
-														<div className="flex items-center">
-															<span className="text-sm font-medium text-gray-700 w-24">
-																Address:
-															</span>
-															<span className="text-sm text-gray-900">
-																{
-																	householdData.address_line_1
-																}
-																{householdData.address_line_2 &&
-																	`, ${householdData.address_line_2}`}
-															</span>
+														<div className="flex items-center space-x-3">
+															<MapPin className="h-5 w-5 text-gray-400" />
+															<div>
+																<p className="text-sm font-medium text-gray-900">
+																	{localization.label_address_colon ||
+																		localization.label_address +
+																			":"}
+																</p>
+																<p className="text-sm text-gray-600">
+																	{
+																		householdData.address_line_1
+																	}
+																	{householdData.address_line_2 &&
+																		`, ${householdData.address_line_2}`}
+																</p>
+															</div>
 														</div>
 													)}
 													{(householdData.city ||
 														householdData.state ||
 														householdData.zip_code) && (
-														<div className="flex items-center">
-															<span className="text-sm font-medium text-gray-700 w-24">
-																Location:
-															</span>
-															<span className="text-sm text-gray-900">
-																{[
-																	householdData.city,
-																	householdData.state,
-																	householdData.zip_code,
-																]
-																	.filter(
-																		Boolean
-																	)
-																	.join(", ")}
-															</span>
+														<div className="flex items-center space-x-3">
+															<MapPin className="h-5 w-5 text-gray-400" />
+															<div>
+																<p className="text-sm font-medium text-gray-900">
+																	{localization.label_location ||
+																		"Location:"}
+																</p>
+																<p className="text-sm text-gray-600">
+																	{[
+																		householdData.city,
+																		householdData.state,
+																		householdData.zip_code,
+																	]
+																		.filter(
+																			Boolean
+																		)
+																		.join(
+																			", "
+																		)}
+																</p>
+															</div>
 														</div>
 													)}
 													{householdData.phone && (
-														<div className="flex items-center">
-															<span className="text-sm font-medium text-gray-700 w-24">
-																Phone:
-															</span>
-															<span className="text-sm text-gray-900">
-																{
-																	householdData.phone
-																}
-															</span>
+														<div className="flex items-center space-x-3">
+															<Phone className="h-5 w-5 text-gray-400" />
+															<div>
+																<p className="text-sm font-medium text-gray-900">
+																	{localization.label_phone_colon ||
+																		localization.label_phone_number +
+																			":"}
+																</p>
+																<p className="text-sm text-gray-600">
+																	{
+																		householdData.phone
+																	}
+																</p>
+															</div>
 														</div>
 													)}
 													{householdData.email && (
-														<div className="flex items-center">
-															<span className="text-sm font-medium text-gray-700 w-24">
-																Email:
-															</span>
-															<span className="text-sm text-gray-900">
-																{
-																	householdData.email
-																}
-															</span>
+														<div className="flex items-center space-x-3">
+															<Mail className="h-5 w-5 text-gray-400" />
+															<div>
+																<p className="text-sm font-medium text-gray-900">
+																	{localization.label_email_colon ||
+																		localization.label_email +
+																			":"}
+																</p>
+																<p className="text-sm text-gray-600">
+																	{
+																		householdData.email
+																	}
+																</p>
+															</div>
 														</div>
 													)}
 												</div>
@@ -450,8 +491,8 @@ const AccountPage: React.FC = () => {
 												<div className="text-center py-4">
 													<AlertCircle className="mx-auto h-8 w-8 text-gray-400 mb-2" />
 													<p className="text-sm text-gray-500 mb-3">
-														No address information
-														available
+														{localization.text_no_address_information_available ||
+															"No address information available"}
 													</p>
 													<Button
 														onClick={() =>
@@ -461,7 +502,8 @@ const AccountPage: React.FC = () => {
 														size="sm"
 													>
 														<Home className="mr-2 h-4 w-4" />
-														Add Address Information
+														{localization.button_add_address_information ||
+															"Add Address Information"}
 													</Button>
 												</div>
 											)}
@@ -474,17 +516,18 @@ const AccountPage: React.FC = () => {
 									householdData.members.length > 0 && (
 										<Card>
 											<CardHeader>
-												<div className="flex flex-col space-y-2 md:space-y-0 md:flex-row items-center justify-between">
-													<div>
-														<CardTitle className="flex items-center">
-															<Users className="mr-2 h-5 w-5" />
-															Household Members
-														</CardTitle>
-														<CardDescription>
-															Family members in
-															your household
-														</CardDescription>
-													</div>
+												<CardTitle className="flex items-center">
+													<Users className="mr-2 h-5 w-5" />
+													{localization.title_household_members ||
+														"Household Members"}
+												</CardTitle>
+												<CardDescription>
+													{localization.description_family_members_household ||
+														"Family members in your household"}
+												</CardDescription>
+											</CardHeader>
+											<CardContent className="space-y-6">
+												<div className="flex justify-center md:justify-end mb-4">
 													<Button
 														onClick={() =>
 															navigateToHouseholdDashboard()
@@ -493,11 +536,10 @@ const AccountPage: React.FC = () => {
 														size="sm"
 													>
 														<Home className="mr-2 h-4 w-4" />
-														Update Household
+														{localization.button_update_household ||
+															"Update Household"}
 													</Button>
 												</div>
-											</CardHeader>
-											<CardContent className="space-y-4">
 												{householdData.members
 													.sort((a: any, b: any) => {
 														// Sort head of household first
@@ -531,132 +573,163 @@ const AccountPage: React.FC = () => {
 																		: ""
 																}`}
 															>
-																<CardContent>
-																	<div className="space-y-3">
-																		{/* Member Name and Status */}
-																		<div className="flex items-center justify-between">
-																			<div>
-																				<h4 className="font-semibold text-gray-900">
+																<CardContent className="space-y-6">
+																	{/* Member Name and Status */}
+																	<div className="flex items-center justify-between">
+																		<div className="flex items-center flex-col md:flex-row">
+																			<h4 className="text-lg font-semibold text-gray-900">
+																				{
+																					member.first_name
+																				}
+																				{member.middle_name &&
+																					` ${member.middle_name}`}
+																				{` ${member.last_name}`}
+																				{member.suffix &&
+																					` ${member.suffix}`}
+																			</h4>
+																			{member.is_head_of_household ===
+																				1 && (
+																				<span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+																					{localization.text_head_of_household ||
+																						"Head of Household"}
+																				</span>
+																			)}
+																			{member.status ===
+																				"inactive" && (
+																				<span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded mt-1 inline-block">
 																					{
-																						member.first_name
+																						localization.status_inactive
 																					}
-																					{member.middle_name &&
-																						` ${member.middle_name}`}
-																					{` ${member.last_name}`}
-																					{member.suffix &&
-																						` ${member.suffix}`}
-																					{member.is_head_of_household ===
-																						1 && (
-																						<span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-																							Head
-																							of
-																							Household
-																						</span>
-																					)}
-																				</h4>
-																				{member.status ===
-																					"inactive" && (
-																					<span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
-																						Inactive
-																					</span>
-																				)}
-																			</div>
+																				</span>
+																			)}
 																		</div>
+																	</div>
 
-																		{/* Member Details */}
-																		<div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-																			{member.date_of_birth &&
-																				member.date_of_birth !==
-																					"1900-01-01" && (
-																					<div className="flex items-center">
-																						<span className="text-gray-600 w-20">
-																							Age:
-																						</span>
-																						<span className="text-gray-900">
+																	<Separator />
+
+																	{/* Member Details */}
+																	<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+																		{member.date_of_birth &&
+																			member.date_of_birth !==
+																				"1900-01-01" && (
+																				<div className="flex items-center space-x-3">
+																					<Calendar className="h-5 w-5 text-gray-400" />
+																					<div>
+																						<p className="text-sm font-medium text-gray-900">
+																							{localization.label_age ||
+																								"Age:"}
+																						</p>
+																						<p className="text-sm text-gray-600">
 																							{
 																								calculateAge(
 																									member.date_of_birth
 																								)
 																									.years
 																							}
-																						</span>
+																						</p>
 																					</div>
-																				)}
-																			{member.gender && (
-																				<div className="flex items-center">
-																					<span className="text-gray-600 w-20">
-																						Gender:
-																					</span>
-																					<span className="text-gray-900 capitalize">
+																				</div>
+																			)}
+																		{member.gender && (
+																			<div className="flex items-center space-x-3">
+																				<User className="h-5 w-5 text-gray-400" />
+																				<div>
+																					<p className="text-sm font-medium text-gray-900">
+																						{localization.label_gender_colon ||
+																							localization.label_gender +
+																								":"}
+																					</p>
+																					<p className="text-sm text-gray-600 capitalize">
 																						{
 																							member.gender
 																						}
-																					</span>
+																					</p>
 																				</div>
-																			)}
-																			{member.phone && (
-																				<div className="flex items-center">
-																					<span className="text-gray-600 w-20">
-																						Phone:
-																					</span>
-																					<span className="text-gray-900">
+																			</div>
+																		)}
+																		{member.phone && (
+																			<div className="flex items-center space-x-3">
+																				<Phone className="h-5 w-5 text-gray-400" />
+																				<div>
+																					<p className="text-sm font-medium text-gray-900">
+																						{localization.label_phone_colon ||
+																							localization.label_phone_number +
+																								":"}
+																					</p>
+																					<p className="text-sm text-gray-600">
 																						{
 																							member.phone
 																						}
-																					</span>
+																					</p>
 																				</div>
-																			)}
-																			{member.email && (
-																				<div className="flex items-center">
-																					<span className="text-gray-600 w-20">
-																						Email:
-																					</span>
-																					<span className="text-gray-900">
+																			</div>
+																		)}
+																		{member.email && (
+																			<div className="flex items-center space-x-3">
+																				<Mail className="h-5 w-5 text-gray-400" />
+																				<div>
+																					<p className="text-sm font-medium text-gray-900">
+																						{localization.label_email_colon ||
+																							localization.label_email +
+																								":"}
+																					</p>
+																					<p className="text-sm text-gray-600">
 																						{
 																							member.email
 																						}
-																					</span>
+																					</p>
 																				</div>
-																			)}
-																			{member.preferred_language && (
-																				<div className="flex items-center">
-																					<span className="text-gray-600 w-20">
-																						Language:
-																					</span>
-																					<span className="text-gray-900 capitalize">
+																			</div>
+																		)}
+																		{member.preferred_language && (
+																			<div className="flex items-center space-x-3">
+																				<Globe className="h-5 w-5 text-gray-400" />
+																				<div>
+																					<p className="text-sm font-medium text-gray-900">
+																						{localization.label_language_colon ||
+																							localization.label_language +
+																								":"}
+																					</p>
+																					<p className="text-sm text-gray-600 capitalize">
 																						{
 																							member.preferred_language
 																						}
-																					</span>
+																					</p>
 																				</div>
-																			)}
-																			{member.is_freshtrak_user && (
-																				<div className="flex items-center">
-																					<span className="text-gray-600 w-20">
-																						Status:
-																					</span>
-																					<span className="text-green-600 font-medium">
-																						FreshTrak
-																						User
-																					</span>
+																			</div>
+																		)}
+																		{member.is_freshtrak_user && (
+																			<div className="flex items-center space-x-3">
+																				<CheckCircle className="h-5 w-5 text-gray-400" />
+																				<div>
+																					<p className="text-sm font-medium text-gray-900">
+																						{localization.label_status_colon ||
+																							"Status:"}
+																					</p>
+																					<p className="text-sm text-green-600 font-medium">
+																						{localization.text_freshtrak_user ||
+																							"FreshTrak User"}
+																					</p>
 																				</div>
-																			)}
-																		</div>
-
-																		{/* Notes */}
-																		{member.notes && (
-																			<div className="text-sm">
-																				<span className="text-gray-600">
-																					Notes:{" "}
-																				</span>
-																				<span className="text-gray-900">
-																					{
-																						member.notes
-																					}
-																				</span>
 																			</div>
 																		)}
 																	</div>
+
+																	{/* Notes */}
+																	{member.notes && (
+																		<div className="text-sm">
+																			<span className="text-gray-600">
+																				{localization.label_notes_colon ||
+																					localization.label_notes +
+																						": "}
+																			</span>
+																			<span className="text-gray-900">
+																				{
+																					member.notes
+																				}
+																			</span>
+																		</div>
+																	)}
 																</CardContent>
 															</Card>
 														)

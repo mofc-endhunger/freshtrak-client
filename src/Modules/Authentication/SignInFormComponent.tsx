@@ -7,16 +7,18 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useAuth } from "./AuthContext";
 import { SignInFormData } from "./types/authentication.types";
+import localization from "../Localization/LocalizationComponent";
 
-// Validation schema for signin form
-const signInSchema = z.object({
-	email: z.email("Please enter a valid email address"),
-	password: z.string().min(1, { message: "Password is required" }),
+// Validation schema for signin form - using function to access localization
+const getSignInSchema = () => z.object({
+	email: z.string().email(localization.error_please_enter_valid_email),
+	password: z.string().min(1, { message: localization.error_password_required }),
 });
 
 interface SignInFormComponentProps {
 	onSuccess?: () => void;
 	onError?: (error: string) => void;
+	onUnconfirmedUser?: (email: string) => Promise<void>;
 	onSwitchToSignUp?: () => void;
 	onForgotPassword?: () => void;
 }
@@ -34,6 +36,7 @@ interface SignInFormComponentProps {
 const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 	onSuccess,
 	onError,
+	onUnconfirmedUser,
 	onSwitchToSignUp,
 	onForgotPassword,
 }) => {
@@ -46,7 +49,7 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 		formState: { errors },
 		reset,
 	} = useForm<SignInFormData>({
-		resolver: zodResolver(signInSchema),
+		resolver: zodResolver(getSignInSchema()),
 	});
 
 	const onSubmit = async (data: SignInFormData): Promise<void> => {
@@ -56,8 +59,36 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 			reset();
 			onSuccess?.();
 		} catch (error: any) {
-			console.error("Signin error:", error);
-			onError?.(error.message || "Failed to sign in");
+			console.error("Signin error details:", {
+				name: error.name,
+				code: error.code,
+				message: error.message,
+				isUnconfirmedUser: error.isUnconfirmedUser,
+				fullError: error,
+			});
+
+			const errorMessage = error.message || "Failed to sign in";
+
+			// Check if error indicates unconfirmed user
+			// Check multiple error properties to catch all possible formats
+			const isUnconfirmedUserError =
+				error.isUnconfirmedUser === true ||
+				error.name === "UserNotConfirmedException" ||
+				error.code === "UserNotConfirmedException" ||
+				errorMessage.includes("UserNotConfirmedException") ||
+				errorMessage.includes("User is not confirmed") ||
+				errorMessage
+					.toLowerCase()
+					.includes("user needs to be confirmed") ||
+				errorMessage.toLowerCase().includes("not confirmed");
+
+			if (isUnconfirmedUserError && onUnconfirmedUser) {
+				// Handle unconfirmed user scenario - switch to confirmation tab
+				await onUnconfirmedUser(data.email);
+			} else {
+				// Handle other errors normally
+				onError?.(errorMessage);
+			}
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -66,11 +97,11 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 			<div className="space-y-2">
-				<Label htmlFor="email">Email</Label>
+				<Label htmlFor="email">{localization.label_email}</Label>
 				<Input
 					id="email"
 					type="email"
-					placeholder="Enter your email"
+					placeholder={localization.placeholder_enter_email_simple}
 					{...register("email")}
 					className={errors.email ? "border-red-500" : ""}
 				/>
@@ -82,11 +113,11 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor="password">Password</Label>
+				<Label htmlFor="password">{localization.label_password}</Label>
 				<Input
 					id="password"
 					type="password"
-					placeholder="Enter your password"
+					placeholder={localization.placeholder_enter_password}
 					{...register("password")}
 					className={errors.password ? "border-red-500" : ""}
 				/>
@@ -104,7 +135,7 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 						onClick={onForgotPassword}
 						className="text-sm text-primary hover:underline"
 					>
-						Forgot Password?
+						{localization.button_forgot_password}
 					</button>
 				</div>
 			)}
@@ -118,23 +149,23 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 					{isSubmitting || isLoading ? (
 						<div className="flex items-center justify-center space-x-2">
 							<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-							<span>Signing In...</span>
+							<span>{localization.button_signing_in}</span>
 						</div>
 					) : (
-						"Sign In"
+						localization.button_sign_in
 					)}
 				</Button>
 
 				{onSwitchToSignUp && (
 					<div className="text-center">
 						<p className="text-sm text-gray-600">
-							Don't have an account?{" "}
+							{localization.description_dont_have_account}{" "}
 							<button
 								type="button"
 								onClick={onSwitchToSignUp}
 								className="text-primary hover:underline font-medium"
 							>
-								Sign Up
+								{localization.button_sign_up}
 							</button>
 						</p>
 					</div>

@@ -9,6 +9,7 @@ import { formatDateDayAndDate } from "../../Utils/DateFormat";
 import { RENDER_URL } from "../../Utils/Urls";
 import MiniMapComponent from "../General/MiniMapComponent";
 import FullMapModalComponent from "../General/FullMapModalComponent";
+import localization from "../Localization/LocalizationComponent";
 import "../../Assets/scss/main.scss";
 
 interface Event {
@@ -145,9 +146,9 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 			return null;
 		}
 		if (acceptReservations) {
-			return getButton("Reserve Time", targetUrl);
+			return getButton(localization.button_reserve_time, targetUrl);
 		} else if (showRsvp) {
-			return getButton("RSVP", targetUrl);
+			return getButton(localization.button_rsvp, targetUrl);
 		} else {
 			return null;
 		}
@@ -200,7 +201,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 					/>
 					{exceptionNote && exceptionNote !== "" && (
 						<div className="text-sm font-varela my-2">
-							Service Area Limitations:
+							{localization.label_service_area_limitations}
 							<br />
 							<span
 								className="text-red-600"
@@ -214,7 +215,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 					{showDetails && (
 						<div className="">
 							<p>
-								<b> Information </b>
+								<b> {localization.text_information} </b>
 								<br />
 								{eventDetails}
 							</p>
@@ -222,17 +223,17 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 					)}
 					{!!showRsvpOptional && (
 						<span className="text-red-600 text-sm">
-							RSVP is optional for this event
+							{localization.text_rsvp_optional_for_event}
 						</span>
 					)}
 					{!!showRsvpRequired && (
 						<span className="text-red-600 text-sm">
-							RSVP is required for this event
+							{localization.text_rsvp_required_for_event}
 						</span>
 					)}
 					{alreadyRegistered && (
 						<span className="text-red-600 text-sm">
-							Already Registered
+							{localization.text_already_registered}
 						</span>
 					)}
 					<div className="space-y-3 mt-3">
@@ -246,15 +247,15 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 									}}
 								>
 									{!showDetails
-										? "View Details"
-										: "Hide details"}
+										? localization.button_view_details
+										: localization.button_hide_details}
 								</button>
 							)}
 							<button
 								className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
 								onClick={handleGetDirections}
 							>
-								Get Directions
+								{localization.button_get_directions}
 							</button>
 						</div>
 

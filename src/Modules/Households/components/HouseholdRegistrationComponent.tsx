@@ -18,6 +18,7 @@ import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 import { RegistrationFormData } from "../../Registration/types/registration.types";
 import { ApiHouseholdMember } from "../types/api.types";
 import { getGenderFromId, getGenderDisplayName } from "../utils/householdUtils";
+import localization from "../../Localization/LocalizationComponent";
 
 interface HouseholdRegistrationComponentProps {
 	onComplete: (data: RegistrationFormData) => Promise<void>;
@@ -164,10 +165,10 @@ const HouseholdRegistrationComponent: React.FC<
 			onSubmit={onComplete}
 			onCancel={onCancel}
 			prefilledData={prefilledData}
-			title="Set Up Your Household"
-			subtitle="Complete your household profile to get personalized services"
-			submitButtonText="Complete Setup"
-			cancelButtonText="Cancel"
+			title={localization.title_set_up_household}
+			subtitle={localization.subtitle_complete_household_profile}
+			submitButtonText={localization.button_complete_setup}
+			cancelButtonText={localization.button_cancel}
 			currentHouseholdMembers={currentHouseholdMembers}
 			onDeleteMember={handleDeleteMember}
 			deletedMemberIds={deletedMemberIds}

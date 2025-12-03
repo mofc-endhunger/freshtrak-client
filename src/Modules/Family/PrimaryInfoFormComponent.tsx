@@ -129,7 +129,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 						className="text-sm text-red-600"
 						data-testid="first-name-error"
 					>
-						This field is required
+						{localization.error_first_name_required}
 					</span>
 				)}
 			</div>
@@ -183,7 +183,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 						className="text-sm text-red-600"
 						data-testid="last-name-error"
 					>
-						This field is required
+						{localization.error_last_name_required}
 					</span>
 				)}
 			</div>
@@ -203,13 +203,13 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					data-testid="suffix-select"
 					{...register("suffix")}
 				>
-					<option value=""></option>
-					<option value="Jr">Jr</option>
-					<option value="Sr">Sr</option>
-					<option value="II">II</option>
-					<option value="III">III</option>
-					<option value="IV">IV</option>
-					<option value="V">V</option>
+					<option value="">{localization.option_suffix_none}</option>
+					<option value="Jr">{localization.option_suffix_jr}</option>
+					<option value="Sr">{localization.option_suffix_sr}</option>
+					<option value="II">{localization.option_suffix_ii}</option>
+					<option value="III">{localization.option_suffix_iii}</option>
+					<option value="IV">{localization.option_suffix_iv}</option>
+					<option value="V">{localization.option_suffix_v}</option>
 				</select>
 			</div>
 
@@ -236,12 +236,12 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
           `}
 					id="date_of_birth"
 					value={date_of_birth}
-					placeholder="MM / DD / YYYY"
+					placeholder={localization.placeholder_date_format}
 					data-testid="date-of-birth-input"
 					{...register("date_of_birth", {
 						validate: (value: string) =>
 							isValidDob(value) ||
-							"Please enter a valid date of birth.",
+							localization.error_please_enter_valid_date,
 						onChange: handleChangeDob,
 					})}
 				/>
@@ -252,7 +252,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					>
 						{String(
 							errors.date_of_birth?.message ||
-								"Please enter a valid date of birth."
+								localization.error_please_enter_valid_date
 						)}
 					</span>
 				)}
@@ -282,11 +282,11 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					{...register("gender", { required: true })}
 				>
 					<option value=""></option>
-					<option value="male">{localization?.male}</option>
-					<option value="female">{localization?.female}</option>
-					<option value="other">{localization?.other}</option>
+					<option value="male">{localization.option_gender_male}</option>
+					<option value="female">{localization.option_gender_female}</option>
+					<option value="other">{localization.option_gender_other}</option>
 					<option value="not_specify">
-						{localization?.not_to_say}
+						{localization.option_gender_prefer_not_to_say}
 					</option>
 				</select>
 				{errors?.gender && (
@@ -294,7 +294,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 						className="text-sm text-red-600"
 						data-testid="gender-error"
 					>
-						This field is required
+						{localization.error_field_required}
 					</span>
 				)}
 			</div>
@@ -308,7 +308,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 						variant="highlight"
 						data-testid="continue-button"
 					>
-						Continue
+						{localization.button_continue}
 					</Button>
 				</div>
 			)}

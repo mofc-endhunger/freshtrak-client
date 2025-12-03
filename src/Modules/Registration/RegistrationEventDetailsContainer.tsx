@@ -144,6 +144,12 @@ const RegistrationEventDetailsContainer: React.FC<
 			return;
 		}
 
+		// Store event date ID in session storage for household setup flow
+		// This allows HouseholdSignUpWrapper to detect registration flow after email confirmation
+		if (selectedEvent && selectedEvent.id) {
+			StorageService.setRegisteredEventDateID(selectedEvent.id);
+		}
+
 		// If no authentication found, show authentication modal
 		showAuthenticationModal
 			? fetchUserToken()

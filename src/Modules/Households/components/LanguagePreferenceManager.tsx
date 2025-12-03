@@ -26,6 +26,7 @@ import { Checkbox } from "../../../components/ui/checkbox";
 import { Globe, Users, User, CheckCircle } from "lucide-react";
 import { HouseholdMember, Household } from "../types/household.types";
 import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
+import localization from "../../Localization/LocalizationComponent";
 
 interface LanguagePreferenceManagerProps {
 	household: Household;
@@ -50,18 +51,18 @@ interface LanguageOption {
 	flag: string;
 }
 
-const SUPPORTED_LANGUAGES: LanguageOption[] = [
-	{ code: "en", name: "English", nativeName: "English", flag: "🇺🇸" },
-	{ code: "es", name: "Spanish", nativeName: "Español", flag: "🇪🇸" },
-	{ code: "fr", name: "French", nativeName: "Français", flag: "🇫🇷" },
-	{ code: "de", name: "German", nativeName: "Deutsch", flag: "🇩🇪" },
-	{ code: "it", name: "Italian", nativeName: "Italiano", flag: "🇮🇹" },
-	{ code: "pt", name: "Portuguese", nativeName: "Português", flag: "🇵🇹" },
-	{ code: "zh", name: "Chinese", nativeName: "中文", flag: "🇨🇳" },
-	{ code: "ja", name: "Japanese", nativeName: "日本語", flag: "🇯🇵" },
-	{ code: "ko", name: "Korean", nativeName: "한국어", flag: "🇰🇷" },
-	{ code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇸🇦" },
-	{ code: "hi", name: "Hindi", nativeName: "हिन्दी", flag: "🇮🇳" },
+const getSupportedLanguages = (): LanguageOption[] => [
+	{ code: "en", name: localization.option_language_english, nativeName: localization.option_language_english, flag: "🇺🇸" },
+	{ code: "es", name: localization.option_language_spanish, nativeName: localization.option_language_spanish, flag: "🇪🇸" },
+	{ code: "fr", name: localization.option_language_french, nativeName: localization.option_language_french, flag: "🇫🇷" },
+	{ code: "de", name: localization.option_language_german, nativeName: localization.option_language_german, flag: "🇩🇪" },
+	{ code: "it", name: localization.option_language_italian, nativeName: localization.option_language_italian, flag: "🇮🇹" },
+	{ code: "pt", name: localization.option_language_portuguese, nativeName: localization.option_language_portuguese, flag: "🇵🇹" },
+	{ code: "zh", name: localization.option_language_chinese, nativeName: localization.option_language_chinese, flag: "🇨🇳" },
+	{ code: "ja", name: localization.option_language_japanese, nativeName: localization.option_language_japanese, flag: "🇯🇵" },
+	{ code: "ko", name: localization.option_language_korean, nativeName: localization.option_language_korean, flag: "🇰🇷" },
+	{ code: "ar", name: localization.option_language_arabic, nativeName: localization.option_language_arabic, flag: "🇸🇦" },
+	{ code: "hi", name: localization.option_language_hindi, nativeName: localization.option_language_hindi, flag: "🇮🇳" },
 	{ code: "ru", name: "Russian", nativeName: "Русский", flag: "🇷🇺" },
 ];
 
@@ -144,9 +145,10 @@ export const LanguagePreferenceManager: React.FC<
 	};
 
 	const getLanguageInfo = (code: string): LanguageOption => {
+		const languages = getSupportedLanguages();
 		return (
-			SUPPORTED_LANGUAGES.find(lang => lang.code === code) ||
-			SUPPORTED_LANGUAGES[0]
+			languages.find(lang => lang.code === code) ||
+			languages[0]
 		);
 	};
 
@@ -167,11 +169,10 @@ export const LanguagePreferenceManager: React.FC<
 			<CardHeader>
 				<CardTitle className="flex items-center space-x-2">
 					<Globe className="w-5 h-5 text-highlight" />
-					<span>Language Preferences</span>
+					<span>{localization.header_language_preferences}</span>
 				</CardTitle>
 				<CardDescription>
-					Language settings for {household.primary_first_name}{" "}
-					{household.primary_last_name}'s household
+					{localization.subtitle_preferred_language_comm}
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-6">
@@ -179,7 +180,7 @@ export const LanguagePreferenceManager: React.FC<
 				<div className="space-y-4">
 					<h4 className="font-semibold text-gray-900 flex items-center space-x-2">
 						<Users className="w-4 h-4" />
-						<span>Household Language</span>
+						<span>{localization.label_household_language}</span>
 					</h4>
 
 					<div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
@@ -216,14 +217,14 @@ export const LanguagePreferenceManager: React.FC<
 				<div className="space-y-4">
 					<h4 className="font-semibold text-gray-900 flex items-center space-x-2">
 						<User className="w-4 h-4" />
-						<span>Member Languages</span>
+						<span>{localization.label_member_language_settings}</span>
 					</h4>
 
 					{watchedValues.use_household_language_for_all ? (
 						<div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
 							<CheckCircle className="w-4 h-4 text-blue-500" />
 							<span className="text-sm text-blue-700">
-								All members use household language
+								{localization.description_fallback_language}
 							</span>
 						</div>
 					) : (
@@ -269,7 +270,7 @@ export const LanguagePreferenceManager: React.FC<
 				{/* Fallback Language */}
 				<div className="space-y-2">
 					<h4 className="font-semibold text-gray-900">
-						Fallback Language
+						{localization.label_fallback_language}
 					</h4>
 					<div className="flex items-center space-x-2">
 						<span className="text-lg">
@@ -294,7 +295,7 @@ export const LanguagePreferenceManager: React.FC<
 						variant="outline"
 						size="sm"
 					>
-						Edit Preferences
+						{localization.header_edit_language_preferences}
 					</Button>
 				</div>
 			</CardContent>
@@ -306,11 +307,10 @@ export const LanguagePreferenceManager: React.FC<
 			<CardHeader>
 				<CardTitle className="flex items-center space-x-2">
 					<Globe className="w-5 h-5 text-highlight" />
-					<span>Edit Language Preferences</span>
+					<span>{localization.header_edit_language_preferences}</span>
 				</CardTitle>
 				<CardDescription>
-					Configure language settings for the household and individual
-					members
+					{localization.subtitle_select_language_comm}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -319,12 +319,12 @@ export const LanguagePreferenceManager: React.FC<
 					<div className="space-y-4">
 						<h4 className="font-semibold text-gray-900 flex items-center space-x-2">
 							<Users className="w-4 h-4" />
-							<span>Household Language</span>
+							<span>{localization.label_household_language}</span>
 						</h4>
 
 						<div>
 							<Label htmlFor="household_preferred_language">
-								Default Language
+								{localization.label_preferred_language}
 							</Label>
 							<Select
 								value={
@@ -339,10 +339,10 @@ export const LanguagePreferenceManager: React.FC<
 								}
 							>
 								<SelectTrigger>
-									<SelectValue placeholder="Select household language" />
+									<SelectValue placeholder={localization.placeholder_select_household_language} />
 								</SelectTrigger>
 								<SelectContent>
-									{SUPPORTED_LANGUAGES.map(language => (
+									{getSupportedLanguages().map(language => (
 										<SelectItem
 											key={language.code}
 											value={language.code}
@@ -371,7 +371,7 @@ export const LanguagePreferenceManager: React.FC<
 					<div className="space-y-4">
 						<h4 className="font-semibold text-gray-900 flex items-center space-x-2">
 							<User className="w-4 h-4" />
-							<span>Member Language Settings</span>
+							<span>{localization.label_member_language_settings}</span>
 						</h4>
 
 						<div className="flex items-center space-x-2">
@@ -389,14 +389,14 @@ export const LanguagePreferenceManager: React.FC<
 								}
 							/>
 							<Label htmlFor="use_household_language_for_all">
-								Use household language for all members
+								{localization.description_fallback_language}
 							</Label>
 						</div>
 
 						{!watchedValues.use_household_language_for_all && (
 							<div className="space-y-3">
 								<h5 className="font-medium text-gray-700">
-									Individual Member Languages
+									{localization.label_household_members}
 								</h5>
 								{members.map(member => {
 									const memberLang =
@@ -430,7 +430,7 @@ export const LanguagePreferenceManager: React.FC<
 													<SelectValue />
 												</SelectTrigger>
 												<SelectContent>
-													{SUPPORTED_LANGUAGES.map(
+													{getSupportedLanguages().map(
 														language => (
 															<SelectItem
 																key={
@@ -467,7 +467,7 @@ export const LanguagePreferenceManager: React.FC<
 					{/* Fallback Language */}
 					<div>
 						<Label htmlFor="fallback_language">
-							Fallback Language
+							{localization.label_fallback_language}
 						</Label>
 						<Select
 							value={watchedValues.fallback_language}
@@ -478,10 +478,10 @@ export const LanguagePreferenceManager: React.FC<
 							}
 						>
 							<SelectTrigger>
-								<SelectValue placeholder="Select fallback language" />
+								<SelectValue placeholder={localization.placeholder_select_fallback_language} />
 							</SelectTrigger>
 							<SelectContent>
-								{SUPPORTED_LANGUAGES.map(language => (
+								{getSupportedLanguages().map(language => (
 									<SelectItem
 										key={language.code}
 										value={language.code}
@@ -504,8 +504,7 @@ export const LanguagePreferenceManager: React.FC<
 							</SelectContent>
 						</Select>
 						<p className="text-sm text-gray-600 mt-1">
-							Used when a member's preferred language is not
-							available
+							{localization.description_fallback_language}
 						</p>
 					</div>
 
@@ -517,14 +516,14 @@ export const LanguagePreferenceManager: React.FC<
 							variant="outline"
 							disabled={isLoading}
 						>
-							Cancel
+							{localization.button_cancel}
 						</Button>
 						<Button
 							type="submit"
 							disabled={isLoading || !isDirty}
 							className="bg-highlight text-white hover:bg-highlight-dark"
 						>
-							{isLoading ? "Saving..." : "Save Preferences"}
+							{isLoading ? localization.button_saving : localization.button_save_preferences}
 						</Button>
 					</div>
 				</form>
@@ -589,8 +588,9 @@ export const useLanguagePreferenceManager = () => {
 	};
 
 	const getLanguageDisplayInfo = (code: string) => {
-		const language = SUPPORTED_LANGUAGES.find(lang => lang.code === code);
-		return language || SUPPORTED_LANGUAGES[0];
+		const languages = getSupportedLanguages();
+		const language = languages.find(lang => lang.code === code);
+		return language || languages[0];
 	};
 
 	return {

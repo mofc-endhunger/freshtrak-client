@@ -44,6 +44,7 @@ import {
 	EventListProps,
 	HomeEventFormatData,
 } from "./types/home.types";
+import localization from "../Localization/LocalizationComponent";
 
 const HomeContainer: React.FC<HomeContainerProps> = () => {
 	const [agencyResponse, setAgencyResponse] = useState<boolean>(false);
@@ -225,14 +226,14 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 						<form onSubmit={handleSubmit(onSubmit)}>
 							<div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
 								<div className="space-y-2 w-full sm:w-auto sm:flex-1">
-									<Label htmlFor="zip_code">Zip Code</Label>
+									<Label htmlFor="zip_code">{localization.label_zip_code}</Label>
 									<Input
 										type="text"
 										id="zip_code"
 										{...register("zip_code", {
-											required: "Zip code is required",
+											required: localization.error_zip_code_required,
 										})}
-										placeholder="Enter zip code"
+										placeholder={localization.placeholder_enter_zip_code}
 										className="w-full"
 									/>
 									{errors.zip_code && (
@@ -249,10 +250,10 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 									{loading ? (
 										<div className="flex items-center justify-center space-x-2">
 											<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-											<span>Searching...</span>
+											<span>{localization.loading_searching}</span>
 										</div>
 									) : (
-										"Search"
+										localization.button_search
 									)}
 								</Button>
 							</div>

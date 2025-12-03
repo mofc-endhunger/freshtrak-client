@@ -6,6 +6,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../components/ui/select";
+import localization from "./LocalizationComponent";
 
 interface CountryOption {
 	key: string;
@@ -48,7 +49,7 @@ const CountryListComponent: React.FC<CountryListComponentProps> = (props) => {
 	return (
 		<Select value={selectedValue} onValueChange={handleValueChange}>
 			<SelectTrigger className="bg-white text-gray-400 border border-white rounded px-2 md:px-3 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 h-auto min-w-[140px]">
-				<SelectValue placeholder="Select Language" />
+				<SelectValue placeholder={localization.placeholder_select_language} />
 			</SelectTrigger>
 			<SelectContent className="bg-white z-[10000]">
 				{countryOptions.map((option) => (

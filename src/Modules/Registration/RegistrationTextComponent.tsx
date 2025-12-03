@@ -11,13 +11,11 @@ const RegistrationTextComponent: React.FC<RegistrationTextComponentProps> = ({
 	event,
 }) => {
 	const [isRegRequired, setRegRequired] = useState<string>();
-	const OPTIONAL = "optional";
-	const REQUIRED = "required";
 	useEffect(() => {
 		if (event && event.acceptWalkin) {
-			setRegRequired(OPTIONAL);
+			setRegRequired(localization.text_optional);
 		} else {
-			setRegRequired(REQUIRED);
+			setRegRequired(localization.text_required);
 		}
 	}, [event]);
 

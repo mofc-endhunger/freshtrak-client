@@ -7,6 +7,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useAuth } from "./AuthContext";
 import { ResetPasswordFormData } from "./types/authentication.types";
+import localization from "../Localization/LocalizationComponent";
 
 // Validation schema for reset password form
 const resetPasswordSchema = z.object({
@@ -63,11 +64,11 @@ const ResetPasswordFormComponent: React.FC<ResetPasswordFormComponentProps> = ({
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 			<div className="space-y-2">
-				<Label htmlFor="email">Email</Label>
+				<Label htmlFor="email">{localization.label_email}</Label>
 				<Input
 					id="email"
 					type="email"
-					placeholder="Enter your email address"
+					placeholder={localization.placeholder_enter_email}
 					{...register("email")}
 					className={errors.email ? "border-red-500" : ""}
 				/>
@@ -87,23 +88,23 @@ const ResetPasswordFormComponent: React.FC<ResetPasswordFormComponentProps> = ({
 					{isSubmitting || isLoading ? (
 						<div className="flex items-center justify-center space-x-2">
 							<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-							<span>Sending Reset Code...</span>
+							<span>{localization.button_processing}...</span>
 						</div>
 					) : (
-						"Send Reset Code"
+						localization.button_reset_password
 					)}
 				</Button>
 
 				{onBackToSignIn && (
 					<div className="text-center">
 						<p className="text-sm text-gray-600">
-							Remember your password?{" "}
+							{localization.description_remember_password}{" "}
 							<button
 								type="button"
 								onClick={onBackToSignIn}
 								className="text-primary hover:underline font-medium"
 							>
-								Sign In
+								{localization.button_sign_in || "Sign In"}
 							</button>
 						</p>
 					</div>

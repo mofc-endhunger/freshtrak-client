@@ -78,7 +78,7 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 	): DestructuredAddress => {
 		let destructured: DestructuredAddress = {};
 
-		address_components.forEach(component => {
+		address_components.forEach((component) => {
 			switch (component["types"][0]) {
 				case "neighborhood":
 					destructured["neighborhood"] = component.long_name;
@@ -152,7 +152,7 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 						className="text-sm text-red-600"
 						data-testid="address-line-1-error"
 					>
-						This field is required
+						{localization.error_field_required}
 					</span>
 				)}
 			</div>
@@ -205,7 +205,7 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 							className="text-sm text-red-600"
 							data-testid="city-error"
 						>
-							This field is required
+							{localization.error_field_required}
 						</span>
 					)}
 				</div>
@@ -250,7 +250,7 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 							className="text-sm text-red-600"
 							data-testid="zip-code-error"
 						>
-							This field is required
+							{localization.error_field_required}
 						</span>
 					)}
 				</div>

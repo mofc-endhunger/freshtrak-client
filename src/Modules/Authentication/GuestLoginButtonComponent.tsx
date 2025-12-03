@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "../../components/ui/button";
 import { GuestLoginButtonComponentProps } from "./types/authentication.types";
+import localization from "../Localization/LocalizationComponent";
 
 /**
  * GuestLoginButtonComponent - Button component for guest login functionality
@@ -31,15 +32,15 @@ const GuestLoginButtonComponent: React.FC<GuestLoginButtonComponentProps> = ({
 			className="w-full bg-primary text-white min-h-12 uppercase"
 			onClick={onGuestLogin}
 			disabled={disabled}
-			aria-label="Continue as guest"
+			aria-label={localization.aria_continue_as_guest}
 		>
 			{disabled ? (
 				<div className="flex items-center justify-center space-x-2">
 					<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-					<span>Processing...</span>
+					<span>{localization.button_processing}</span>
 				</div>
 			) : (
-				"Continue as Guest"
+				localization.button_continue_as_guest || "Continue as Guest"
 			)}
 		</Button>
 	);

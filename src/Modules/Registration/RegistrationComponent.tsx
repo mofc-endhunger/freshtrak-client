@@ -7,6 +7,7 @@ import { HouseholdForm } from "../../components/shared";
 
 // Type imports
 import { RegistrationComponentProps } from "./types/registration.types";
+import localization from "../Localization/LocalizationComponent";
 
 const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 	user,
@@ -26,10 +27,10 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 			prefilledData={user}
 			event={event}
 			disabled={disabled}
-			title="Event Registration"
-			subtitle="Complete your registration for the upcoming event"
-			submitButtonText="Register"
-			cancelButtonText="Cancel"
+			title={localization.title_event_registration}
+			subtitle={localization.subtitle_complete_registration}
+			submitButtonText={localization.button_register}
+			cancelButtonText={localization.button_cancel}
 		/>
 	);
 };

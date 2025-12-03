@@ -116,6 +116,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	const handleShow = () => setShow(true);
 
 	const backHome = () => {
+		setShow(false);
 		navigate(-1);
 	};
 
@@ -274,7 +275,6 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				error?.response?.data?.message ||
 				error?.message ||
 				localization.error_unexpected_registration;
-
 			if (
 				isAlreadyRegisteredError(errorMessage) ||
 				(error?.response?.data &&
@@ -357,7 +357,11 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 							"Select an available time slot for your registration."}
 					</DialogDescription>
 				</VisuallyHidden>
-				<DialogContent className="sm:max-w-md bg-highlight border-none text-white">
+				<DialogContent
+					className="sm:max-w-md bg-highlight border-none text-white"
+					onPointerDownOutside={(e) => e.preventDefault()}
+					onEscapeKeyDown={(e) => e.preventDefault()}
+				>
 					<DialogHeader>
 						<DialogTitle
 							id="timeslot-modal-title"

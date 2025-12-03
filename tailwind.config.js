@@ -16,6 +16,8 @@ module.exports = {
 				"default-button": "#E5E5E5",
 				"switch-button": "#F2F0F4",
 				"text-primary": "#009F56",
+				link: "#2563eb",
+				"link-hover": "#1d4ed8",
 				"content-text": "#616161",
 				highlight: "#392947",
 				"gray-light": "#F2F0F4",

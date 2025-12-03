@@ -156,6 +156,21 @@ The application uses AWS services for deployment:
 - **CI/CD**: AWS CodeBuild with `buildspec.yml`
 - **Deployment Script**: `deploy.sh` handles S3 upload and CloudFront invalidation
 
+### Deploying Feature Branches to Dev
+
+To deploy your feature branch to the dev environment:
+
+1. Push your branch to origin
+2. Get your latest commit ID:
+   ```bash
+   git rev-parse HEAD
+   ```
+3. Go to AWS CodePipeline console → `freshtrak-client-dev`
+4. Click **"Release change"**
+5. Expand **"Source revision overrides"**
+6. Paste your commit ID in the **"Commit ID"** field
+7. Click **"Release"**
+
 ### Deployment Process
 ```bash
 # Beta deployment

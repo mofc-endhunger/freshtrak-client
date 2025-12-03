@@ -46,6 +46,7 @@ const RegistrationTextInfoComponent: React.FC<
 
 			<div className="flex mt-4">
 				<Button
+					className="w-full md:w-auto"
 					type="submit"
 					variant="highlight"
 					data-testid="continue button"

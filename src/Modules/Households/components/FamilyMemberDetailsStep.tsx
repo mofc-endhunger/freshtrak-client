@@ -379,7 +379,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 						</div>
 
 						{/* Navigation */}
-						<div className="flex justify-between pt-6 border-t">
+						<div className="flex flex-col space-y-2 md:space-y-0 md:flex-row justify-between pt-6 border-t">
 							<Button
 								type="button"
 								variant="highlight"
@@ -388,7 +388,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 								{localization.button_previous}
 							</Button>
 
-							<div className="flex space-x-3">
+							<div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-3">
 								<Button
 									type="button"
 									variant="highlightOutline"

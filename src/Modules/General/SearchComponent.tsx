@@ -97,7 +97,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 		const getDestructured = (address_components: AddressComponent[]) => {
 			let destructured: Record<string, string> = {};
 			// eslint-disable-next-line array-callback-return
-			address_components.filter(component => {
+			address_components.filter((component) => {
 				switch (component["types"][0]) {
 					case "street_number":
 						destructured["street_number"] = component.long_name;
@@ -115,7 +115,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 		return (
 			<Fragment>
 				<div
-					className="grid grid-cols-1 gap-6 sm:grid-cols-3 gap-4 items-end"
+					className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 items-end w-full"
 					ref={ref}
 				>
 					<div className="sm:col-span-2">

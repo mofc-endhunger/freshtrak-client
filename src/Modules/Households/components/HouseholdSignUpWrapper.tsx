@@ -8,6 +8,19 @@ import { useAuth } from "../../Authentication/AuthContext";
 import { HouseholdSetupOffer } from "./HouseholdSetupOffer";
 import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegration";
 import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
+import { RENDER_URL } from "../../../Utils/Urls";
+import localization from "../../Localization/LocalizationComponent";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "../../../components/ui/alert-dialog";
+import { StorageService } from "../../../Utils/StorageService";
 
 interface HouseholdSignUpWrapperProps {
 	children: React.ReactNode;
@@ -27,12 +40,19 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	const { user, isAuthenticated } = useAuth();
 	const [showHouseholdOffer, setShowHouseholdOffer] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
+	const [showWarningDialog, setShowWarningDialog] = useState(false);
 
 	const { offerHouseholdSetup, deferHouseholdSetup, isNewUserSignUp } =
 		useHouseholdSignUpIntegration();
 
 	// Memoized API service instance
 	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
+
+	// Check if we're in registration flow using session storage
+	// The event date ID is stored when auth modal opens from registration flow
+	const storedEventDateId = StorageService.getRegisteredEventDateID();
+	const isRegistrationFlow = !!storedEventDateId;
+	const eventDateId = storedEventDateId;
 
 	// Check if we should show household setup offer
 	useEffect(() => {
@@ -58,6 +78,13 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 
 	// Handle household setup now
 	const handleSetupNow = async () => {
+		// If in registration flow, show warning dialog first
+		if (isRegistrationFlow) {
+			setShowWarningDialog(true);
+			return;
+		}
+
+		// Normal flow: redirect to setup wizard
 		setIsProcessing(true);
 		try {
 			// Just redirect to setup wizard - no API calls here
@@ -69,6 +96,35 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 		} finally {
 			setIsProcessing(false);
 		}
+	};
+
+	// Handle warning dialog confirmation (proceed with household setup)
+	const handleWarningConfirm = async () => {
+		setShowWarningDialog(false);
+		setIsProcessing(true);
+		try {
+			// Clear stored event date ID since user is leaving registration flow
+			if (eventDateId) {
+				StorageService.removeItem(
+					"freshtrak_session_registered_event_date_id",
+					"session"
+				);
+			}
+			// Redirect to setup wizard - user will complete setup and land on account page
+			window.location.href = "/households/setup";
+		} catch (error) {
+			console.error("Error redirecting to setup:", error);
+			onSignUpError?.("Failed to redirect to setup. Please try again.");
+		} finally {
+			setIsProcessing(false);
+		}
+	};
+
+	// Handle warning dialog cancellation (fall back to "Set Up Later" behavior)
+	const handleWarningCancel = async () => {
+		setShowWarningDialog(false);
+		// Fall back to "Set Up Later" behavior
+		await handleSetupLater();
 	};
 
 	// Handle setup later
@@ -112,8 +168,13 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 			await deferHouseholdSetup();
 			setShowHouseholdOffer(false);
 
-			// Redirect to dashboard
-			window.location.href = "/dashboard";
+			// If in registration flow, navigate to registration form (which will show timeslot selection)
+			if (isRegistrationFlow && eventDateId) {
+				window.location.href = `${RENDER_URL.REGISTRATION_FORM_URL}/${eventDateId}`;
+			} else {
+				// Normal flow: redirect to dashboard
+				window.location.href = "/dashboard";
+			}
 		} catch (error) {
 			console.error("Error creating user (setup later):", error);
 			onSignUpError?.("Failed to create user record. Please try again.");
@@ -122,14 +183,47 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 		}
 	};
 
-	// If showing household offer, render the offer component
+	// If showing household offer, render the offer component with warning dialog
 	if (showHouseholdOffer) {
 		return (
-			<HouseholdSetupOffer
-				onSetupNow={handleSetupNow}
-				onSetupLater={handleSetupLater}
-				isLoading={isProcessing}
-			/>
+			<>
+				<HouseholdSetupOffer
+					onSetupNow={handleSetupNow}
+					onSetupLater={handleSetupLater}
+					isLoading={isProcessing}
+				/>
+				{/* Warning dialog for registration flow */}
+				<AlertDialog
+					open={showWarningDialog}
+					onOpenChange={setShowWarningDialog}
+				>
+					<AlertDialogContent className="bg-white border border-gray-200 text-gray-900">
+						<AlertDialogHeader>
+							<AlertDialogTitle>
+								{localization.household_warning_title}
+							</AlertDialogTitle>
+							<AlertDialogDescription>
+								{localization.household_warning_description}
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel
+								onClick={handleWarningCancel}
+								disabled={isProcessing}
+							>
+								{localization.household_warning_cancel}
+							</AlertDialogCancel>
+							<AlertDialogAction
+								onClick={handleWarningConfirm}
+								disabled={isProcessing}
+								className="bg-highlight text-white hover:bg-highlight-dark"
+							>
+								{localization.household_warning_confirm}
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+			</>
 		);
 	}
 
@@ -218,11 +312,12 @@ export const HouseholdCompletionPrompt: React.FC<{
 					</div>
 					<div>
 						<h3 className="font-semibold text-blue-900">
-							Complete Your Profile
+							{localization.household_complete_profile_title}
 						</h3>
 						<p className="text-sm text-blue-700">
-							Set up your household for personalized services and
-							easier event registration.
+							{
+								localization.household_complete_profile_description
+							}
 						</p>
 					</div>
 				</div>
@@ -231,13 +326,13 @@ export const HouseholdCompletionPrompt: React.FC<{
 						onClick={onSetup}
 						className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
 					>
-						Set Up Now
+						{localization.household_setup_now}
 					</button>
 					<button
 						onClick={handleDismiss}
 						className="text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:text-blue-800 transition-colors"
 					>
-						Later
+						{localization.household_later}
 					</button>
 				</div>
 			</div>

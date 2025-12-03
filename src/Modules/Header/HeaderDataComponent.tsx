@@ -58,14 +58,15 @@ const HeaderDataComponent: React.FC<HeaderDataComponentProps> = () => {
 					) : isLoginPage ? (
 						<>
 							<h1 className="text-center text-white font-bold text-[1.4rem] sm:text-[2.3rem] md:text-[2.5rem] lg:text-[3.3rem] capitalize leading-tight">
-								Welcome
+								{localization.title_welcome}
 							</h1>
 							<p
 								className="text-center text-white font-varela text-[0.9rem] sm:text-[1.2rem] mt-4"
 								data-testid="subtext-on-header"
 							>
-								Create a username and password to create
-								FreshTrak account.
+								{
+									localization.description_create_account_username_password
+								}
 							</p>
 						</>
 					) : (

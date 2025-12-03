@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { formatAddress } from "../../Utils/MapUtils";
+import localization from "../Localization/LocalizationComponent";
 
 // Fix for default markers in Leaflet with webpack
 delete L.Icon.Default.prototype._getIconUrl;
@@ -186,7 +187,7 @@ const FullMapModalComponent = ({
 					<button
 						className="close-button"
 						onClick={handleCloseClick}
-						aria-label="Close map"
+						aria-label={localization.aria_close_map}
 					>
 						×
 					</button>

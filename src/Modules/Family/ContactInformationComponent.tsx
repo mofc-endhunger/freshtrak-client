@@ -137,7 +137,7 @@ const ContactInformationComponent: React.FC<
 						htmlFor="email"
 						className="block text-sm font-medium text-gray-700"
 					>
-						Email
+						{localization.label_email}
 						<span className="text-red-500 ml-1">*</span>
 					</label>
 					<input

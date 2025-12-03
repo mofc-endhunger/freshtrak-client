@@ -148,6 +148,9 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 					{...register("password")}
 					className={errors.password ? "border-red-500" : ""}
 				/>
+				<p className="text-xs text-gray-600 mt-1">
+					{localization.password_complexity_requirements}
+				</p>
 				{errors.password && (
 					<p className="text-sm text-red-500">
 						{errors.password.message}

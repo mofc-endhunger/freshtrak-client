@@ -726,6 +726,8 @@ let localization = new LocalizedStrings({
 		error_unexpected_registration:
 			"An unexpected error occurred during registration",
 		or: "OR",
+		password_complexity_requirements:
+			"Make your password at least 8 characters long with at least one capital letter and one special character. Pick something only you would guess — mixing letters, numbers, and symbols to make it stronger.",
 		household_warning_title: "Lose Current Progress?",
 		household_warning_description:
 			"Setting up your household now will take you away from event registration. You'll need to start registration again. Continue with household setup?",
@@ -1461,6 +1463,8 @@ let localization = new LocalizedStrings({
 		error_unexpected_registration:
 			"Ocurrió un error inesperado durante el registro",
 		or: "O",
+		password_complexity_requirements:
+			"Haga que su contraseña tenga al menos 8 caracteres con al menos una letra mayúscula y un carácter especial. Elija algo que solo usted adivinaría: mezcle letras, números y símbolos para hacerla más fuerte.",
 		household_warning_title: "¿Perder el Progreso Actual?",
 		household_warning_description:
 			"Configurar su hogar ahora lo alejará del registro de eventos. Tendrá que comenzar el registro nuevamente. ¿Continuar con la configuración del hogar?",
@@ -2196,6 +2200,8 @@ let localization = new LocalizedStrings({
 		error_unexpected_registration:
 			"Qalad aan la filayn ayaa dhacay markii la diiwaangelinayay",
 		or: "AMA",
+		password_complexity_requirements:
+			"Samee erifkaaga ugu yaraan 8 xaraf ah oo ugu yaraan hal xaraf weyn iyo hal calaamad gaar ah. Dooro waxaad uun u malayn lahayd — isku dar xarfaha, tirooyinka, iyo calaamadaha si aad ugu xoogaysato.",
 		household_warning_title: "Halkaad Hadda Jirto Ma Dhumaysaa?",
 		household_warning_description:
 			"Guryahaaga hadda u diyaarinta ayaa kaa siin doonta diiwaangelinta dhacdooyinka. Waa inaad dib u bilaabtaa diiwaangelinta. Ma sii wadaysaa diyaarinta guryaha?",
@@ -2937,6 +2943,8 @@ let localization = new LocalizedStrings({
 		error_unexpected_registration:
 			"Произошла непредвиденная ошибка во время регистрации",
 		or: "ИЛИ",
+		password_complexity_requirements:
+			"Сделайте свой пароль длиной не менее 8 символов с хотя бы одной заглавной буквой и одним специальным символом. Выберите то, что угадаете только вы — смешивая буквы, цифры и символы, чтобы сделать его сильнее.",
 		household_warning_title: "Потерять Текущий Прогресс?",
 		household_warning_description:
 			"Настройка вашего домохозяйства сейчас отвлечет вас от регистрации на мероприятие. Вам нужно будет начать регистрацию заново. Продолжить настройку домохозяйства?",
@@ -3654,6 +3662,8 @@ let localization = new LocalizedStrings({
 		error_unexpected_registration:
 			"Kayıt sırasında beklenmeyen bir hata oluştu",
 		or: "VEYA",
+		password_complexity_requirements:
+			"Şifrenizi en az 8 karakter uzunluğunda, en az bir büyük harf ve bir özel karakter içerecek şekilde yapın. Sadece sizin tahmin edebileceğiniz bir şey seçin — harfleri, sayıları ve sembolleri karıştırarak daha güçlü hale getirin.",
 		household_warning_title: "Mevcut İlerlemeyi Kaybet?",
 		household_warning_description:
 			"Şimdi hanenizi ayarlamak sizi etkinlik kaydından uzaklaştıracak. Kayıt işlemini tekrar başlatmanız gerekecek. Hane kurulumuna devam edilsin mi?",
@@ -4351,6 +4361,8 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "فشل التسجيل",
 		error_unexpected_registration: "حدث خطأ غير متوقع أثناء التسجيل",
 		or: "أو",
+		password_complexity_requirements:
+			"اجعل كلمة المرور الخاصة بك بطول 8 أحرف على الأقل مع حرف كبير واحد على الأقل ورمز خاص واحد. اختر شيئًا لن تخمنه إلا أنت — اخلط الأحرف والأرقام والرموز لجعله أقوى.",
 		household_warning_title: "فقدان التقدم الحالي؟",
 		household_warning_description:
 			"إعداد أسرتك الآن سيبعدك عن تسجيل الحدث. ستحتاج إلى بدء التسجيل مرة أخرى. متابعة إعداد الأسرة؟",
@@ -5024,6 +5036,8 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "注册失败",
 		error_unexpected_registration: "注册期间发生意外错误",
 		or: "或",
+		password_complexity_requirements:
+			"使您的密码至少8个字符长，至少包含一个大写字母和一个特殊字符。选择只有您能猜到的东西——混合字母、数字和符号使其更强大。",
 		household_warning_title: "丢失当前进度？",
 		household_warning_description:
 			"现在设置您的家庭将使您离开活动注册。您需要重新开始注册。继续设置家庭？",
@@ -5739,6 +5753,8 @@ let localization = new LocalizedStrings({
 		error_unexpected_registration:
 			"पंजीकरण के दौरान एक अप्रत्याशित त्रुटि हुई",
 		or: "या",
+		password_complexity_requirements:
+			"अपना पासवर्ड कम से कम 8 अक्षर लंबा बनाएं जिसमें कम से कम एक बड़ा अक्षर और एक विशेष वर्ण हो। कुछ ऐसा चुनें जो केवल आप अनुमान लगाएंगे — इसे मजबूत बनाने के लिए अक्षरों, संख्याओं और प्रतीकों को मिलाएं।",
 		household_warning_title: "वर्तमान प्रगति खो दें?",
 		household_warning_description:
 			"अभी अपने परिवार को सेट अप करने से आप इवेंट पंजीकरण से दूर हो जाएंगे। आपको फिर से पंजीकरण शुरू करना होगा। परिवार सेटअप जारी रखें?",
@@ -6461,6 +6477,8 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "दर्ता असफल",
 		error_unexpected_registration: "दर्ताको क्रममा अप्रत्याशित त्रुटि भयो",
 		or: "वा",
+		password_complexity_requirements:
+			"तपाईंको पासवर्ड कम्तिमा ८ वर्ण लामो बनाउनुहोस् जसमा कम्तिमा एक ठूलो अक्षर र एक विशेष वर्ण हुनुपर्छ। केवल तपाईंले अनुमान लगाउने कुरा छान्नुहोस् — यसलाई बलियो बनाउन अक्षरहरू, संख्याहरू र प्रतीकहरू मिलाउनुहोस्।",
 		household_warning_title: "हालको प्रगति हराउनुहुन्छ?",
 		household_warning_description:
 			"अहिले तपाईंको घर सेट अप गर्दा तपाईंलाई घटना दर्ताबाट टाढा लैजानेछ। तपाईंले फेरि दर्ता सुरु गर्नुपर्नेछ। घर सेटअप जारी राख्नुहुन्छ?",

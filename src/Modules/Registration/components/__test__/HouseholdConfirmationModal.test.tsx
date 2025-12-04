@@ -143,20 +143,29 @@ describe("HouseholdConfirmationModal", () => {
 		});
 
 		test("does not render modal when isOpen is false", () => {
-			render(<HouseholdConfirmationModal {...defaultProps} isOpen={false} />);
+			render(
+				<HouseholdConfirmationModal {...defaultProps} isOpen={false} />
+			);
 			expect(screen.queryByTestId("dialog")).not.toBeInTheDocument();
 		});
 
 		test("renders household information when householdData is provided", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
-			expect(screen.getByTestId("household-info-display")).toBeInTheDocument();
+			expect(
+				screen.getByTestId("household-info-display")
+			).toBeInTheDocument();
 			expect(screen.getByTestId("household-name")).toHaveTextContent(
 				"Smith Family"
 			);
 		});
 
 		test("renders loading state when isLoading is true", () => {
-			render(<HouseholdConfirmationModal {...defaultProps} isLoading={true} />);
+			render(
+				<HouseholdConfirmationModal
+					{...defaultProps}
+					isLoading={true}
+				/>
+			);
 
 			expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
 			expect(
@@ -169,7 +178,10 @@ describe("HouseholdConfirmationModal", () => {
 		test("calls onConfirm when confirm button is clicked", () => {
 			const onConfirm = jest.fn();
 			render(
-				<HouseholdConfirmationModal {...defaultProps} onConfirm={onConfirm} />
+				<HouseholdConfirmationModal
+					{...defaultProps}
+					onConfirm={onConfirm}
+				/>
 			);
 
 			const confirmButton = screen.getByText("Yes, register");
@@ -181,7 +193,10 @@ describe("HouseholdConfirmationModal", () => {
 		test("calls onReview when review button is clicked", () => {
 			const onReview = jest.fn();
 			render(
-				<HouseholdConfirmationModal {...defaultProps} onReview={onReview} />
+				<HouseholdConfirmationModal
+					{...defaultProps}
+					onReview={onReview}
+				/>
 			);
 
 			const reviewButton = screen.getByText("No, review & update");
@@ -191,7 +206,12 @@ describe("HouseholdConfirmationModal", () => {
 		});
 
 		test("disables confirm button when isLoading is true", () => {
-			render(<HouseholdConfirmationModal {...defaultProps} isLoading={true} />);
+			render(
+				<HouseholdConfirmationModal
+					{...defaultProps}
+					isLoading={true}
+				/>
+			);
 
 			const confirmButton = screen.getByText("Yes, register");
 			expect(confirmButton).toBeDisabled();

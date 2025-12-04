@@ -747,6 +747,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"To view eligibility requirements for our programs click here:",
 		eligibility_view_guidelines_button: "View Eligibility Guidelines",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"There are currently no available timeslots for this event. This may be due to technical issues or other temporary conditions. Please try again later. If the issue persists, please contact support.",
 	},
 
 	spa: {
@@ -1493,6 +1497,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"Para ver los requisitos de elegibilidad para nuestros programas, haga clic aquí:",
 		eligibility_view_guidelines_button: "Ver Pautas de Elegibilidad",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"Actualmente no hay horarios disponibles para este evento. Esto puede deberse a problemas técnicos u otras condiciones temporales. Por favor, intente nuevamente más tarde. Si el problema persiste, póngase en contacto con el soporte.",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -2239,6 +2247,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"Si aad u aragto shuruudaha u qalma barnaamijyadeena, halkan guji:",
 		eligibility_view_guidelines_button: "Eeg Tilmaamaha U Qalma",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"Ma jiro wakhtiyada la heli karo ee hadda loo baahan yahay dhacdadan. Tani waxay sabab u noqon kartaa dhibaatooyinka farsamada ama xaaladaha kale ee ku meel gaarka ah. Fadlan mar kale isku day. Haddii dhibaatadu sii waddo, fadlan la xidhiidh taageerada.",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -2991,6 +3003,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"Чтобы просмотреть требования к соответствию критериям для наших программ, нажмите здесь:",
 		eligibility_view_guidelines_button: "Посмотреть правила отбора",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"В настоящее время нет доступных временных слотов для этого мероприятия. Это может быть связано с техническими проблемами или другими временными условиями. Пожалуйста, попробуйте позже. Если проблема сохраняется, обратитесь в службу поддержки.",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -3719,6 +3735,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"Programlarımız için uygunluk gereksinimlerini görüntülemek için buraya tıklayın:",
 		eligibility_view_guidelines_button: "Uygunluk Yönergelerini Görüntüle",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"Bu etkinlik için şu anda müsait zaman dilimi bulunmamaktadır. Bu durum teknik sorunlar veya diğer geçici koşullardan kaynaklanıyor olabilir. Lütfen daha sonra tekrar deneyin. Sorun devam ederse, lütfen destek ekibiyle iletişime geçin.",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -4426,6 +4446,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"لعرض متطلبات الأهلية لبرامجنا، انقر هنا:",
 		eligibility_view_guidelines_button: "عرض إرشادات الأهلية",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"لا توجد حاليًا فترات زمنية متاحة لهذا الحدث. قد يكون هذا بسبب مشاكل تقنية أو ظروف مؤقتة أخرى. يرجى المحاولة مرة أخرى لاحقًا. إذا استمرت المشكلة، يرجى الاتصال بالدعم.",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -5109,6 +5133,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"要查看我们计划的资格要求，请点击此处：",
 		eligibility_view_guidelines_button: "查看资格指南",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"目前此活动没有可用的时间段。这可能是由于技术问题或其他临时条件造成的。请稍后再试。如果问题持续存在，请联系支持。",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -5835,6 +5863,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"हाम्रा कार्यक्रमहरूको लागि योग्यताको आवश्यकताहरू हेर्न यहाँ क्लिक गर्नुहोस्:",
 		eligibility_view_guidelines_button: "योग्यता दिशानिर्देशहरू हेर्नुहोस्",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"हाल यस कार्यक्रमको लागि उपलब्ध समय स्लटहरू छैनन्। यो प्राविधिक समस्याहरू वा अन्य अस्थायी अवस्थाहरूको कारणले हुन सक्छ। कृपया पछि फेरि प्रयास गर्नुहोस्। यदि समस्या जारी रहन्छ भने, कृपया समर्थनसँग सम्पर्क गर्नुहोस्।",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -6568,6 +6600,10 @@ let localization = new LocalizedStrings({
 		eligibility_view_requirements_text:
 			"हाम्रा कार्यक्रमहरूको लागि योग्यताको आवश्यकताहरू हेर्न यहाँ क्लिक गर्नुहोस्:",
 		eligibility_view_guidelines_button: "योग्यता दिशानिर्देशहरू हेर्नुहोस्",
+
+		// EVENT SLOTS
+		event_slots_no_available_message:
+			"हाल यस कार्यक्रमको लागि उपलब्ध समय स्लटहरू छैनन्। यो प्राविधिक समस्याहरू वा अन्य अस्थायी अवस्थाहरूको कारणले हुन सक्छ। कृपया पछि फेरि प्रयास गर्नुहोस्। यदि समस्या जारी रहन्छ भने, कृपया समर्थनसँग सम्पर्क गर्नुहोस्।",
 	},
 });
 

@@ -90,7 +90,6 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 				dataLayer: gtmEvent,
 			});
 		} catch (error) {
-			console.error("Guest login error:", error);
 			handleAuthError("Failed to login as guest. Please try again.");
 			setCurrentTab("signin"); // Go back to signin tab on error
 		} finally {

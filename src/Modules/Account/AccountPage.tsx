@@ -88,7 +88,10 @@ const AccountPage: React.FC = () => {
 					setShowSkippedSetupPrompt(true);
 				}
 			} catch (error) {
-				console.error("Error fetching household data:", error);
+				console.warn(
+					"AccountPage: Error fetching household data:",
+					error
+				);
 				// If API call fails, assume user needs household setup
 				setShowHouseholdPrompt(true);
 			} finally {

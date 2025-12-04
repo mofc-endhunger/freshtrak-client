@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import TagManager from "react-gtm-module";
 import { RENDER_URL } from "../../Utils/Urls";
@@ -34,6 +34,17 @@ const LoginPage: React.FC = () => {
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const navigate = useNavigate();
 	const { resendConfirmationCode } = useAuth();
+
+	/**
+	 * Clear any existing event date ID when user navigates to login page
+	 * This ensures initial sign up from /login doesn't trigger registration flow warning
+	 */
+	useEffect(() => {
+		StorageService.removeItem(
+			"freshtrak_session_registered_event_date_id",
+			"session"
+		);
+	}, []);
 
 	/**
 	 * Handles guest login process using API

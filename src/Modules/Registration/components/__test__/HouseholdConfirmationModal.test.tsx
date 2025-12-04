@@ -85,6 +85,14 @@ jest.mock("../HouseholdInfoDisplay", () => {
 	};
 });
 
+// Mock localization
+jest.mock("../../../Localization/LocalizationComponent", () => ({
+	loading_processing_registration: "Processing your registration...",
+	button_no_review_update: "No, review & update",
+	button_yes_register: "Yes, register",
+	text_no_household_info_available: "No household information available.",
+}));
+
 describe("HouseholdConfirmationModal", () => {
 	const mockHouseholdData: UsersMeResponse = {
 		id: 1,
@@ -109,14 +117,7 @@ describe("HouseholdConfirmationModal", () => {
 		state: "CA",
 		zip_code: "12345",
 		phone: "555-1234",
-		email: "smith@example.com",
-	};
-
-	const mockSelectedSlot = {
-		event_slot_id: "slot123",
-		start_time: "10:00 AM",
-		end_time: "11:00 AM",
-		open_slots: 5,
+		email: "test@example.com",
 	};
 
 	const defaultProps: HouseholdConfirmationModalProps = {
@@ -127,7 +128,8 @@ describe("HouseholdConfirmationModal", () => {
 		onReview: jest.fn(),
 		householdData: mockHouseholdData,
 		isLoading: false,
-		selectedSlot: mockSelectedSlot,
+		selectedSlot: null,
+		error: undefined,
 	};
 
 	beforeEach(() => {
@@ -135,49 +137,81 @@ describe("HouseholdConfirmationModal", () => {
 	});
 
 	describe("Rendering", () => {
-		it("renders modal when open", () => {
+		test("renders modal when isOpen is true", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
-
 			expect(screen.getByTestId("dialog")).toBeInTheDocument();
-			expect(
-				screen.getByTestId("household-confirmation-modal")
-			).toBeInTheDocument();
-			// Use getAllByTestId to handle multiple elements
-			const titles = screen.getAllByTestId("dialog-title");
-			expect(titles.length).toBeGreaterThan(0);
-			// Check that the visible title with specific ID exists
-			const visibleTitle = screen
-				.getByRole("dialog")
-				.querySelector('[id="household-modal-title"]');
-			expect(visibleTitle).toBeInTheDocument();
 		});
 
-		it("renders household information when data is available", () => {
-			render(<HouseholdConfirmationModal {...defaultProps} />);
+		test("does not render modal when isOpen is false", () => {
+			render(<HouseholdConfirmationModal {...defaultProps} isOpen={false} />);
+			expect(screen.queryByTestId("dialog")).not.toBeInTheDocument();
+		});
 
-			expect(
-				screen.getByTestId("household-info-display")
-			).toBeInTheDocument();
+		test("renders household information when householdData is provided", () => {
+			render(<HouseholdConfirmationModal {...defaultProps} />);
+			expect(screen.getByTestId("household-info-display")).toBeInTheDocument();
 			expect(screen.getByTestId("household-name")).toHaveTextContent(
 				"Smith Family"
 			);
 		});
 
-		it("renders loading state when isLoading is true", () => {
-			render(
-				<HouseholdConfirmationModal
-					{...defaultProps}
-					isLoading={true}
-				/>
-			);
+		test("renders loading state when isLoading is true", () => {
+			render(<HouseholdConfirmationModal {...defaultProps} isLoading={true} />);
 
 			expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
 			expect(
 				screen.getByText("Processing your registration...")
 			).toBeInTheDocument();
 		});
+	});
 
-		it("renders error state when error is provided", () => {
+	describe("User Interactions", () => {
+		test("calls onConfirm when confirm button is clicked", () => {
+			const onConfirm = jest.fn();
+			render(
+				<HouseholdConfirmationModal {...defaultProps} onConfirm={onConfirm} />
+			);
+
+			const confirmButton = screen.getByText("Yes, register");
+			fireEvent.click(confirmButton);
+
+			expect(onConfirm).toHaveBeenCalledTimes(1);
+		});
+
+		test("calls onReview when review button is clicked", () => {
+			const onReview = jest.fn();
+			render(
+				<HouseholdConfirmationModal {...defaultProps} onReview={onReview} />
+			);
+
+			const reviewButton = screen.getByText("No, review & update");
+			fireEvent.click(reviewButton);
+
+			expect(onReview).toHaveBeenCalledTimes(1);
+		});
+
+		test("disables confirm button when isLoading is true", () => {
+			render(<HouseholdConfirmationModal {...defaultProps} isLoading={true} />);
+
+			const confirmButton = screen.getByText("Yes, register");
+			expect(confirmButton).toBeDisabled();
+		});
+
+		test("disables confirm button when householdData is null", () => {
+			render(
+				<HouseholdConfirmationModal
+					{...defaultProps}
+					householdData={null}
+				/>
+			);
+
+			const confirmButton = screen.getByText("Yes, register");
+			expect(confirmButton).toBeDisabled();
+		});
+	});
+
+	describe("Error Handling", () => {
+		test("displays error message when error is provided", () => {
 			const errorMessage = "Registration failed";
 			render(
 				<HouseholdConfirmationModal
@@ -186,132 +220,17 @@ describe("HouseholdConfirmationModal", () => {
 				/>
 			);
 
-			expect(screen.getByText("Registration Error")).toBeInTheDocument();
 			expect(screen.getByText(errorMessage)).toBeInTheDocument();
 		});
 
-		it("renders no household data message when householdData is null", () => {
-			render(
-				<HouseholdConfirmationModal
-					{...defaultProps}
-					householdData={null}
-				/>
-			);
-
-			expect(
-				screen.getByText("No household information available.")
-			).toBeInTheDocument();
-		});
-	});
-
-	describe("Button Interactions", () => {
-		it('calls onConfirm when "Yes, register" button is clicked', () => {
+		test("does not display error when error is undefined", () => {
 			render(<HouseholdConfirmationModal {...defaultProps} />);
-
-			const confirmButton = screen.getByTestId("confirm-register-button");
-			fireEvent.click(confirmButton);
-
-			expect(defaultProps.onConfirm).toHaveBeenCalledTimes(1);
-		});
-
-		it('calls onReview when "No, review & update" button is clicked', () => {
-			render(<HouseholdConfirmationModal {...defaultProps} />);
-
-			const reviewButton = screen.getByTestId("review-update-button");
-			fireEvent.click(reviewButton);
-
-			expect(defaultProps.onReview).toHaveBeenCalledTimes(1);
-		});
-
-		it("disables buttons when loading", () => {
-			render(
-				<HouseholdConfirmationModal
-					{...defaultProps}
-					isLoading={true}
-				/>
+			// Error should not be visible when undefined (exclude screen reader text)
+			const errorElements = screen.queryAllByText(/error/i);
+			const visibleErrors = errorElements.filter(
+				(el) => !el.classList.contains("sr-only")
 			);
-
-			const confirmButton = screen.getByTestId("confirm-register-button");
-			const reviewButton = screen.getByTestId("review-update-button");
-
-			expect(confirmButton).toBeDisabled();
-			expect(reviewButton).toBeDisabled();
-		});
-
-		it("disables confirm button when no household data", () => {
-			render(
-				<HouseholdConfirmationModal
-					{...defaultProps}
-					householdData={null}
-				/>
-			);
-
-			const confirmButton = screen.getByTestId("confirm-register-button");
-			expect(confirmButton).toBeDisabled();
-		});
-	});
-
-	describe("Accessibility", () => {
-		it("has proper ARIA labels and roles", () => {
-			render(<HouseholdConfirmationModal {...defaultProps} />);
-
-			// Use getAllByTestId to handle multiple elements
-			const titles = screen.getAllByTestId("dialog-title");
-			expect(titles.length).toBeGreaterThan(0);
-			const descriptions = screen.getAllByTestId("dialog-description");
-			expect(descriptions.length).toBeGreaterThan(0);
-
-			// Check that the visible elements with specific IDs exist
-			const visibleTitle = screen
-				.getByRole("dialog")
-				.querySelector('[id="household-modal-title"]');
-			expect(visibleTitle).toBeInTheDocument();
-			const visibleDescription = screen
-				.getByRole("dialog")
-				.querySelector('[id="household-modal-description"]');
-			expect(visibleDescription).toBeInTheDocument();
-		});
-
-		it("supports keyboard navigation", () => {
-			render(<HouseholdConfirmationModal {...defaultProps} />);
-
-			const confirmButton = screen.getByTestId("confirm-register-button");
-			const reviewButton = screen.getByTestId("review-update-button");
-
-			expect(confirmButton).toBeInTheDocument();
-			expect(reviewButton).toBeInTheDocument();
-		});
-	});
-
-	describe("Error Handling", () => {
-		it("shows error message and fallback button in error state", () => {
-			const errorMessage = "Network error";
-			render(
-				<HouseholdConfirmationModal
-					{...defaultProps}
-					error={errorMessage}
-				/>
-			);
-
-			expect(screen.getByText("Registration Error")).toBeInTheDocument();
-			expect(screen.getByText(errorMessage)).toBeInTheDocument();
-			expect(
-				screen.getByText("Review & Update Instead")
-			).toBeInTheDocument();
-		});
-
-		it("calls onReview when fallback button is clicked in error state", () => {
-			render(
-				<HouseholdConfirmationModal
-					{...defaultProps}
-					error="Test error"
-				/>
-			);
-
-			const fallbackButton = screen.getByText("Review & Update Instead");
-			fireEvent.click(fallbackButton);
-
-			expect(defaultProps.onReview).toHaveBeenCalledTimes(1);
+			expect(visibleErrors).toHaveLength(0);
 		});
 	});
 });

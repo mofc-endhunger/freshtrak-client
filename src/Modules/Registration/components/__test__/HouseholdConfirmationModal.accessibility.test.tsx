@@ -99,6 +99,15 @@ const defaultProps = {
 	error: undefined,
 };
 
+// Mock localization
+jest.mock("../../../Localization/LocalizationComponent", () => ({
+	loading_processing_registration: "Processing your registration...",
+	aria_processing_registration: "Processing registration",
+	button_no_review_update: "No, review & update",
+	button_yes_register: "Yes, register",
+	text_no_household_info_available: "No household information available.",
+}));
+
 describe("HouseholdConfirmationModal Accessibility", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();

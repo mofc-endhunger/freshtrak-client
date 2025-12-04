@@ -464,7 +464,7 @@ let localization = new LocalizedStrings({
 		// STATUS & LOADING MESSAGES
 		loading_loading: "Loading...",
 		loading_loading_time_slots: "Loading time slots",
-		loading_processing_registration: "Processing registration",
+		loading_processing_registration: "Processing your registration...",
 		loading_please_wait: "Please wait while we retrieve your data",
 		loading_searching: "Searching...",
 		status_active: "Active",

@@ -26,6 +26,7 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 	phone_contact_you: "Permission to text you",
 	no_email: "No Email Available",
 	email_contact_you: "Permission to email you",
+	label_email: "Email",
 	register_where_you_live: "Where do you live?",
 	street_address: "Street Address",
 	lot_suite: "Lot/Suite",

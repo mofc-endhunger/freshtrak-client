@@ -104,6 +104,21 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 		userToken,
 	]);
 
+	// Clear event date ID after registration is complete and event data is loaded
+	// This prevents the warning dialog from showing if user signs up again later
+	useEffect(() => {
+		// Clear the event date ID after event data has been successfully loaded
+		// Registration is complete at this point, so we don't need it anymore
+		// Only clear if we have event data (registration was successful)
+		if (selectedEvent && Object.keys(selectedEvent).length > 0) {
+			StorageService.removeItem(
+				"freshtrak_session_registered_event_date_id",
+				"session"
+			);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [selectedEvent]);
+
 	// Show guest signin modal for guest users only
 	useEffect(() => {
 		// Only show modal if user is a guest user (not a Cognito user)

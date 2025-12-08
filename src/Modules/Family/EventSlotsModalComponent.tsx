@@ -169,7 +169,6 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				navigateToRegistration(slot, household);
 			}
 		} catch (error) {
-			console.error("Failed to fetch household data:", error);
 			setHouseholdError(localization.error_failed_load_household);
 			// Proceed to registration form without prefilled data
 			navigateToRegistration(slot, null);
@@ -264,7 +263,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				}
 
 				// Registration failed - show error for other errors
-				console.error("Household registration failed:", result.error);
+				console.warn("Household registration failed:", result.error);
 				setHouseholdError(errorMessage);
 			}
 		} catch (error: any) {
@@ -395,66 +394,99 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 								<LoadingSpinner size="medium" />
 							</div>
 						) : (
-							<fieldset
-								role="radiogroup"
-								aria-labelledby="timeslot-modal-title"
-							>
-								<legend className="sr-only">
-									{
-										localization.sr_available_time_slots_registration
-									}
-								</legend>
-								{eventHour.map((item, index) =>
-									item.event_slots
-										.filter((e) => e.open_slots > 0)
-										.map((e, i) => {
-											const radioId = `time_slot_${e.event_slot_id}`;
-											return (
-												<div
-													className="flex items-center p-2 space-x-2"
-													key={index + "-" + i}
-												>
-													<input
-														className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-														type="radio"
-														name="time_slot"
-														id={radioId}
-														value={e.event_slot_id}
-														checked={
-															String(
-																selectedSlotId
-															) ===
-															String(
-																e.event_slot_id
-															)
-														}
-														onChange={onSlotChange}
-														aria-describedby={`${radioId}-description`}
-													/>
-													<label
-														className="ml-2 text-sm font-medium cursor-pointer"
-														htmlFor={radioId}
-													>
-														{e.start_time} -{" "}
-														{e.end_time}
-													</label>
-													<span
-														id={`${radioId}-description`}
-														className="sr-only"
-													>
-														{e.open_slots}{" "}
-														{e.open_slots !== 1
-															? localization.text_slots
-															: localization.text_slot}{" "}
-														{
-															localization.text_available
-														}
-													</span>
-												</div>
-											);
-										})
-								)}
-							</fieldset>
+							(() => {
+								// Check if there are any available timeslots
+								const availableSlots = eventHour.flatMap(
+									(item) =>
+										item.event_slots.filter(
+											(e) => e.open_slots > 0
+										)
+								);
+
+								if (availableSlots.length === 0) {
+									return (
+										<div className="text-center py-6 px-4">
+											<p className="text-sm leading-relaxed">
+												{
+													localization.event_slots_no_available_message
+												}
+											</p>
+										</div>
+									);
+								}
+
+								return (
+									<fieldset
+										role="radiogroup"
+										aria-labelledby="timeslot-modal-title"
+									>
+										<legend className="sr-only">
+											{
+												localization.sr_available_time_slots_registration
+											}
+										</legend>
+										{eventHour.map((item, index) =>
+											item.event_slots
+												.filter((e) => e.open_slots > 0)
+												.map((e, i) => {
+													const radioId = `time_slot_${e.event_slot_id}`;
+													return (
+														<div
+															className="flex items-center p-2 space-x-2"
+															key={
+																index + "-" + i
+															}
+														>
+															<input
+																className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+																type="radio"
+																name="time_slot"
+																id={radioId}
+																value={
+																	e.event_slot_id
+																}
+																checked={
+																	String(
+																		selectedSlotId
+																	) ===
+																	String(
+																		e.event_slot_id
+																	)
+																}
+																onChange={
+																	onSlotChange
+																}
+																aria-describedby={`${radioId}-description`}
+															/>
+															<label
+																className="ml-2 text-sm font-medium cursor-pointer"
+																htmlFor={
+																	radioId
+																}
+															>
+																{e.start_time} -{" "}
+																{e.end_time}
+															</label>
+															<span
+																id={`${radioId}-description`}
+																className="sr-only"
+															>
+																{e.open_slots}{" "}
+																{e.open_slots !==
+																1
+																	? localization.text_slots
+																	: localization.text_slot}{" "}
+																{
+																	localization.text_available
+																}
+															</span>
+														</div>
+													);
+												})
+										)}
+									</fieldset>
+								);
+							})()
 						)}
 					</div>
 					<DialogFooter className="flex flex-col sm:flex-row gap-2">
@@ -467,20 +499,35 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 						>
 							{localization.button_go_back}
 						</Button>
-						<Button
-							type="submit"
-							disabled={!selectedSlotId || isLoadingHousehold}
-							className="w-full sm:w-auto flex-1 bg-primary text-white min-h-12 uppercase"
-							onClick={() =>
-								selectedSlotId &&
-								handleSlotSelection(selectedSlotId)
+						{(() => {
+							// Only show continue button if there are available slots
+							const availableSlots = eventHour.flatMap((item) =>
+								item.event_slots.filter((e) => e.open_slots > 0)
+							);
+
+							if (availableSlots.length === 0) {
+								return null;
 							}
-							aria-describedby="continue-button-description"
-						>
-							{isLoadingHousehold
-								? localization.loading_loading
-								: localization.button_save_and_continue}
-						</Button>
+
+							return (
+								<Button
+									type="submit"
+									disabled={
+										!selectedSlotId || isLoadingHousehold
+									}
+									className="w-full sm:w-auto flex-1 bg-primary text-white min-h-12 uppercase"
+									onClick={() =>
+										selectedSlotId &&
+										handleSlotSelection(selectedSlotId)
+									}
+									aria-describedby="continue-button-description"
+								>
+									{isLoadingHousehold
+										? localization.loading_loading
+										: localization.button_save_and_continue}
+								</Button>
+							);
+						})()}
 					</DialogFooter>
 
 					{/* Hidden descriptions for screen readers */}

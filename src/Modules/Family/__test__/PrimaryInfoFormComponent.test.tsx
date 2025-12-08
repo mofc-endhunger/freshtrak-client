@@ -15,6 +15,23 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 	female: "Female",
 	other: "Other",
 	not_to_say: "Prefer not to say",
+	button_continue: "Continue",
+	placeholder_date_format: "MM / DD / YYYY",
+	option_suffix_none: "None",
+	option_suffix_jr: "Jr",
+	option_suffix_sr: "Sr",
+	option_suffix_ii: "II",
+	option_suffix_iii: "III",
+	option_suffix_iv: "IV",
+	option_suffix_v: "V",
+	option_gender_male: "Male",
+	option_gender_female: "Female",
+	option_gender_other: "Other",
+	option_gender_prefer_not_to_say: "Prefer not to say",
+	error_first_name_required: "First name is required",
+	error_last_name_required: "Last name is required",
+	error_please_enter_valid_date: "Please enter a valid date of birth.",
+	error_field_required: "This field is required",
 }));
 
 // Mock React Hook Form
@@ -137,26 +154,26 @@ describe("PrimaryInfoFormComponent", () => {
 
 		test("should render suffix options", () => {
 			renderComponent();
-			const suffixSelect = screen.getByTestId("suffix-select");
+			const suffixSelect = screen.getByTestId("suffix-select") as HTMLSelectElement;
 
 			expect(suffixSelect).toHaveValue("");
-			expect(screen.getByText("Jr")).toBeInTheDocument();
-			expect(screen.getByText("Sr")).toBeInTheDocument();
-			expect(screen.getByText("II")).toBeInTheDocument();
-			expect(screen.getByText("III")).toBeInTheDocument();
-			expect(screen.getByText("IV")).toBeInTheDocument();
-			expect(screen.getByText("V")).toBeInTheDocument();
+			expect(suffixSelect.querySelector('option[value="Jr"]')).toBeInTheDocument();
+			expect(suffixSelect.querySelector('option[value="Sr"]')).toBeInTheDocument();
+			expect(suffixSelect.querySelector('option[value="II"]')).toBeInTheDocument();
+			expect(suffixSelect.querySelector('option[value="III"]')).toBeInTheDocument();
+			expect(suffixSelect.querySelector('option[value="IV"]')).toBeInTheDocument();
+			expect(suffixSelect.querySelector('option[value="V"]')).toBeInTheDocument();
 		});
 
 		test("should render gender options", () => {
 			renderComponent();
-			const genderSelect = screen.getByTestId("gender-select");
+			const genderSelect = screen.getByTestId("gender-select") as HTMLSelectElement;
 
 			expect(genderSelect).toHaveValue("");
-			expect(screen.getByText("Male")).toBeInTheDocument();
-			expect(screen.getByText("Female")).toBeInTheDocument();
-			expect(screen.getByText("Other")).toBeInTheDocument();
-			expect(screen.getByText("Prefer not to say")).toBeInTheDocument();
+			expect(genderSelect.querySelector('option[value="male"]')).toBeInTheDocument();
+			expect(genderSelect.querySelector('option[value="female"]')).toBeInTheDocument();
+			expect(genderSelect.querySelector('option[value="other"]')).toBeInTheDocument();
+			expect(genderSelect.querySelector('option[value="not_specify"]')).toBeInTheDocument();
 		});
 
 		test("should have proper input attributes", () => {

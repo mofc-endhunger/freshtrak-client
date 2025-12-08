@@ -140,26 +140,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					throw unconfirmedError;
 				}
 			} catch (signInError: any) {
-				// Catch sign-in errors immediately to handle unconfirmed users
-				console.error(
-					"SignIn error caught at signIn call:",
-					signInError
-				);
-				console.error("SignIn error structure:", {
-					name: signInError?.name,
-					code: signInError?.code,
-					message: signInError?.message,
-					cause: signInError?.cause,
-					__type: signInError?.__type,
-					underlyingError: signInError?.underlyingError,
-					toString: signInError?.toString(),
-					// Check for AWS Amplify AuthError properties
-					recoverySuggestion: signInError?.recoverySuggestion,
-					underlyingErrorName: signInError?.underlyingError?.name,
-					underlyingErrorMessage:
-						signInError?.underlyingError?.message,
-				});
-
 				// Check for unconfirmed user error in the caught error
 				// AWS Amplify v6 might wrap errors in different ways
 				const errorMessage =
@@ -390,20 +370,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				StorageService.removeItem("household_signup_state");
 			}
 		} catch (error: any) {
-			console.error("Sign in error:", error);
-			console.error("Sign in error full details:", {
-				name: error.name,
-				code: error.code,
-				message: error.message,
-				underlyingError: error.underlyingError,
-				__type: error.__type,
-				toString: error.toString(),
-				fullError: JSON.stringify(
-					error,
-					Object.getOwnPropertyNames(error)
-				),
-			});
-
+			console.warn("Sign in error:", error);
 			// Check if this is an unconfirmed user error - preserve the original error structure
 			// Check multiple possible error formats from AWS Amplify/Cognito
 			const errorMessage = error.message || error.toString() || "";
@@ -472,7 +439,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			};
 			StorageService.setItem("pendingUser", pendingUser);
 		} catch (error: any) {
-			console.error("Sign up error:", error);
+			console.warn("Sign up error:", error);
 
 			// Check if this is an unverified user error - preserve the original error structure
 			const isUnverifiedUserError =
@@ -614,7 +581,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			// Purge Redux persist store to clear persisted state
 			await persistor.purge();
 		} catch (error: any) {
-			console.error("Sign out error:", error);
 			throw new Error(error.message || "Failed to sign out");
 		} finally {
 			setIsLoading(false);
@@ -630,7 +596,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				username: email,
 			});
 		} catch (error: any) {
-			console.error("Reset password error:", error);
 			throw new Error(error.message || "Failed to reset password");
 		} finally {
 			setIsLoading(false);
@@ -652,7 +617,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				newPassword,
 			});
 		} catch (error: any) {
-			console.error("Confirm reset password error:", error);
 			throw new Error(
 				error.message || "Failed to confirm reset password"
 			);
@@ -672,7 +636,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				username: email,
 			});
 		} catch (error: any) {
-			console.error("Resend confirmation code error:", error);
 			throw new Error(
 				error.message || "Failed to resend confirmation code"
 			);

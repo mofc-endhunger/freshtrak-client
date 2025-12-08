@@ -91,7 +91,6 @@ export class HouseholdRegistrationService {
         data: response.data,
       };
     } catch (error: any) {
-      console.error(`❌ Household registration failed (attempt ${attempt + 1}):`, error);
 
       const registrationError = this.mapApiError(error);
 

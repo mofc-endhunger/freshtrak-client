@@ -11,6 +11,15 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 	seniors: "Seniors",
 	adults: "Adults",
 	kids: "Kids",
+	sr_decrease_seniors: "Decrease number of seniors",
+	sr_increase_seniors: "Increase number of seniors",
+	sr_decrease_adults: "Decrease number of adults",
+	sr_increase_adults: "Increase number of adults",
+	sr_decrease_kids: "Decrease number of kids",
+	sr_increase_kids: "Increase number of kids",
+	sr_number_seniors: "Number of Seniors (60+)",
+	sr_number_adults: "Number of Adults (18+)",
+	sr_number_kids: "Number of Kids",
 }));
 
 // Mock event data
@@ -281,7 +290,7 @@ describe("MemberCountFormComponent", () => {
 			// When ages are undefined, the component shows the base text with parentheses
 			// Use getAllByText to handle multiple matches
 			expect(screen.getAllByText(/Seniors/)).toHaveLength(2); // One in display, one in label
-			expect(screen.getAllByText(/Adults/)).toHaveLength(3); // One in display, one in label, one in button
+			expect(screen.getAllByText(/Adults/)).toHaveLength(2); // One in display, one in label
 		});
 	});
 
@@ -289,23 +298,24 @@ describe("MemberCountFormComponent", () => {
 		test("should have proper ARIA labels for buttons", () => {
 			render(<TestWrapper />);
 
+			// The button labels are in sr-only spans, so we check for the text directly
 			expect(
-				screen.getByLabelText("Decrease number of seniors")
+				screen.getByText("Decrease number of seniors")
 			).toBeInTheDocument();
 			expect(
-				screen.getByLabelText("Increase number of seniors")
+				screen.getByText("Increase number of seniors")
 			).toBeInTheDocument();
 			expect(
-				screen.getByLabelText("Decrease number of adults")
+				screen.getByText("Decrease number of adults")
 			).toBeInTheDocument();
 			expect(
-				screen.getByLabelText("Increase number of adults")
+				screen.getByText("Increase number of adults")
 			).toBeInTheDocument();
 			expect(
-				screen.getByLabelText("Decrease number of kids")
+				screen.getByText("Decrease number of kids")
 			).toBeInTheDocument();
 			expect(
-				screen.getByLabelText("Increase number of kids")
+				screen.getByText("Increase number of kids")
 			).toBeInTheDocument();
 		});
 

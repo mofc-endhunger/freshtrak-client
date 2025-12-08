@@ -395,7 +395,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 			await onSubmit(data);
 		} catch (error) {
-			console.error("Form submission error:", error);
+			console.warn("Form submission error:", error);
 		} finally {
 			setState((prev) => ({ ...prev, isSubmitting: false }));
 		}

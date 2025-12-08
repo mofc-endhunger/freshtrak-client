@@ -11,6 +11,7 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 	phone_contact_you: "Permission to text you",
 	no_email: "No Email Available",
 	email_contact_you: "Permission to email you",
+	label_email: "Email",
 }));
 
 // Mock PhoneInputComponent

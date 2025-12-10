@@ -43,6 +43,8 @@ interface SearchComponentProps {
 	range: string;
 	categories: ServiceCategory[];
 	isLoading?: boolean;
+	initialAvailability?: string;
+	initialReservations?: boolean;
 }
 
 const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
@@ -55,6 +57,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 			range,
 			categories,
 			isLoading = false,
+			initialAvailability = "All",
+			initialReservations = false,
 		},
 		ref
 	) => {
@@ -66,8 +70,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 		const [zipCode, setZipCode] = useState<string>(z_code);
 		const [distance, setDistance] = useState<string>(range);
 		const [serviceCat, setServiceCat] = useState<string>("");
-		const [availability, setAvailability] = useState<string>("All");
-		const [reservations, setReservations] = useState<boolean>(false);
+		const [availability, setAvailability] = useState<string>(initialAvailability);
+		const [reservations, setReservations] = useState<boolean>(initialReservations);
 		const [showFilter, setShowFilter] = useState<boolean>(
 			z_code !== undefined
 		);

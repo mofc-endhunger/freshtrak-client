@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { HouseholdCompletionPrompt } from "../Households/components/HouseholdCompletionPrompt";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
+import { createUserRecordSingleAttempt } from "../../Utils/UserRecordHelper";
 import { LoadingCard } from "../Households/components/LoadingSpinner";
 import { UsersMeResponse } from "../Households/types/api.types";
 import { calculateAge } from "../Households/utils/householdUtils";
@@ -87,12 +88,56 @@ const AccountPage: React.FC = () => {
 				if (hasMinimalData) {
 					setShowSkippedSetupPrompt(true);
 				}
-			} catch (error) {
+			} catch (error: any) {
 				console.warn(
 					"AccountPage: Error fetching household data:",
 					error
 				);
-				// If API call fails, assume user needs household setup
+
+				// Check if this is a "User not found" / 404 error
+				// This means user exists in Cognito but not in backend - try to create
+				const isNotFoundError =
+					error?.type === "NOT_FOUND" ||
+					error?.message?.toLowerCase().includes("not found") ||
+					error?.message?.toLowerCase().includes("user not found");
+
+				if (isNotFoundError) {
+					console.log(
+						"User not found in backend, attempting fallback creation..."
+					);
+					const result = await createUserRecordSingleAttempt(
+						householdsApiService,
+						user?.name
+					);
+
+					if (result.success) {
+						// Try fetching again after creation
+						try {
+							const userInfo =
+								await householdsApiService.getUsersMe();
+							setHouseholdData(userInfo);
+
+							if (userInfo?.id) {
+								localStorage.setItem(
+									"householdId",
+									userInfo.id.toString()
+								);
+							}
+
+							// Show setup prompt since this is a recovered user
+							setShowSkippedSetupPrompt(true);
+							setIsLoadingHousehold(false);
+							return;
+						} catch (retryError) {
+							console.error(
+								"Failed to fetch user data after fallback creation:",
+								retryError
+							);
+						}
+					}
+				}
+
+				// If API call fails and recovery didn't work, show household setup prompt
 				setShowHouseholdPrompt(true);
 			} finally {
 				setIsLoadingHousehold(false);
@@ -100,7 +145,7 @@ const AccountPage: React.FC = () => {
 		};
 
 		fetchHouseholdData();
-	}, [user?.email, householdsApiService]);
+	}, [user?.email, user?.name, householdsApiService]);
 
 	/**
 	 * Navigate to household setup wizard (full page)

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { RENDER_URL } from "../../Utils/Urls";
 import TagManager from "react-gtm-module";
@@ -24,6 +24,8 @@ import { Button } from "../../components/ui/button";
 import localization from "../Localization/LocalizationComponent";
 import { useAuth } from "./AuthContext";
 import { StorageService } from "../../Utils/StorageService";
+import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
+import { createUserRecordWithRetry } from "../../Utils/UserRecordHelper";
 
 /**
  * AuthenticationModal - Main authentication interface component
@@ -64,7 +66,10 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	const navigate = useNavigate();
 	const location = useLocation();
 	const params = useParams();
-	const { resendConfirmationCode, isAuthenticated } = useAuth();
+	const { resendConfirmationCode, isAuthenticated, user } = useAuth();
+
+	// Memoized API service instance for user creation
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
 	/**
 	 * Handles guest login process
@@ -236,11 +241,14 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 
 		// Mark this user as a new user who just completed email confirmation
 		// This will trigger the household setup offer in HouseholdSignUpWrapper
+		// Note: No expiration - flag is cleared when processed by HouseholdSignUpWrapper
 		if (pendingEmail) {
 			const flagData = {
 				email: pendingEmail,
 				timestamp: Date.now(),
 				completed: true,
+				// Flag to indicate user record creation is pending
+				userRecordCreated: false,
 			};
 
 			// Store a flag to indicate this is a new user sign-up
@@ -252,9 +260,39 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 
 		setshow(false);
 
-		// Wait a bit for AuthContext to finish signing in the user after confirmation
+		// Wait for AuthContext to finish signing in the user after confirmation
 		// The handleConfirmSignUp in AuthContext is async and signs the user in automatically
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+		await new Promise((resolve) => setTimeout(resolve, 1500));
+
+		// Attempt to create user record immediately after confirmation
+		// This ensures user always has a backend record, even if they abandon the setup offer
+		try {
+			const userName = user?.name || pendingEmail?.split("@")[0];
+			const result = await createUserRecordWithRetry(
+				householdsApiService,
+				{
+					name: userName,
+					maxRetries: 3,
+				}
+			);
+
+			// Update flag to indicate user record was created
+			if (result.success && pendingEmail) {
+				const flagData = {
+					email: pendingEmail,
+					timestamp: Date.now(),
+					completed: true,
+					userRecordCreated: true,
+				};
+				localStorage.setItem(
+					"new_user_signup",
+					JSON.stringify(flagData)
+				);
+			}
+		} catch (error) {
+			// Log error but don't block navigation - fallback will handle this
+			console.error("Error creating user record on confirmation:", error);
+		}
 
 		// Always navigate to home - never call onLogin after confirmation
 		// Even if Cognito auth isn't detected yet, don't call onLogin as it would create guest user

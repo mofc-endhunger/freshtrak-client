@@ -125,7 +125,7 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
    */
   getSignUpState(): HouseholdSignUpState {
     const state = StorageService.getHouseholdSignUpState();
-    
+
     if (state) {
       return state;
     }
@@ -213,24 +213,36 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
 
   /**
    * Check if this is a new user sign-up (just completed email confirmation)
+   * Note: No expiration time - flag is cleared after processing to handle session timeouts
    */
   isNewUserSignUp(userEmail: string): boolean {
     try {
       // Check if there's a new user signup flag in storage
       const newUserFlag = StorageService.getItem<{
+        email?: string;
         timestamp: number;
         completed: boolean;
+        userRecordCreated?: boolean;
       }>('new_user_signup');
 
-      if (newUserFlag) {
-        // Check if the flag is recent (within last 5 minutes) and completed
-        const isRecent = (Date.now() - newUserFlag.timestamp) < (5 * 60 * 1000); // 5 minutes
-
-        if (isRecent && newUserFlag.completed) {
-          // Clear the flag since we're processing it
+      if (newUserFlag && newUserFlag.completed) {
+        // Verify email matches if available (prevents cross-user issues)
+        if (newUserFlag.email && newUserFlag.email !== userEmail) {
+          // Different user - clear the flag
           StorageService.removeItem('new_user_signup');
-          return true;
+          return false;
         }
+
+        // Check if flag is extremely old (more than 24 hours) - safety cleanup
+        const isVeryOld = (Date.now() - newUserFlag.timestamp) > (24 * 60 * 60 * 1000);
+        if (isVeryOld) {
+          StorageService.removeItem('new_user_signup');
+          return false;
+        }
+
+        // Clear the flag since we're processing it
+        StorageService.removeItem('new_user_signup');
+        return true;
       }
 
       // Check if this is an existing user signing in (not a new signup)

@@ -6,6 +6,12 @@
 import { HouseholdsApiService } from '../../../Services/HouseholdsApiService';
 import { CreateHouseholdApiRequest, HouseholdResponse } from '../types/api.types';
 import { StorageService } from '../../../Utils/StorageService';
+import {
+  hasValidNewUserSignupFlag,
+  clearNewUserSignupFlag,
+  storeHouseholdToLocalStorage,
+  isUserAlreadyExistsError,
+} from '../../../Utils/UserRecordHelper';
 
 export interface HouseholdSignUpState {
   hasOfferedSetup: boolean;
@@ -68,6 +74,9 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
       // Create household via API
       const household = await this.apiService.createHousehold(data);
 
+      // Store household data using centralized helper
+      storeHouseholdToLocalStorage(household);
+
       // Update sign-up state
       this.updateSignUpState({
         userChoice: 'setup',
@@ -79,7 +88,17 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
       this.persistSignUpState();
 
       return household;
-    } catch (error) {
+    } catch (error: any) {
+      // If user already exists, treat as success and update state
+      if (isUserAlreadyExistsError(error)) {
+        console.log('Household already exists, updating state...');
+        this.updateSignUpState({
+          userChoice: 'setup',
+          completionStatus: 'completed',
+        });
+        this.persistSignUpState();
+        // Re-throw to let caller handle fetching existing data
+      }
       console.error('Error creating household during sign-up:', error);
       throw error;
     }
@@ -217,31 +236,10 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
    */
   isNewUserSignUp(userEmail: string): boolean {
     try {
-      // Check if there's a new user signup flag in storage
-      const newUserFlag = StorageService.getItem<{
-        email?: string;
-        timestamp: number;
-        completed: boolean;
-        userRecordCreated?: boolean;
-      }>('new_user_signup');
-
-      if (newUserFlag && newUserFlag.completed) {
-        // Verify email matches if available (prevents cross-user issues)
-        if (newUserFlag.email && newUserFlag.email !== userEmail) {
-          // Different user - clear the flag
-          StorageService.removeItem('new_user_signup');
-          return false;
-        }
-
-        // Check if flag is extremely old (more than 24 hours) - safety cleanup
-        const isVeryOld = (Date.now() - newUserFlag.timestamp) > (24 * 60 * 60 * 1000);
-        if (isVeryOld) {
-          StorageService.removeItem('new_user_signup');
-          return false;
-        }
-
+      // Check if there's a valid new user signup flag
+      if (hasValidNewUserSignupFlag(userEmail)) {
         // Clear the flag since we're processing it
-        StorageService.removeItem('new_user_signup');
+        clearNewUserSignupFlag();
         return true;
       }
 
@@ -250,7 +248,7 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
       const state = this.getSignUpState();
 
       // If user has old state but no new user flag, they're signing in (not signing up)
-      if (state.hasOfferedSetup && !newUserFlag) {
+      if (state.hasOfferedSetup) {
         // Clear old state for this user since they're signing in fresh
         this.clearSignUpState();
         return false;

@@ -25,7 +25,10 @@ import localization from "../Localization/LocalizationComponent";
 import { useAuth } from "./AuthContext";
 import { StorageService } from "../../Utils/StorageService";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import { createUserRecordWithRetry } from "../../Utils/UserRecordHelper";
+import {
+	createUserRecordWithRetry,
+	setNewUserSignupFlag,
+} from "../../Utils/UserRecordHelper";
 
 /**
  * AuthenticationModal - Main authentication interface component
@@ -243,16 +246,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 		// This will trigger the household setup offer in HouseholdSignUpWrapper
 		// Note: No expiration - flag is cleared when processed by HouseholdSignUpWrapper
 		if (pendingEmail) {
-			const flagData = {
-				email: pendingEmail,
-				timestamp: Date.now(),
-				completed: true,
-				// Flag to indicate user record creation is pending
-				userRecordCreated: false,
-			};
-
-			// Store a flag to indicate this is a new user sign-up
-			localStorage.setItem("new_user_signup", JSON.stringify(flagData));
+			setNewUserSignupFlag(pendingEmail, false);
 		}
 
 		// Set flag to prevent onLogin from being called when modal closes
@@ -278,16 +272,7 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 
 			// Update flag to indicate user record was created
 			if (result.success && pendingEmail) {
-				const flagData = {
-					email: pendingEmail,
-					timestamp: Date.now(),
-					completed: true,
-					userRecordCreated: true,
-				};
-				localStorage.setItem(
-					"new_user_signup",
-					JSON.stringify(flagData)
-				);
+				setNewUserSignupFlag(pendingEmail, true);
 			}
 		} catch (error) {
 			// Log error but don't block navigation - fallback will handle this

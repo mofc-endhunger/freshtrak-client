@@ -19,6 +19,8 @@ import { AuthGuard } from "./components/AuthGuard";
 import { Button } from "../../components/ui/button";
 import { Settings } from "lucide-react";
 import { getGenderId } from "./utils/householdUtils";
+import { storeHouseholdToLocalStorage } from "../../Utils/UserRecordHelper";
+import { StorageService } from "../../Utils/StorageService";
 
 interface HouseholdContainerProps {
 	className?: string;
@@ -84,11 +86,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 								initialHouseholdData
 							);
 
-						// Store household ID
-						localStorage.setItem(
-							"householdId",
-							response.data.id.toString()
-						);
+						// Store household data using centralized helper
+						storeHouseholdToLocalStorage(response);
 
 						// Now show setup wizard for additional details
 						setShowSetupWizard(true);
@@ -110,7 +109,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				setError(null);
 
 				// Get household ID from localStorage
-				const householdId = localStorage.getItem("householdId");
+				const householdId = StorageService.getItem<string>("householdId");
 				if (!householdId) {
 					throw new Error("No household ID found");
 				}

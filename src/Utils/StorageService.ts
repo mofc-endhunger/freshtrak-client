@@ -66,6 +66,9 @@ const LEGACY_KEY_MAP: Record<string, string> = {
     'household_signup_state': 'freshtrak_household_signup_state',
     'new_user_signup': 'freshtrak_user_new_signup',
     'registeredEventDateID': 'freshtrak_session_registered_event_date_id',
+    'household': 'freshtrak_household_data',
+    'householdId': 'freshtrak_household_id',
+    'search_zip': 'freshtrak_session_search_zip',
 };
 
 /**

@@ -28,7 +28,11 @@ import {
 } from "lucide-react";
 import { HouseholdCompletionPrompt } from "../Households/components/HouseholdCompletionPrompt";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import { createUserRecordSingleAttempt } from "../../Utils/UserRecordHelper";
+import {
+	createUserRecordSingleAttempt,
+	isNotFoundError,
+} from "../../Utils/UserRecordHelper";
+import { StorageService } from "../../Utils/StorageService";
 import { LoadingCard } from "../Households/components/LoadingSpinner";
 import { UsersMeResponse } from "../Households/types/api.types";
 import { calculateAge } from "../Households/utils/householdUtils";
@@ -75,7 +79,7 @@ const AccountPage: React.FC = () => {
 
 				// Save household_id to localStorage for later use
 				if (userInfo?.id) {
-					localStorage.setItem("householdId", userInfo.id.toString());
+					StorageService.setItem("householdId", userInfo.id.toString());
 				}
 
 				// Check if household data is incomplete (minimal data suggests setup was skipped)
@@ -96,12 +100,7 @@ const AccountPage: React.FC = () => {
 
 				// Check if this is a "User not found" / 404 error
 				// This means user exists in Cognito but not in backend - try to create
-				const isNotFoundError =
-					error?.type === "NOT_FOUND" ||
-					error?.message?.toLowerCase().includes("not found") ||
-					error?.message?.toLowerCase().includes("user not found");
-
-				if (isNotFoundError) {
+				if (isNotFoundError(error)) {
 					console.log(
 						"User not found in backend, attempting fallback creation..."
 					);
@@ -118,7 +117,7 @@ const AccountPage: React.FC = () => {
 							setHouseholdData(userInfo);
 
 							if (userInfo?.id) {
-								localStorage.setItem(
+								StorageService.setItem(
 									"householdId",
 									userInfo.id.toString()
 								);

@@ -16,7 +16,10 @@ import { StorageService } from "../../Utils/StorageService";
 import localization from "../Localization/LocalizationComponent";
 import { useAuth } from "./AuthContext";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import { createUserRecordWithRetry } from "../../Utils/UserRecordHelper";
+import {
+	createUserRecordWithRetry,
+	setNewUserSignupFlag,
+} from "../../Utils/UserRecordHelper";
 
 /**
  * LoginPage - Full-page login interface with authentication forms
@@ -167,16 +170,7 @@ const LoginPage: React.FC = () => {
 		// This will trigger the household setup offer in HouseholdSignUpWrapper
 		// Note: No expiration - flag is cleared when processed by HouseholdSignUpWrapper
 		if (pendingEmail) {
-			const flagData = {
-				email: pendingEmail,
-				timestamp: Date.now(),
-				completed: true,
-				// Flag to indicate user record creation is pending
-				userRecordCreated: false,
-			};
-
-			// Store a flag to indicate this is a new user sign-up
-			localStorage.setItem("new_user_signup", JSON.stringify(flagData));
+			setNewUserSignupFlag(pendingEmail, false);
 		}
 
 		// Wait for AuthContext to finish signing in the user after confirmation
@@ -196,16 +190,7 @@ const LoginPage: React.FC = () => {
 
 			// Update flag to indicate user record was created
 			if (result.success && pendingEmail) {
-				const flagData = {
-					email: pendingEmail,
-					timestamp: Date.now(),
-					completed: true,
-					userRecordCreated: true,
-				};
-				localStorage.setItem(
-					"new_user_signup",
-					JSON.stringify(flagData)
-				);
+				setNewUserSignupFlag(pendingEmail, true);
 			}
 		} catch (error) {
 			// Log error but don't block navigation - fallback will handle this

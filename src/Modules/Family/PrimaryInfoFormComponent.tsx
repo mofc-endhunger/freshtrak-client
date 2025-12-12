@@ -7,9 +7,9 @@ import {
 	UseFormTrigger,
 	FieldErrors,
 } from "react-hook-form";
-import moment from "moment";
 import localization from "../Localization/LocalizationComponent";
 import { Button } from "../../components/ui/button";
+import { validateDobText, formatDateInput } from "./utils/dateValidation";
 
 // Component props interface
 interface PrimaryInfoFormComponentProps {
@@ -39,44 +39,10 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 }) => {
 	const date_of_birth = watch("date_of_birth") || "";
 
-	// Date validation utility function
-	const checkValue = (str: string, max: number): string => {
-		if (str.charAt(0) !== "0" || str === "00") {
-			const num = parseInt(str);
-			if (isNaN(num) || num <= 0 || num > max) return "1";
-			const result =
-				num > parseInt(max.toString().charAt(0)) &&
-				num.toString().length === 1
-					? "0" + num
-					: num.toString();
-			return result;
-		}
-		return str;
-	};
-
-	// Date of birth input handler
+	// Date of birth input handler - formats as user types
 	const handleChangeDob = (e: React.ChangeEvent<HTMLInputElement>) => {
-		let input = e.target.value;
-		if (/\D\/$/.test(input)) input = input.substr(0, input.length - 3);
-
-		const values = input.split("/").map(v => v.replace(/\D/g, ""));
-
-		if (values[0]) values[0] = checkValue(values[0], 12);
-		if (values[1]) values[1] = checkValue(values[1], 31);
-
-		const output = values.map((v, i) => {
-			return v.length === 2 && i < 2 ? v + " / " : v;
-		});
-
-		const value = output.join("").substr(0, 14);
-		setValue("date_of_birth", value);
-	};
-
-	// Date of birth validation
-	const isValidDob = (value: string): boolean => {
-		const maxAgeDate = moment().subtract(123, "years");
-		const enteredDate = moment(value, "MM / DD / YYYY");
-		return enteredDate.isAfter(maxAgeDate);
+		const formattedValue = formatDateInput(e.target.value);
+		setValue("date_of_birth", formattedValue);
 	};
 
 	// Continue button handler
@@ -239,9 +205,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					placeholder={localization.placeholder_date_format}
 					data-testid="date-of-birth-input"
 					{...register("date_of_birth", {
-						validate: (value: string) =>
-							isValidDob(value) ||
-							localization.error_please_enter_valid_date,
+						validate: validateDobText,
 						onChange: handleChangeDob,
 					})}
 				/>

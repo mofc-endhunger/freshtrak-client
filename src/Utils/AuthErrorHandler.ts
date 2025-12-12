@@ -5,6 +5,7 @@
  */
 
 import { StorageService } from './StorageService';
+import { isAuthenticationError } from './UserRecordHelper';
 
 export interface AuthErrorHandlerOptions {
   userType: "cognito" | "guest";
@@ -23,7 +24,7 @@ export const handleAuthError = (
   options: AuthErrorHandlerOptions
 ): boolean => {
   // Check if this is a 401 authentication error
-  if (error?.response?.status === 401 || error?.type === 'AUTHENTICATION_ERROR') {
+  if (isAuthenticationError(error)) {
     // Clean up storage based on user type using StorageService
     StorageService.clearAuthData(options.userType);
 

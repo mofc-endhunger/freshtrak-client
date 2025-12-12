@@ -6,6 +6,7 @@
  */
 
 import { HouseholdsApiService } from "../Services/HouseholdsApiService";
+import { StorageService } from "./StorageService";
 
 export interface CreateUserRecordOptions {
 	name?: string;
@@ -58,12 +59,16 @@ export const storeHouseholdToLocalStorage = (response: any): void => {
 			userId: response.data.primary_user_id,
 			household_id: response.data.id,
 		};
-		localStorage.setItem("household", JSON.stringify(householdStorage));
+		StorageService.setItem("household", householdStorage);
 	}
 };
 
+// ============================================================================
+// API Error Type Helpers
+// ============================================================================
+
 /**
- * Checks if an error indicates the user already exists
+ * Checks if an error indicates the user already exists (409 Conflict)
  * @param error - Error object from API call
  */
 export const isUserAlreadyExistsError = (error: any): boolean => {
@@ -74,11 +79,28 @@ export const isUserAlreadyExistsError = (error: any): boolean => {
 };
 
 /**
- * Checks if an error is an authentication error
+ * Checks if an error is an authentication error (401)
  * @param error - Error object from API call
  */
 export const isAuthenticationError = (error: any): boolean => {
-	return error?.type === "AUTHENTICATION_ERROR";
+	return (
+		error?.response?.status === 401 ||
+		error?.type === "AUTHENTICATION_ERROR"
+	);
+};
+
+/**
+ * Checks if an error is a not found error (404)
+ * Commonly occurs when user exists in Cognito but not in backend
+ * @param error - Error object from API call
+ */
+export const isNotFoundError = (error: any): boolean => {
+	return (
+		error?.response?.status === 404 ||
+		error?.type === "NOT_FOUND" ||
+		error?.message?.toLowerCase().includes("not found") ||
+		error?.message?.toLowerCase().includes("user not found")
+	);
 };
 
 /**
@@ -115,7 +137,7 @@ export const createUserRecordWithRetry = async (
 
 			console.log("User record created successfully on attempt", attempt);
 			onSuccess?.();
-			
+
 			return { success: true };
 		} catch (error: any) {
 			console.warn(`User creation attempt ${attempt} failed:`, error);
@@ -176,5 +198,120 @@ export const createUserRecordSingleAttempt = async (
 		console.error("User creation failed:", error);
 		return { success: false, error };
 	}
+};
+
+// ============================================================================
+// New User Signup Flag Management
+// ============================================================================
+
+/**
+ * Interface for the new_user_signup flag stored in localStorage
+ * This flag tracks new users who have completed email confirmation
+ */
+export interface NewUserSignupFlag {
+	email: string;
+	timestamp: number;
+	completed: boolean;
+	userRecordCreated: boolean;
+}
+
+const NEW_USER_SIGNUP_KEY = "new_user_signup";
+
+/**
+ * Sets the new user signup flag after email confirmation
+ * 
+ * @param email - User's email address
+ * @param userRecordCreated - Whether the backend user record was created
+ * 
+ * @example
+ * ```ts
+ * // After email confirmation, before user record creation
+ * setNewUserSignupFlag("user@example.com", false);
+ * 
+ * // After successful user record creation
+ * setNewUserSignupFlag("user@example.com", true);
+ * ```
+ */
+export const setNewUserSignupFlag = (
+	email: string,
+	userRecordCreated: boolean = false
+): void => {
+	const flagData: NewUserSignupFlag = {
+		email,
+		timestamp: Date.now(),
+		completed: true,
+		userRecordCreated,
+	};
+	StorageService.setItem(NEW_USER_SIGNUP_KEY, flagData);
+};
+
+/**
+ * Updates the userRecordCreated status of an existing flag
+ * Only updates if the flag exists and email matches
+ * 
+ * @param email - User's email to verify match
+ * @param userRecordCreated - New value for userRecordCreated
+ * @returns true if flag was updated, false if not found or email mismatch
+ */
+export const updateNewUserSignupFlag = (
+	email: string,
+	userRecordCreated: boolean
+): boolean => {
+	const existingFlag = getNewUserSignupFlag();
+
+	if (!existingFlag || existingFlag.email !== email) {
+		return false;
+	}
+
+	setNewUserSignupFlag(email, userRecordCreated);
+	return true;
+};
+
+/**
+ * Gets the current new user signup flag
+ * 
+ * @returns The flag data or null if not set
+ */
+export const getNewUserSignupFlag = (): NewUserSignupFlag | null => {
+	return StorageService.getItem<NewUserSignupFlag>(NEW_USER_SIGNUP_KEY);
+};
+
+/**
+ * Clears the new user signup flag
+ * Should be called after the flag has been processed
+ */
+export const clearNewUserSignupFlag = (): void => {
+	StorageService.removeItem(NEW_USER_SIGNUP_KEY);
+};
+
+/**
+ * Checks if a valid new user signup flag exists for the given email
+ * Validates email match and age (must be less than 24 hours old)
+ * 
+ * @param userEmail - Email to validate against (optional)
+ * @returns true if valid flag exists, false otherwise
+ */
+export const hasValidNewUserSignupFlag = (userEmail?: string): boolean => {
+	const flag = getNewUserSignupFlag();
+
+	if (!flag || !flag.completed) {
+		return false;
+	}
+
+	// Verify email matches if provided
+	if (userEmail && flag.email && flag.email !== userEmail) {
+		// Different user - clear the stale flag
+		clearNewUserSignupFlag();
+		return false;
+	}
+
+	// Check if flag is extremely old (more than 24 hours) - safety cleanup
+	const isVeryOld = (Date.now() - flag.timestamp) > (24 * 60 * 60 * 1000);
+	if (isVeryOld) {
+		clearNewUserSignupFlag();
+		return false;
+	}
+
+	return true;
 };
 

@@ -109,7 +109,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				setError(null);
 
 				// Get household ID from localStorage
-				const householdId = StorageService.getItem<string>("householdId");
+				const householdId =
+					StorageService.getItem<string>("householdId");
 				if (!householdId) {
 					throw new Error("No household ID found");
 				}
@@ -185,16 +186,20 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				members: (() => {
 					// Start with existing members from /users/me
 					const existingMembers = currentHouseholdData.members || [];
+					const deletedIds =
+						registrationData.deleted_member_ids || [];
 
-					// Update existing members and ensure proper data types, filter out deleted members
+					// Filter out deleted members - backend will deactivate omitted members
 					const updatedMembers = existingMembers
-						.filter(
-							member =>
-								!registrationData.deleted_member_ids?.includes(
-									member.id
-								)
-						)
-						.map(member => ({
+						.filter((member: any) => {
+							const memberId = member.id;
+							const isDeleted =
+								deletedIds.includes(memberId) ||
+								deletedIds.includes(Number(memberId)) ||
+								deletedIds.includes(String(memberId));
+							return !isDeleted;
+						})
+						.map((member: any) => ({
 							...member,
 							gender_id: member.gender_id
 								? Number(member.gender_id)
@@ -202,6 +207,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							suffix_id: member.suffix_id
 								? Number(member.suffix_id)
 								: null,
+							is_active: 1,
 						}));
 
 					if (updatedMembers.length > 0) {

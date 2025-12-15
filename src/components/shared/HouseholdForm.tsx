@@ -174,7 +174,11 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				seniors_in_household = 0,
 				adults_in_household = 0,
 				children_in_household = 0,
+				no_phone_number = false,
 			} = safeData;
+
+			// Infer no_phone_number if phone is null/empty (user previously had no phone)
+			const inferredNoPhone = no_phone_number || !phone;
 
 			reset({
 				first_name,
@@ -197,6 +201,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				seniors_in_household,
 				adults_in_household,
 				children_in_household,
+				no_phone_number: inferredNoPhone,
 			});
 		}
 	}, [prefilledData, reset]);

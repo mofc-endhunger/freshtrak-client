@@ -290,6 +290,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						zip_code: householdData.zip_code || user.zip_code,
 						phone: householdData.phone || user.phone,
 						email: householdData.email || user.email,
+						// Prefill contact preferences
+						permission_to_text:
+							householdData.permission_to_text ??
+							user.permission_to_text,
+						permission_to_email:
+							householdData.permission_to_email ??
+							user.permission_to_email,
 						// Prefill date_of_birth and gender from primary member
 						date_of_birth: primaryMember
 							? convertDateFormat(
@@ -602,6 +609,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			zip_code: registrationData.zip_code || null,
 			phone: registrationData.phone || null,
 			email: registrationData.email || null,
+
+			// Update contact preferences
+			permission_to_text: registrationData.permission_to_text ?? null,
+			permission_to_email: registrationData.permission_to_email ?? null,
 
 			// Update counts from registration
 			counts: {

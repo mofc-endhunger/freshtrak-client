@@ -183,6 +183,10 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				zip_code: registrationData.zip_code || null,
 				phone: registrationData.phone || null,
 				email: registrationData.email || null,
+				// Contact preferences
+				permission_to_text: registrationData.permission_to_text ?? null,
+				permission_to_email:
+					registrationData.permission_to_email ?? null,
 				members: (() => {
 					// Start with existing members from /users/me
 					const existingMembers = currentHouseholdData.members || [];
@@ -190,12 +194,12 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 					// Update existing members and ensure proper data types, filter out deleted members
 					const updatedMembers = existingMembers
 						.filter(
-							member =>
+							(member) =>
 								!registrationData.deleted_member_ids?.includes(
 									member.id
 								)
 						)
-						.map(member => ({
+						.map((member) => ({
 							...member,
 							gender_id: member.gender_id
 								? Number(member.gender_id)

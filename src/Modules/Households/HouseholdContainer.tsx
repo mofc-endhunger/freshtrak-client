@@ -183,6 +183,10 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				zip_code: registrationData.zip_code || null,
 				phone: registrationData.phone || null,
 				email: registrationData.email || null,
+				// Contact preferences
+				permission_to_text: registrationData.permission_to_text ?? null,
+				permission_to_email:
+					registrationData.permission_to_email ?? null,
 				members: (() => {
 					// Start with existing members from /users/me
 					const existingMembers = currentHouseholdData.members || [];

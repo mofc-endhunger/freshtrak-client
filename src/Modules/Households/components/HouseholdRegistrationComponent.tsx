@@ -17,7 +17,7 @@ import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 // Type imports
 import { RegistrationFormData } from "../../Registration/types/registration.types";
 import { ApiHouseholdMember } from "../types/api.types";
-import { getGenderFromId, getGenderDisplayName } from "../utils/householdUtils";
+import { getGenderFromId } from "../utils/householdUtils";
 import localization from "../../Localization/LocalizationComponent";
 
 interface HouseholdRegistrationComponentProps {
@@ -92,13 +92,20 @@ const HouseholdRegistrationComponent: React.FC<
 					setCurrentHouseholdMembers(userData.members);
 					const primaryMember = userData.members[0];
 
-					// Convert gender_id to gender display name for form
+					// Convert gender_id to form value (lowercase format expected by form)
 					const getGenderForForm = (
 						genderId: number | null
 					): string => {
 						if (!genderId) return "";
 						const gender = getGenderFromId(genderId);
-						return getGenderDisplayName(gender);
+						// Map from household format to form format
+						const genderMap: Record<string, string> = {
+							male: "male",
+							female: "female",
+							other: "other",
+							prefer_not_to_say: "not_specify",
+						};
+						return genderMap[gender] || "";
 					};
 
 					setPrefilledData({
@@ -118,6 +125,11 @@ const HouseholdRegistrationComponent: React.FC<
 						city: userData.city || "",
 						state: userData.state || "",
 						zip_code: userData.zip_code || "",
+						// Contact preferences
+						permission_to_text:
+							userData.permission_to_text ?? false,
+						permission_to_email:
+							userData.permission_to_email ?? false,
 					});
 				} else {
 					// No members found - set empty prefilled data

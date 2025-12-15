@@ -143,29 +143,51 @@ export const isValidDateOfBirth = (
 };
 
 /**
+ * Helper to validate and auto-correct date part values as user types
+ * @param str - The string value to check
+ * @param max - Maximum allowed value (12 for month, 31 for day)
+ */
+const checkDatePartValue = (str: string, max: number): string => {
+  if (str.charAt(0) !== "0" || str === "00") {
+    const num = parseInt(str);
+    if (isNaN(num) || num <= 0 || num > max) return "1";
+    const result =
+      num > parseInt(max.toString().charAt(0)) && num.toString().length === 1
+        ? "0" + num
+        : num.toString();
+    return result;
+  }
+  return str;
+};
+
+/**
  * Formats date input as user types (MM / DD / YYYY format)
+ * Validates month (1-12) and day (1-31) as user types
  */
 export const formatDateInput = (input: string): string => {
   if (!input || typeof input !== 'string') {
     return '';
   }
 
-  // Remove all non-digits
-  const digits = input.replace(/\D/g, '');
-
-  // Limit to 8 digits (MMDDYYYY)
-  const limitedDigits = digits.slice(0, 8);
-
-  // Format as MM / DD / YYYY
-  let formatted = '';
-  for (let i = 0; i < limitedDigits.length; i++) {
-    if (i === 2 || i === 4) {
-      formatted += ' / ';
-    }
-    formatted += limitedDigits[i];
+  // Handle backspace on separator
+  if (/\D\/$/.test(input)) {
+    input = input.substr(0, input.length - 3);
   }
 
-  return formatted;
+  // Split by separator and clean each part
+  const values = input.split("/").map(v => v.replace(/\D/g, ""));
+
+  // Validate month (max 12) and day (max 31) as user types
+  if (values[0]) values[0] = checkDatePartValue(values[0], 12);
+  if (values[1]) values[1] = checkDatePartValue(values[1], 31);
+
+  // Format with separators
+  const output = values.map((v, i) => {
+    return v.length === 2 && i < 2 ? v + " / " : v;
+  });
+
+  // Limit to 14 characters (MM / DD / YYYY)
+  return output.join("").substr(0, 14);
 };
 
 /**
@@ -460,4 +482,109 @@ export const validateDateWithRules = (
     allowFuture,
     allowPast,
   });
+};
+
+// ============================================================================
+// React Hook Form Validation Helpers
+// ============================================================================
+
+/**
+ * Validates date of birth for react-hook-form (native date input - YYYY-MM-DD format)
+ * Returns true if valid, or error message string if invalid
+ * 
+ * @example
+ * ```tsx
+ * <Input type="date" {...register("date_of_birth", { validate: validateDobNative })} />
+ * ```
+ */
+export const validateDobNative = (value: string): string | true => {
+  if (!value) {
+    return "Date of birth is required";
+  }
+
+  const date = moment(value, DATE_CONSTANTS.SERVER_FORMAT, true);
+
+  // Check if date is valid
+  if (!date.isValid()) {
+    return "Please enter a valid date";
+  }
+
+  // Check if date is in the future
+  if (date.isAfter(moment())) {
+    return "Date of birth cannot be in the future";
+  }
+
+  // Check if date is too far in the past (max 123 years)
+  const maxAgeDate = moment().subtract(DATE_CONSTANTS.MAX_AGE, "years");
+  if (date.isBefore(maxAgeDate)) {
+    return "Please enter a valid date of birth";
+  }
+
+  return true;
+};
+
+/**
+ * Validates date of birth for react-hook-form (text input - MM / DD / YYYY format)
+ * Returns true if valid, or error message string if invalid
+ * 
+ * @example
+ * ```tsx
+ * <input type="text" {...register("date_of_birth", { validate: validateDobText })} />
+ * ```
+ */
+export const validateDobText = (value: string): string | true => {
+  if (!value) {
+    return "Date of birth is required";
+  }
+
+  const date = moment(value, DATE_CONSTANTS.DEFAULT_FORMAT, true);
+
+  // Check if date is valid
+  if (!date.isValid()) {
+    return "Please enter a valid date";
+  }
+
+  // Check if date is in the future
+  if (date.isAfter(moment())) {
+    return "Date of birth cannot be in the future";
+  }
+
+  // Check if date is too far in the past (max 123 years)
+  const maxAgeDate = moment().subtract(DATE_CONSTANTS.MAX_AGE, "years");
+  if (date.isBefore(maxAgeDate)) {
+    return "Please enter a valid date of birth";
+  }
+
+  return true;
+};
+
+/**
+ * Gets today's date in YYYY-MM-DD format (for native date input max attribute)
+ */
+export const getTodayForDateInput = (): string => {
+  return moment().format(DATE_CONSTANTS.SERVER_FORMAT);
+};
+
+/**
+ * Gets the minimum allowed date (123 years ago) in YYYY-MM-DD format
+ */
+export const getMinDateForDateInput = (): string => {
+  return moment().subtract(DATE_CONSTANTS.MAX_AGE, "years").format(DATE_CONSTANTS.SERVER_FORMAT);
+};
+
+/**
+ * Date input constraints for native date inputs
+ * Use with max and min attributes
+ * 
+ * @example
+ * ```tsx
+ * const { today, minDate } = getDateInputConstraints();
+ * <Input type="date" max={today} min={minDate} />
+ * ```
+ */
+export const getDateInputConstraints = (): { today: string; minDate: string } => {
+  return {
+    today: getTodayForDateInput(),
+    minDate: getMinDateForDateInput(),
+  };
 };

@@ -3,7 +3,7 @@
  * Form for collecting individual family member information
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { HouseholdMember } from "../types/household.types";
 import { HouseholdCounts } from "../../Registration/types/registration.types";
@@ -11,6 +11,10 @@ import { getGenderFromId } from "../utils/householdUtils";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import {
+	validateDobNative,
+	getDateInputConstraints,
+} from "../../Family/utils/dateValidation";
 import {
 	Select,
 	SelectContent,
@@ -75,6 +79,9 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 			suffix_id: undefined,
 		},
 	});
+
+	// Date validation constraints (memoized for performance)
+	const dateConstraints = useMemo(() => getDateInputConstraints(), []);
 
 	// Initialize members data array
 	useEffect(() => {
@@ -324,9 +331,12 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 								<Input
 									id="date_of_birth"
 									type="date"
+									max={dateConstraints.today}
+									min={dateConstraints.minDate}
 									{...register("date_of_birth", {
 										required:
 											localization.error_date_of_birth_required,
+										validate: validateDobNative,
 									})}
 								/>
 								{errors.date_of_birth && (

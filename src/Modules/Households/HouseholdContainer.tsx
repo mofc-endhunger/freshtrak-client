@@ -347,8 +347,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 			const currentSignUpState = StorageService.getHouseholdSignUpState();
 			StorageService.setHouseholdSignUpState({
 				hasOfferedSetup: currentSignUpState?.hasOfferedSetup ?? true,
-				userChoice: 'setup',
-				completionStatus: 'completed',
+				userChoice: "setup",
+				completionStatus: "completed",
 				householdId: currentHouseholdData.id,
 				lastPromptDate: new Date(),
 				isNewUser: false,

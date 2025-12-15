@@ -6,6 +6,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import {
+	validateDobNative,
+	getDateInputConstraints,
+} from "../../Family/utils/dateValidation";
 import { Button } from "../../../components/ui/button";
 import {
 	Card,
@@ -132,6 +136,9 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 	});
 
 	const watchedValues = watch();
+
+	// Date validation constraints (memoized for performance)
+	const dateConstraints = useMemo(() => getDateInputConstraints(), []);
 
 	// Compute step completion status on each render instead of storing in state
 	const steps = useMemo(() => {
@@ -461,8 +468,11 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 							<Input
 								id="primary_date_of_birth"
 								type="date"
+								max={dateConstraints.today}
+								min={dateConstraints.minDate}
 								{...register("primary_date_of_birth", {
 									required: localization.error_date_of_birth_required,
+									validate: validateDobNative,
 								})}
 							/>
 							{errors.primary_date_of_birth && (

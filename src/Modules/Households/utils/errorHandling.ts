@@ -178,13 +178,15 @@ export const retryWithBackoff = async <T>(
         break;
       }
 
-      // Check if error is retryable
-      const errorMessage = getUserFriendlyErrorMessage(
-        error as HouseholdApiError,
-        context
-      );
-
-      if (!errorMessage.retryable) {
+      // Check if error is retryable based on status code
+      const axiosError = error as any;
+      const status = axiosError?.response?.status;
+      
+      // Don't retry on 4xx errors (except 429 rate limit)
+      // Only retry on 5xx errors or network errors
+      const isRetryable = !status || status >= 500 || status === 429;
+      
+      if (!isRetryable) {
         throw error;
       }
 

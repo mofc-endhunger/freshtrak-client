@@ -389,10 +389,10 @@ export class HouseholdsApiService {
       };
 
       return householdResponse;
-    } catch (error) {
+    } catch (error: any) {
       const errorDetails = ApiErrorHandler.createError(error, context);
-      const errorMessage = errorDetails?.message || 'Failed to create user';
-      throw new Error(errorMessage);
+      // Throw the error details object to preserve type information (e.g., CONFLICT)
+      throw errorDetails;
     }
   }
 
@@ -458,10 +458,11 @@ export class HouseholdsApiService {
       const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       const errorDetails = ApiErrorHandler.createError(error, context);
-      const errorMessage = errorDetails?.message || 'Failed to get user information';
-      throw new Error(errorMessage);
+      // Throw the error details object to preserve type information (e.g., NOT_FOUND)
+      // This allows callers to check error.type for proper error handling
+      throw errorDetails;
     }
   }
 
@@ -476,10 +477,10 @@ export class HouseholdsApiService {
       const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       const errorDetails = ApiErrorHandler.createError(error, context);
-      const errorMessage = errorDetails?.message || 'Failed to get household information';
-      throw new Error(errorMessage);
+      // Throw the error details object to preserve type information (e.g., NOT_FOUND)
+      throw errorDetails;
     }
   }
 

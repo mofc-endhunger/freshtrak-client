@@ -44,6 +44,9 @@ export interface UsersMeResponse {
   zip_code: string | null;
   phone: string | null;
   email: string | null;
+  // Contact preferences
+  permission_to_text: boolean | null;
+  permission_to_email: boolean | null;
 }
 
 // API member structure (matches actual API response)

@@ -154,6 +154,8 @@ export const mockUpdateHouseholdRequest: UpdateHouseholdRequest = {
   zip_code: '43005',
   phone: '555-123-4567',
   email: 'mock@example.com',
+  permission_to_text: true,
+  permission_to_email: true,
 };
 
 /**

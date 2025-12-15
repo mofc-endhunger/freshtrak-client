@@ -185,6 +185,8 @@ const EventContainer: React.FC = () => {
 								range={distance?.toString() || ""}
 								categories={categories}
 								isLoading={loading}
+								initialAvailability={availability}
+								initialReservations={reservations}
 							/>
 						</form>
 						{loading && (

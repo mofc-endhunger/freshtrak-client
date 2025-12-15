@@ -19,6 +19,8 @@ import { AuthGuard } from "./components/AuthGuard";
 import { Button } from "../../components/ui/button";
 import { Settings } from "lucide-react";
 import { getGenderId } from "./utils/householdUtils";
+import { storeHouseholdToLocalStorage } from "../../Utils/UserRecordHelper";
+import { StorageService } from "../../Utils/StorageService";
 
 interface HouseholdContainerProps {
 	className?: string;
@@ -84,11 +86,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 								initialHouseholdData
 							);
 
-						// Store household ID
-						localStorage.setItem(
-							"householdId",
-							response.data.id.toString()
-						);
+						// Store household data using centralized helper
+						storeHouseholdToLocalStorage(response);
 
 						// Now show setup wizard for additional details
 						setShowSetupWizard(true);
@@ -110,7 +109,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				setError(null);
 
 				// Get household ID from localStorage
-				const householdId = localStorage.getItem("householdId");
+				const householdId =
+					StorageService.getItem<string>("householdId");
 				if (!householdId) {
 					throw new Error("No household ID found");
 				}
@@ -183,19 +183,27 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				zip_code: registrationData.zip_code || null,
 				phone: registrationData.phone || null,
 				email: registrationData.email || null,
+				// Contact preferences
+				permission_to_text: registrationData.permission_to_text ?? null,
+				permission_to_email:
+					registrationData.permission_to_email ?? null,
 				members: (() => {
 					// Start with existing members from /users/me
 					const existingMembers = currentHouseholdData.members || [];
+					const deletedIds =
+						registrationData.deleted_member_ids || [];
 
-					// Update existing members and ensure proper data types, filter out deleted members
+					// Filter out deleted members - backend will deactivate omitted members
 					const updatedMembers = existingMembers
-						.filter(
-							member =>
-								!registrationData.deleted_member_ids?.includes(
-									member.id
-								)
-						)
-						.map(member => ({
+						.filter((member: any) => {
+							const memberId = member.id;
+							const isDeleted =
+								deletedIds.includes(memberId) ||
+								deletedIds.includes(Number(memberId)) ||
+								deletedIds.includes(String(memberId));
+							return !isDeleted;
+						})
+						.map((member: any) => ({
 							...member,
 							gender_id: member.gender_id
 								? Number(member.gender_id)
@@ -203,6 +211,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							suffix_id: member.suffix_id
 								? Number(member.suffix_id)
 								: null,
+							is_active: 1,
 						}));
 
 					if (updatedMembers.length > 0) {

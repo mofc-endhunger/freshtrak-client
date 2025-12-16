@@ -22,6 +22,7 @@ import { Button } from "../ui/button";
 // Utility imports
 import { formatDateForServer } from "../../Utils/DateFormat";
 import { getGenderId } from "../../Modules/Households/utils/householdUtils";
+import { StorageService } from "../../Utils/StorageService";
 
 // Type imports
 import {
@@ -177,8 +178,26 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				no_phone_number = false,
 			} = safeData;
 
-			// Infer no_phone_number if phone is null/empty (user previously had no phone)
-			const inferredNoPhone = no_phone_number || !phone;
+			// Determine if we should infer no_phone_number from empty phone
+			// Guest users: never infer, always show input unchecked
+			// New Cognito users who skipped setup: never infer, always show input unchecked
+			// Existing users with completed setup: infer from empty phone (they previously chose no phone)
+			const isGuestUser = StorageService.isGuestUser();
+			const signUpState = StorageService.getHouseholdSignUpState();
+			const hasCompletedSetup = signUpState?.completionStatus === 'completed';
+
+			let inferredNoPhone: boolean;
+			if (isGuestUser) {
+				// Guest users: never auto-check the checkbox
+				inferredNoPhone = false;
+			} else if (!hasCompletedSetup) {
+				// New Cognito users who skipped/haven't completed setup: don't infer
+				inferredNoPhone = no_phone_number === true;
+			} else {
+				// Existing users with completed setup: infer from empty phone
+				// If they previously chose "No Phone", phone would be empty
+				inferredNoPhone = no_phone_number === true || !phone;
+			}
 
 			reset({
 				first_name,

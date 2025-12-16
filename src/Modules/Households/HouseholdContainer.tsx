@@ -343,6 +343,18 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				updateData
 			);
 
+			// Set household completion status flag after successful PATCH
+			const currentSignUpState = StorageService.getHouseholdSignUpState();
+			StorageService.setHouseholdSignUpState({
+				hasOfferedSetup: currentSignUpState?.hasOfferedSetup ?? true,
+				userChoice: "setup",
+				completionStatus: "completed",
+				householdId: currentHouseholdData.id,
+				lastPromptDate: new Date(),
+				isNewUser: false,
+				userId: user?.email || null,
+			});
+
 			// Redirect back to account page
 			navigate(RENDER_URL.ACCOUNT_URL);
 		} catch (error: any) {

@@ -19,6 +19,7 @@ import { HouseholdRegistrationService } from "../../Services/HouseholdRegistrati
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { UsersMeResponse } from "../Households/types/api.types";
 import { useAuth } from "../Authentication/AuthContext";
+import { StorageService } from "../../Utils/StorageService";
 
 import { Event } from "./types/family.types";
 import localization from "../Localization/LocalizationComponent";
@@ -155,14 +156,13 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			const household = await householdsApiService.getUsersMe();
 			setHouseholdData(household);
 
-			// Check if household data is complete enough for direct registration
-			const isComplete =
-				householdRegistrationService.checkHouseholdCompleteness(
-					household
-				);
+			// Check if user has completed household setup via the completionStatus flag
+			const signUpState = StorageService.getHouseholdSignUpState();
+			const hasCompletedSetup =
+				signUpState?.completionStatus === "completed";
 
-			if (isComplete) {
-				// Show confirmation modal
+			if (hasCompletedSetup) {
+				// Show confirmation modal for users who completed household setup
 				setShowHouseholdModal(true);
 			} else {
 				// Proceed directly to registration form with prefilled data

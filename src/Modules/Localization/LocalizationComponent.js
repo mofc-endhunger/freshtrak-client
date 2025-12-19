@@ -61,6 +61,8 @@ let localization = new LocalizedStrings({
 		no_email: "No Email Available",
 		email_contact_you:
 			"Is it okay to email you with updates and information about your registration, and updates to our network?",
+		sms_consent_text:
+			"By providing your phone number, you agree to receive text messages from FreshTrak or your local food bank for the purpose of confirming your reservation and for other reservation-related communications. Message frequency may vary. Standard messaging and data rates may apply. You can opt-out at any time by replying STOP to any message. For help, contact us at help@freshtrak.com. See our full Terms & Conditions and Privacy Policy.",
 		register_about_family: "Tell us about your family",
 		family_count:
 			"How many additional family members are in each age group? (Do not include yourself)",
@@ -813,6 +815,8 @@ let localization = new LocalizedStrings({
 		no_email: "No hay correo electrónico disponible",
 		email_contact_you:
 			"¿Está bien enviarle un correo electrónico con actualizaciones e información sobre su registro y actualizaciones de nuestra red?",
+		sms_consent_text:
+			"Al proporcionar su número de teléfono, usted acepta recibir mensajes de texto de FreshTrak o de su banco de alimentos local con el fin de confirmar su reservación y para otras comunicaciones relacionadas con la reservación. La frecuencia de los mensajes puede variar. Pueden aplicarse tarifas estándar de mensajería y datos. Puede darse de baja en cualquier momento respondiendo STOP a cualquier mensaje. Para obtener ayuda, contáctenos en help@freshtrak.com. Consulte nuestros Términos y Condiciones y Política de Privacidad completos.",
 		register_about_family: "Háblanos de tu familia",
 		family_count:
 			"¿Cuántos miembros adicionales de la familia hay en cada grupo de edad? (No te incluyas a ti mismo)",
@@ -1563,6 +1567,8 @@ let localization = new LocalizedStrings({
 		no_email: "Email Laheli Mayo",
 		email_contact_you:
 			"Ma caadi baa inaan kugu soo dirno cusbooneysiin iyo macluumaad ku saabsan diiwaangelintaada, iyo cusbooneysiinta shabakadeena?",
+		sms_consent_text:
+			"Marka aad bixiso lambarkaaga telefoonka, waxaad aqbashay inaad hesho fariimo qoraal ah oo ka imanaysa FreshTrak ama bangigaaga cuntada ee maxalliga ah si loogu xaqiijiyo ballantaada iyo xiriirro kale oo la xidhiidha ballanta. Tirada fariimaha ayaa kala duwan karta. Qiimaha caadiga ah ee fariimaha iyo xogta ayaa suurtagal ah inay khushmaan. Waxaad ka bixi kartaa wakhti kasta adigoo ku jawaabaya STOP farriin kasta. Si aad caawimo u hesho, nala soo xiriir help@freshtrak.com. Eeg Shuruudaheenna iyo Siyaasadda Arrimaha Gaarka ah ee dhammaystiran.",
 		register_about_family: "Reerkaaga wax nooga sheeg",
 		family_count:
 			"Immisa xubnood oo qoys ah ayaa ku jira da 'kasta? (Ha ku darin naftaada)",
@@ -2314,6 +2320,8 @@ let localization = new LocalizedStrings({
 		no_email: "Электронная почта недоступна",
 		email_contact_you:
 			"Можно ли отправлять вам по электронной почте обновления и информацию о вашей регистрации и обновлениях в нашей сети?",
+		sms_consent_text:
+			"Предоставляя свой номер телефона, вы соглашаетесь получать текстовые сообщения от FreshTrak или вашего местного продовольственного банка для подтверждения вашего бронирования и для других связанных с бронированием сообщений. Частота сообщений может варьироваться. Могут применяться стандартные тарифы на сообщения и передачу данных. Вы можете отказаться в любое время, ответив STOP на любое сообщение. Для получения помощи свяжитесь с нами по адресу help@freshtrak.com. Ознакомьтесь с нашими полными Условиями использования и Политикой конфиденциальности.",
 		register_about_family: "Информация о вашей семье",
 		family_count:
 			"Сколько дополнительных членов семьи в каждой возрастной группе? (Не включайте себя)",
@@ -3069,6 +3077,8 @@ let localization = new LocalizedStrings({
 		no_email: "Kullanılabilir E-posta Yok",
 		email_contact_you:
 			"Kaydınızla ilgili güncellemeler ve bilgiler ve ağımızdaki güncellemeler ile size e-posta gönderebilir miyim?",
+		sms_consent_text:
+			"Telefon numaranızı vererek, rezervasyonunuzu onaylamak ve diğer rezervasyonla ilgili iletişimler için FreshTrak'tan veya yerel gıda bankanızdan kısa mesaj almayı kabul etmiş olursunuz. Mesaj sıklığı değişiklik gösterebilir. Standart mesajlaşma ve veri ücretleri geçerli olabilir. Herhangi bir mesaja STOP yanıtı vererek istediğiniz zaman vazgeçebilirsiniz. Yardım için help@freshtrak.com adresinden bize ulaşın. Tam Şartlar ve Koşullar ile Gizlilik Politikamızı inceleyin.",
 		register_about_family: "Bize ailenden bahset",
 		family_count:
 			"Her yaş grubunda kaç aile üyesi daha var? (Kendinizi dahil etmeyin)",
@@ -3799,6 +3809,8 @@ let localization = new LocalizedStrings({
 		no_email: "لا يوجد بريد إلكتروني متاح",
 		email_contact_you:
 			"هل من المقبول مراسلتك عبر البريد الإلكتروني بالتحديثات والمعلومات حول التسجيل والتحديثات الخاصة بشبكتنا؟",
+		sms_consent_text:
+			"من خلال تقديم رقم هاتفك، فإنك توافق على تلقي رسائل نصية من FreshTrak أو بنك الطعام المحلي الخاص بك لغرض تأكيد حجزك ولأغراض الاتصالات الأخرى المتعلقة بالحجز. قد يختلف تكرار الرسائل. قد تنطبق رسوم الرسائل والبيانات القياسية. يمكنك إلغاء الاشتراك في أي وقت عن طريق الرد بـ STOP على أي رسالة. للمساعدة، تواصل معنا على help@freshtrak.com. راجع الشروط والأحكام وسياسة الخصوصية الكاملة.",
 		register_about_family: "أخبرنا عن عائلتك",
 		family_count:
 			"كم عدد أفراد الأسرة الإضافيين في كل فئة عمرية؟ (لا تشمل نفسك)",
@@ -4509,6 +4521,8 @@ let localization = new LocalizedStrings({
 		no_email: "没有可用的电子邮件",
 		email_contact_you:
 			"可以通过电子邮件向您发送有关注册的更新和信息以及我们网络的更新吗",
+		sms_consent_text:
+			"通过提供您的电话号码，您同意接收来自FreshTrak或您当地食品银行的短信，用于确认您的预约和其他与预约相关的通信。消息频率可能会有所不同。可能会收取标准短信和数据费用。您可以随时通过回复STOP退订任何消息。如需帮助，请通过help@freshtrak.com联系我们。查看我们完整的条款与条件和隐私政策。",
 		register_about_family: "告诉我们你的家人",
 		family_count: "每个年龄段还有多少家庭成员？ （不要包括自己)",
 		seniors: "老年人",
@@ -5199,6 +5213,8 @@ let localization = new LocalizedStrings({
 		no_email: "कोई ईमेल उपलब्ध नहीं है",
 		email_contact_you:
 			"क्या आपको अपने पंजीकरण के बारे में जानकारी और जानकारी और हमारे नेटवर्क के अपडेट के साथ ईमेल करना ठीक है?",
+		sms_consent_text:
+			"अपना फ़ोन नंबर प्रदान करके, आप अपनी आरक्षण की पुष्टि और अन्य आरक्षण-संबंधित संचार के उद्देश्य से FreshTrak या अपने स्थानीय फूड बैंक से टेक्स्ट संदेश प्राप्त करने के लिए सहमत होते हैं। संदेश की आवृत्ति भिन्न हो सकती है। मानक मैसेजिंग और डेटा शुल्क लागू हो सकते हैं। आप किसी भी संदेश का जवाब STOP देकर किसी भी समय सदस्यता समाप्त कर सकते हैं। सहायता के लिए, help@freshtrak.com पर हमसे संपर्क करें। हमारे पूर्ण नियम एवं शर्तें और गोपनीयता नीति देखें।",
 		register_about_family: "अपने परिवार के बारे में हमें बताएं",
 		family_count:
 			"प्रत्येक आयु वर्ग में कितने अतिरिक्त परिवार के सदस्य हैं? (खुद को शामिल न करें)",
@@ -5929,6 +5945,8 @@ let localization = new LocalizedStrings({
 		no_email: "कुनै ईमेल उपलब्ध छैन",
 		email_contact_you:
 			"के तपाइँलाई तपाइँको पंजीकरणको बारेमा अद्यावधिक र जानकारी, र हाम्रो नेटवर्कमा अद्यावधिकको साथ ईमेल गर्न ठीक छ?",
+		sms_consent_text:
+			"तपाईंको फोन नम्बर प्रदान गरेर, तपाईं आफ्नो आरक्षण पुष्टि गर्ने र अन्य आरक्षण-सम्बन्धित सञ्चारका लागि FreshTrak वा तपाईंको स्थानीय फूड बैंकबाट पाठ सन्देशहरू प्राप्त गर्न सहमत हुनुहुन्छ। सन्देशको बारम्बारता फरक हुन सक्छ। मानक सन्देश र डाटा शुल्कहरू लागू हुन सक्छन्। तपाईं कुनै पनि सन्देशको STOP जवाफ दिएर कुनै पनि समयमा सदस्यता रद्द गर्न सक्नुहुन्छ। मद्दतको लागि, help@freshtrak.com मा हामीलाई सम्पर्क गर्नुहोस्। हाम्रो पूर्ण सर्त र शर्तहरू र गोपनीयता नीति हेर्नुहोस्।",
 		register_about_family: "तपाईंको परिवारको बारेमा हामीलाई भन्नुहोस्",
 		family_count:
 			"प्रत्येक उमेर समूहमा कति अतिरिक्त परिवार सदस्यहरू छन्? (आफूलाई समावेश नगर्नुहोस्)",

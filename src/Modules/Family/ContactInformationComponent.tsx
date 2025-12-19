@@ -78,19 +78,22 @@ const ContactInformationComponent: React.FC<
 								: false,
 						})}
 					/>
-					{errors.phone && (
-						<span
-							className="text-sm text-red-600"
-							data-testid="phone-error"
-						>
-							This field is required. If you have no phone check
-							"No Phone Available".
-						</span>
-					)}
-				</div>
-			)}
+				{errors.phone && (
+					<span
+						className="text-sm text-red-600"
+						data-testid="phone-error"
+					>
+						This field is required. If you have no phone check
+						"No Phone Available".
+					</span>
+				)}
+				<p className="text-xs text-gray-500 mt-2">
+					{localization.sms_consent_text}
+				</p>
+			</div>
+		)}
 
-			{/* No Phone Checkbox */}
+		{/* No Phone Checkbox */}
 			{phone === "" && (
 				<div className="flex items-center space-x-2">
 					<input

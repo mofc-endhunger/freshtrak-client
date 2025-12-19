@@ -768,6 +768,9 @@ export const HouseholdSetupWizard: React.FC<HouseholdSetupWizardProps> = ({
 									{errors.primary_phone.message}
 								</p>
 							)}
+							<p className="text-xs text-gray-500 mt-2">
+								{localization.sms_consent_text}
+							</p>
 						</div>
 					</div>
 				);

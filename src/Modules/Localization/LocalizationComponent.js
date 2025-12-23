@@ -100,6 +100,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "Check-in Code",
 		label_years_old: "years old",
 		alt_qr_code: "QR Code",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Cancel Reservation",
+		title_cancel_reservation: "Cancel Reservation",
+		message_cancel_confirmation: "Are you sure you want to cancel your reservation for this event?",
+		message_cancel_warning: "Your slot may be given to someone else and you may need to re-register.",
+		button_keep_reservation: "Keep Reservation",
+		button_confirm_cancel: "Yes, Cancel",
+		message_cancel_success: "Your reservation has been cancelled successfully.",
+		message_cancel_error: "Unable to cancel reservation. Please try again.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Past Events",
+		text_no_past_events: "No past events found.",
+		text_past_events_description: "Your event history from the last 2 weeks.",
+		status_cancelled: "Cancelled",
+		status_confirmed: "Confirmed",
+
 		event_type_in_person: "In-Person",
 		event_type_drive_through: "Drive-Through",
 		event_type_delivery: "Delivery",
@@ -886,6 +904,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "Código de Registro",
 		label_years_old: "años",
 		alt_qr_code: "Código QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Cancelar Reservación",
+		title_cancel_reservation: "Cancelar Reservación",
+		message_cancel_confirmation: "¿Está seguro de que desea cancelar su reservación para este evento?",
+		message_cancel_warning: "Su lugar puede ser dado a otra persona y es posible que deba registrarse nuevamente.",
+		button_keep_reservation: "Mantener Reservación",
+		button_confirm_cancel: "Sí, Cancelar",
+		message_cancel_success: "Su reservación ha sido cancelada exitosamente.",
+		message_cancel_error: "No se pudo cancelar la reservación. Por favor intente de nuevo.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Eventos Pasados",
+		text_no_past_events: "No se encontraron eventos pasados.",
+		text_past_events_description: "Su historial de eventos de las últimas 2 semanas.",
+		status_cancelled: "Cancelado",
+		status_confirmed: "Confirmado",
+
 		event_type_in_person: "En Persona",
 		event_type_drive_through: "Drive-Through",
 		event_type_delivery: "Entrega",
@@ -1667,6 +1703,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "Koodka Diiwangelinta",
 		label_years_old: "sano jir ah",
 		alt_qr_code: "Koodka QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Jooji Ballanqaadka",
+		title_cancel_reservation: "Jooji Ballanqaadka",
+		message_cancel_confirmation: "Ma hubtaa inaad joojisey ballanqaadkaaga dhacdadan?",
+		message_cancel_warning: "Booska aad haysatay waxaa la siin karaa qof kale waxaadna u baahan kartaa inaad mar kale is diiwaan geliso.",
+		button_keep_reservation: "Hay Ballanqaadka",
+		button_confirm_cancel: "Haa, Jooji",
+		message_cancel_success: "Ballanqaadkaaga si guul leh ayaa loo joojiyay.",
+		message_cancel_error: "Lama joojin karo ballanqaadka. Fadlan isku day mar kale.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Dhacdooyinkii Hore",
+		text_no_past_events: "Lama helin dhacdooyin hore.",
+		text_past_events_description: "Taariikhda dhacdooyinkaaga 2-dii toddobaad ee la soo dhaafay.",
+		status_cancelled: "La Joojiyay",
+		status_confirmed: "La Xaqiijiyay",
+
 		event_type_in_person: "Qof ahaan",
 		event_type_drive_through: "Wadista",
 		event_type_delivery: "Gaarsiinta",
@@ -2452,6 +2506,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "Код Регистрации",
 		label_years_old: "лет",
 		alt_qr_code: "QR-код",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Отменить бронирование",
+		title_cancel_reservation: "Отменить бронирование",
+		message_cancel_confirmation: "Вы уверены, что хотите отменить бронирование на это мероприятие?",
+		message_cancel_warning: "Ваше место может быть передано другому человеку, и вам может потребоваться зарегистрироваться снова.",
+		button_keep_reservation: "Сохранить бронирование",
+		button_confirm_cancel: "Да, отменить",
+		message_cancel_success: "Ваше бронирование успешно отменено.",
+		message_cancel_error: "Не удалось отменить бронирование. Пожалуйста, попробуйте снова.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Прошедшие мероприятия",
+		text_no_past_events: "Прошедшие мероприятия не найдены.",
+		text_past_events_description: "История ваших мероприятий за последние 2 недели.",
+		status_cancelled: "Отменено",
+		status_confirmed: "Подтверждено",
+
 		event_type_in_person: "Лично",
 		event_type_drive_through: "Автораздача",
 		event_type_delivery: "Доставка",
@@ -3238,6 +3310,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "Giriş Kodu",
 		label_years_old: "yaşında",
 		alt_qr_code: "QR Kod",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Rezervasyonu İptal Et",
+		title_cancel_reservation: "Rezervasyonu İptal Et",
+		message_cancel_confirmation: "Bu etkinlik için rezervasyonunuzu iptal etmek istediğinizden emin misiniz?",
+		message_cancel_warning: "Yeriniz başka birine verilebilir ve tekrar kayıt olmanız gerekebilir.",
+		button_keep_reservation: "Rezervasyonu Koru",
+		button_confirm_cancel: "Evet, İptal Et",
+		message_cancel_success: "Rezervasyonunuz başarıyla iptal edildi.",
+		message_cancel_error: "Rezervasyon iptal edilemedi. Lütfen tekrar deneyin.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Geçmiş Etkinlikler",
+		text_no_past_events: "Geçmiş etkinlik bulunamadı.",
+		text_past_events_description: "Son 2 haftadaki etkinlik geçmişiniz.",
+		status_cancelled: "İptal Edildi",
+		status_confirmed: "Onaylandı",
+
 		event_type_in_person: "Yüz Yüze",
 		event_type_drive_through: "Araçtan Alım",
 		event_type_delivery: "Teslimat",
@@ -4000,6 +4090,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "رمز تسجيل الوصول",
 		label_years_old: "سنة",
 		alt_qr_code: "رمز QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "إلغاء الحجز",
+		title_cancel_reservation: "إلغاء الحجز",
+		message_cancel_confirmation: "هل أنت متأكد أنك تريد إلغاء حجزك لهذا الحدث؟",
+		message_cancel_warning: "قد يُعطى مكانك لشخص آخر وقد تحتاج إلى التسجيل مرة أخرى.",
+		button_keep_reservation: "الاحتفاظ بالحجز",
+		button_confirm_cancel: "نعم، إلغاء",
+		message_cancel_success: "تم إلغاء حجزك بنجاح.",
+		message_cancel_error: "تعذر إلغاء الحجز. يرجى المحاولة مرة أخرى.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "الأحداث السابقة",
+		text_no_past_events: "لم يتم العثور على أحداث سابقة.",
+		text_past_events_description: "سجل أحداثك من الأسبوعين الماضيين.",
+		status_cancelled: "ملغى",
+		status_confirmed: "مؤكد",
+
 		event_type_in_person: "حضوري",
 		event_type_drive_through: "من السيارة",
 		event_type_delivery: "توصيل",
@@ -4740,6 +4848,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "签到码",
 		label_years_old: "岁",
 		alt_qr_code: "二维码",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "取消预约",
+		title_cancel_reservation: "取消预约",
+		message_cancel_confirmation: "您确定要取消此活动的预约吗？",
+		message_cancel_warning: "您的名额可能会被分配给其他人，您可能需要重新注册。",
+		button_keep_reservation: "保留预约",
+		button_confirm_cancel: "是的，取消",
+		message_cancel_success: "您的预约已成功取消。",
+		message_cancel_error: "无法取消预约。请重试。",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "过去的活动",
+		text_no_past_events: "未找到过去的活动。",
+		text_past_events_description: "您过去2周的活动历史。",
+		status_cancelled: "已取消",
+		status_confirmed: "已确认",
+
 		event_type_in_person: "现场",
 		event_type_drive_through: "免下车",
 		event_type_delivery: "配送",
@@ -5464,6 +5590,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "चेक-इन कोड",
 		label_years_old: "साल",
 		alt_qr_code: "QR कोड",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "आरक्षण रद्द करें",
+		title_cancel_reservation: "आरक्षण रद्द करें",
+		message_cancel_confirmation: "क्या आप वाकई इस कार्यक्रम के लिए अपना आरक्षण रद्द करना चाहते हैं?",
+		message_cancel_warning: "आपकी जगह किसी और को दी जा सकती है और आपको फिर से पंजीकरण करना पड़ सकता है।",
+		button_keep_reservation: "आरक्षण रखें",
+		button_confirm_cancel: "हाँ, रद्द करें",
+		message_cancel_success: "आपका आरक्षण सफलतापूर्वक रद्द कर दिया गया है।",
+		message_cancel_error: "आरक्षण रद्द करने में असमर्थ। कृपया पुनः प्रयास करें।",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "पिछले कार्यक्रम",
+		text_no_past_events: "कोई पिछले कार्यक्रम नहीं मिले।",
+		text_past_events_description: "पिछले 2 सप्ताह का आपका कार्यक्रम इतिहास।",
+		status_cancelled: "रद्द",
+		status_confirmed: "पुष्टि",
+
 		event_type_in_person: "व्यक्तिगत",
 		event_type_drive_through: "ड्राइव-थ्रू",
 		event_type_delivery: "डिलीवरी",
@@ -6226,6 +6370,24 @@ let localization = new LocalizedStrings({
 		label_check_in_code: "चेक-इन कोड",
 		label_years_old: "वर्ष",
 		alt_qr_code: "QR कोड",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "आरक्षण रद्द गर्नुहोस्",
+		title_cancel_reservation: "आरक्षण रद्द गर्नुहोस्",
+		message_cancel_confirmation: "के तपाईं यो कार्यक्रमको लागि आफ्नो आरक्षण रद्द गर्न चाहनुहुन्छ?",
+		message_cancel_warning: "तपाईंको स्थान अरू कसैलाई दिन सकिन्छ र तपाईंले फेरि दर्ता गर्नुपर्ने हुन सक्छ।",
+		button_keep_reservation: "आरक्षण राख्नुहोस्",
+		button_confirm_cancel: "हो, रद्द गर्नुहोस्",
+		message_cancel_success: "तपाईंको आरक्षण सफलतापूर्वक रद्द गरियो।",
+		message_cancel_error: "आरक्षण रद्द गर्न असमर्थ। कृपया फेरि प्रयास गर्नुहोस्।",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "विगतका कार्यक्रमहरू",
+		text_no_past_events: "विगतका कार्यक्रमहरू फेला परेनन्।",
+		text_past_events_description: "गत २ हप्ताको तपाईंको कार्यक्रम इतिहास।",
+		status_cancelled: "रद्द",
+		status_confirmed: "पुष्टि",
+
 		event_type_in_person: "व्यक्तिगत",
 		event_type_drive_through: "ड्राइव-थ्रू",
 		event_type_delivery: "डेलिभरी",

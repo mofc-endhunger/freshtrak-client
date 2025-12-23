@@ -22,7 +22,10 @@ import { StorageService } from "../../Utils/StorageService";
 import { LoadingCard } from "../Households/components/LoadingSpinner";
 import { UsersMeResponse } from "../Households/types/api.types";
 import localization from "../Localization/LocalizationComponent";
-import { YourReservations } from "../Reservations/components";
+import {
+	YourReservations,
+	PastEventsSection,
+} from "../Reservations/components";
 import { AccountInfoSection, HouseholdMembersSection } from "./components";
 
 /**
@@ -230,7 +233,11 @@ const AccountPage: React.FC = () => {
 
 						{/* Summary Tab Content */}
 						<TabsContent value="summary" className="mt-6">
+							{/* Upcoming Reservations */}
 							<YourReservations />
+
+							{/* Past Events / History */}
+							<PastEventsSection />
 						</TabsContent>
 
 						{/* Account Tab Content */}

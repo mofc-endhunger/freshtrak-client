@@ -210,13 +210,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<form
-						onSubmit={(e) => {
-							e.preventDefault();
-							handleSubmit(onSubmit)();
-						}}
-						className="space-y-4"
-					>
+					<div className="space-y-4">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							{/* First Name */}
 							<div className="space-y-2">
@@ -418,7 +412,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 								</Button>
 							</div>
 						</div>
-					</form>
+					</div>
 
 					{/* Progress indicator */}
 					<div className="flex justify-center space-x-2 mt-6">

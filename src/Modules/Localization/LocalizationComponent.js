@@ -85,6 +85,38 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Sign In / Create Account",
 		account_loading_message: "Please wait while we retrieve your data",
 
+		// TABS
+		tab_summary: "Summary",
+		tab_account: "Account",
+		text_profile: "Profile",
+
+		// RESERVATIONS
+		title_your_reservations: "Your Reservations",
+		text_you_have_event_coming_up: "You have an event coming up.",
+		text_no_upcoming_events: "No upcoming events found.",
+		text_browse_events_to_register: "Browse events to make a reservation.",
+		loading_reservations: "Loading reservations...",
+		error_loading_reservations: "Failed to load reservations",
+		label_check_in_code: "Check-in Code",
+		label_years_old: "years old",
+		alt_qr_code: "QR Code",
+		event_type_in_person: "In-Person",
+		event_type_drive_through: "Drive-Through",
+		event_type_delivery: "Delivery",
+		event_type_virtual: "Virtual",
+
+		// ACCOUNT SECTION
+		title_your_information: "Your Information",
+		card_title_information: "Information",
+		card_title_address: "Address",
+		card_title_contact: "Contact",
+		member_category_senior: "Senior",
+		member_category_adult: "Adult",
+		member_category_child: "Child",
+		badge_freshtrak_user: "FreshTrak User",
+		text_no_other_members: "No other household members added.",
+		link_update_household: "Update Household",
+
 		// BUTTONS & ACTIONS
 		button_continue: "Continue",
 		button_cancel: "Cancel",
@@ -838,6 +870,39 @@ let localization = new LocalizedStrings({
 		account_loading_message:
 			"Por favor espere mientras recuperamos sus datos",
 
+		// TABS
+		tab_summary: "Resumen",
+		tab_account: "Cuenta",
+		text_profile: "Perfil",
+
+		// RESERVATIONS
+		title_your_reservations: "Tus Reservaciones",
+		text_you_have_event_coming_up: "Tienes un evento próximo.",
+		text_no_upcoming_events: "No se encontraron eventos próximos.",
+		text_browse_events_to_register:
+			"Explora eventos para hacer una reservación.",
+		loading_reservations: "Cargando reservaciones...",
+		error_loading_reservations: "Error al cargar las reservaciones",
+		label_check_in_code: "Código de Registro",
+		label_years_old: "años",
+		alt_qr_code: "Código QR",
+		event_type_in_person: "En Persona",
+		event_type_drive_through: "Drive-Through",
+		event_type_delivery: "Entrega",
+		event_type_virtual: "Virtual",
+
+		// ACCOUNT SECTION
+		title_your_information: "Tu Información",
+		card_title_information: "Información",
+		card_title_address: "Dirección",
+		card_title_contact: "Contacto",
+		member_category_senior: "Mayor",
+		member_category_adult: "Adulto",
+		member_category_child: "Niño",
+		badge_freshtrak_user: "Usuario FreshTrak",
+		text_no_other_members: "No se han agregado otros miembros del hogar.",
+		link_update_household: "Actualizar Hogar",
+
 		// BUTTONS & ACTIONS
 		button_continue: "Continuar",
 		button_cancel: "Cancelar",
@@ -1586,6 +1651,38 @@ let localization = new LocalizedStrings({
 			"Gali ama samee akoon si aad waqti u badbaadiso mustaqbalka",
 		guest_signin_button: "Gali / Samee Akoon",
 		account_loading_message: "Fadlan sug inta aan ku soo celinno xogtaada",
+
+		// TABS
+		tab_summary: "Kooban",
+		tab_account: "Akoon",
+		text_profile: "Aqoonsiga",
+
+		// RESERVATIONS
+		title_your_reservations: "Ballanqaadkaaga",
+		text_you_have_event_coming_up: "Waxaad leedahay dhacdo soo socota.",
+		text_no_upcoming_events: "Lama helin dhacdo soo socota.",
+		text_browse_events_to_register: "Raadi dhacdo si aad u ballanqaadato.",
+		loading_reservations: "Ballanqaadyada ayaa la soo dejinayaa...",
+		error_loading_reservations: "Ballanqaadyada soo dejinta way fashilmeen",
+		label_check_in_code: "Koodka Diiwangelinta",
+		label_years_old: "sano jir ah",
+		alt_qr_code: "Koodka QR",
+		event_type_in_person: "Qof ahaan",
+		event_type_drive_through: "Wadista",
+		event_type_delivery: "Gaarsiinta",
+		event_type_virtual: "Farsamaysan",
+
+		// ACCOUNT SECTION
+		title_your_information: "Macluumaadkaaga",
+		card_title_information: "Macluumaad",
+		card_title_address: "Cinwaan",
+		card_title_contact: "Xiriir",
+		member_category_senior: "Waayeel",
+		member_category_adult: "Qof weyn",
+		member_category_child: "Ilmo",
+		badge_freshtrak_user: "Isticmaale FreshTrak",
+		text_no_other_members: "Xubnaha kale ee qoyska lama shixin.",
+		link_update_household: "Cusboonaysii Qoyska",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Sii Wadi",
@@ -2338,6 +2435,39 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Войти / Создать Аккаунт",
 		account_loading_message:
 			"Пожалуйста, подождите, пока мы получим ваши данные",
+
+		// TABS
+		tab_summary: "Сводка",
+		tab_account: "Аккаунт",
+		text_profile: "Профиль",
+
+		// RESERVATIONS
+		title_your_reservations: "Ваши Бронирования",
+		text_you_have_event_coming_up: "У вас есть предстоящее мероприятие.",
+		text_no_upcoming_events: "Предстоящих мероприятий не найдено.",
+		text_browse_events_to_register:
+			"Просмотрите мероприятия для бронирования.",
+		loading_reservations: "Загрузка бронирований...",
+		error_loading_reservations: "Ошибка загрузки бронирований",
+		label_check_in_code: "Код Регистрации",
+		label_years_old: "лет",
+		alt_qr_code: "QR-код",
+		event_type_in_person: "Лично",
+		event_type_drive_through: "Автораздача",
+		event_type_delivery: "Доставка",
+		event_type_virtual: "Онлайн",
+
+		// ACCOUNT SECTION
+		title_your_information: "Ваша Информация",
+		card_title_information: "Информация",
+		card_title_address: "Адрес",
+		card_title_contact: "Контакт",
+		member_category_senior: "Пожилой",
+		member_category_adult: "Взрослый",
+		member_category_child: "Ребёнок",
+		badge_freshtrak_user: "Пользователь FreshTrak",
+		text_no_other_members: "Другие члены семьи не добавлены.",
+		link_update_household: "Обновить Домохозяйство",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Продолжить",
@@ -3092,6 +3222,39 @@ let localization = new LocalizedStrings({
 			"Gelecekte zaman kazanmak için giriş yapın veya hesap oluşturun",
 		guest_signin_button: "Giriş Yap / Hesap Oluştur",
 
+		// TABS
+		tab_summary: "Özet",
+		tab_account: "Hesap",
+		text_profile: "Profil",
+
+		// RESERVATIONS
+		title_your_reservations: "Rezervasyonlarınız",
+		text_you_have_event_coming_up: "Yaklaşan bir etkinliğiniz var.",
+		text_no_upcoming_events: "Yaklaşan etkinlik bulunamadı.",
+		text_browse_events_to_register:
+			"Rezervasyon yapmak için etkinliklere göz atın.",
+		loading_reservations: "Rezervasyonlar yükleniyor...",
+		error_loading_reservations: "Rezervasyonlar yüklenemedi",
+		label_check_in_code: "Giriş Kodu",
+		label_years_old: "yaşında",
+		alt_qr_code: "QR Kod",
+		event_type_in_person: "Yüz Yüze",
+		event_type_drive_through: "Araçtan Alım",
+		event_type_delivery: "Teslimat",
+		event_type_virtual: "Sanal",
+
+		// ACCOUNT SECTION
+		title_your_information: "Bilgileriniz",
+		card_title_information: "Bilgi",
+		card_title_address: "Adres",
+		card_title_contact: "İletişim",
+		member_category_senior: "Yaşlı",
+		member_category_adult: "Yetişkin",
+		member_category_child: "Çocuk",
+		badge_freshtrak_user: "FreshTrak Kullanıcısı",
+		text_no_other_members: "Başka hane üyesi eklenmedi.",
+		link_update_household: "Haneyi Güncelle",
+
 		// BUTTONS & ACTIONS
 		button_continue: "Devam Et",
 		button_cancel: "İptal",
@@ -3822,6 +3985,38 @@ let localization = new LocalizedStrings({
 			"سجل الدخول أو أنشئ حسابًا لتوفير الوقت في المستقبل",
 		guest_signin_button: "تسجيل الدخول / إنشاء حساب",
 
+		// TABS
+		tab_summary: "ملخص",
+		tab_account: "الحساب",
+		text_profile: "الملف الشخصي",
+
+		// RESERVATIONS
+		title_your_reservations: "حجوزاتك",
+		text_you_have_event_coming_up: "لديك حدث قادم.",
+		text_no_upcoming_events: "لم يتم العثور على أحداث قادمة.",
+		text_browse_events_to_register: "تصفح الأحداث لإجراء حجز.",
+		loading_reservations: "جاري تحميل الحجوزات...",
+		error_loading_reservations: "فشل تحميل الحجوزات",
+		label_check_in_code: "رمز تسجيل الوصول",
+		label_years_old: "سنة",
+		alt_qr_code: "رمز QR",
+		event_type_in_person: "حضوري",
+		event_type_drive_through: "من السيارة",
+		event_type_delivery: "توصيل",
+		event_type_virtual: "افتراضي",
+
+		// ACCOUNT SECTION
+		title_your_information: "معلوماتك",
+		card_title_information: "المعلومات",
+		card_title_address: "العنوان",
+		card_title_contact: "الاتصال",
+		member_category_senior: "كبير السن",
+		member_category_adult: "بالغ",
+		member_category_child: "طفل",
+		badge_freshtrak_user: "مستخدم FreshTrak",
+		text_no_other_members: "لم تتم إضافة أفراد آخرين للأسرة.",
+		link_update_household: "تحديث الأسرة",
+
 		// BUTTONS & ACTIONS
 		button_continue: "متابعة",
 		button_cancel: "إلغاء",
@@ -4530,6 +4725,38 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt: "登录或创建账户以在未来节省时间",
 		guest_signin_button: "登录 / 创建账户",
 
+		// TABS
+		tab_summary: "摘要",
+		tab_account: "账户",
+		text_profile: "个人资料",
+
+		// RESERVATIONS
+		title_your_reservations: "您的预约",
+		text_you_have_event_coming_up: "您有一个即将到来的活动。",
+		text_no_upcoming_events: "未找到即将到来的活动。",
+		text_browse_events_to_register: "浏览活动以进行预约。",
+		loading_reservations: "正在加载预约...",
+		error_loading_reservations: "加载预约失败",
+		label_check_in_code: "签到码",
+		label_years_old: "岁",
+		alt_qr_code: "二维码",
+		event_type_in_person: "现场",
+		event_type_drive_through: "免下车",
+		event_type_delivery: "配送",
+		event_type_virtual: "线上",
+
+		// ACCOUNT SECTION
+		title_your_information: "您的信息",
+		card_title_information: "信息",
+		card_title_address: "地址",
+		card_title_contact: "联系方式",
+		member_category_senior: "老年人",
+		member_category_adult: "成人",
+		member_category_child: "儿童",
+		badge_freshtrak_user: "FreshTrak用户",
+		text_no_other_members: "未添加其他家庭成员。",
+		link_update_household: "更新家庭",
+
 		// BUTTONS & ACTIONS
 		button_continue: "继续",
 		button_cancel: "取消",
@@ -5221,6 +5448,38 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"भविष्य में समय बचाने के लिए साइन इन करें या खाता बनाएं",
 		guest_signin_button: "साइन इन / खाता बनाएं",
+
+		// TABS
+		tab_summary: "सारांश",
+		tab_account: "खाता",
+		text_profile: "प्रोफ़ाइल",
+
+		// RESERVATIONS
+		title_your_reservations: "आपकी आरक्षण",
+		text_you_have_event_coming_up: "आपके पास एक आगामी कार्यक्रम है।",
+		text_no_upcoming_events: "कोई आगामी कार्यक्रम नहीं मिला।",
+		text_browse_events_to_register: "आरक्षण के लिए कार्यक्रम ब्राउज़ करें।",
+		loading_reservations: "आरक्षण लोड हो रहे हैं...",
+		error_loading_reservations: "आरक्षण लोड करने में विफल",
+		label_check_in_code: "चेक-इन कोड",
+		label_years_old: "साल",
+		alt_qr_code: "QR कोड",
+		event_type_in_person: "व्यक्तिगत",
+		event_type_drive_through: "ड्राइव-थ्रू",
+		event_type_delivery: "डिलीवरी",
+		event_type_virtual: "वर्चुअल",
+
+		// ACCOUNT SECTION
+		title_your_information: "आपकी जानकारी",
+		card_title_information: "जानकारी",
+		card_title_address: "पता",
+		card_title_contact: "संपर्क",
+		member_category_senior: "वरिष्ठ",
+		member_category_adult: "वयस्क",
+		member_category_child: "बच्चा",
+		badge_freshtrak_user: "FreshTrak उपयोगकर्ता",
+		text_no_other_members: "कोई अन्य घरेलू सदस्य नहीं जोड़े गए।",
+		link_update_household: "परिवार अपडेट करें",
 
 		// BUTTONS & ACTIONS
 		button_continue: "जारी रखें",
@@ -5951,6 +6210,38 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"भविष्यमा समय बचाउन साइन इन गर्नुहोस् वा खाता बनाउनुहोस्",
 		guest_signin_button: "साइन इन / खाता बनाउनुहोस्",
+
+		// TABS
+		tab_summary: "सारांश",
+		tab_account: "खाता",
+		text_profile: "प्रोफाइल",
+
+		// RESERVATIONS
+		title_your_reservations: "तपाईंको आरक्षण",
+		text_you_have_event_coming_up: "तपाईंसँग आगामी कार्यक्रम छ।",
+		text_no_upcoming_events: "कुनै आगामी कार्यक्रम भेटिएन।",
+		text_browse_events_to_register: "आरक्षण गर्न कार्यक्रमहरू हेर्नुहोस्।",
+		loading_reservations: "आरक्षणहरू लोड हुँदैछ...",
+		error_loading_reservations: "आरक्षणहरू लोड गर्न असफल",
+		label_check_in_code: "चेक-इन कोड",
+		label_years_old: "वर्ष",
+		alt_qr_code: "QR कोड",
+		event_type_in_person: "व्यक्तिगत",
+		event_type_drive_through: "ड्राइव-थ्रू",
+		event_type_delivery: "डेलिभरी",
+		event_type_virtual: "भर्चुअल",
+
+		// ACCOUNT SECTION
+		title_your_information: "तपाईंको जानकारी",
+		card_title_information: "जानकारी",
+		card_title_address: "ठेगाना",
+		card_title_contact: "सम्पर्क",
+		member_category_senior: "वरिष्ठ",
+		member_category_adult: "वयस्क",
+		member_category_child: "बालक",
+		badge_freshtrak_user: "FreshTrak प्रयोगकर्ता",
+		text_no_other_members: "अन्य घरपरिवारका सदस्यहरू थपिएका छैनन्।",
+		link_update_household: "घरपरिवार अपडेट गर्नुहोस्",
 
 		// BUTTONS & ACTIONS
 		button_continue: "जारी राख्नुहोस्",

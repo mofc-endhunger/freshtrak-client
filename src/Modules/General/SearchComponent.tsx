@@ -164,6 +164,8 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 												);
 												setShowFilter(true);
 												setServiceCat("");
+												setAvailability("All");
+												setReservations(false);
 												onSubmitHandler({
 													zip_code: e.target.value,
 													distance:

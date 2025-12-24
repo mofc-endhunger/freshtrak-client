@@ -19,7 +19,6 @@ import { HouseholdRegistrationService } from "../../Services/HouseholdRegistrati
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { UsersMeResponse } from "../Households/types/api.types";
 import { useAuth } from "../Authentication/AuthContext";
-import { StorageService } from "../../Utils/StorageService";
 
 import { Event } from "./types/family.types";
 import localization from "../Localization/LocalizationComponent";
@@ -156,10 +155,15 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			const household = await householdsApiService.getUsersMe();
 			setHouseholdData(household);
 
-			// Check if user has completed household setup via the completionStatus flag
-			const signUpState = StorageService.getHouseholdSignUpState();
-			const hasCompletedSetup =
-				signUpState?.completionStatus === "completed";
+			// Check if user has completed household setup by verifying DOB is not placeholder
+			// When household is auto-created on signup, DOB defaults to "1900-01-01"
+			const headOfHousehold = household?.members?.find(
+				(member) => member.is_head_of_household === 1
+			);
+			const hasCompletedSetup = Boolean(
+				headOfHousehold?.date_of_birth &&
+					headOfHousehold.date_of_birth !== "1900-01-01"
+			);
 
 			if (hasCompletedSetup) {
 				// Show confirmation modal for users who completed household setup

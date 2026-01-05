@@ -106,7 +106,8 @@ const AccountPage: React.FC = () => {
 					);
 					const result = await createUserRecordSingleAttempt(
 						householdsApiService,
-						user?.name
+						user?.name,
+						user?.email
 					);
 
 					if (result.success) {

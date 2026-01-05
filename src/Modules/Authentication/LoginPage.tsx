@@ -166,11 +166,22 @@ const LoginPage: React.FC = () => {
 	const handleConfirmSuccess = async (): Promise<void> => {
 		setErrorMessage("");
 
+		// Get pending user data from localStorage (stored during signup)
+		// This contains the actual name the user entered, not just the email prefix
+		const pendingUser = StorageService.getItem<{
+			name?: string;
+			email?: string;
+		}>("pendingUser");
+
+		// Use the actual name from pendingUser, falling back to user context or email prefix
+		const userEmail = pendingEmail || pendingUser?.email || user?.email;
+		const userName = pendingUser?.name || user?.name || userEmail?.split("@")[0];
+
 		// Mark this user as a new user who just completed email confirmation
 		// This will trigger the household setup offer in HouseholdSignUpWrapper
 		// Note: No expiration - flag is cleared when processed by HouseholdSignUpWrapper
-		if (pendingEmail) {
-			setNewUserSignupFlag(pendingEmail, false);
+		if (userEmail) {
+			setNewUserSignupFlag(userEmail, false);
 		}
 
 		// Wait for AuthContext to finish signing in the user after confirmation
@@ -179,18 +190,18 @@ const LoginPage: React.FC = () => {
 		// Attempt to create user record immediately after confirmation
 		// This ensures user always has a backend record, even if they abandon the setup offer
 		try {
-			const userName = user?.name || pendingEmail?.split("@")[0];
 			const result = await createUserRecordWithRetry(
 				householdsApiService,
 				{
 					name: userName,
+					email: userEmail,
 					maxRetries: 3,
 				}
 			);
 
 			// Update flag to indicate user record was created
-			if (result.success && pendingEmail) {
-				setNewUserSignupFlag(pendingEmail, true);
+			if (result.success && userEmail) {
+				setNewUserSignupFlag(userEmail, true);
 			}
 		} catch (error) {
 			// Log error but don't block navigation - fallback will handle this

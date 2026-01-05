@@ -346,10 +346,15 @@ export class HouseholdsApiService {
     }
 
     // Map the data to the new API format
+    // TODO: Re-add email field once backend /api/users endpoint accepts it in request body
+    // Currently backend gets email from Cognito JWT token, but explicit email in body
+    // would ensure it's properly stored. Uncomment when backend is updated:
+    // email: data.primary_email || data.email || null,
     const apiData = {
       first_name: data.primary_first_name || '',
       last_name: data.primary_last_name || '',
       phone: data.phone || null,
+      email: data.primary_email || data.email || null,
       address_line_1: data.address_line_1 || null,
       city: data.city || null,
       state: data.state || null,

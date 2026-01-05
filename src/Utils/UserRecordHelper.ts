@@ -10,6 +10,7 @@ import { StorageService } from "./StorageService";
 
 export interface CreateUserRecordOptions {
 	name?: string;
+	email?: string;
 	maxRetries?: number;
 	onSuccess?: () => void;
 	onError?: (error: any) => void;
@@ -24,8 +25,9 @@ export interface CreateUserRecordResult {
 /**
  * Builds minimal user data object for creating a new user record
  * @param name - User's full name (will be split into first/last)
+ * @param email - User's email address
  */
-export const buildMinimalUserData = (name?: string) => {
+export const buildMinimalUserData = (name?: string, email?: string) => {
 	const firstName = name?.split(" ")[0] || "User";
 	const lastName = name?.split(" ").slice(1).join(" ") || "";
 
@@ -33,6 +35,7 @@ export const buildMinimalUserData = (name?: string) => {
 		// Required fields for CreateHouseholdRequest
 		primary_first_name: firstName,
 		primary_last_name: lastName,
+		primary_email: email,
 		primary_date_of_birth: "",
 		preferred_language: "en",
 		address_line_1: "",
@@ -42,6 +45,7 @@ export const buildMinimalUserData = (name?: string) => {
 		// Additional fields for new API
 		first_name: firstName,
 		last_name: lastName,
+		email: email,
 		phone: undefined,
 		date_of_birth: undefined,
 		permission_to_email: undefined,
@@ -125,8 +129,8 @@ export const createUserRecordWithRetry = async (
 	apiService: HouseholdsApiService,
 	options: CreateUserRecordOptions = {}
 ): Promise<CreateUserRecordResult> => {
-	const { name, maxRetries = 3, onSuccess, onError } = options;
-	const minimalUserData = buildMinimalUserData(name);
+	const { name, email, maxRetries = 3, onSuccess, onError } = options;
+	const minimalUserData = buildMinimalUserData(name, email);
 
 	for (let attempt = 1; attempt <= maxRetries; attempt++) {
 		try {
@@ -176,13 +180,15 @@ export const createUserRecordWithRetry = async (
  * 
  * @param apiService - HouseholdsApiService instance
  * @param name - User's full name
+ * @param email - User's email address
  * @returns Promise resolving to CreateUserRecordResult
  */
 export const createUserRecordSingleAttempt = async (
 	apiService: HouseholdsApiService,
-	name?: string
+	name?: string,
+	email?: string
 ): Promise<CreateUserRecordResult> => {
-	const minimalUserData = buildMinimalUserData(name);
+	const minimalUserData = buildMinimalUserData(name, email);
 
 	try {
 		const response = await apiService.createHousehold(minimalUserData);

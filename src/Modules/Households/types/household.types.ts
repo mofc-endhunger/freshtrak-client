@@ -105,6 +105,7 @@ export interface CreateHouseholdRequest {
   child_count?: number;
   senior_count?: number;
   // Additional fields for new API
+  email?: string;
   phone?: string;
   date_of_birth?: string;
   permission_to_email?: boolean;

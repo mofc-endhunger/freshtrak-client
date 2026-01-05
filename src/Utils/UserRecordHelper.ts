@@ -5,12 +5,12 @@
  * Handles retry logic, error handling, and localStorage management.
  */
 
+import { fetchUserAttributes } from "aws-amplify/auth";
 import { HouseholdsApiService } from "../Services/HouseholdsApiService";
 import { StorageService } from "./StorageService";
 
 export interface CreateUserRecordOptions {
 	name?: string;
-	email?: string;
 	maxRetries?: number;
 	onSuccess?: () => void;
 	onError?: (error: any) => void;
@@ -25,9 +25,8 @@ export interface CreateUserRecordResult {
 /**
  * Builds minimal user data object for creating a new user record
  * @param name - User's full name (will be split into first/last)
- * @param email - User's email address
  */
-export const buildMinimalUserData = (name?: string, email?: string) => {
+export const buildMinimalUserData = (name?: string) => {
 	const firstName = name?.split(" ")[0] || "User";
 	const lastName = name?.split(" ").slice(1).join(" ") || "";
 
@@ -35,7 +34,6 @@ export const buildMinimalUserData = (name?: string, email?: string) => {
 		// Required fields for CreateHouseholdRequest
 		primary_first_name: firstName,
 		primary_last_name: lastName,
-		primary_email: email,
 		primary_date_of_birth: "",
 		preferred_language: "en",
 		address_line_1: "",
@@ -45,7 +43,6 @@ export const buildMinimalUserData = (name?: string, email?: string) => {
 		// Additional fields for new API
 		first_name: firstName,
 		last_name: lastName,
-		email: email,
 		phone: undefined,
 		date_of_birth: undefined,
 		permission_to_email: undefined,
@@ -129,8 +126,8 @@ export const createUserRecordWithRetry = async (
 	apiService: HouseholdsApiService,
 	options: CreateUserRecordOptions = {}
 ): Promise<CreateUserRecordResult> => {
-	const { name, email, maxRetries = 3, onSuccess, onError } = options;
-	const minimalUserData = buildMinimalUserData(name, email);
+	const { name, maxRetries = 3, onSuccess, onError } = options;
+	const minimalUserData = buildMinimalUserData(name);
 
 	for (let attempt = 1; attempt <= maxRetries; attempt++) {
 		try {
@@ -180,15 +177,13 @@ export const createUserRecordWithRetry = async (
  * 
  * @param apiService - HouseholdsApiService instance
  * @param name - User's full name
- * @param email - User's email address
  * @returns Promise resolving to CreateUserRecordResult
  */
 export const createUserRecordSingleAttempt = async (
 	apiService: HouseholdsApiService,
-	name?: string,
-	email?: string
+	name?: string
 ): Promise<CreateUserRecordResult> => {
-	const minimalUserData = buildMinimalUserData(name, email);
+	const minimalUserData = buildMinimalUserData(name);
 
 	try {
 		const response = await apiService.createHousehold(minimalUserData);
@@ -203,6 +198,138 @@ export const createUserRecordSingleAttempt = async (
 		}
 		console.error("User creation failed:", error);
 		return { success: false, error };
+	}
+};
+
+// ============================================================================
+// Post-Confirmation User Record Creation
+// ============================================================================
+
+/**
+ * Options for creating user record after email confirmation
+ */
+export interface PostConfirmationOptions {
+	pendingEmail?: string;
+	authUser?: { name?: string; email?: string } | null;
+	apiService: HouseholdsApiService;
+	maxRetries?: number;
+}
+
+/**
+ * Result of post-confirmation user record creation
+ */
+export interface PostConfirmationResult {
+	success: boolean;
+	userName?: string;
+	userEmail?: string;
+	alreadyExists?: boolean;
+	error?: any;
+}
+
+/**
+ * Resolves user name using multiple fallback sources
+ * 
+ * Resolution order:
+ * 1. pendingUser.name from localStorage (stored during signup)
+ * 2. Auth context user name
+ * 3. Cognito user attributes (fetched from AWS)
+ * 4. Email prefix (last resort)
+ * 
+ * @param pendingEmail - Email from pending confirmation state
+ * @param authUser - User object from auth context
+ * @returns Object containing resolved userName and userEmail
+ */
+export const resolveUserNameWithFallback = async (
+	pendingEmail?: string,
+	authUser?: { name?: string; email?: string } | null
+): Promise<{ userName: string; userEmail: string | undefined }> => {
+	// Get pending user data from localStorage (stored during signup)
+	const pendingUser = StorageService.getItem<{
+		name?: string;
+		email?: string;
+	}>("pendingUser");
+
+	let userName = pendingUser?.name || authUser?.name;
+	let userEmail = pendingEmail || pendingUser?.email || authUser?.email;
+
+	// If name not found in localStorage or context, try fetching from Cognito attributes
+	// This handles the case where user cleared localStorage after signup but before confirmation
+	if (!userName || userName === userEmail?.split("@")[0]) {
+		try {
+			const cognitoAttributes = await fetchUserAttributes();
+			if (cognitoAttributes?.name) {
+				userName = cognitoAttributes.name;
+			}
+			if (!userEmail && cognitoAttributes?.email) {
+				userEmail = cognitoAttributes.email;
+			}
+		} catch (error) {
+			console.warn("Could not fetch Cognito user attributes:", error);
+		}
+	}
+
+	// Final fallback to email prefix if still no name
+	if (!userName) {
+		userName = userEmail?.split("@")[0] || "User";
+	}
+
+	return { userName, userEmail };
+};
+
+/**
+ * Creates user record after email confirmation with proper name resolution
+ * 
+ * This function handles the complete post-confirmation flow:
+ * 1. Resolves user name from multiple sources (localStorage, Cognito, etc.)
+ * 2. Sets the new user signup flag
+ * 3. Creates the user record in the backend
+ * 4. Updates the signup flag on success
+ * 
+ * @param options - Configuration options
+ * @returns Promise resolving to PostConfirmationResult
+ */
+export const createUserRecordAfterConfirmation = async (
+	options: PostConfirmationOptions
+): Promise<PostConfirmationResult> => {
+	const { pendingEmail, authUser, apiService, maxRetries = 3 } = options;
+
+	// Resolve user name with fallbacks
+	const { userName, userEmail } = await resolveUserNameWithFallback(
+		pendingEmail,
+		authUser
+	);
+
+	// Mark this user as a new user who just completed email confirmation
+	if (userEmail) {
+		setNewUserSignupFlag(userEmail, false);
+	}
+
+	// Attempt to create user record
+	try {
+		const result = await createUserRecordWithRetry(apiService, {
+			name: userName,
+			maxRetries,
+		});
+
+		// Update flag to indicate user record was created
+		if (result.success && userEmail) {
+			setNewUserSignupFlag(userEmail, true);
+		}
+
+		return {
+			success: result.success,
+			userName,
+			userEmail,
+			alreadyExists: result.alreadyExists,
+		};
+	} catch (error) {
+		console.error("Error creating user record on confirmation:", error);
+		return {
+			success: false,
+			userName,
+			userEmail,
+			error,
+		};
 	}
 };
 

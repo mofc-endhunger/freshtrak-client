@@ -16,10 +16,7 @@ import { StorageService } from "../../Utils/StorageService";
 import localization from "../Localization/LocalizationComponent";
 import { useAuth } from "./AuthContext";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import {
-	createUserRecordWithRetry,
-	setNewUserSignupFlag,
-} from "../../Utils/UserRecordHelper";
+import { createUserRecordAfterConfirmation } from "../../Utils/UserRecordHelper";
 
 /**
  * LoginPage - Full-page login interface with authentication forms
@@ -166,47 +163,16 @@ const LoginPage: React.FC = () => {
 	const handleConfirmSuccess = async (): Promise<void> => {
 		setErrorMessage("");
 
-		// Get pending user data from localStorage (stored during signup)
-		// This contains the actual name the user entered, not just the email prefix
-		const pendingUser = StorageService.getItem<{
-			name?: string;
-			email?: string;
-		}>("pendingUser");
-
-		// Use the actual name from pendingUser, falling back to user context or email prefix
-		const userEmail = pendingEmail || pendingUser?.email || user?.email;
-		const userName = pendingUser?.name || user?.name || userEmail?.split("@")[0];
-
-		// Mark this user as a new user who just completed email confirmation
-		// This will trigger the household setup offer in HouseholdSignUpWrapper
-		// Note: No expiration - flag is cleared when processed by HouseholdSignUpWrapper
-		if (userEmail) {
-			setNewUserSignupFlag(userEmail, false);
-		}
-
 		// Wait for AuthContext to finish signing in the user after confirmation
 		await new Promise((resolve) => setTimeout(resolve, 1500));
 
-		// Attempt to create user record immediately after confirmation
-		// This ensures user always has a backend record, even if they abandon the setup offer
-		try {
-			const result = await createUserRecordWithRetry(
-				householdsApiService,
-				{
-					name: userName,
-					email: userEmail,
-					maxRetries: 3,
-				}
-			);
-
-			// Update flag to indicate user record was created
-			if (result.success && userEmail) {
-				setNewUserSignupFlag(userEmail, true);
-			}
-		} catch (error) {
-			// Log error but don't block navigation - fallback will handle this
-			console.error("Error creating user record on confirmation:", error);
-		}
+		// Create user record with proper name resolution (localStorage → Cognito → email prefix)
+		await createUserRecordAfterConfirmation({
+			pendingEmail,
+			authUser: user,
+			apiService: householdsApiService,
+			maxRetries: 3,
+		});
 
 		// Redirect to home page after successful confirmation
 		// Note: Household setup will be offered via HouseholdSignUpWrapper

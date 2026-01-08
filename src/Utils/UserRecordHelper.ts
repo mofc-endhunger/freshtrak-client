@@ -213,6 +213,8 @@ export interface PostConfirmationOptions {
 	authUser?: { name?: string; email?: string } | null;
 	apiService: HouseholdsApiService;
 	maxRetries?: number;
+	/** Guest token saved before Cognito sign-in (which clears storage) */
+	guestToken?: string | null;
 }
 
 /**
@@ -223,7 +225,18 @@ export interface PostConfirmationResult {
 	userName?: string;
 	userEmail?: string;
 	alreadyExists?: boolean;
+	wasGuestUpgrade?: boolean;
+	userId?: number;
+	householdId?: number;
+	/**
+	 * Whether an empty household was created (requires user to update later)
+	 * - true: empty household created, show setup offer
+	 * - false: household created from guest data, no setup needed
+	 */
+	householdCreated?: boolean;
 	error?: any;
+	/** Localization key for user-facing message (e.g., "error_account_already_exists") */
+	messageKey?: string;
 }
 
 /**
@@ -280,10 +293,11 @@ export const resolveUserNameWithFallback = async (
  * Creates user record after email confirmation with proper name resolution
  * 
  * This function handles the complete post-confirmation flow:
- * 1. Resolves user name from multiple sources (localStorage, Cognito, etc.)
- * 2. Sets the new user signup flag
- * 3. Creates the user record in the backend
- * 4. Updates the signup flag on success
+ * 1. Checks if user was a guest and attempts to upgrade
+ *    - If upgrade fails, returns error with user-facing message (no fallback)
+ * 2. If not a guest, creates new user record via POST /api/users
+ * 3. Resolves user name from multiple sources (localStorage, Cognito, etc.)
+ * 4. Updates the user record with proper name after upgrade
  * 
  * @param options - Configuration options
  * @returns Promise resolving to PostConfirmationResult
@@ -291,7 +305,7 @@ export const resolveUserNameWithFallback = async (
 export const createUserRecordAfterConfirmation = async (
 	options: PostConfirmationOptions
 ): Promise<PostConfirmationResult> => {
-	const { pendingEmail, authUser, apiService, maxRetries = 3 } = options;
+	const { pendingEmail, authUser, apiService, maxRetries = 3, guestToken: passedGuestToken } = options;
 
 	// Resolve user name with fallbacks
 	const { userName, userEmail } = await resolveUserNameWithFallback(
@@ -304,7 +318,95 @@ export const createUserRecordAfterConfirmation = async (
 		setNewUserSignupFlag(userEmail, false);
 	}
 
-	// Attempt to create user record
+	// Check if user was a guest - if so, try to upgrade instead of creating new user
+	// Note: guestToken should be passed in since Cognito sign-in clears storage
+	const guestUser = StorageService.getGuestUser();
+	const guestToken = passedGuestToken || guestUser?.token;
+
+	if (guestToken) {
+		try {
+			const upgradeResult = await apiService.upgradeGuestUser(guestToken);
+
+			// Clear guest token after upgrade attempt (regardless of result)
+			StorageService.removeItem("freshtrak_user_guest");
+			StorageService.removeItem("userProfile"); // Legacy key
+			StorageService.clearUserToken();
+
+			if (upgradeResult.upgraded) {
+				// Store household ID in localStorage (same format as non-guest registration)
+				const householdStorage = {
+					userId: upgradeResult.user_id,
+					household_id: upgradeResult.household_id,
+				};
+				StorageService.setItem("household", householdStorage);
+
+				// Update flag to indicate user record was created
+				if (userEmail) {
+					setNewUserSignupFlag(userEmail, true);
+				}
+
+				return {
+					success: true,
+					userName,
+					userEmail,
+					wasGuestUpgrade: true,
+					userId: upgradeResult.user_id,
+					householdId: upgradeResult.household_id,
+					householdCreated: upgradeResult.household_created,
+				};
+			}
+
+			// upgraded is false - unexpected, return error
+			return {
+				success: false,
+				userName,
+				userEmail,
+				wasGuestUpgrade: false,
+				messageKey: "error_guest_upgrade_failed",
+			};
+		} catch (upgradeError: any) {
+			// Clear guest token on any error
+			StorageService.removeItem("freshtrak_user_guest");
+			StorageService.removeItem("userProfile");
+			StorageService.clearUserToken();
+
+			// Handle 409 Conflict - Cognito account already linked to another user
+			if (upgradeError?.status === 409 || upgradeError?.type === "CONFLICT") {
+				return {
+					success: false,
+					userName,
+					userEmail,
+					wasGuestUpgrade: false,
+					error: upgradeError,
+					messageKey: "error_account_already_exists",
+				};
+			}
+
+			// Handle 400 - Invalid/expired guest token
+			if (upgradeError?.status === 400 || upgradeError?.type === "BAD_REQUEST") {
+				return {
+					success: false,
+					userName,
+					userEmail,
+					wasGuestUpgrade: false,
+					error: upgradeError,
+					messageKey: "error_guest_upgrade_failed",
+				};
+			}
+
+			// Handle other errors (401, 500, etc.)
+			return {
+				success: false,
+				userName,
+				userEmail,
+				wasGuestUpgrade: false,
+				error: upgradeError,
+				messageKey: "error_guest_upgrade_failed",
+			};
+		}
+	}
+
+	// No guest token - create new user record
 	try {
 		const result = await createUserRecordWithRetry(apiService, {
 			name: userName,
@@ -321,6 +423,7 @@ export const createUserRecordAfterConfirmation = async (
 			userName,
 			userEmail,
 			alreadyExists: result.alreadyExists,
+			wasGuestUpgrade: false,
 		};
 	} catch (error) {
 		console.error("Error creating user record on confirmation:", error);

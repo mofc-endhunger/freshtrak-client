@@ -36,6 +36,7 @@ export class HouseholdRegistrationService {
   /**
    * Register user with household data using existing registration API
    * @param timeslotData - Event and timeslot information
+   * @param counts - Optional household member counts
    * @returns Promise<RegistrationResponse>
    */
   async registerWithHousehold(
@@ -43,14 +44,20 @@ export class HouseholdRegistrationService {
       eventId: string;
       eventDateId: string;
       eventSlotId: string;
+    },
+    counts?: {
+      seniors: number;
+      adults: number;
+      children: number;
     }
   ): Promise<RegistrationResponse> {
-    return this.registerWithRetry(timeslotData, 0);
+    return this.registerWithRetry(timeslotData, counts, 0);
   }
 
   /**
    * Register with retry logic for transient errors
    * @param timeslotData - Event and timeslot information
+   * @param counts - Optional household member counts
    * @param attempt - Current attempt number
    * @returns Promise<RegistrationResponse>
    */
@@ -60,6 +67,7 @@ export class HouseholdRegistrationService {
       eventDateId: string;
       eventSlotId: string;
     },
+    counts: { seniors: number; adults: number; children: number } | undefined,
     attempt: number
   ): Promise<RegistrationResponse> {
     try {
@@ -68,11 +76,17 @@ export class HouseholdRegistrationService {
         'Content-Type': 'application/json',
       };
 
-      const payload = {
+      // Build payload with counts nested for registered users
+      const payload: Record<string, any> = {
         event_id: timeslotData.eventId,
         event_date_id: timeslotData.eventDateId,
         event_slot_id: timeslotData.eventSlotId,
       };
+
+      // Add counts in nested format for registered users
+      if (counts) {
+        payload.counts = counts;
+      }
 
 
       const response = await axios.post<RegistrationResponse>(
@@ -97,7 +111,7 @@ export class HouseholdRegistrationService {
       // Check if we should retry
       if (registrationError.retryable && attempt < this.maxRetryAttempts - 1) {
         await this.delay(this.retryDelay);
-        return this.registerWithRetry(timeslotData, attempt + 1);
+        return this.registerWithRetry(timeslotData, counts, attempt + 1);
       }
 
       return {

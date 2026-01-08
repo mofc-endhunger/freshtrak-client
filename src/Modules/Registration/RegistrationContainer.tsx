@@ -306,16 +306,17 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						gender: primaryMember
 							? getGenderForForm(primaryMember.gender_id || null)
 							: user.gender || "",
-						// Prefill household member counts
-						adults_in_household:
-							householdData.counts?.adults ||
-							user.adults_in_household,
-						children_in_household:
-							householdData.counts?.children ||
-							user.children_in_household,
-						seniors_in_household:
-							householdData.counts?.seniors ||
-							user.seniors_in_household,
+					// Prefill household member counts
+					// Subtract 1 from adults because head of household is counted as an adult
+					adults_in_household:
+						Math.max(0, (householdData.counts?.adults || 0) - 1) ||
+						user.adults_in_household,
+					children_in_household:
+						householdData.counts?.children ||
+						user.children_in_household,
+					seniors_in_household:
+						householdData.counts?.seniors ||
+						user.seniors_in_household,
 						// Prefill household name if available
 						identification_code:
 							householdData.identification_code ||
@@ -799,17 +800,38 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					? { "X-Guest-Token": `${userToken}` }
 					: { Authorization: `Bearer ${getCognitoToken()}` };
 
-			await axios.post<ApiResponse<any>>(
-				CREATE_RESERVATION,
-				eventSlotId
-					? {
-							event_id: selectedEvent.eventId,
-							event_date_id,
-							event_slot_id,
-					  }
-					: { event_id: selectedEvent.eventId, event_date_id },
-				{ headers }
-			);
+		// Build registration payload with counts based on user type
+		const basePayload = eventSlotId
+			? {
+					event_id: selectedEvent.eventId,
+					event_date_id,
+					event_slot_id,
+			  }
+			: { event_id: selectedEvent.eventId, event_date_id };
+
+		// Add counts in appropriate format based on user type
+		// Guest users: flat fields (seniors, adults, children)
+		// Registered users: nested counts object
+		const countsPayload =
+			userType === "guest"
+				? {
+						seniors: updatedUser.seniors_in_household || 0,
+						adults: updatedUser.adults_in_household || 0,
+						children: updatedUser.children_in_household || 0,
+				  }
+				: {
+						counts: {
+							seniors: updatedUser.seniors_in_household || 0,
+							adults: updatedUser.adults_in_household || 0,
+							children: updatedUser.children_in_household || 0,
+						},
+				  };
+
+		await axios.post<ApiResponse<any>>(
+			CREATE_RESERVATION,
+			{ ...basePayload, ...countsPayload },
+			{ headers }
+		);
 			TagManager.dataLayer({
 				dataLayer: {
 					event: "reservation",

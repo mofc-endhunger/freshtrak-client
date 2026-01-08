@@ -34,8 +34,13 @@ const LoginPage: React.FC = () => {
 	const [pendingEmail, setPendingEmail] = useState<string>("");
 	const [resetEmail, setResetEmail] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
+	// Store guest token early, before confirmation flow clears it
+	const [savedGuestToken] = useState<string | null>(() => {
+		const guestUser = StorageService.getGuestUser();
+		return guestUser?.token || null;
+	});
 	const navigate = useNavigate();
-	const { resendConfirmationCode, user } = useAuth();
+	const { resendConfirmationCode, user, setNeedsHouseholdSetup } = useAuth();
 
 	// Memoized API service instance for user creation
 	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
@@ -163,16 +168,36 @@ const LoginPage: React.FC = () => {
 	const handleConfirmSuccess = async (): Promise<void> => {
 		setErrorMessage("");
 
-		// Wait for AuthContext to finish signing in the user after confirmation
-		await new Promise((resolve) => setTimeout(resolve, 1500));
-
 		// Create user record with proper name resolution (localStorage → Cognito → email prefix)
-		await createUserRecordAfterConfirmation({
+		// This also handles guest user upgrade if applicable
+		// Note: savedGuestToken was captured on component mount, before confirmation cleared storage
+		// Note: The helper function waits for Cognito token to be available
+		const result = await createUserRecordAfterConfirmation({
 			pendingEmail,
 			authUser: user,
 			apiService: householdsApiService,
 			maxRetries: 3,
+			guestToken: savedGuestToken,
 		});
+
+		// Handle errors - display localized message
+		if (result.messageKey) {
+			const message =
+				localization.getString(result.messageKey) ||
+				localization.error_guest_upgrade_failed;
+			setErrorMessage(message);
+			setCurrentTab("signin");
+			return;
+		}
+
+		// Set household setup state based on result
+		// - Guest upgrade: use householdCreated (true = empty household, needs setup)
+		// - Non-guest: always true (new user needs setup)
+		if (result.wasGuestUpgrade) {
+			setNeedsHouseholdSetup(result.householdCreated ?? true);
+		} else {
+			setNeedsHouseholdSetup(true);
+		}
 
 		// Redirect to home page after successful confirmation
 		// Note: Household setup will be offered via HouseholdSignUpWrapper

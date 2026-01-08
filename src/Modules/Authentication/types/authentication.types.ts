@@ -77,6 +77,10 @@ export interface AuthContextType {
   user: any | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  /** Whether the user needs to complete household setup (null = not yet determined) */
+  needsHouseholdSetup: boolean | null;
+  /** Set whether household setup is needed (called after signup/upgrade) */
+  setNeedsHouseholdSetup: (value: boolean | null) => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   confirmSignUp: (email: string, code: string) => Promise<void>;

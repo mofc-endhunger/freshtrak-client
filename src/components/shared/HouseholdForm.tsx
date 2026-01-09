@@ -225,8 +225,57 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		}
 	}, [prefilledData, reset]);
 
-	// Handle member deletion
+	// Calculate age from date of birth
+	const calculateAge = (dateOfBirth: string): number => {
+		if (!dateOfBirth || dateOfBirth === "1900-01-01") {
+			return 0;
+		}
+		const today = new Date();
+		const birthDate = new Date(dateOfBirth);
+		let age = today.getFullYear() - birthDate.getFullYear();
+		const monthDiff = today.getMonth() - birthDate.getMonth();
+		if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+			age--;
+		}
+		return age;
+	};
+
+	// Determine member category based on age
+	const getMemberCategory = (dateOfBirth: string): 'senior' | 'adult' | 'child' | null => {
+		const age = calculateAge(dateOfBirth);
+		if (age === 0) return null; // Unknown age
+		if (age >= 65) return 'senior';
+		if (age >= 18) return 'adult';
+		return 'child';
+	};
+
+	// Handle member deletion with automatic count update
 	const handleDeleteMember = (memberId: number): void => {
+		// Find the member being deleted
+		const member = currentHouseholdMembers.find((m: any) => m.id === memberId);
+		
+		if (member && member.date_of_birth) {
+			const category = getMemberCategory(member.date_of_birth);
+			
+			// Decrement the appropriate count
+			if (category === 'senior') {
+				const currentCount = watchField('seniors_in_household') || 0;
+				if (currentCount > 0) {
+					setValue('seniors_in_household', currentCount - 1);
+				}
+			} else if (category === 'adult') {
+				const currentCount = watchField('adults_in_household') || 0;
+				if (currentCount > 0) {
+					setValue('adults_in_household', currentCount - 1);
+				}
+			} else if (category === 'child') {
+				const currentCount = watchField('children_in_household') || 0;
+				if (currentCount > 0) {
+					setValue('children_in_household', currentCount - 1);
+				}
+			}
+		}
+
 		if (onDeleteMember) {
 			onDeleteMember(memberId);
 		}

@@ -136,7 +136,6 @@ export const createUserRecordWithRetry = async (
 			// Store user ID and household ID in localStorage
 			storeHouseholdToLocalStorage(response);
 
-			console.log("User record created successfully on attempt", attempt);
 			onSuccess?.();
 
 			return { success: true };
@@ -145,7 +144,6 @@ export const createUserRecordWithRetry = async (
 
 			// If it's a conflict (user already exists), that's fine
 			if (isUserAlreadyExistsError(error)) {
-				console.log("User record already exists, continuing...");
 				return { success: true, alreadyExists: true };
 			}
 
@@ -188,12 +186,10 @@ export const createUserRecordSingleAttempt = async (
 	try {
 		const response = await apiService.createHousehold(minimalUserData);
 		storeHouseholdToLocalStorage(response);
-		console.log("User record created via single attempt");
 		return { success: true };
 	} catch (error: any) {
 		// If it's a conflict (user already exists), that's fine
 		if (isUserAlreadyExistsError(error)) {
-			console.log("User record already exists");
 			return { success: true, alreadyExists: true };
 		}
 		console.error("User creation failed:", error);

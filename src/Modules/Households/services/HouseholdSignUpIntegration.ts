@@ -91,7 +91,6 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
     } catch (error: any) {
       // If user already exists, treat as success and update state
       if (isUserAlreadyExistsError(error)) {
-        console.log('Household already exists, updating state...');
         this.updateSignUpState({
           userChoice: 'setup',
           completionStatus: 'completed',

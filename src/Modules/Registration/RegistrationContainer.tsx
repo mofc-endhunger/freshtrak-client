@@ -113,6 +113,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const [errors, setErrors] = useState<string[]>([]);
 	const [disabled, setDisabled] = useState<boolean>(false);
 	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+	const [householdMembers, setHouseholdMembers] = useState<any[]>([]);
 	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
 	const householdDataProcessedRef = useRef<boolean>(false);
 
@@ -323,6 +324,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							user.identification_code,
 					};
 					setUser(prefilledUser);
+					// Store household members for count validation
+					if (householdData.members && householdData.members.length > 0) {
+						setHouseholdMembers(householdData.members);
+					}
 					householdDataProcessedRef.current = true; // Mark as processed
 				} catch (error) {
 					console.error(
@@ -969,6 +974,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					}
 					event={selectedEvent}
 					disabled={disabled}
+					householdMembers={householdMembers}
 				/>
 			</Fragment>
 		</Fragment>

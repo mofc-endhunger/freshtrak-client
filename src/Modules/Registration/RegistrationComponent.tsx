@@ -14,6 +14,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 	onRegister,
 	event,
 	disabled,
+	householdMembers = [],
 }) => {
 	const navigate = useNavigate();
 
@@ -31,6 +32,7 @@ const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
 			subtitle={localization.subtitle_complete_registration}
 			submitButtonText={localization.button_register}
 			cancelButtonText={localization.button_cancel}
+			currentHouseholdMembers={householdMembers}
 		/>
 	);
 };

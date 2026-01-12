@@ -268,8 +268,38 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 						};
 					}
 
-					// Add new family members from setup wizard
-					const newMembers = registrationData.family_members || [];
+					// Process family members from setup wizard
+					// Separate existing members (have ID) from new members (no ID or negative ID)
+					const familyMembers = registrationData.family_members || [];
+					
+					// Update existing members in updatedMembers array
+					familyMembers.forEach((member: any) => {
+						// Check if this is an existing member (has positive ID)
+						if (member.id && member.id > 0) {
+							// Find and update the existing member
+							const existingIndex = updatedMembers.findIndex(
+								(m: any) => m.id === member.id
+							);
+							if (existingIndex !== -1) {
+								updatedMembers[existingIndex] = {
+									...updatedMembers[existingIndex],
+									first_name: member.first_name,
+									middle_name: member.middle_name || null,
+									last_name: member.last_name,
+									date_of_birth: member.date_of_birth,
+									gender_id: member.gender_id
+										? Number(member.gender_id)
+										: updatedMembers[existingIndex].gender_id,
+									suffix_id: member.suffix_id || null,
+								};
+							}
+						}
+					});
+
+					// Add only truly new members (no ID or negative ID)
+					const newMembers = familyMembers.filter(
+						(member: any) => !member.id || member.id < 0
+					);
 					const formattedNewMembers = newMembers.map(
 						(member: any) => ({
 							id: null, // New members get null ID
@@ -293,39 +323,19 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 					return [...updatedMembers, ...formattedNewMembers];
 				})(),
 				counts: (() => {
-					// Calculate counts based on actual members
-					const allMembers = (() => {
-						const existingMembers =
-							currentHouseholdData.members || [];
-						const updatedMembers = [...existingMembers];
-						if (updatedMembers.length > 0) {
-							updatedMembers[0] = {
-								...updatedMembers[0],
-								first_name:
-									registrationData.first_name ||
-									updatedMembers[0].first_name,
-								last_name:
-									registrationData.last_name ||
-									updatedMembers[0].last_name,
-								middle_name:
-									registrationData.middle_name ||
-									updatedMembers[0].middle_name,
-								date_of_birth:
-									registrationData.date_of_birth ||
-									updatedMembers[0].date_of_birth,
-							};
-						}
-						const newMembers =
-							registrationData.family_members || [];
-						return [...updatedMembers, ...newMembers];
-					})();
-
-					// Use provided counts if available, otherwise calculate from members
+					// Use provided counts if available, otherwise calculate from step 3 data
 					if (registrationData.household_counts) {
 						return registrationData.household_counts;
 					}
 
 					// Calculate counts from step 3 data as fallback
+					const familyMembers = registrationData.family_members || [];
+					// Count only truly new members (no ID or negative ID)
+					const newMembersCount = familyMembers.filter(
+						(member: any) => !member.id || member.id < 0
+					).length;
+					const existingMembersCount = (currentHouseholdData.members || []).length;
+					
 					return {
 						seniors:
 							Number(registrationData.seniors_in_household) || 0,
@@ -333,7 +343,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							Number(registrationData.adults_in_household) || 0,
 						children:
 							Number(registrationData.children_in_household) || 0,
-						total: allMembers.length,
+						total: existingMembersCount + newMembersCount,
 					};
 				})(),
 			};

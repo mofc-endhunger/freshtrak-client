@@ -144,6 +144,8 @@ export interface AddressComponentProps extends FormComponentProps {
 
 export interface MemberCountFormComponentProps extends FormComponentProps {
   event: Event;
+  existingMembers?: any[]; // Current household members from API
+  deletedMemberIds?: number[]; // IDs of members marked for deletion
 }
 
 export interface EventSlotsModalProps {

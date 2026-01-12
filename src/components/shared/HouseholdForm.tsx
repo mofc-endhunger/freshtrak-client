@@ -992,8 +992,13 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	};
 
 	// Loading state - maintain same container structure to prevent layout shift
+	// pb-40 accounts for the fixed footer height (~160px)
 	if (state.isSubmitting) {
-		return <LoadingSpinner size="large" className="m-auto h-screen" />;
+		return (
+			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+				<LoadingSpinner />
+			</div>
+		);
 	}
 
 	// Determine if this is the final step

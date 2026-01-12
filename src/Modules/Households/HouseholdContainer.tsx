@@ -21,6 +21,7 @@ import { Settings } from "lucide-react";
 import { getGenderId } from "./utils/householdUtils";
 import { storeHouseholdToLocalStorage } from "../../Utils/UserRecordHelper";
 import { StorageService } from "../../Utils/StorageService";
+import LoadingSpinner from "../General/LoadingSpinner";
 
 interface HouseholdContainerProps {
 	className?: string;
@@ -271,7 +272,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 					// Process family members from setup wizard
 					// Separate existing members (have ID) from new members (no ID or negative ID)
 					const familyMembers = registrationData.family_members || [];
-					
+
 					// Update existing members in updatedMembers array
 					familyMembers.forEach((member: any) => {
 						// Check if this is an existing member (has positive ID)
@@ -289,7 +290,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 									date_of_birth: member.date_of_birth,
 									gender_id: member.gender_id
 										? Number(member.gender_id)
-										: updatedMembers[existingIndex].gender_id,
+										: updatedMembers[existingIndex]
+												.gender_id,
 									suffix_id: member.suffix_id || null,
 								};
 							}
@@ -334,8 +336,10 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 					const newMembersCount = familyMembers.filter(
 						(member: any) => !member.id || member.id < 0
 					).length;
-					const existingMembersCount = (currentHouseholdData.members || []).length;
-					
+					const existingMembersCount = (
+						currentHouseholdData.members || []
+					).length;
+
 					return {
 						seniors:
 							Number(registrationData.seniors_in_household) || 0,
@@ -375,14 +379,12 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 		}
 	};
 
-	// Show loading state
+	// Show loading state - maintain consistent layout to prevent footer overlap
+	// pb-40 accounts for the fixed footer height (~160px)
 	if (isLoading) {
 		return (
 			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-				<div className="text-center">
-					<div className="w-8 h-8 border-4 border-highlight border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-					<p className="text-gray-600">Loading household data...</p>
-				</div>
+				<LoadingSpinner />
 			</div>
 		);
 	}

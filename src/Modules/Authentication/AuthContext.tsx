@@ -23,6 +23,8 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [user, setUser] = useState<any | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	// Whether the user needs to complete household setup (null = not yet determined)
+	const [needsHouseholdSetup, setNeedsHouseholdSetup] = useState<boolean | null>(null);
 
 	// Check if user is authenticated
 	const isAuthenticated = !!user;
@@ -573,6 +575,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			setIsLoading(true);
 			await signOut();
 			setUser(null);
+			setNeedsHouseholdSetup(null);
 
 			// Clear all application data from localStorage and sessionStorage
 			// This includes auth data, household data, preferences, etc.
@@ -648,6 +651,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		user,
 		isLoading,
 		isAuthenticated,
+		needsHouseholdSetup,
+		setNeedsHouseholdSetup,
 		signIn: handleSignIn,
 		signUp: handleSignUp,
 		confirmSignUp: handleConfirmSignUp,

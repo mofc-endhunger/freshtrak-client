@@ -79,7 +79,10 @@ const AccountPage: React.FC = () => {
 
 				// Save household_id to localStorage for later use
 				if (userInfo?.id) {
-					StorageService.setItem("householdId", userInfo.id.toString());
+					StorageService.setItem(
+						"householdId",
+						userInfo.id.toString()
+					);
 				}
 
 				// Check if household data is incomplete (minimal data suggests setup was skipped)
@@ -101,9 +104,6 @@ const AccountPage: React.FC = () => {
 				// Check if this is a "User not found" / 404 error
 				// This means user exists in Cognito but not in backend - try to create
 				if (isNotFoundError(error)) {
-					console.log(
-						"User not found in backend, attempting fallback creation..."
-					);
 					const result = await createUserRecordSingleAttempt(
 						householdsApiService,
 						user?.name

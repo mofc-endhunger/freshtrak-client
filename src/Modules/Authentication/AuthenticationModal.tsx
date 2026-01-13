@@ -25,10 +25,7 @@ import localization from "../Localization/LocalizationComponent";
 import { useAuth } from "./AuthContext";
 import { StorageService } from "../../Utils/StorageService";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import {
-	createUserRecordWithRetry,
-	setNewUserSignupFlag,
-} from "../../Utils/UserRecordHelper";
+import { createUserRecordAfterConfirmation } from "../../Utils/UserRecordHelper";
 
 /**
  * AuthenticationModal - Main authentication interface component
@@ -66,10 +63,20 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [justConfirmedEmail, setJustConfirmedEmail] =
 		useState<boolean>(false);
+	// Store guest token early, before confirmation flow clears it
+	const [savedGuestToken] = useState<string | null>(() => {
+		const guestUser = StorageService.getGuestUser();
+		return guestUser?.token || null;
+	});
 	const navigate = useNavigate();
 	const location = useLocation();
 	const params = useParams();
-	const { resendConfirmationCode, isAuthenticated, user } = useAuth();
+	const {
+		resendConfirmationCode,
+		isAuthenticated,
+		user,
+		setNeedsHouseholdSetup,
+	} = useAuth();
 
 	// Memoized API service instance for user creation
 	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
@@ -242,41 +249,41 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	const handleConfirmSuccess = async (): Promise<void> => {
 		setErrorMessage("");
 
-		// Mark this user as a new user who just completed email confirmation
-		// This will trigger the household setup offer in HouseholdSignUpWrapper
-		// Note: No expiration - flag is cleared when processed by HouseholdSignUpWrapper
-		if (pendingEmail) {
-			setNewUserSignupFlag(pendingEmail, false);
-		}
-
 		// Set flag to prevent onLogin from being called when modal closes
 		setJustConfirmedEmail(true);
 
 		setshow(false);
 
-		// Wait for AuthContext to finish signing in the user after confirmation
-		// The handleConfirmSignUp in AuthContext is async and signs the user in automatically
-		await new Promise((resolve) => setTimeout(resolve, 1500));
+		// Create user record with proper name resolution (localStorage → Cognito → email prefix)
+		// This also handles guest user upgrade if applicable
+		// Note: savedGuestToken was captured on component mount, before confirmation cleared storage
+		// Note: The helper function waits for Cognito token to be available
+		const result = await createUserRecordAfterConfirmation({
+			pendingEmail,
+			authUser: user,
+			apiService: householdsApiService,
+			maxRetries: 3,
+			guestToken: savedGuestToken,
+		});
 
-		// Attempt to create user record immediately after confirmation
-		// This ensures user always has a backend record, even if they abandon the setup offer
-		try {
-			const userName = user?.name || pendingEmail?.split("@")[0];
-			const result = await createUserRecordWithRetry(
-				householdsApiService,
-				{
-					name: userName,
-					maxRetries: 3,
-				}
-			);
+		// Handle errors - display localized message
+		if (result.messageKey) {
+			const message =
+				localization.getString(result.messageKey) ||
+				localization.error_guest_upgrade_failed;
+			setErrorMessage(message);
+			setshow(true);
+			setCurrentTab("signin");
+			return;
+		}
 
-			// Update flag to indicate user record was created
-			if (result.success && pendingEmail) {
-				setNewUserSignupFlag(pendingEmail, true);
-			}
-		} catch (error) {
-			// Log error but don't block navigation - fallback will handle this
-			console.error("Error creating user record on confirmation:", error);
+		// Set household setup state based on result
+		// - Guest upgrade: use householdCreated (true = empty household, needs setup)
+		// - Non-guest: always true (new user needs setup)
+		if (result.wasGuestUpgrade) {
+			setNeedsHouseholdSetup(result.householdCreated ?? true);
+		} else {
+			setNeedsHouseholdSetup(true);
 		}
 
 		// Always navigate to home - never call onLogin after confirmation

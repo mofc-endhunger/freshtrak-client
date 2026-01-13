@@ -108,29 +108,38 @@ const HouseholdRegistrationComponent: React.FC<
 						return genderMap[gender] || "";
 					};
 
-					setPrefilledData({
-						first_name: primaryMember.first_name || "",
-						last_name: primaryMember.last_name || "",
-						middle_name: primaryMember.middle_name || "",
-						date_of_birth: convertDateFormat(
-							primaryMember.date_of_birth || ""
-						),
-						gender: getGenderForForm(
-							primaryMember.gender_id || null
-						),
-						phone: userData.phone || "",
-						email: userData.email || "",
-						address_line_1: userData.address_line_1 || "",
-						address_line_2: userData.address_line_2 || "",
-						city: userData.city || "",
-						state: userData.state || "",
-						zip_code: userData.zip_code || "",
-						// Contact preferences
-						permission_to_text:
-							userData.permission_to_text ?? false,
-						permission_to_email:
-							userData.permission_to_email ?? false,
-					});
+				// Get counts from API response
+				// These counts represent additional household members (not including head of household)
+				const apiCounts = userData.counts || { seniors: 0, adults: 0, children: 0 };
+				
+				setPrefilledData({
+					first_name: primaryMember.first_name || "",
+					last_name: primaryMember.last_name || "",
+					middle_name: primaryMember.middle_name || "",
+					date_of_birth: convertDateFormat(
+						primaryMember.date_of_birth || ""
+					),
+					gender: getGenderForForm(
+						primaryMember.gender_id || null
+					),
+					phone: userData.phone || "",
+					email: userData.email || "",
+					address_line_1: userData.address_line_1 || "",
+					address_line_2: userData.address_line_2 || "",
+					city: userData.city || "",
+					state: userData.state || "",
+					zip_code: userData.zip_code || "",
+					// Contact preferences
+					permission_to_text:
+						userData.permission_to_text ?? false,
+					permission_to_email:
+						userData.permission_to_email ?? false,
+				// Household member counts (additional members, not including head of household)
+				// Subtract 1 from adults count because head of household is counted as an adult
+				seniors_in_household: apiCounts.seniors || 0,
+				adults_in_household: Math.max(0, (apiCounts.adults || 0) - 1),
+				children_in_household: apiCounts.children || 0,
+				});
 				} else {
 					// No members found - set empty prefilled data
 					console.error("No members found in user data");

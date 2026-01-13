@@ -16,10 +16,7 @@ import { StorageService } from "../../Utils/StorageService";
 import localization from "../Localization/LocalizationComponent";
 import { useAuth } from "./AuthContext";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import {
-	createUserRecordWithRetry,
-	setNewUserSignupFlag,
-} from "../../Utils/UserRecordHelper";
+import { createUserRecordAfterConfirmation } from "../../Utils/UserRecordHelper";
 
 /**
  * LoginPage - Full-page login interface with authentication forms
@@ -37,8 +34,13 @@ const LoginPage: React.FC = () => {
 	const [pendingEmail, setPendingEmail] = useState<string>("");
 	const [resetEmail, setResetEmail] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
+	// Store guest token early, before confirmation flow clears it
+	const [savedGuestToken] = useState<string | null>(() => {
+		const guestUser = StorageService.getGuestUser();
+		return guestUser?.token || null;
+	});
 	const navigate = useNavigate();
-	const { resendConfirmationCode, user } = useAuth();
+	const { resendConfirmationCode, user, setNeedsHouseholdSetup } = useAuth();
 
 	// Memoized API service instance for user creation
 	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
@@ -166,35 +168,35 @@ const LoginPage: React.FC = () => {
 	const handleConfirmSuccess = async (): Promise<void> => {
 		setErrorMessage("");
 
-		// Mark this user as a new user who just completed email confirmation
-		// This will trigger the household setup offer in HouseholdSignUpWrapper
-		// Note: No expiration - flag is cleared when processed by HouseholdSignUpWrapper
-		if (pendingEmail) {
-			setNewUserSignupFlag(pendingEmail, false);
+		// Create user record with proper name resolution (localStorage → Cognito → email prefix)
+		// This also handles guest user upgrade if applicable
+		// Note: savedGuestToken was captured on component mount, before confirmation cleared storage
+		// Note: The helper function waits for Cognito token to be available
+		const result = await createUserRecordAfterConfirmation({
+			pendingEmail,
+			authUser: user,
+			apiService: householdsApiService,
+			maxRetries: 3,
+			guestToken: savedGuestToken,
+		});
+
+		// Handle errors - display localized message
+		if (result.messageKey) {
+			const message =
+				localization.getString(result.messageKey) ||
+				localization.error_guest_upgrade_failed;
+			setErrorMessage(message);
+			setCurrentTab("signin");
+			return;
 		}
 
-		// Wait for AuthContext to finish signing in the user after confirmation
-		await new Promise((resolve) => setTimeout(resolve, 1500));
-
-		// Attempt to create user record immediately after confirmation
-		// This ensures user always has a backend record, even if they abandon the setup offer
-		try {
-			const userName = user?.name || pendingEmail?.split("@")[0];
-			const result = await createUserRecordWithRetry(
-				householdsApiService,
-				{
-					name: userName,
-					maxRetries: 3,
-				}
-			);
-
-			// Update flag to indicate user record was created
-			if (result.success && pendingEmail) {
-				setNewUserSignupFlag(pendingEmail, true);
-			}
-		} catch (error) {
-			// Log error but don't block navigation - fallback will handle this
-			console.error("Error creating user record on confirmation:", error);
+		// Set household setup state based on result
+		// - Guest upgrade: use householdCreated (true = empty household, needs setup)
+		// - Non-guest: always true (new user needs setup)
+		if (result.wasGuestUpgrade) {
+			setNeedsHouseholdSetup(result.householdCreated ?? true);
+		} else {
+			setNeedsHouseholdSetup(true);
 		}
 
 		// Redirect to home page after successful confirmation

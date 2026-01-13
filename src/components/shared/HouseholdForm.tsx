@@ -184,7 +184,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			// Existing users with completed setup: infer from empty phone (they previously chose no phone)
 			const isGuestUser = StorageService.isGuestUser();
 			const signUpState = StorageService.getHouseholdSignUpState();
-			const hasCompletedSetup = signUpState?.completionStatus === 'completed';
+			const hasCompletedSetup =
+				signUpState?.completionStatus === "completed";
 
 			let inferredNoPhone: boolean;
 			if (isGuestUser) {
@@ -225,8 +226,64 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		}
 	}, [prefilledData, reset]);
 
-	// Handle member deletion
+	// Calculate age from date of birth
+	const calculateAge = (dateOfBirth: string): number => {
+		if (!dateOfBirth || dateOfBirth === "1900-01-01") {
+			return 0;
+		}
+		const today = new Date();
+		const birthDate = new Date(dateOfBirth);
+		let age = today.getFullYear() - birthDate.getFullYear();
+		const monthDiff = today.getMonth() - birthDate.getMonth();
+		if (
+			monthDiff < 0 ||
+			(monthDiff === 0 && today.getDate() < birthDate.getDate())
+		) {
+			age--;
+		}
+		return age;
+	};
+
+	// Determine member category based on age
+	const getMemberCategory = (
+		dateOfBirth: string
+	): "senior" | "adult" | "child" | null => {
+		const age = calculateAge(dateOfBirth);
+		if (age === 0) return null; // Unknown age
+		if (age >= 65) return "senior";
+		if (age >= 18) return "adult";
+		return "child";
+	};
+
+	// Handle member deletion with automatic count update
 	const handleDeleteMember = (memberId: number): void => {
+		// Find the member being deleted
+		const member = currentHouseholdMembers.find(
+			(m: any) => m.id === memberId
+		);
+
+		if (member && member.date_of_birth) {
+			const category = getMemberCategory(member.date_of_birth);
+
+			// Decrement the appropriate count
+			if (category === "senior") {
+				const currentCount = watchField("seniors_in_household") || 0;
+				if (currentCount > 0) {
+					setValue("seniors_in_household", currentCount - 1);
+				}
+			} else if (category === "adult") {
+				const currentCount = watchField("adults_in_household") || 0;
+				if (currentCount > 0) {
+					setValue("adults_in_household", currentCount - 1);
+				}
+			} else if (category === "child") {
+				const currentCount = watchField("children_in_household") || 0;
+				if (currentCount > 0) {
+					setValue("children_in_household", currentCount - 1);
+				}
+			}
+		}
+
 		if (onDeleteMember) {
 			onDeleteMember(memberId);
 		}
@@ -397,16 +454,19 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				// Add family members and counts
 				if (state.familyMembers.length > 0) {
 					data.family_members = state.familyMembers.map((member) => ({
+						id: member.id, // Preserve ID for existing members (positive ID = existing, negative/null = new)
 						first_name: member.first_name,
 						last_name: member.last_name,
 						middle_name: member.middle_name,
-						gender_id: getGenderId(
-							member.gender || "prefer_not_to_say"
-						),
+						gender_id:
+							member.gender_id ||
+							getGenderId(member.gender || "prefer_not_to_say"),
 						date_of_birth: member.date_of_birth || "",
-						suffix_id: member.suffix
-							? getSuffixId(member.suffix)
-							: undefined,
+						suffix_id:
+							member.suffix_id ||
+							(member.suffix
+								? getSuffixId(member.suffix)
+								: undefined),
 					}));
 				}
 
@@ -757,6 +817,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 								watch={watchField}
 								setValue={setValue}
 								event={event}
+								existingMembers={currentHouseholdMembers}
+								deletedMemberIds={deletedMemberIds}
 							/>
 						</div>
 					);
@@ -768,6 +830,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 							watch={watchField}
 							setValue={setValue}
 							errors={errors}
+							existingMembers={currentHouseholdMembers}
+							deletedMemberIds={deletedMemberIds}
 						/>
 					);
 				}
@@ -784,126 +848,136 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				);
 
 			case HouseholdFormStep.FAMILY_MEMBER_DETAILS:
-				// Generate mock members based on counts
-				const mockMembers: HouseholdMember[] = [];
-				let memberId = 1;
+				// Helper to create empty member template
+				const createEmptyMember = (
+					id: number,
+					category: string
+				): HouseholdMember => ({
+					id,
+					household_id: 0,
+					is_primary: false,
+					first_name: "",
+					last_name: "",
+					middle_name: "",
+					suffix: "",
+					gender: undefined,
+					race: undefined,
+					ethnicity: undefined,
+					phone: "",
+					email: "",
+					address_line_1: "",
+					address_line_2: "",
+					city: "",
+					state: "",
+					zip_code: "",
+					date_of_birth: "",
+					status: "active",
+					is_freshtrak_user: false,
+					preferred_language: "en",
+					notes: "",
+					is_active: true,
+					head_of_household: false,
+					member_category: category, // Track category for display
+				});
 
-				// Add children
-				for (
-					let i = 0;
-					i < (state.formValues.children_in_household || 0);
-					i++
-				) {
-					mockMembers.push({
-						id: memberId++,
-						household_id: 0,
-						is_primary: false,
-						first_name: "",
-						last_name: "",
-						middle_name: "",
-						suffix: "",
-						gender: undefined,
-						race: undefined,
-						ethnicity: undefined,
-						phone: "",
-						email: "",
-						address_line_1: "",
-						address_line_2: "",
-						city: "",
-						state: "",
-						zip_code: "",
-						date_of_birth: "",
-						status: "active",
-						is_freshtrak_user: false,
-						preferred_language: "en",
-						notes: "",
-						is_active: true,
-						head_of_household: false,
-					});
+				// Get active existing members (excluding deleted and head of household)
+				const activeExistingMembers = currentHouseholdMembers.filter(
+					(member: any) =>
+						!deletedMemberIds.includes(member.id) &&
+						member.is_head_of_household !== 1
+				);
+
+				// Categorize existing members by age
+				const existingSeniors: HouseholdMember[] = [];
+				const existingAdults: HouseholdMember[] = [];
+				const existingChildren: HouseholdMember[] = [];
+
+				activeExistingMembers.forEach((member: any) => {
+					if (
+						member.date_of_birth &&
+						member.date_of_birth !== "1900-01-01"
+					) {
+						const category = getMemberCategory(
+							member.date_of_birth
+						);
+						const householdMember: HouseholdMember = {
+							...member,
+							member_category: category || "adult",
+							isExisting: true, // Flag to identify existing vs new
+						};
+						if (category === "senior")
+							existingSeniors.push(householdMember);
+						else if (category === "child")
+							existingChildren.push(householdMember);
+						else existingAdults.push(householdMember);
+					}
+				});
+
+				// Calculate how many NEW members needed for each category
+				const seniorsCount =
+					Number(state.formValues.seniors_in_household) || 0;
+				const adultsCount =
+					Number(state.formValues.adults_in_household) || 0;
+				const childrenCount =
+					Number(state.formValues.children_in_household) || 0;
+
+				const newSeniorsNeeded = Math.max(
+					0,
+					seniorsCount - existingSeniors.length
+				);
+				const newAdultsNeeded = Math.max(
+					0,
+					adultsCount - existingAdults.length
+				);
+				const newChildrenNeeded = Math.max(
+					0,
+					childrenCount - existingChildren.length
+				);
+
+				// Build members array: existing first (prefilled), then new (empty)
+				const membersForDetails: HouseholdMember[] = [];
+				let tempMemberId = -1; // Use negative IDs for new members
+
+				// Add seniors: existing first, then new
+				existingSeniors.forEach((member) =>
+					membersForDetails.push(member)
+				);
+				for (let i = 0; i < newSeniorsNeeded; i++) {
+					membersForDetails.push(
+						createEmptyMember(tempMemberId--, "senior")
+					);
 				}
 
-				// Add adults
-				for (
-					let i = 0;
-					i < (state.formValues.adults_in_household || 0);
-					i++
-				) {
-					mockMembers.push({
-						id: memberId++,
-						household_id: 0,
-						is_primary: false,
-						first_name: "",
-						last_name: "",
-						middle_name: "",
-						suffix: "",
-						gender: undefined,
-						race: undefined,
-						ethnicity: undefined,
-						phone: "",
-						email: "",
-						address_line_1: "",
-						address_line_2: "",
-						city: "",
-						state: "",
-						zip_code: "",
-						date_of_birth: "",
-						status: "active",
-						is_freshtrak_user: false,
-						preferred_language: "en",
-						notes: "",
-						is_active: true,
-						head_of_household: false,
-					});
+				// Add adults: existing first, then new
+				existingAdults.forEach((member) =>
+					membersForDetails.push(member)
+				);
+				for (let i = 0; i < newAdultsNeeded; i++) {
+					membersForDetails.push(
+						createEmptyMember(tempMemberId--, "adult")
+					);
 				}
 
-				// Add seniors
-				for (
-					let i = 0;
-					i < (state.formValues.seniors_in_household || 0);
-					i++
-				) {
-					mockMembers.push({
-						id: memberId++,
-						household_id: 0,
-						is_primary: false,
-						first_name: "",
-						last_name: "",
-						middle_name: "",
-						suffix: "",
-						gender: undefined,
-						race: undefined,
-						ethnicity: undefined,
-						phone: "",
-						email: "",
-						address_line_1: "",
-						address_line_2: "",
-						city: "",
-						state: "",
-						zip_code: "",
-						date_of_birth: "",
-						status: "active",
-						is_freshtrak_user: false,
-						preferred_language: "en",
-						notes: "",
-						is_active: true,
-						head_of_household: false,
-					});
+				// Add children: existing first, then new
+				existingChildren.forEach((member) =>
+					membersForDetails.push(member)
+				);
+				for (let i = 0; i < newChildrenNeeded; i++) {
+					membersForDetails.push(
+						createEmptyMember(tempMemberId--, "child")
+					);
 				}
 
 				const originalCounts = {
-					seniors: Number(state.formValues.seniors_in_household) || 0,
-					adults: Number(state.formValues.adults_in_household) || 0,
-					children:
-						Number(state.formValues.children_in_household) || 0,
-					total:
-						(Number(state.formValues.seniors_in_household) || 0) +
-						(Number(state.formValues.adults_in_household) || 0) +
-						(Number(state.formValues.children_in_household) || 0),
+					seniors: seniorsCount,
+					adults: adultsCount,
+					children: childrenCount,
+					total: seniorsCount + adultsCount + childrenCount,
 				};
 
 				return (
 					<FamilyMemberDetailsStep
-						members={mockMembers}
+						members={membersForDetails}
 						householdId={0}
 						originalCounts={originalCounts}
 						onComplete={handleFamilyMembersComplete}
@@ -917,9 +991,14 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		}
 	};
 
-	// Loading state
+	// Loading state - maintain same container structure to prevent layout shift
+	// pb-40 accounts for the fixed footer height (~160px)
 	if (state.isSubmitting) {
-		return <LoadingSpinner size="large" className="m-auto h-screen" />;
+		return (
+			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+				<LoadingSpinner />
+			</div>
+		);
 	}
 
 	// Determine if this is the final step

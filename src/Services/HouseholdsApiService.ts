@@ -39,6 +39,7 @@ const API_CONFIG: HouseholdApiConfig = {
     getUsersMe: 'api/users/me',
     getHouseholdById: (id: number) => `api/households/${id}`,
     updateHousehold: (id: number) => `api/users/${id}`,
+    upgradeGuest: 'api/auth/upgrade-guest',
   },
   timeout: 30000, // 30 seconds
   retryAttempts: 3,
@@ -214,8 +215,6 @@ export class HouseholdsApiService {
         if (token) {
           config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${token}`;
-        } else {
-          console.warn('⚠️ HouseholdsApiService - No token available, request will be unauthenticated');
         }
         return config;
       },
@@ -230,17 +229,29 @@ export class HouseholdsApiService {
         return response;
       },
       (error) => {
-        // Handle authentication errors specifically
-        if (handleAuthError(error, {
-          userType: "cognito",
-          redirectPath: "/login",
-        })) {
-          // Auth error was handled, return a rejected promise with auth error
-          return Promise.reject({
-            type: 'AUTHENTICATION_ERROR',
-            message: 'Authentication failed',
-            handled: true
-          });
+        // Get the request URL to determine if we should skip auth error handling
+        const requestUrl = error?.config?.url || '';
+
+        // Skip aggressive auth error handling for user creation endpoints
+        // These endpoints may return 401 for reasons other than expired session
+        // (e.g., upgrade-guest may fail but we still want to try /api/users with the same token)
+        const skipAuthErrorHandling =
+          requestUrl.includes('upgrade-guest') ||
+          requestUrl.includes('api/users');
+
+        if (!skipAuthErrorHandling) {
+          // Handle authentication errors for other endpoints
+          if (handleAuthError(error, {
+            userType: "cognito",
+            redirectPath: "/login",
+          })) {
+            // Auth error was handled, return a rejected promise with auth error
+            return Promise.reject({
+              type: 'AUTHENTICATION_ERROR',
+              message: 'Authentication failed',
+              handled: true
+            });
+          }
         }
 
         const apiError = ApiErrorHandler.createError(error);
@@ -495,6 +506,58 @@ export class HouseholdsApiService {
     this.cache.delete(CACHE_CONFIG.keys.household);
 
     return response.data;
+  }
+
+  // ==================== GUEST UPGRADE OPERATIONS ====================
+
+  /**
+   * Upgrade a guest user to a registered Cognito user
+   * 
+   * This endpoint links the existing guest user record to a Cognito account.
+   * The guest token is invalidated after successful upgrade.
+   * 
+   * @param guestToken - The guest token from POST /auth/guest
+   * @returns Promise with upgrade result containing user_id
+   * @throws Error with status code for handling:
+   *   - 400: Invalid/expired guest token
+   *   - 401: Invalid Cognito JWT
+   *   - 409: Cognito account already linked to another user
+   */
+  async upgradeGuestUser(guestToken: string): Promise<{
+    upgraded: boolean;
+    user_id: number;
+    household_id: number;
+    household_created: boolean;
+  }> {
+    const context = createErrorContext('upgrade_guest_user');
+
+    try {
+      const response = await this.axiosInstance.post(
+        API_CONFIG.endpoints.upgradeGuest,
+        {}, // Empty body as per contract
+        {
+          headers: {
+            'X-Guest-Token': guestToken,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      // Preserve the status code for caller to handle different cases
+      const status = error?.response?.status;
+      const message = error?.response?.data?.message || error.message;
+
+      const upgradeError: any = new Error(message);
+      upgradeError.status = status;
+      upgradeError.type = status === 409 ? 'CONFLICT' :
+        status === 401 ? 'AUTHENTICATION_ERROR' :
+          status === 400 ? 'BAD_REQUEST' : 'UNKNOWN_ERROR';
+      upgradeError.originalError = error;
+
+      logError(upgradeError, context, { status, message });
+      throw upgradeError;
+    }
   }
 
   // ==================== UTILITY METHODS ====================

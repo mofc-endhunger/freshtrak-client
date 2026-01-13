@@ -315,9 +315,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					children_in_household:
 						householdData.counts?.children ||
 						user.children_in_household,
+					// Only trust API seniors count if head of household has valid DOB
+					// Backend defaults DOB to "1900-01-01" which would incorrectly count as 125+ years old (senior)
 					seniors_in_household:
-						householdData.counts?.seniors ||
-						user.seniors_in_household,
+						primaryMember?.date_of_birth &&
+						primaryMember.date_of_birth !== "1900-01-01"
+							? householdData.counts?.seniors || 0
+							: user.seniors_in_household || 0,
 						// Prefill household name if available
 						identification_code:
 							householdData.identification_code ||

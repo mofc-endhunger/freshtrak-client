@@ -775,6 +775,10 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Registration failed",
 		error_unexpected_registration:
 			"An unexpected error occurred during registration",
+		error_account_already_exists:
+			"Account already exists. Please sign in with your existing account.",
+		error_guest_upgrade_failed:
+			"Something went wrong. Please try again or contact support.",
 		or: "OR",
 		password_complexity_requirements:
 			"Make your password at least 8 characters long with at least one capital letter and one special character. Pick something only you would guess — mixing letters, numbers, and symbols to make it stronger.",
@@ -1576,6 +1580,10 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Error en el registro",
 		error_unexpected_registration:
 			"Ocurrió un error inesperado durante el registro",
+		error_account_already_exists:
+			"La cuenta ya existe. Por favor inicie sesión con su cuenta existente.",
+		error_guest_upgrade_failed:
+			"Algo salió mal. Por favor intente de nuevo o contacte a soporte.",
 		or: "O",
 		password_complexity_requirements:
 			"Haga que su contraseña tenga al menos 8 caracteres con al menos una letra mayúscula y un carácter especial. Elija algo que solo usted adivinaría: mezcle letras, números y símbolos para hacerla más fuerte.",
@@ -2376,6 +2384,10 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Diiwaangelintu waa fashilantay",
 		error_unexpected_registration:
 			"Qalad aan la filayn ayaa dhacay markii la diiwaangelinayay",
+		error_account_already_exists:
+			"Akoon ayaa horeyba u jira. Fadlan ku soo gal akoontaada jirta.",
+		error_guest_upgrade_failed:
+			"Wax baa qaldamay. Fadlan mar kale isku day ama la xiriir taageerada.",
 		or: "AMA",
 		password_complexity_requirements:
 			"Samee erifkaaga ugu yaraan 8 xaraf ah oo ugu yaraan hal xaraf weyn iyo hal calaamad gaar ah. Dooro waxaad uun u malayn lahayd — isku dar xarfaha, tirooyinka, iyo calaamadaha si aad ugu xoogaysato.",
@@ -3183,6 +3195,10 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Регистрация не удалась",
 		error_unexpected_registration:
 			"Произошла непредвиденная ошибка во время регистрации",
+		error_account_already_exists:
+			"Аккаунт уже существует. Пожалуйста, войдите в существующий аккаунт.",
+		error_guest_upgrade_failed:
+			"Что-то пошло не так. Пожалуйста, попробуйте снова или свяжитесь со службой поддержки.",
 		or: "ИЛИ",
 		password_complexity_requirements:
 			"Сделайте свой пароль длиной не менее 8 символов с хотя бы одной заглавной буквой и одним специальным символом. Выберите то, что угадаете только вы — смешивая буквы, цифры и символы, чтобы сделать его сильнее.",
@@ -3966,6 +3982,10 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "Kayıt başarısız",
 		error_unexpected_registration:
 			"Kayıt sırasında beklenmeyen bir hata oluştu",
+		error_account_already_exists:
+			"Hesap zaten mevcut. Lütfen mevcut hesabınızla giriş yapın.",
+		error_guest_upgrade_failed:
+			"Bir şeyler ters gitti. Lütfen tekrar deneyin veya destekle iletişime geçin.",
 		or: "VEYA",
 		password_complexity_requirements:
 			"Şifrenizi en az 8 karakter uzunluğunda, en az bir büyük harf ve bir özel karakter içerecek şekilde yapın. Sadece sizin tahmin edebileceğiniz bir şey seçin — harfleri, sayıları ve sembolleri karıştırarak daha güçlü hale getirin.",
@@ -4728,6 +4748,10 @@ let localization = new LocalizedStrings({
 			"فشل تحميل معلومات الأسرة. يرجى المحاولة مرة أخرى.",
 		error_registration_failed: "فشل التسجيل",
 		error_unexpected_registration: "حدث خطأ غير متوقع أثناء التسجيل",
+		error_account_already_exists:
+			"الحساب موجود بالفعل. يرجى تسجيل الدخول باستخدام حسابك الحالي.",
+		error_guest_upgrade_failed:
+			"حدث خطأ ما. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.",
 		or: "أو",
 		password_complexity_requirements:
 			"اجعل كلمة المرور الخاصة بك بطول 8 أحرف على الأقل مع حرف كبير واحد على الأقل ورمز خاص واحد. اختر شيئًا لن تخمنه إلا أنت — اخلط الأحرف والأرقام والرموز لجعله أقوى.",
@@ -5465,6 +5489,8 @@ let localization = new LocalizedStrings({
 		error_failed_load_household: "加载家庭信息失败。请重试。",
 		error_registration_failed: "注册失败",
 		error_unexpected_registration: "注册期间发生意外错误",
+		error_account_already_exists: "账户已存在。请使用您的现有账户登录。",
+		error_guest_upgrade_failed: "出了点问题。请重试或联系支持。",
 		or: "或",
 		password_complexity_requirements:
 			"使您的密码至少8个字符长，至少包含一个大写字母和一个特殊字符。选择只有您能猜到的东西——混合字母、数字和符号使其更强大。",
@@ -6244,6 +6270,10 @@ let localization = new LocalizedStrings({
 		error_registration_failed: "पंजीकरण विफल",
 		error_unexpected_registration:
 			"पंजीकरण के दौरान एक अप्रत्याशित त्रुटि हुई",
+		error_account_already_exists:
+			"खाता पहले से मौजूद है। कृपया अपने मौजूदा खाते से साइन इन करें।",
+		error_guest_upgrade_failed:
+			"कुछ गलत हो गया। कृपया पुनः प्रयास करें या सहायता से संपर्क करें।",
 		or: "या",
 		password_complexity_requirements:
 			"अपना पासवर्ड कम से कम 8 अक्षर लंबा बनाएं जिसमें कम से कम एक बड़ा अक्षर और एक विशेष वर्ण हो। कुछ ऐसा चुनें जो केवल आप अनुमान लगाएंगे — इसे मजबूत बनाने के लिए अक्षरों, संख्याओं और प्रतीकों को मिलाएं।",
@@ -7031,6 +7061,10 @@ let localization = new LocalizedStrings({
 			"घरपरिवारको जानकारी लोड गर्न असफल। कृपया पुनः प्रयास गर्नुहोस्।",
 		error_registration_failed: "दर्ता असफल",
 		error_unexpected_registration: "दर्ताको क्रममा अप्रत्याशित त्रुटि भयो",
+		error_account_already_exists:
+			"खाता पहिले नै अवस्थित छ। कृपया आफ्नो अवस्थित खातामा साइन इन गर्नुहोस्।",
+		error_guest_upgrade_failed:
+			"केहि गलत भयो। कृपया पुनः प्रयास गर्नुहोस् वा सहायतासँग सम्पर्क गर्नुहोस्।",
 		or: "वा",
 		password_complexity_requirements:
 			"तपाईंको पासवर्ड कम्तिमा ८ वर्ण लामो बनाउनुहोस् जसमा कम्तिमा एक ठूलो अक्षर र एक विशेष वर्ण हुनुपर्छ। केवल तपाईंले अनुमान लगाउने कुरा छान्नुहोस् — यसलाई बलियो बनाउन अक्षरहरू, संख्याहरू र प्रतीकहरू मिलाउनुहोस्।",

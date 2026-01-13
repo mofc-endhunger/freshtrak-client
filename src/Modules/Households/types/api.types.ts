@@ -86,6 +86,7 @@ export interface HouseholdApiEndpoints {
   getUsersMe: string;
   getHouseholdById: (id: number) => string;
   updateHousehold: (id: number) => string;
+  upgradeGuest: string;
 }
 
 // API Service configuration

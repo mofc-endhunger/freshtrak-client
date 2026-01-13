@@ -36,7 +36,12 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	onSignUpSuccess,
 	onSignUpError,
 }) => {
-	const { user, isAuthenticated } = useAuth();
+	const {
+		user,
+		isAuthenticated,
+		needsHouseholdSetup,
+		setNeedsHouseholdSetup,
+	} = useAuth();
 	const [showHouseholdOffer, setShowHouseholdOffer] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [showWarningDialog, setShowWarningDialog] = useState(false);
@@ -51,17 +56,27 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	const eventDateId = storedEventDateId;
 
 	// Check if we should show household setup offer
+	// Uses context state (needsHouseholdSetup) which is set by confirmation handler
 	useEffect(() => {
 		const checkHouseholdSetup = async () => {
-			if (isAuthenticated && user && user.email) {
-				// Only show household setup offer for new users who just completed email confirmation
-				// This prevents showing the prompt to existing users who are signing in
+			if (
+				isAuthenticated &&
+				user &&
+				user.email &&
+				needsHouseholdSetup === true
+			) {
+				// needsHouseholdSetup is set by confirmation handler after upgrade/creation
+				// true = show offer (guest upgrade with empty household OR non-guest new user)
+				// false = skip offer (guest upgrade with existing data)
+				// null = not yet determined, don't show
 				const isNewUser = isNewUserSignUp(user.email);
 
 				if (isNewUser) {
 					try {
 						await offerHouseholdSetup(user.email);
 						setShowHouseholdOffer(true);
+						// Clear the context state after showing the offer
+						setNeedsHouseholdSetup(null);
 					} catch (error) {
 						console.error("Error offering household setup:", error);
 					}
@@ -70,7 +85,14 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 		};
 
 		checkHouseholdSetup();
-	}, [isAuthenticated, user, isNewUserSignUp, offerHouseholdSetup]);
+	}, [
+		isAuthenticated,
+		user,
+		needsHouseholdSetup,
+		isNewUserSignUp,
+		offerHouseholdSetup,
+		setNeedsHouseholdSetup,
+	]);
 
 	// Handle household setup now
 	const handleSetupNow = async () => {

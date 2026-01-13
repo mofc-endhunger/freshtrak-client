@@ -136,7 +136,13 @@ const HouseholdRegistrationComponent: React.FC<
 						userData.permission_to_email ?? false,
 				// Household member counts (additional members, not including head of household)
 				// Subtract 1 from adults count because head of household is counted as an adult
-				seniors_in_household: apiCounts.seniors || 0,
+				// Only trust API seniors count if head of household has valid DOB
+				// Backend defaults DOB to "1900-01-01" which would incorrectly count as 125+ years old (senior)
+				seniors_in_household:
+					primaryMember.date_of_birth &&
+					primaryMember.date_of_birth !== "1900-01-01"
+						? apiCounts.seniors || 0
+						: 0,
 				adults_in_household: Math.max(0, (apiCounts.adults || 0) - 1),
 				children_in_household: apiCounts.children || 0,
 				});

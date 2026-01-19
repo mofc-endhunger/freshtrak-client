@@ -29,6 +29,8 @@ describe("HouseholdInfoDisplay", () => {
 		zip_code: "12345",
 		phone: "555-1234",
 		email: "smith@example.com",
+		permission_to_text: true,
+		permission_to_email: true,
 	};
 
 	describe("Rendering", () => {

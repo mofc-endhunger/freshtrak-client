@@ -3,11 +3,10 @@
  * Integrates household setup with the existing sign-up process
  */
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../Authentication/AuthContext";
 import { HouseholdSetupOffer } from "./HouseholdSetupOffer";
 import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegration";
-import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 import { RENDER_URL } from "../../../Utils/Urls";
 import localization from "../../Localization/LocalizationComponent";
 import {
@@ -37,16 +36,18 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	onSignUpSuccess,
 	onSignUpError,
 }) => {
-	const { user, isAuthenticated } = useAuth();
+	const {
+		user,
+		isAuthenticated,
+		needsHouseholdSetup,
+		setNeedsHouseholdSetup,
+	} = useAuth();
 	const [showHouseholdOffer, setShowHouseholdOffer] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [showWarningDialog, setShowWarningDialog] = useState(false);
 
 	const { offerHouseholdSetup, deferHouseholdSetup, isNewUserSignUp } =
 		useHouseholdSignUpIntegration();
-
-	// Memoized API service instance
-	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
 	// Check if we're in registration flow using session storage
 	// The event date ID is stored when auth modal opens from registration flow
@@ -55,17 +56,27 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	const eventDateId = storedEventDateId;
 
 	// Check if we should show household setup offer
+	// Uses context state (needsHouseholdSetup) which is set by confirmation handler
 	useEffect(() => {
 		const checkHouseholdSetup = async () => {
-			if (isAuthenticated && user && user.email) {
-				// Only show household setup offer for new users who just completed email confirmation
-				// This prevents showing the prompt to existing users who are signing in
+			if (
+				isAuthenticated &&
+				user &&
+				user.email &&
+				needsHouseholdSetup === true
+			) {
+				// needsHouseholdSetup is set by confirmation handler after upgrade/creation
+				// true = show offer (guest upgrade with empty household OR non-guest new user)
+				// false = skip offer (guest upgrade with existing data)
+				// null = not yet determined, don't show
 				const isNewUser = isNewUserSignUp(user.email);
 
 				if (isNewUser) {
 					try {
 						await offerHouseholdSetup(user.email);
 						setShowHouseholdOffer(true);
+						// Clear the context state after showing the offer
+						setNeedsHouseholdSetup(null);
 					} catch (error) {
 						console.error("Error offering household setup:", error);
 					}
@@ -74,7 +85,14 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 		};
 
 		checkHouseholdSetup();
-	}, [isAuthenticated, user, isNewUserSignUp, offerHouseholdSetup]);
+	}, [
+		isAuthenticated,
+		user,
+		needsHouseholdSetup,
+		isNewUserSignUp,
+		offerHouseholdSetup,
+		setNeedsHouseholdSetup,
+	]);
 
 	// Handle household setup now
 	const handleSetupNow = async () => {
@@ -128,42 +146,10 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 	};
 
 	// Handle setup later
+	// Note: User record is already created on email confirmation, so we just redirect
 	const handleSetupLater = async () => {
 		setIsProcessing(true);
 		try {
-			// Create minimal user record with just basic info from Cognito
-			const minimalUserData = {
-				// Required fields for CreateHouseholdRequest
-				primary_first_name: user?.name?.split(" ")[0] || "User",
-				primary_last_name:
-					user?.name?.split(" ").slice(1).join(" ") || "",
-				primary_date_of_birth: "",
-				preferred_language: "en",
-				address_line_1: "",
-				city: "",
-				state: "",
-				zip_code: "",
-				// Additional fields for new API (use undefined for optional fields)
-				first_name: user?.name?.split(" ")[0] || "User",
-				last_name: user?.name?.split(" ").slice(1).join(" ") || "",
-				phone: undefined,
-				date_of_birth: undefined,
-				permission_to_email: undefined,
-				children_in_household: undefined,
-			};
-
-			// Create user via POST API call
-			const response = await householdsApiService.createHousehold(
-				minimalUserData
-			);
-
-			// Store user ID and household ID in localStorage
-			const householdStorage = {
-				userId: response.data.primary_user_id,
-				household_id: response.data.id,
-			};
-			localStorage.setItem("household", JSON.stringify(householdStorage));
-
 			// Defer household setup (set flags)
 			await deferHouseholdSetup();
 			setShowHouseholdOffer(false);
@@ -176,8 +162,13 @@ export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
 				window.location.href = "/dashboard";
 			}
 		} catch (error) {
-			console.error("Error creating user (setup later):", error);
-			onSignUpError?.("Failed to create user record. Please try again.");
+			console.error("Error deferring household setup:", error);
+			// Even if deferring fails, still redirect - user record exists
+			if (isRegistrationFlow && eventDateId) {
+				window.location.href = `${RENDER_URL.REGISTRATION_FORM_URL}/${eventDateId}`;
+			} else {
+				window.location.href = "/dashboard";
+			}
 		} finally {
 			setIsProcessing(false);
 		}

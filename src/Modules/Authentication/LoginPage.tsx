@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import TagManager from "react-gtm-module";
 import { RENDER_URL } from "../../Utils/Urls";
@@ -15,6 +15,8 @@ import { API_URL } from "../../Utils/Urls";
 import { StorageService } from "../../Utils/StorageService";
 import localization from "../Localization/LocalizationComponent";
 import { useAuth } from "./AuthContext";
+import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
+import { createUserRecordAfterConfirmation } from "../../Utils/UserRecordHelper";
 
 /**
  * LoginPage - Full-page login interface with authentication forms
@@ -32,8 +34,16 @@ const LoginPage: React.FC = () => {
 	const [pendingEmail, setPendingEmail] = useState<string>("");
 	const [resetEmail, setResetEmail] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
+	// Store guest token early, before confirmation flow clears it
+	const [savedGuestToken] = useState<string | null>(() => {
+		const guestUser = StorageService.getGuestUser();
+		return guestUser?.token || null;
+	});
 	const navigate = useNavigate();
-	const { resendConfirmationCode } = useAuth();
+	const { resendConfirmationCode, user, setNeedsHouseholdSetup } = useAuth();
+
+	// Memoized API service instance for user creation
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
 	/**
 	 * Clear any existing event date ID when user navigates to login page
@@ -116,7 +126,7 @@ const LoginPage: React.FC = () => {
 	const handleUnverifiedUserError = async (email: string): Promise<void> => {
 		setPendingEmail(email);
 		setCurrentTab("confirm");
-		
+
 		// Automatically resend confirmation code
 		try {
 			await resendConfirmationCode(email);
@@ -137,7 +147,7 @@ const LoginPage: React.FC = () => {
 	const handleUnconfirmedUserError = async (email: string): Promise<void> => {
 		setPendingEmail(email);
 		setCurrentTab("confirm");
-		
+
 		// Automatically resend confirmation code
 		try {
 			await resendConfirmationCode(email);
@@ -155,20 +165,38 @@ const LoginPage: React.FC = () => {
 	/**
 	 * Handles successful confirmation - redirect to home or household setup
 	 */
-	const handleConfirmSuccess = (): void => {
+	const handleConfirmSuccess = async (): Promise<void> => {
 		setErrorMessage("");
 
-		// Mark this user as a new user who just completed email confirmation
-		// This will trigger the household setup offer in HouseholdSignUpWrapper
-		if (pendingEmail) {
-			const flagData = {
-				email: pendingEmail,
-				timestamp: Date.now(),
-				completed: true,
-			};
+		// Create user record with proper name resolution (localStorage → Cognito → email prefix)
+		// This also handles guest user upgrade if applicable
+		// Note: savedGuestToken was captured on component mount, before confirmation cleared storage
+		// Note: The helper function waits for Cognito token to be available
+		const result = await createUserRecordAfterConfirmation({
+			pendingEmail,
+			authUser: user,
+			apiService: householdsApiService,
+			maxRetries: 3,
+			guestToken: savedGuestToken,
+		});
 
-			// Store a flag to indicate this is a new user sign-up
-			localStorage.setItem("new_user_signup", JSON.stringify(flagData));
+		// Handle errors - display localized message
+		if (result.messageKey) {
+			const message =
+				localization.getString(result.messageKey) ||
+				localization.error_guest_upgrade_failed;
+			setErrorMessage(message);
+			setCurrentTab("signin");
+			return;
+		}
+
+		// Set household setup state based on result
+		// - Guest upgrade: use householdCreated (true = empty household, needs setup)
+		// - Non-guest: always true (new user needs setup)
+		if (result.wasGuestUpgrade) {
+			setNeedsHouseholdSetup(result.householdCreated ?? true);
+		} else {
+			setNeedsHouseholdSetup(true);
 		}
 
 		// Redirect to home page after successful confirmation
@@ -280,7 +308,9 @@ const LoginPage: React.FC = () => {
 								<SignInFormComponent
 									onSuccess={handleAuthSuccess}
 									onError={handleAuthError}
-									onUnconfirmedUser={handleUnconfirmedUserError}
+									onUnconfirmedUser={
+										handleUnconfirmedUserError
+									}
 									onSwitchToSignUp={() => switchTab("signup")}
 									onForgotPassword={() => switchTab("reset")}
 								/>
@@ -290,7 +320,9 @@ const LoginPage: React.FC = () => {
 								<SignUpFormComponent
 									onSuccess={handleSignUpSuccess}
 									onError={handleAuthError}
-									onUnverifiedUserExists={handleUnverifiedUserError}
+									onUnverifiedUserExists={
+										handleUnverifiedUserError
+									}
 									onSwitchToSignIn={() => switchTab("signin")}
 								/>
 							)}

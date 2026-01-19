@@ -79,6 +79,8 @@ const mockHouseholdData: UsersMeResponse = {
 	zip_code: "12345",
 	phone: "555-123-4567",
 	email: "test@example.com",
+	permission_to_text: true,
+	permission_to_email: true,
 	counts: {
 		adults: 2,
 		children: 1,

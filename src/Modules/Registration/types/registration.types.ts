@@ -177,6 +177,7 @@ export interface RegistrationComponentProps {
   onRegister: (data: RegistrationFormData) => Promise<void>;
   event: Event;
   disabled: boolean;
+  householdMembers?: any[]; // Existing household members for count validation
 }
 
 /**

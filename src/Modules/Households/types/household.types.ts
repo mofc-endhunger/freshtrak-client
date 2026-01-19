@@ -30,7 +30,9 @@ export interface HouseholdMember {
   middle_name?: string;
   last_name: string;
   suffix?: string;
+  suffix_id?: number;
   gender?: MemberGender;
+  gender_id?: number;
   race?: MemberRace;
   ethnicity?: MemberEthnicity;
   phone?: string;
@@ -47,6 +49,9 @@ export interface HouseholdMember {
   notes?: string;
   is_active: boolean;
   head_of_household: boolean;
+  // Optional fields for member details step
+  member_category?: 'senior' | 'adult' | 'child' | string;
+  isExisting?: boolean; // Flag to identify existing vs new members
 }
 
 // Derived household counts
@@ -135,6 +140,9 @@ export interface UpdateHouseholdRequest {
   zip_code: string | null;
   phone: string | null;
   email: string | null;
+  // Contact preferences
+  permission_to_text: boolean | null;
+  permission_to_email: boolean | null;
 }
 
 // Member creation request

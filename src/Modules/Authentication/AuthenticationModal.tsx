@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { RENDER_URL } from "../../Utils/Urls";
 import TagManager from "react-gtm-module";
@@ -24,6 +24,8 @@ import { Button } from "../../components/ui/button";
 import localization from "../Localization/LocalizationComponent";
 import { useAuth } from "./AuthContext";
 import { StorageService } from "../../Utils/StorageService";
+import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
+import { createUserRecordAfterConfirmation } from "../../Utils/UserRecordHelper";
 
 /**
  * AuthenticationModal - Main authentication interface component
@@ -61,10 +63,23 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	const [errorMessage, setErrorMessage] = useState<string>("");
 	const [justConfirmedEmail, setJustConfirmedEmail] =
 		useState<boolean>(false);
+	// Store guest token early, before confirmation flow clears it
+	const [savedGuestToken] = useState<string | null>(() => {
+		const guestUser = StorageService.getGuestUser();
+		return guestUser?.token || null;
+	});
 	const navigate = useNavigate();
 	const location = useLocation();
 	const params = useParams();
-	const { resendConfirmationCode, isAuthenticated } = useAuth();
+	const {
+		resendConfirmationCode,
+		isAuthenticated,
+		user,
+		setNeedsHouseholdSetup,
+	} = useAuth();
+
+	// Memoized API service instance for user creation
+	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
 	/**
 	 * Handles guest login process
@@ -234,27 +249,42 @@ const AuthenticationModal: React.FC<ExtendedAuthenticationModalProps> = ({
 	const handleConfirmSuccess = async (): Promise<void> => {
 		setErrorMessage("");
 
-		// Mark this user as a new user who just completed email confirmation
-		// This will trigger the household setup offer in HouseholdSignUpWrapper
-		if (pendingEmail) {
-			const flagData = {
-				email: pendingEmail,
-				timestamp: Date.now(),
-				completed: true,
-			};
-
-			// Store a flag to indicate this is a new user sign-up
-			localStorage.setItem("new_user_signup", JSON.stringify(flagData));
-		}
-
 		// Set flag to prevent onLogin from being called when modal closes
 		setJustConfirmedEmail(true);
 
 		setshow(false);
 
-		// Wait a bit for AuthContext to finish signing in the user after confirmation
-		// The handleConfirmSignUp in AuthContext is async and signs the user in automatically
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+		// Create user record with proper name resolution (localStorage → Cognito → email prefix)
+		// This also handles guest user upgrade if applicable
+		// Note: savedGuestToken was captured on component mount, before confirmation cleared storage
+		// Note: The helper function waits for Cognito token to be available
+		const result = await createUserRecordAfterConfirmation({
+			pendingEmail,
+			authUser: user,
+			apiService: householdsApiService,
+			maxRetries: 3,
+			guestToken: savedGuestToken,
+		});
+
+		// Handle errors - display localized message
+		if (result.messageKey) {
+			const message =
+				localization.getString(result.messageKey) ||
+				localization.error_guest_upgrade_failed;
+			setErrorMessage(message);
+			setshow(true);
+			setCurrentTab("signin");
+			return;
+		}
+
+		// Set household setup state based on result
+		// - Guest upgrade: use householdCreated (true = empty household, needs setup)
+		// - Non-guest: always true (new user needs setup)
+		if (result.wasGuestUpgrade) {
+			setNeedsHouseholdSetup(result.householdCreated ?? true);
+		} else {
+			setNeedsHouseholdSetup(true);
+		}
 
 		// Always navigate to home - never call onLogin after confirmation
 		// Even if Cognito auth isn't detected yet, don't call onLogin as it would create guest user

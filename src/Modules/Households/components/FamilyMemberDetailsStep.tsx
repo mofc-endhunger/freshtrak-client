@@ -3,7 +3,7 @@
  * Form for collecting individual family member information
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { HouseholdMember } from "../types/household.types";
 import { HouseholdCounts } from "../../Registration/types/registration.types";
@@ -11,6 +11,10 @@ import { getGenderFromId } from "../utils/householdUtils";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import {
+	validateDobNative,
+	getDateInputConstraints,
+} from "../../Family/utils/dateValidation";
 import {
 	Select,
 	SelectContent,
@@ -76,20 +80,67 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 		},
 	});
 
-	// Initialize members data array
+	// Date validation constraints (memoized for performance)
+	const dateConstraints = useMemo(() => getDateInputConstraints(), []);
+
+	// Helper to convert gender string to gender_id
+	const getGenderIdFromString = (gender: string | undefined): number => {
+		if (!gender) return 1;
+		const genderMap: Record<string, number> = {
+			male: 1,
+			female: 2,
+			other: 3,
+			prefer_not_to_say: 4,
+			not_specify: 4,
+		};
+		return genderMap[gender.toLowerCase()] || 1;
+	};
+
+	// Helper to convert date format from yyyy-mm-dd to yyyy-mm-dd (for input)
+	const formatDateForInput = (dateString: string | undefined): string => {
+		if (!dateString || dateString === "1900-01-01") return "";
+		// If already in correct format, return as is
+		if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+		// Try to parse and reformat
+		try {
+			const date = new Date(dateString);
+			if (isNaN(date.getTime())) return "";
+			return date.toISOString().split("T")[0];
+		} catch {
+			return "";
+		}
+	};
+
+	// Initialize members data array with existing data where available
 	useEffect(() => {
-		const initialMembers: MemberFormData[] = Array(members.length)
-			.fill(null)
-			.map(() => ({
+		const initialMembers: MemberFormData[] = members.map((member: any) => {
+			// Check if this is an existing member with data
+			if (member.isExisting && member.first_name) {
+				return {
+					first_name: member.first_name || "",
+					last_name: member.last_name || "",
+					middle_name: member.middle_name || "",
+					gender_id: member.gender_id
+						? Number(member.gender_id)
+						: getGenderIdFromString(member.gender),
+					date_of_birth: formatDateForInput(member.date_of_birth),
+					suffix_id: member.suffix_id
+						? Number(member.suffix_id)
+						: undefined,
+				};
+			}
+			// New member - return empty form
+			return {
 				first_name: "",
 				last_name: "",
 				middle_name: "",
 				gender_id: 1,
 				date_of_birth: "",
 				suffix_id: undefined,
-			}));
+			};
+		});
 		setMembersData(initialMembers);
-	}, [members.length]);
+	}, [members]);
 
 	// Update form when current member index changes
 	useEffect(() => {
@@ -131,10 +182,12 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 					last_name: member.last_name,
 					middle_name: member.middle_name,
 					gender: getGenderFromId(member.gender_id),
+					gender_id: member.gender_id, // Preserve gender_id for backend
 					date_of_birth: member.date_of_birth,
 					suffix: member.suffix_id
 						? getSuffixText(member.suffix_id)
 						: "",
+					suffix_id: member.suffix_id, // Preserve suffix_id for backend
 				})
 			);
 
@@ -160,8 +213,27 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 	};
 
 	const getMemberTypeLabel = (index: number): string => {
-		// This is a simplified version - you might want to determine based on age or other criteria
-		return `${localization.title_family_member_details} ${index + 1}`;
+		const member = members[index] as any;
+		const category = member?.member_category || "member";
+
+		// Capitalize category for display
+		const categoryLabels: Record<string, string> = {
+			senior: localization.seniors || "Senior",
+			adult: localization.adults || "Adult",
+			child: localization.kids || "Child",
+			member: localization.title_family_member_details || "Family Member",
+		};
+		const categoryLabel = categoryLabels[category] || category;
+
+		// If existing member with a name, show "Editing: Name"
+		if (member?.isExisting && member?.first_name) {
+			return `${localization.button_edit || "Edit"}: ${
+				member.first_name
+			} ${member.last_name || ""}`.trim();
+		}
+
+		// For new members, show "New Senior/Adult/Child"
+		return `${localization.button_add || "Add"} ${categoryLabel}`;
 	};
 
 	const getSuffixText = (suffixId: number): string => {
@@ -324,9 +396,12 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 								<Input
 									id="date_of_birth"
 									type="date"
+									max={dateConstraints.today}
+									min={dateConstraints.minDate}
 									{...register("date_of_birth", {
 										required:
 											localization.error_date_of_birth_required,
+										validate: validateDobNative,
 									})}
 								/>
 								{errors.date_of_birth && (

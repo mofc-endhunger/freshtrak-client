@@ -155,14 +155,18 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			const household = await householdsApiService.getUsersMe();
 			setHouseholdData(household);
 
-			// Check if household data is complete enough for direct registration
-			const isComplete =
-				householdRegistrationService.checkHouseholdCompleteness(
-					household
-				);
+			// Check if user has completed household setup by verifying DOB is not placeholder
+			// When household is auto-created on signup, DOB defaults to "1900-01-01"
+			const headOfHousehold = household?.members?.find(
+				(member) => member.is_head_of_household === 1
+			);
+			const hasCompletedSetup = Boolean(
+				headOfHousehold?.date_of_birth &&
+					headOfHousehold.date_of_birth !== "1900-01-01"
+			);
 
-			if (isComplete) {
-				// Show confirmation modal
+			if (hasCompletedSetup) {
+				// Show confirmation modal for users who completed household setup
 				setShowHouseholdModal(true);
 			} else {
 				// Proceed directly to registration form with prefilled data
@@ -343,6 +347,12 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		}
 	};
 
+	// Calculate available slots once for reuse
+	const availableSlots = eventHour.flatMap((item) =>
+		item.event_slots.filter((e) => e.open_slots > 0)
+	);
+	const hasAvailableSlots = availableSlots.length > 0;
+
 	return (
 		<Fragment>
 			<Dialog open={show} onOpenChange={setShow}>
@@ -360,6 +370,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 					className="sm:max-w-md bg-highlight border-none text-white"
 					onPointerDownOutside={(e) => e.preventDefault()}
 					onEscapeKeyDown={(e) => e.preventDefault()}
+					showCloseButton={false}
 				>
 					<DialogHeader>
 						<DialogTitle
@@ -395,15 +406,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 							</div>
 						) : (
 							(() => {
-								// Check if there are any available timeslots
-								const availableSlots = eventHour.flatMap(
-									(item) =>
-										item.event_slots.filter(
-											(e) => e.open_slots > 0
-										)
-								);
-
-								if (availableSlots.length === 0) {
+								if (!hasAvailableSlots) {
 									return (
 										<div className="text-center py-6 px-4">
 											<p className="text-sm leading-relaxed">
@@ -499,35 +502,22 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 						>
 							{localization.button_go_back}
 						</Button>
-						{(() => {
-							// Only show continue button if there are available slots
-							const availableSlots = eventHour.flatMap((item) =>
-								item.event_slots.filter((e) => e.open_slots > 0)
-							);
-
-							if (availableSlots.length === 0) {
-								return null;
-							}
-
-							return (
-								<Button
-									type="submit"
-									disabled={
-										!selectedSlotId || isLoadingHousehold
-									}
-									className="w-full sm:w-auto flex-1 bg-primary text-white min-h-12 uppercase"
-									onClick={() =>
-										selectedSlotId &&
-										handleSlotSelection(selectedSlotId)
-									}
-									aria-describedby="continue-button-description"
-								>
-									{isLoadingHousehold
-										? localization.loading_loading
-										: localization.button_save_and_continue}
-								</Button>
-							);
-						})()}
+						{hasAvailableSlots && (
+							<Button
+								type="submit"
+								disabled={!selectedSlotId || isLoadingHousehold}
+								className="w-full sm:w-auto flex-1 bg-primary text-white min-h-12 uppercase"
+								onClick={() =>
+									selectedSlotId &&
+									handleSlotSelection(selectedSlotId)
+								}
+								aria-describedby="continue-button-description"
+							>
+								{isLoadingHousehold
+									? localization.loading_loading
+									: localization.button_save_and_continue}
+							</Button>
+						)}
 					</DialogFooter>
 
 					{/* Hidden descriptions for screen readers */}

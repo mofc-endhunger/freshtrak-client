@@ -6,6 +6,12 @@
 import { HouseholdsApiService } from '../../../Services/HouseholdsApiService';
 import { CreateHouseholdApiRequest, HouseholdResponse } from '../types/api.types';
 import { StorageService } from '../../../Utils/StorageService';
+import {
+  hasValidNewUserSignupFlag,
+  clearNewUserSignupFlag,
+  storeHouseholdToLocalStorage,
+  isUserAlreadyExistsError,
+} from '../../../Utils/UserRecordHelper';
 
 export interface HouseholdSignUpState {
   hasOfferedSetup: boolean;
@@ -68,6 +74,9 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
       // Create household via API
       const household = await this.apiService.createHousehold(data);
 
+      // Store household data using centralized helper
+      storeHouseholdToLocalStorage(household);
+
       // Update sign-up state
       this.updateSignUpState({
         userChoice: 'setup',
@@ -79,7 +88,16 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
       this.persistSignUpState();
 
       return household;
-    } catch (error) {
+    } catch (error: any) {
+      // If user already exists, treat as success and update state
+      if (isUserAlreadyExistsError(error)) {
+        this.updateSignUpState({
+          userChoice: 'setup',
+          completionStatus: 'completed',
+        });
+        this.persistSignUpState();
+        // Re-throw to let caller handle fetching existing data
+      }
       console.error('Error creating household during sign-up:', error);
       throw error;
     }
@@ -125,7 +143,7 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
    */
   getSignUpState(): HouseholdSignUpState {
     const state = StorageService.getHouseholdSignUpState();
-    
+
     if (state) {
       return state;
     }
@@ -213,24 +231,15 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
 
   /**
    * Check if this is a new user sign-up (just completed email confirmation)
+   * Note: No expiration time - flag is cleared after processing to handle session timeouts
    */
   isNewUserSignUp(userEmail: string): boolean {
     try {
-      // Check if there's a new user signup flag in storage
-      const newUserFlag = StorageService.getItem<{
-        timestamp: number;
-        completed: boolean;
-      }>('new_user_signup');
-
-      if (newUserFlag) {
-        // Check if the flag is recent (within last 5 minutes) and completed
-        const isRecent = (Date.now() - newUserFlag.timestamp) < (5 * 60 * 1000); // 5 minutes
-
-        if (isRecent && newUserFlag.completed) {
-          // Clear the flag since we're processing it
-          StorageService.removeItem('new_user_signup');
-          return true;
-        }
+      // Check if there's a valid new user signup flag
+      if (hasValidNewUserSignupFlag(userEmail)) {
+        // Clear the flag since we're processing it
+        clearNewUserSignupFlag();
+        return true;
       }
 
       // Check if this is an existing user signing in (not a new signup)
@@ -238,7 +247,7 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
       const state = this.getSignUpState();
 
       // If user has old state but no new user flag, they're signing in (not signing up)
-      if (state.hasOfferedSetup && !newUserFlag) {
+      if (state.hasOfferedSetup) {
         // Clear old state for this user since they're signing in fresh
         this.clearSignUpState();
         return false;

@@ -113,6 +113,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const [errors, setErrors] = useState<string[]>([]);
 	const [disabled, setDisabled] = useState<boolean>(false);
 	const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+	const [householdMembers, setHouseholdMembers] = useState<any[]>([]);
 	const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
 	const householdDataProcessedRef = useRef<boolean>(false);
 
@@ -290,6 +291,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						zip_code: householdData.zip_code || user.zip_code,
 						phone: householdData.phone || user.phone,
 						email: householdData.email || user.email,
+						// Prefill contact preferences
+						permission_to_text:
+							householdData.permission_to_text ??
+							user.permission_to_text,
+						permission_to_email:
+							householdData.permission_to_email ??
+							user.permission_to_email,
 						// Prefill date_of_birth and gender from primary member
 						date_of_birth: primaryMember
 							? convertDateFormat(
@@ -299,22 +307,31 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						gender: primaryMember
 							? getGenderForForm(primaryMember.gender_id || null)
 							: user.gender || "",
-						// Prefill household member counts
-						adults_in_household:
-							householdData.counts?.adults ||
-							user.adults_in_household,
-						children_in_household:
-							householdData.counts?.children ||
-							user.children_in_household,
-						seniors_in_household:
-							householdData.counts?.seniors ||
-							user.seniors_in_household,
+					// Prefill household member counts
+					// Subtract 1 from adults because head of household is counted as an adult
+					adults_in_household:
+						Math.max(0, (householdData.counts?.adults || 0) - 1) ||
+						user.adults_in_household,
+					children_in_household:
+						householdData.counts?.children ||
+						user.children_in_household,
+					// Only trust API seniors count if head of household has valid DOB
+					// Backend defaults DOB to "1900-01-01" which would incorrectly count as 125+ years old (senior)
+					seniors_in_household:
+						primaryMember?.date_of_birth &&
+						primaryMember.date_of_birth !== "1900-01-01"
+							? householdData.counts?.seniors || 0
+							: user.seniors_in_household || 0,
 						// Prefill household name if available
 						identification_code:
 							householdData.identification_code ||
 							user.identification_code,
 					};
 					setUser(prefilledUser);
+					// Store household members for count validation
+					if (householdData.members && householdData.members.length > 0) {
+						setHouseholdMembers(householdData.members);
+					}
 					householdDataProcessedRef.current = true; // Mark as processed
 				} catch (error) {
 					console.error(
@@ -603,6 +620,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			phone: registrationData.phone || null,
 			email: registrationData.email || null,
 
+			// Update contact preferences
+			permission_to_text: registrationData.permission_to_text ?? null,
+			permission_to_email: registrationData.permission_to_email ?? null,
+
 			// Update counts from registration
 			counts: {
 				seniors: registrationData.seniors_in_household || 0,
@@ -788,17 +809,38 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					? { "X-Guest-Token": `${userToken}` }
 					: { Authorization: `Bearer ${getCognitoToken()}` };
 
-			await axios.post<ApiResponse<any>>(
-				CREATE_RESERVATION,
-				eventSlotId
-					? {
-							event_id: selectedEvent.eventId,
-							event_date_id,
-							event_slot_id,
-					  }
-					: { event_id: selectedEvent.eventId, event_date_id },
-				{ headers }
-			);
+		// Build registration payload with counts based on user type
+		const basePayload = eventSlotId
+			? {
+					event_id: selectedEvent.eventId,
+					event_date_id,
+					event_slot_id,
+			  }
+			: { event_id: selectedEvent.eventId, event_date_id };
+
+		// Add counts in appropriate format based on user type
+		// Guest users: flat fields (seniors, adults, children)
+		// Registered users: nested counts object
+		const countsPayload =
+			userType === "guest"
+				? {
+						seniors: updatedUser.seniors_in_household || 0,
+						adults: updatedUser.adults_in_household || 0,
+						children: updatedUser.children_in_household || 0,
+				  }
+				: {
+						counts: {
+							seniors: updatedUser.seniors_in_household || 0,
+							adults: updatedUser.adults_in_household || 0,
+							children: updatedUser.children_in_household || 0,
+						},
+				  };
+
+		await axios.post<ApiResponse<any>>(
+			CREATE_RESERVATION,
+			{ ...basePayload, ...countsPayload },
+			{ headers }
+		);
 			TagManager.dataLayer({
 				dataLayer: {
 					event: "reservation",
@@ -936,6 +978,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					}
 					event={selectedEvent}
 					disabled={disabled}
+					householdMembers={householdMembers}
 				/>
 			</Fragment>
 		</Fragment>

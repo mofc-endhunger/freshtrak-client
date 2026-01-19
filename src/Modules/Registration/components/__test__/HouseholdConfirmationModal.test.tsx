@@ -118,6 +118,8 @@ describe("HouseholdConfirmationModal", () => {
 		zip_code: "12345",
 		phone: "555-1234",
 		email: "test@example.com",
+		permission_to_text: true,
+		permission_to_email: true,
 	};
 
 	const defaultProps: HouseholdConfirmationModalProps = {

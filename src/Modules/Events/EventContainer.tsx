@@ -202,6 +202,7 @@ const EventContainer: React.FC = () => {
 							zipCode={zipCode}
 							availabilityFilter={availability}
 							reservationsFilter={reservations}
+							distance={Number(distance) || 10}
 						/>
 					)}
 					{loading && <LoadingSpinner />}

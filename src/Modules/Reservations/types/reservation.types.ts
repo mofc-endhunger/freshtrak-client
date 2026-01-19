@@ -2,274 +2,120 @@
  * Reservation Types
  *
  * TypeScript interfaces for reservation-related data structures.
- * These types are designed to be API-ready for future backend integration.
+ * Updated to match the backend API response schema from RESERVATIONS_PRD.md
  *
  * ============================================================================
- * API DISCUSSION NOTES FOR BACKEND TEAM:
+ * API INTEGRATION NOTES:
  * ============================================================================
  *
- * 1. GET /api/reservations
- *    - Should return ReservationsResponse with both upcoming and past reservations
- *    - Upcoming: status = "confirmed" | "pending", date >= today
- *    - Past: status = "completed" | "cancelled", OR date < today
- *    - Consider: separate endpoints vs single endpoint with query params?
- *      Option A: GET /api/reservations?type=upcoming|past|all
- *      Option B: GET /api/reservations/upcoming and GET /api/reservations/history
- *    - History should go back at least 2 weeks (configurable?)
- *
- * 2. POST /api/reservations/{id}/cancel
- *    - Should update reservation status to "cancelled"
- *    - Should return the updated reservation object
- *    - Should free up the slot for other users
- *    - Consider: Should we track cancellation reason? (optional field)
- *    - Consider: Should we track cancelled_at timestamp?
- *    - Consider: Any restrictions on cancellation? (e.g., can't cancel within 2 hours)
- *
- * 3. Reservation Status Flow:
- *    - pending -> confirmed (after processing)
- *    - confirmed -> completed (after event date passes and user checked in)
- *    - confirmed -> cancelled (user cancels)
- *    - pending -> cancelled (user cancels before confirmation)
- *
- * 4. Questions for Backend:
- *    - How do we determine "completed" status? Auto-update after event date?
- *    - Do we track check-in status separately from reservation status?
- *    - Should cancelled reservations be soft-deleted or kept in history?
- *    - What's the retention period for past reservations?
+ * Endpoint: GET /reservations
+ * - Returns all reservations for the authenticated user
+ * - Response includes upcoming_count and past_count
+ * - Status is derived on frontend from date (past = completed, future = confirmed)
  *
  * ============================================================================
  */
 
 // ============================================================================
-// ENUMS AND BASIC TYPES
+// BACKEND API RESPONSE TYPES (Raw API Schema)
 // ============================================================================
 
 /**
- * Reservation status enum
- *
- * API NOTE: Backend should return one of these status values.
- * Status transitions:
- *   - "pending" -> "confirmed" -> "completed"
- *   - "pending" -> "cancelled"
- *   - "confirmed" -> "cancelled"
+ * Backend API event object (nested in reservation)
+ * Note: API may return string IDs and name may be missing
  */
-export type ReservationStatus =
-    | "confirmed"  // Reservation is active and confirmed
-    | "pending"    // Reservation is awaiting confirmation
-    | "cancelled"  // User cancelled the reservation
-    | "completed"; // Event has passed and user attended (or event date passed)
+export interface ReservationApiEvent {
+	id: number | string;
+	name?: string; // Optional - may not be provided by backend
+}
 
 /**
- * Event type enum
- *
- * API NOTE: This should match the event_type values from the events API.
- * Used for visual badges and filtering.
+ * Backend API timeslot object (nested in reservation)
+ * Times are in ISO 8601 format
  */
-export type EventType = "in-person" | "drive-through" | "delivery" | "virtual";
+export interface ReservationApiTimeslot {
+	start_time: string; // ISO: "2026-01-17T09:00:00.000Z"
+	end_time: string; // ISO: "2026-01-17T15:00:00.000Z"
+}
+
+/**
+ * Single reservation as returned by the backend API
+ * This is the raw format before transformation
+ * Note: date and timeslot can be null when data is incomplete
+ */
+export interface ReservationApiResponse {
+	id: number | string;
+	event: ReservationApiEvent;
+	date: string | null; // Can be null
+	timeslot: ReservationApiTimeslot | null; // Can be null
+	public_event_slot_id?: number; // Additional field from backend
+	public_event_date_id?: number; // Additional field from backend
+	household_id: number;
+	created_at: string; // ISO timestamp
+	updated_at: string; // ISO timestamp
+}
+
+/**
+ * List response from GET /reservations endpoint
+ */
+export interface ReservationsApiListResponse {
+	reservations: ReservationApiResponse[];
+	total: number;
+	upcoming_count: number;
+	past_count: number;
+}
 
 // ============================================================================
-// NESTED OBJECT INTERFACES
+// FRONTEND DISPLAY TYPES (Transformed for UI)
 // ============================================================================
 
 /**
- * Reservation event/location information
- *
- * API NOTE: This is a denormalized copy of event data stored with the reservation.
- * This allows displaying reservation details without fetching the full event.
- * Backend should populate this when creating the reservation.
+ * Reservation status
+ * Only "completed" status is used - shown for past events
+ * Derived from date: date < today → "completed"
+ */
+export type ReservationStatus = "completed";
+
+/**
+ * Event object for frontend display
  */
 export interface ReservationEvent {
-    id: number;
-    name: string;
-    location: {
-        address_line_1: string;
-        address_line_2?: string;
-        city: string;
-        state: string;
-        zip_code: string;
-    };
-    organization_name?: string;
+	id: number;
+	name: string;
 }
 
 /**
- * Timeslot information from selected event slot
- *
- * API NOTE: This should contain the timeslot data from when the user registered.
- * Should match the event_slot they selected during registration.
- * The event_slot_id links back to the original slot for reference.
+ * Timeslot for frontend display
+ * Times are formatted for display (e.g., "9:00am")
  */
 export interface ReservationTimeslot {
-    event_slot_id: number;
-    start_time: string; // e.g., "9:00am" - format should be consistent with events API
-    end_time: string;   // e.g., "3:00pm"
+	start_time: string; // Formatted: "9:00am"
+	end_time: string; // Formatted: "3:00pm"
 }
 
-// ============================================================================
-// MAIN RESERVATION INTERFACE
-// ============================================================================
-
 /**
- * Main reservation interface
- *
- * API NOTE: This is the core reservation object returned by the API.
- * All fields should be populated by the backend when fetching reservations.
+ * Main reservation interface for frontend components
+ * This is the transformed format used by UI components
  */
 export interface Reservation {
-    id: number;                           // Unique reservation ID (primary key)
-    confirmation_code: string;            // Human-readable confirmation code for check-in
-    event: ReservationEvent;              // Denormalized event data (see ReservationEvent)
-    event_date_id: string;                // Reference to the event_date record
-    date: string;                         // ISO date string (YYYY-MM-DD) of the event
-    timeslot: ReservationTimeslot;        // Selected timeslot data (see ReservationTimeslot)
-    event_type: EventType;                // Type of event for badge display
-    status: ReservationStatus;            // Current reservation status
-
-    // QR code support - some foodbanks may not support QR codes
-    // API NOTE: If QR codes are supported, backend generates and returns URL
-    qr_code_url?: string | null;
-
-    // Unique ID for check-in (fallback when QR not available)
-    // API NOTE: This could be same as confirmation_code or a separate value
-    check_in_code: string;
-
-    household_id: number;                 // Reference to the household record
-    created_at: string;                   // ISO timestamp when reservation was created
-    updated_at: string;                   // ISO timestamp when reservation was last modified
-
-    // API NOTE: Consider adding these fields for cancellation tracking:
-    // cancelled_at?: string;             // ISO timestamp when cancelled (if status = cancelled)
-    // cancellation_reason?: string;      // Optional reason for cancellation
+	id: number;
+	event: ReservationEvent;
+	date: string; // "2026-01-17"
+	timeslot: ReservationTimeslot;
+	status?: ReservationStatus; // Optional - only "completed" for past events
+	household_id: number;
+	created_at: string;
+	updated_at: string;
 }
 
-// ============================================================================
-// API RESPONSE INTERFACES
-// ============================================================================
-
 /**
- * API Response wrapper for reservations list
- *
- * API NOTE: This is the expected response format from GET /api/reservations
- *
- * Example response:
- * {
- *   "reservations": [...],           // Array of Reservation objects
- *   "total": 5,                      // Total count of all reservations
- *   "upcoming_count": 2,             // Count of upcoming (confirmed/pending) reservations
- *   "past_count": 3                  // Count of past (completed/cancelled) reservations
- * }
- *
- * QUESTION FOR BACKEND: Should we include pagination?
- * If history grows large, we may need:
- *   "page": 1,
- *   "per_page": 20,
- *   "total_pages": 3
+ * Frontend response wrapper for reservations list
  */
 export interface ReservationsResponse {
-    reservations: Reservation[];
-    total: number;
-    upcoming_count: number;
-    past_count: number;
-}
-
-/**
- * Single reservation response
- *
- * API NOTE: Response format for GET /api/reservations/{id}
- * and POST /api/reservations/{id}/cancel
- */
-export interface ReservationResponse {
-    reservation: Reservation;
-}
-
-/**
- * Cancel reservation request
- *
- * API NOTE: Request body for POST /api/reservations/{id}/cancel
- * Currently no required fields, but could include optional cancellation reason.
- *
- * QUESTION FOR BACKEND: Should we require/allow a cancellation reason?
- * This could help foodbanks understand why people cancel.
- */
-export interface CancelReservationRequest {
-    // Optional: reason for cancellation (for analytics/feedback)
-    reason?: string;
-}
-
-/**
- * Cancel reservation response
- *
- * API NOTE: Response from POST /api/reservations/{id}/cancel
- * Should return the updated reservation with status = "cancelled"
- */
-export interface CancelReservationResponse {
-    success: boolean;
-    message: string;
-    reservation: Reservation;  // Updated reservation with status = "cancelled"
-}
-
-/**
- * Past reservations query parameters
- *
- * API NOTE: Query params for fetching past reservations
- * GET /api/reservations?type=past&from_date=2024-01-01&to_date=2024-01-14
- *
- * QUESTION FOR BACKEND: What's the default date range for history?
- * Suggestion: Default to last 2 weeks, allow custom range up to 3 months
- */
-export interface PastReservationsParams {
-    from_date?: string;  // ISO date string - start of date range
-    to_date?: string;    // ISO date string - end of date range
-    limit?: number;      // Max number of results (for pagination)
-    offset?: number;     // Offset for pagination
-}
-
-// ============================================================================
-// API CONFIGURATION
-// ============================================================================
-
-/**
- * API configuration for reservations service
- *
- * API NOTE: These endpoints should be implemented by the backend.
- * Base URL comes from environment config.
- */
-export interface ReservationsApiConfig {
-    baseUrl: string;
-    endpoints: {
-        /**
-         * GET /api/reservations
-         * Returns all reservations for the authenticated user
-         * Query params: type=upcoming|past|all, from_date, to_date
-         */
-        getReservations: string;
-
-        /**
-         * GET /api/reservations/{id}
-         * Returns a single reservation by ID
-         */
-        getReservationById: (id: number) => string;
-
-        /**
-         * POST /api/reservations/{id}/cancel
-         * Cancels a reservation
-         * Request body: CancelReservationRequest (optional reason)
-         * Response: CancelReservationResponse
-         */
-        cancelReservation: (id: number) => string;
-
-        /**
-         * GET /api/reservations/history
-         * Returns past reservations (completed + cancelled)
-         * Query params: from_date, to_date, limit, offset
-         *
-         * API NOTE: This could be a separate endpoint or combined with getReservations
-         * using query parameters. Separate endpoint is cleaner for caching.
-         */
-        getReservationHistory?: string;
-    };
-    timeout: number;
-    retryAttempts: number;
-    retryDelay: number;
+	reservations: Reservation[];
+	total: number;
+	upcoming_count: number;
+	past_count: number;
 }
 
 // ============================================================================
@@ -281,11 +127,3 @@ export interface ReservationsApiConfig {
  * Used in UI to switch between views
  */
 export type ReservationFilter = "upcoming" | "past" | "all";
-
-/**
- * Sort options for reservation lists
- *
- * API NOTE: If sorting is needed, backend should support these sort fields
- * Query param: sort=date_asc|date_desc|created_at_desc
- */
-export type ReservationSortOption = "date_asc" | "date_desc" | "created_at_desc";

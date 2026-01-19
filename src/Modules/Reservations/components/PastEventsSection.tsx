@@ -2,36 +2,29 @@
  * PastEventsSection Component
  *
  * Displays the user's past events/reservations history.
- * Shows completed and cancelled reservations from the last 2 weeks.
+ * Shows completed reservations (events where date < today).
  *
  * ============================================================================
  * API INTEGRATION NOTES:
  * ============================================================================
  *
  * This component fetches past reservations via:
- *   GET /api/reservations?type=past
- *   OR
- *   GET /api/reservations/history
+ *   GET /reservations
  *
- * Expected data includes:
- * - Reservations with status = "completed" (user attended)
- * - Reservations with status = "cancelled" (user cancelled)
- * - Any reservation where date < today
- *
- * The backend should:
- * 1. Return history for at least the last 2 weeks
- * 2. Sort by date descending (most recent first)
- * 3. Consider pagination if history grows large
+ * Status is derived on frontend:
+ * - date < today → "completed"
+ * - date >= today → "confirmed"
  *
  * ============================================================================
  */
 
 import React, { useState, useEffect, useMemo } from "react";
-import { History } from "lucide-react";
+import { History, AlertCircle } from "lucide-react";
 import ReservationCard from "./ReservationCard";
 import { Reservation, ReservationsResponse } from "../types/reservation.types";
 import { ReservationsApiService } from "../../../Services/ReservationsApiService";
 import { LoadingCard } from "../../Households/components/LoadingSpinner";
+import { Alert, AlertDescription } from "../../../components/ui/alert";
 import localization from "../../Localization/LocalizationComponent";
 
 /**
@@ -64,10 +57,8 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 	/**
 	 * Fetch past reservations on mount
 	 *
-	 * API NOTE: This calls GET /api/reservations?type=past
-	 * Backend should return reservations where:
-	 * - status = "completed" OR "cancelled"
-	 * - OR date < today
+	 * Calls GET /reservations and filters for past events
+	 * (where derived status = "completed")
 	 */
 	useEffect(() => {
 		const fetchPastReservations = async () => {
@@ -80,9 +71,16 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 					await reservationsApiService.getPastReservations();
 
 				// Sort by date descending (most recent first)
+				// Handle "N/A" or invalid dates by placing them at the end
 				const sortedReservations = [...data.reservations].sort(
-					(a, b) =>
-						new Date(b.date).getTime() - new Date(a.date).getTime()
+					(a, b) => {
+						const dateA = a.date && a.date !== "N/A" ? new Date(a.date).getTime() : 0;
+						const dateB = b.date && b.date !== "N/A" ? new Date(b.date).getTime() : 0;
+						// Handle invalid dates (NaN)
+						const validA = !isNaN(dateA) ? dateA : 0;
+						const validB = !isNaN(dateB) ? dateB : 0;
+						return validB - validA;
+					}
 				);
 
 				setPastReservations(sortedReservations);
@@ -133,11 +131,10 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 			>
 				{/* Error State */}
 				{error && (
-					<div className="text-center py-8">
-						<p className="font-noto-sans text-sm text-red-500">
-							{error}
-						</p>
-					</div>
+					<Alert variant="destructive" className="mb-4">
+						<AlertCircle className="h-4 w-4" />
+						<AlertDescription>{error}</AlertDescription>
+					</Alert>
 				)}
 
 				{/* Empty State */}

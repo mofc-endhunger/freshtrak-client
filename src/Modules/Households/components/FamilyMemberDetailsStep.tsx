@@ -114,8 +114,8 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 	// Initialize members data array with existing data where available
 	useEffect(() => {
 		const initialMembers: MemberFormData[] = members.map((member: any) => {
-			// Check if this is an existing member with data
-			if (member.isExisting && member.first_name) {
+			// Check if this member has data (either existing from API or previously saved)
+			if (member.first_name) {
 				return {
 					first_name: member.first_name || "",
 					last_name: member.last_name || "",

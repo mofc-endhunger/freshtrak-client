@@ -25,6 +25,7 @@ module.exports = {
 				"gray-inner": "#e5e5e5",
 				"shadow-color": "#e6e6e6",
 				"shadow-dark": "#b9b9b9",
+				"tab-active": "#392947",
 			},
 			fontFamily: {
 				"noto-sans": ["Noto Sans", "sans-serif"],

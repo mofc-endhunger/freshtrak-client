@@ -114,8 +114,8 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 	// Initialize members data array with existing data where available
 	useEffect(() => {
 		const initialMembers: MemberFormData[] = members.map((member: any) => {
-			// Check if this is an existing member with data
-			if (member.isExisting && member.first_name) {
+			// Check if this member has data (either existing from API or previously saved)
+			if (member.first_name) {
 				return {
 					first_name: member.first_name || "",
 					last_name: member.last_name || "",
@@ -275,13 +275,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<form
-						onSubmit={(e) => {
-							e.preventDefault();
-							handleSubmit(onSubmit)();
-						}}
-						className="space-y-4"
-					>
+					<div className="space-y-4">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							{/* First Name */}
 							<div className="space-y-2">
@@ -483,7 +477,7 @@ const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
 								</Button>
 							</div>
 						</div>
-					</form>
+					</div>
 
 					{/* Progress indicator */}
 					<div className="flex justify-center space-x-2 mt-6">

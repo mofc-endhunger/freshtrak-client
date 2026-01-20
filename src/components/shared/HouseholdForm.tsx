@@ -935,37 +935,45 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				);
 
 				// Build members array: existing first (prefilled), then new (empty)
-				const membersForDetails: HouseholdMember[] = [];
-				let tempMemberId = -1; // Use negative IDs for new members
+				// If user navigated back from Step 5, use previously saved familyMembers
+				let membersForDetails: HouseholdMember[] = [];
 
-				// Add seniors: existing first, then new
-				existingSeniors.forEach((member) =>
-					membersForDetails.push(member)
-				);
-				for (let i = 0; i < newSeniorsNeeded; i++) {
-					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "senior")
-					);
-				}
+				if (state.familyMembers.length > 0) {
+					// Use previously saved family members data (from when user completed Step 4)
+					membersForDetails = state.familyMembers;
+				} else {
+					// First time entering Step 4 - build from API data + empty templates
+					let tempMemberId = -1; // Use negative IDs for new members
 
-				// Add adults: existing first, then new
-				existingAdults.forEach((member) =>
-					membersForDetails.push(member)
-				);
-				for (let i = 0; i < newAdultsNeeded; i++) {
-					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "adult")
+					// Add seniors: existing first, then new
+					existingSeniors.forEach((member) =>
+						membersForDetails.push(member)
 					);
-				}
+					for (let i = 0; i < newSeniorsNeeded; i++) {
+						membersForDetails.push(
+							createEmptyMember(tempMemberId--, "senior")
+						);
+					}
 
-				// Add children: existing first, then new
-				existingChildren.forEach((member) =>
-					membersForDetails.push(member)
-				);
-				for (let i = 0; i < newChildrenNeeded; i++) {
-					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "child")
+					// Add adults: existing first, then new
+					existingAdults.forEach((member) =>
+						membersForDetails.push(member)
 					);
+					for (let i = 0; i < newAdultsNeeded; i++) {
+						membersForDetails.push(
+							createEmptyMember(tempMemberId--, "adult")
+						);
+					}
+
+					// Add children: existing first, then new
+					existingChildren.forEach((member) =>
+						membersForDetails.push(member)
+					);
+					for (let i = 0; i < newChildrenNeeded; i++) {
+						membersForDetails.push(
+							createEmptyMember(tempMemberId--, "child")
+						);
+					}
 				}
 
 				const originalCounts = {

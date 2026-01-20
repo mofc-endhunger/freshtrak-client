@@ -85,6 +85,56 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Sign In / Create Account",
 		account_loading_message: "Please wait while we retrieve your data",
 
+		// TABS
+		tab_summary: "Summary",
+		tab_account: "Account",
+		text_profile: "Profile",
+
+		// RESERVATIONS
+		title_your_reservations: "Your Reservations",
+		text_you_have_event_coming_up: "You have an event coming up.",
+		text_no_upcoming_events: "No upcoming events found.",
+		text_browse_events_to_register: "Browse events to make a reservation.",
+		loading_reservations: "Loading reservations...",
+		error_loading_reservations: "Failed to load reservations",
+		label_check_in_code: "Check-in Code",
+		label_years_old: "years old",
+		alt_qr_code: "QR Code",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Cancel Reservation",
+		title_cancel_reservation: "Cancel Reservation",
+		message_cancel_confirmation: "Are you sure you want to cancel your reservation for this event?",
+		message_cancel_warning: "Your slot may be given to someone else and you may need to re-register.",
+		button_keep_reservation: "Keep Reservation",
+		button_confirm_cancel: "Yes, Cancel",
+		message_cancel_success: "Your reservation has been cancelled successfully.",
+		message_cancel_error: "Unable to cancel reservation. Please try again.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Past Events",
+		text_no_past_events: "No past events found.",
+		text_past_events_description: "Your event history from the last 2 weeks.",
+		status_cancelled: "Cancelled",
+		status_confirmed: "Confirmed",
+
+		event_type_in_person: "In-Person",
+		event_type_drive_through: "Drive-Through",
+		event_type_delivery: "Delivery",
+		event_type_virtual: "Virtual",
+
+		// ACCOUNT SECTION
+		title_your_information: "Your Information",
+		card_title_information: "Information",
+		card_title_address: "Address",
+		card_title_contact: "Contact",
+		member_category_senior: "Senior",
+		member_category_adult: "Adult",
+		member_category_child: "Child",
+		badge_freshtrak_user: "FreshTrak User",
+		text_no_other_members: "No other household members added.",
+		link_update_household: "Update Household",
+
 		// BUTTONS & ACTIONS
 		button_continue: "Continue",
 		button_cancel: "Cancel",
@@ -842,6 +892,57 @@ let localization = new LocalizedStrings({
 		account_loading_message:
 			"Por favor espere mientras recuperamos sus datos",
 
+		// TABS
+		tab_summary: "Resumen",
+		tab_account: "Cuenta",
+		text_profile: "Perfil",
+
+		// RESERVATIONS
+		title_your_reservations: "Tus Reservaciones",
+		text_you_have_event_coming_up: "Tienes un evento próximo.",
+		text_no_upcoming_events: "No se encontraron eventos próximos.",
+		text_browse_events_to_register:
+			"Explora eventos para hacer una reservación.",
+		loading_reservations: "Cargando reservaciones...",
+		error_loading_reservations: "Error al cargar las reservaciones",
+		label_check_in_code: "Código de Registro",
+		label_years_old: "años",
+		alt_qr_code: "Código QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Cancelar Reservación",
+		title_cancel_reservation: "Cancelar Reservación",
+		message_cancel_confirmation: "¿Está seguro de que desea cancelar su reservación para este evento?",
+		message_cancel_warning: "Su lugar puede ser dado a otra persona y es posible que deba registrarse nuevamente.",
+		button_keep_reservation: "Mantener Reservación",
+		button_confirm_cancel: "Sí, Cancelar",
+		message_cancel_success: "Su reservación ha sido cancelada exitosamente.",
+		message_cancel_error: "No se pudo cancelar la reservación. Por favor intente de nuevo.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Eventos Pasados",
+		text_no_past_events: "No se encontraron eventos pasados.",
+		text_past_events_description: "Su historial de eventos de las últimas 2 semanas.",
+		status_cancelled: "Cancelado",
+		status_confirmed: "Confirmado",
+
+		event_type_in_person: "En Persona",
+		event_type_drive_through: "Drive-Through",
+		event_type_delivery: "Entrega",
+		event_type_virtual: "Virtual",
+
+		// ACCOUNT SECTION
+		title_your_information: "Tu Información",
+		card_title_information: "Información",
+		card_title_address: "Dirección",
+		card_title_contact: "Contacto",
+		member_category_senior: "Mayor",
+		member_category_adult: "Adulto",
+		member_category_child: "Niño",
+		badge_freshtrak_user: "Usuario FreshTrak",
+		text_no_other_members: "No se han agregado otros miembros del hogar.",
+		link_update_household: "Actualizar Hogar",
+
 		// BUTTONS & ACTIONS
 		button_continue: "Continuar",
 		button_cancel: "Cancelar",
@@ -1594,6 +1695,56 @@ let localization = new LocalizedStrings({
 			"Gali ama samee akoon si aad waqti u badbaadiso mustaqbalka",
 		guest_signin_button: "Gali / Samee Akoon",
 		account_loading_message: "Fadlan sug inta aan ku soo celinno xogtaada",
+
+		// TABS
+		tab_summary: "Kooban",
+		tab_account: "Akoon",
+		text_profile: "Aqoonsiga",
+
+		// RESERVATIONS
+		title_your_reservations: "Ballanqaadkaaga",
+		text_you_have_event_coming_up: "Waxaad leedahay dhacdo soo socota.",
+		text_no_upcoming_events: "Lama helin dhacdo soo socota.",
+		text_browse_events_to_register: "Raadi dhacdo si aad u ballanqaadato.",
+		loading_reservations: "Ballanqaadyada ayaa la soo dejinayaa...",
+		error_loading_reservations: "Ballanqaadyada soo dejinta way fashilmeen",
+		label_check_in_code: "Koodka Diiwangelinta",
+		label_years_old: "sano jir ah",
+		alt_qr_code: "Koodka QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Jooji Ballanqaadka",
+		title_cancel_reservation: "Jooji Ballanqaadka",
+		message_cancel_confirmation: "Ma hubtaa inaad joojisey ballanqaadkaaga dhacdadan?",
+		message_cancel_warning: "Booska aad haysatay waxaa la siin karaa qof kale waxaadna u baahan kartaa inaad mar kale is diiwaan geliso.",
+		button_keep_reservation: "Hay Ballanqaadka",
+		button_confirm_cancel: "Haa, Jooji",
+		message_cancel_success: "Ballanqaadkaaga si guul leh ayaa loo joojiyay.",
+		message_cancel_error: "Lama joojin karo ballanqaadka. Fadlan isku day mar kale.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Dhacdooyinkii Hore",
+		text_no_past_events: "Lama helin dhacdooyin hore.",
+		text_past_events_description: "Taariikhda dhacdooyinkaaga 2-dii toddobaad ee la soo dhaafay.",
+		status_cancelled: "La Joojiyay",
+		status_confirmed: "La Xaqiijiyay",
+
+		event_type_in_person: "Qof ahaan",
+		event_type_drive_through: "Wadista",
+		event_type_delivery: "Gaarsiinta",
+		event_type_virtual: "Farsamaysan",
+
+		// ACCOUNT SECTION
+		title_your_information: "Macluumaadkaaga",
+		card_title_information: "Macluumaad",
+		card_title_address: "Cinwaan",
+		card_title_contact: "Xiriir",
+		member_category_senior: "Waayeel",
+		member_category_adult: "Qof weyn",
+		member_category_child: "Ilmo",
+		badge_freshtrak_user: "Isticmaale FreshTrak",
+		text_no_other_members: "Xubnaha kale ee qoyska lama shixin.",
+		link_update_household: "Cusboonaysii Qoyska",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Sii Wadi",
@@ -2350,6 +2501,57 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Войти / Создать Аккаунт",
 		account_loading_message:
 			"Пожалуйста, подождите, пока мы получим ваши данные",
+
+		// TABS
+		tab_summary: "Сводка",
+		tab_account: "Аккаунт",
+		text_profile: "Профиль",
+
+		// RESERVATIONS
+		title_your_reservations: "Ваши Бронирования",
+		text_you_have_event_coming_up: "У вас есть предстоящее мероприятие.",
+		text_no_upcoming_events: "Предстоящих мероприятий не найдено.",
+		text_browse_events_to_register:
+			"Просмотрите мероприятия для бронирования.",
+		loading_reservations: "Загрузка бронирований...",
+		error_loading_reservations: "Ошибка загрузки бронирований",
+		label_check_in_code: "Код Регистрации",
+		label_years_old: "лет",
+		alt_qr_code: "QR-код",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Отменить бронирование",
+		title_cancel_reservation: "Отменить бронирование",
+		message_cancel_confirmation: "Вы уверены, что хотите отменить бронирование на это мероприятие?",
+		message_cancel_warning: "Ваше место может быть передано другому человеку, и вам может потребоваться зарегистрироваться снова.",
+		button_keep_reservation: "Сохранить бронирование",
+		button_confirm_cancel: "Да, отменить",
+		message_cancel_success: "Ваше бронирование успешно отменено.",
+		message_cancel_error: "Не удалось отменить бронирование. Пожалуйста, попробуйте снова.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Прошедшие мероприятия",
+		text_no_past_events: "Прошедшие мероприятия не найдены.",
+		text_past_events_description: "История ваших мероприятий за последние 2 недели.",
+		status_cancelled: "Отменено",
+		status_confirmed: "Подтверждено",
+
+		event_type_in_person: "Лично",
+		event_type_drive_through: "Автораздача",
+		event_type_delivery: "Доставка",
+		event_type_virtual: "Онлайн",
+
+		// ACCOUNT SECTION
+		title_your_information: "Ваша Информация",
+		card_title_information: "Информация",
+		card_title_address: "Адрес",
+		card_title_contact: "Контакт",
+		member_category_senior: "Пожилой",
+		member_category_adult: "Взрослый",
+		member_category_child: "Ребёнок",
+		badge_freshtrak_user: "Пользователь FreshTrak",
+		text_no_other_members: "Другие члены семьи не добавлены.",
+		link_update_household: "Обновить Домохозяйство",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Продолжить",
@@ -3108,6 +3310,57 @@ let localization = new LocalizedStrings({
 			"Gelecekte zaman kazanmak için giriş yapın veya hesap oluşturun",
 		guest_signin_button: "Giriş Yap / Hesap Oluştur",
 
+		// TABS
+		tab_summary: "Özet",
+		tab_account: "Hesap",
+		text_profile: "Profil",
+
+		// RESERVATIONS
+		title_your_reservations: "Rezervasyonlarınız",
+		text_you_have_event_coming_up: "Yaklaşan bir etkinliğiniz var.",
+		text_no_upcoming_events: "Yaklaşan etkinlik bulunamadı.",
+		text_browse_events_to_register:
+			"Rezervasyon yapmak için etkinliklere göz atın.",
+		loading_reservations: "Rezervasyonlar yükleniyor...",
+		error_loading_reservations: "Rezervasyonlar yüklenemedi",
+		label_check_in_code: "Giriş Kodu",
+		label_years_old: "yaşında",
+		alt_qr_code: "QR Kod",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Rezervasyonu İptal Et",
+		title_cancel_reservation: "Rezervasyonu İptal Et",
+		message_cancel_confirmation: "Bu etkinlik için rezervasyonunuzu iptal etmek istediğinizden emin misiniz?",
+		message_cancel_warning: "Yeriniz başka birine verilebilir ve tekrar kayıt olmanız gerekebilir.",
+		button_keep_reservation: "Rezervasyonu Koru",
+		button_confirm_cancel: "Evet, İptal Et",
+		message_cancel_success: "Rezervasyonunuz başarıyla iptal edildi.",
+		message_cancel_error: "Rezervasyon iptal edilemedi. Lütfen tekrar deneyin.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Geçmiş Etkinlikler",
+		text_no_past_events: "Geçmiş etkinlik bulunamadı.",
+		text_past_events_description: "Son 2 haftadaki etkinlik geçmişiniz.",
+		status_cancelled: "İptal Edildi",
+		status_confirmed: "Onaylandı",
+
+		event_type_in_person: "Yüz Yüze",
+		event_type_drive_through: "Araçtan Alım",
+		event_type_delivery: "Teslimat",
+		event_type_virtual: "Sanal",
+
+		// ACCOUNT SECTION
+		title_your_information: "Bilgileriniz",
+		card_title_information: "Bilgi",
+		card_title_address: "Adres",
+		card_title_contact: "İletişim",
+		member_category_senior: "Yaşlı",
+		member_category_adult: "Yetişkin",
+		member_category_child: "Çocuk",
+		badge_freshtrak_user: "FreshTrak Kullanıcısı",
+		text_no_other_members: "Başka hane üyesi eklenmedi.",
+		link_update_household: "Haneyi Güncelle",
+
 		// BUTTONS & ACTIONS
 		button_continue: "Devam Et",
 		button_cancel: "İptal",
@@ -3842,6 +4095,56 @@ let localization = new LocalizedStrings({
 			"سجل الدخول أو أنشئ حسابًا لتوفير الوقت في المستقبل",
 		guest_signin_button: "تسجيل الدخول / إنشاء حساب",
 
+		// TABS
+		tab_summary: "ملخص",
+		tab_account: "الحساب",
+		text_profile: "الملف الشخصي",
+
+		// RESERVATIONS
+		title_your_reservations: "حجوزاتك",
+		text_you_have_event_coming_up: "لديك حدث قادم.",
+		text_no_upcoming_events: "لم يتم العثور على أحداث قادمة.",
+		text_browse_events_to_register: "تصفح الأحداث لإجراء حجز.",
+		loading_reservations: "جاري تحميل الحجوزات...",
+		error_loading_reservations: "فشل تحميل الحجوزات",
+		label_check_in_code: "رمز تسجيل الوصول",
+		label_years_old: "سنة",
+		alt_qr_code: "رمز QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "إلغاء الحجز",
+		title_cancel_reservation: "إلغاء الحجز",
+		message_cancel_confirmation: "هل أنت متأكد أنك تريد إلغاء حجزك لهذا الحدث؟",
+		message_cancel_warning: "قد يُعطى مكانك لشخص آخر وقد تحتاج إلى التسجيل مرة أخرى.",
+		button_keep_reservation: "الاحتفاظ بالحجز",
+		button_confirm_cancel: "نعم، إلغاء",
+		message_cancel_success: "تم إلغاء حجزك بنجاح.",
+		message_cancel_error: "تعذر إلغاء الحجز. يرجى المحاولة مرة أخرى.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "الأحداث السابقة",
+		text_no_past_events: "لم يتم العثور على أحداث سابقة.",
+		text_past_events_description: "سجل أحداثك من الأسبوعين الماضيين.",
+		status_cancelled: "ملغى",
+		status_confirmed: "مؤكد",
+
+		event_type_in_person: "حضوري",
+		event_type_drive_through: "من السيارة",
+		event_type_delivery: "توصيل",
+		event_type_virtual: "افتراضي",
+
+		// ACCOUNT SECTION
+		title_your_information: "معلوماتك",
+		card_title_information: "المعلومات",
+		card_title_address: "العنوان",
+		card_title_contact: "الاتصال",
+		member_category_senior: "كبير السن",
+		member_category_adult: "بالغ",
+		member_category_child: "طفل",
+		badge_freshtrak_user: "مستخدم FreshTrak",
+		text_no_other_members: "لم تتم إضافة أفراد آخرين للأسرة.",
+		link_update_household: "تحديث الأسرة",
+
 		// BUTTONS & ACTIONS
 		button_continue: "متابعة",
 		button_cancel: "إلغاء",
@@ -4554,6 +4857,56 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt: "登录或创建账户以在未来节省时间",
 		guest_signin_button: "登录 / 创建账户",
 
+		// TABS
+		tab_summary: "摘要",
+		tab_account: "账户",
+		text_profile: "个人资料",
+
+		// RESERVATIONS
+		title_your_reservations: "您的预约",
+		text_you_have_event_coming_up: "您有一个即将到来的活动。",
+		text_no_upcoming_events: "未找到即将到来的活动。",
+		text_browse_events_to_register: "浏览活动以进行预约。",
+		loading_reservations: "正在加载预约...",
+		error_loading_reservations: "加载预约失败",
+		label_check_in_code: "签到码",
+		label_years_old: "岁",
+		alt_qr_code: "二维码",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "取消预约",
+		title_cancel_reservation: "取消预约",
+		message_cancel_confirmation: "您确定要取消此活动的预约吗？",
+		message_cancel_warning: "您的名额可能会被分配给其他人，您可能需要重新注册。",
+		button_keep_reservation: "保留预约",
+		button_confirm_cancel: "是的，取消",
+		message_cancel_success: "您的预约已成功取消。",
+		message_cancel_error: "无法取消预约。请重试。",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "过去的活动",
+		text_no_past_events: "未找到过去的活动。",
+		text_past_events_description: "您过去2周的活动历史。",
+		status_cancelled: "已取消",
+		status_confirmed: "已确认",
+
+		event_type_in_person: "现场",
+		event_type_drive_through: "免下车",
+		event_type_delivery: "配送",
+		event_type_virtual: "线上",
+
+		// ACCOUNT SECTION
+		title_your_information: "您的信息",
+		card_title_information: "信息",
+		card_title_address: "地址",
+		card_title_contact: "联系方式",
+		member_category_senior: "老年人",
+		member_category_adult: "成人",
+		member_category_child: "儿童",
+		badge_freshtrak_user: "FreshTrak用户",
+		text_no_other_members: "未添加其他家庭成员。",
+		link_update_household: "更新家庭",
+
 		// BUTTONS & ACTIONS
 		button_continue: "继续",
 		button_cancel: "取消",
@@ -5247,6 +5600,56 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"भविष्य में समय बचाने के लिए साइन इन करें या खाता बनाएं",
 		guest_signin_button: "साइन इन / खाता बनाएं",
+
+		// TABS
+		tab_summary: "सारांश",
+		tab_account: "खाता",
+		text_profile: "प्रोफ़ाइल",
+
+		// RESERVATIONS
+		title_your_reservations: "आपकी आरक्षण",
+		text_you_have_event_coming_up: "आपके पास एक आगामी कार्यक्रम है।",
+		text_no_upcoming_events: "कोई आगामी कार्यक्रम नहीं मिला।",
+		text_browse_events_to_register: "आरक्षण के लिए कार्यक्रम ब्राउज़ करें।",
+		loading_reservations: "आरक्षण लोड हो रहे हैं...",
+		error_loading_reservations: "आरक्षण लोड करने में विफल",
+		label_check_in_code: "चेक-इन कोड",
+		label_years_old: "साल",
+		alt_qr_code: "QR कोड",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "आरक्षण रद्द करें",
+		title_cancel_reservation: "आरक्षण रद्द करें",
+		message_cancel_confirmation: "क्या आप वाकई इस कार्यक्रम के लिए अपना आरक्षण रद्द करना चाहते हैं?",
+		message_cancel_warning: "आपकी जगह किसी और को दी जा सकती है और आपको फिर से पंजीकरण करना पड़ सकता है।",
+		button_keep_reservation: "आरक्षण रखें",
+		button_confirm_cancel: "हाँ, रद्द करें",
+		message_cancel_success: "आपका आरक्षण सफलतापूर्वक रद्द कर दिया गया है।",
+		message_cancel_error: "आरक्षण रद्द करने में असमर्थ। कृपया पुनः प्रयास करें।",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "पिछले कार्यक्रम",
+		text_no_past_events: "कोई पिछले कार्यक्रम नहीं मिले।",
+		text_past_events_description: "पिछले 2 सप्ताह का आपका कार्यक्रम इतिहास।",
+		status_cancelled: "रद्द",
+		status_confirmed: "पुष्टि",
+
+		event_type_in_person: "व्यक्तिगत",
+		event_type_drive_through: "ड्राइव-थ्रू",
+		event_type_delivery: "डिलीवरी",
+		event_type_virtual: "वर्चुअल",
+
+		// ACCOUNT SECTION
+		title_your_information: "आपकी जानकारी",
+		card_title_information: "जानकारी",
+		card_title_address: "पता",
+		card_title_contact: "संपर्क",
+		member_category_senior: "वरिष्ठ",
+		member_category_adult: "वयस्क",
+		member_category_child: "बच्चा",
+		badge_freshtrak_user: "FreshTrak उपयोगकर्ता",
+		text_no_other_members: "कोई अन्य घरेलू सदस्य नहीं जोड़े गए।",
+		link_update_household: "परिवार अपडेट करें",
 
 		// BUTTONS & ACTIONS
 		button_continue: "जारी रखें",
@@ -5981,6 +6384,56 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"भविष्यमा समय बचाउन साइन इन गर्नुहोस् वा खाता बनाउनुहोस्",
 		guest_signin_button: "साइन इन / खाता बनाउनुहोस्",
+
+		// TABS
+		tab_summary: "सारांश",
+		tab_account: "खाता",
+		text_profile: "प्रोफाइल",
+
+		// RESERVATIONS
+		title_your_reservations: "तपाईंको आरक्षण",
+		text_you_have_event_coming_up: "तपाईंसँग आगामी कार्यक्रम छ।",
+		text_no_upcoming_events: "कुनै आगामी कार्यक्रम भेटिएन।",
+		text_browse_events_to_register: "आरक्षण गर्न कार्यक्रमहरू हेर्नुहोस्।",
+		loading_reservations: "आरक्षणहरू लोड हुँदैछ...",
+		error_loading_reservations: "आरक्षणहरू लोड गर्न असफल",
+		label_check_in_code: "चेक-इन कोड",
+		label_years_old: "वर्ष",
+		alt_qr_code: "QR कोड",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "आरक्षण रद्द गर्नुहोस्",
+		title_cancel_reservation: "आरक्षण रद्द गर्नुहोस्",
+		message_cancel_confirmation: "के तपाईं यो कार्यक्रमको लागि आफ्नो आरक्षण रद्द गर्न चाहनुहुन्छ?",
+		message_cancel_warning: "तपाईंको स्थान अरू कसैलाई दिन सकिन्छ र तपाईंले फेरि दर्ता गर्नुपर्ने हुन सक्छ।",
+		button_keep_reservation: "आरक्षण राख्नुहोस्",
+		button_confirm_cancel: "हो, रद्द गर्नुहोस्",
+		message_cancel_success: "तपाईंको आरक्षण सफलतापूर्वक रद्द गरियो।",
+		message_cancel_error: "आरक्षण रद्द गर्न असमर्थ। कृपया फेरि प्रयास गर्नुहोस्।",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "विगतका कार्यक्रमहरू",
+		text_no_past_events: "विगतका कार्यक्रमहरू फेला परेनन्।",
+		text_past_events_description: "गत २ हप्ताको तपाईंको कार्यक्रम इतिहास।",
+		status_cancelled: "रद्द",
+		status_confirmed: "पुष्टि",
+
+		event_type_in_person: "व्यक्तिगत",
+		event_type_drive_through: "ड्राइव-थ्रू",
+		event_type_delivery: "डेलिभरी",
+		event_type_virtual: "भर्चुअल",
+
+		// ACCOUNT SECTION
+		title_your_information: "तपाईंको जानकारी",
+		card_title_information: "जानकारी",
+		card_title_address: "ठेगाना",
+		card_title_contact: "सम्पर्क",
+		member_category_senior: "वरिष्ठ",
+		member_category_adult: "वयस्क",
+		member_category_child: "बालक",
+		badge_freshtrak_user: "FreshTrak प्रयोगकर्ता",
+		text_no_other_members: "अन्य घरपरिवारका सदस्यहरू थपिएका छैनन्।",
+		link_update_household: "घरपरिवार अपडेट गर्नुहोस्",
 
 		// BUTTONS & ACTIONS
 		button_continue: "जारी राख्नुहोस्",

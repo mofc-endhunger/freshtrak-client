@@ -19,6 +19,7 @@ interface EventListContainerProps {
 	agencyData: Agency[];
 	availabilityFilter?: string;
 	reservationsFilter?: boolean;
+	distance?: number;
 }
 
 const EventListContainer: React.FC<EventListContainerProps> = ({
@@ -26,6 +27,7 @@ const EventListContainer: React.FC<EventListContainerProps> = ({
 	agencyData,
 	availabilityFilter = "All",
 	reservationsFilter = false,
+	distance = 10,
 }) => {
 	const EventList: React.FC = () => {
 		const agencyDataSorted = EventHandler(agencyData);
@@ -41,6 +43,7 @@ const EventListContainer: React.FC<EventListContainerProps> = ({
 			<EventListComponent
 				events={filteredEvents as Record<string, any[]>}
 				zipCode={zipCode}
+				distance={distance}
 			/>
 		);
 	};

@@ -75,14 +75,31 @@ const CACHE_CONFIG = {
 // ============================================================================
 
 /**
- * Transform ISO time string to display format
- * Example: "2026-01-17T09:00:00.000Z" → "9:00am"
+ * Transform time string to display format
+ * Handles both ISO timestamps and simple time strings:
+ * - ISO: "2026-01-17T09:00:00.000Z" → "9:00am"
+ * - Simple: "12:00:00" → "12:00pm"
  *
- * @param isoString - ISO 8601 timestamp
+ * @param timeString - ISO 8601 timestamp or simple time string (HH:mm:ss)
  * @returns Formatted time string (e.g., "9:00am")
  */
-function formatTimeFromISO(isoString: string): string {
-    const date = new Date(isoString);
+function formatTimeFromISO(timeString: string): string {
+    let date: Date;
+
+    // Check if it's a simple time string (HH:mm:ss or HH:mm)
+    if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(timeString)) {
+        // Prepend a dummy date to make it parseable
+        date = new Date(`1970-01-01T${timeString}`);
+    } else {
+        // Assume ISO format
+        date = new Date(timeString);
+    }
+
+    // Check for invalid date
+    if (isNaN(date.getTime())) {
+        return "N/A";
+    }
+
     return date
         .toLocaleTimeString("en-US", {
             hour: "numeric",

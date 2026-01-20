@@ -294,4 +294,3 @@ const localizationUtils = {
 };
 
 export default localizationUtils;
-

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, forwardRef } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import localization from "../Localization/LocalizationComponent";
 
 interface GooglePlacesAutocompleteProps {
@@ -12,6 +12,7 @@ interface GooglePlacesAutocompleteProps {
 	[key: string]: any;
 }
 
+// Internal interface for component state (maintains backward compatibility)
 interface GooglePlace {
 	place_id: string;
 	description: string;
@@ -21,6 +22,7 @@ interface GooglePlace {
 	};
 }
 
+// Interface for place details returned to consuming components (maintains backward compatibility)
 interface GooglePlaceDetails {
 	place_id: string;
 	address_components: Array<{
@@ -38,23 +40,96 @@ interface GooglePlaceDetails {
 	name?: string;
 }
 
+// New API interfaces for AutocompleteSuggestion
+interface AutocompleteSuggestionRequest {
+	input: string;
+	includedPrimaryTypes?: string[];
+	includedRegionCodes?: string[];
+	language?: string;
+}
+
+interface PlacePredictionText {
+	text: string;
+	matches?: Array<{ startOffset: number; endOffset: number }>;
+}
+
+interface PlacePrediction {
+	placeId: string;
+	text: PlacePredictionText;
+	structuredFormat?: {
+		mainText: PlacePredictionText;
+		secondaryText: PlacePredictionText;
+	};
+}
+
+interface AutocompleteSuggestion {
+	placePrediction: PlacePrediction;
+}
+
+interface AutocompleteSuggestionResponse {
+	suggestions: AutocompleteSuggestion[];
+}
+
 declare global {
 	interface Window {
-		google: {
-			maps: {
-				places: {
-					AutocompleteService: new () => any;
-					AutocompleteSessionToken: new () => any;
-					PlacesService: new (div: HTMLElement) => any;
-					PlacesServiceStatus: {
-						OK: string;
-						REQUEST_DENIED: string;
-						OVER_QUERY_LIMIT: string;
-						INVALID_REQUEST: string;
-					};
-				};
+		google: typeof google;
+	}
+
+	namespace google.maps {
+		class LatLng {
+			lat(): number;
+			lng(): number;
+		}
+
+		namespace places {
+			// New API
+			class AutocompleteSuggestion {
+				static fetchAutocompleteSuggestions(
+					request: AutocompleteSuggestionRequest
+				): Promise<AutocompleteSuggestionResponse>;
+			}
+
+			class Place {
+				constructor(options: { id: string });
+				id: string;
+				displayName?: { text: string; languageCode?: string };
+				formattedAddress?: string;
+				addressComponents?: Array<{
+					longText: string;
+					shortText: string;
+					types: string[];
+				}>;
+				location?: LatLng;
+				fetchFields(options: {
+					fields: string[];
+				}): Promise<{ place: Place }>;
+			}
+
+			// Legacy API (kept for type compatibility during transition)
+			class AutocompleteService {
+				getPlacePredictions(
+					request: any,
+					callback: (predictions: any[], status: string) => void
+				): void;
+			}
+
+			class AutocompleteSessionToken {}
+
+			class PlacesService {
+				constructor(attrContainer: HTMLElement);
+				getDetails(
+					request: any,
+					callback: (place: any, status: string) => void
+				): void;
+			}
+
+			const PlacesServiceStatus: {
+				OK: string;
+				REQUEST_DENIED: string;
+				OVER_QUERY_LIMIT: string;
+				INVALID_REQUEST: string;
 			};
-		};
+		}
 	}
 }
 
@@ -77,45 +152,24 @@ const GooglePlacesAutocomplete = forwardRef<
 	const [suggestions, setSuggestions] = useState<GooglePlace[]>([]);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-	const autocompleteService = useRef<any>(null);
-	const sessionToken = useRef<any>(null);
+	const [isApiAvailable, setIsApiAvailable] = useState<boolean>(false);
 
 	useEffect(() => {
-		// Initialize Google Places Autocomplete Service
-		const initializePlacesService = () => {
-			if (
-				window.google &&
-				window.google.maps &&
-				window.google.maps.places
-			) {
-				try {
-					// Use the current standard AutocompleteService provided by the Google Places API
-					if (window.google.maps.places.AutocompleteService) {
-						autocompleteService.current =
-							new window.google.maps.places.AutocompleteService();
-					}
-
-					if (window.google.maps.places.AutocompleteSessionToken) {
-						sessionToken.current =
-							new window.google.maps.places.AutocompleteSessionToken();
-					}
-				} catch (error) {
-					console.error(
-						"Error initializing Google Places service:",
-						error
-					);
-				}
+		// Check if new Google Places API is available
+		const checkApiAvailability = () => {
+			if (window.google?.maps?.places?.AutocompleteSuggestion) {
+				setIsApiAvailable(true);
+				return true;
 			}
+			return false;
 		};
 
-		// Try to initialize immediately
-		initializePlacesService();
+		// Try to check immediately
+		if (checkApiAvailability()) return;
 
-		// If not available immediately, wait a bit and try again
-		if (!window.google) {
-			const timer = setTimeout(initializePlacesService, 1000);
-			return () => clearTimeout(timer);
-		}
+		// If not available immediately, wait and try again
+		const timer = setTimeout(checkApiAvailability, 1000);
+		return () => clearTimeout(timer);
 	}, []);
 
 	const getPlacePredictions = async (input: string) => {
@@ -127,68 +181,51 @@ const GooglePlacesAutocomplete = forwardRef<
 
 		setLoading(true);
 		try {
-			// Check if Google Places API is available and working
-			if (
-				autocompleteService.current &&
-				autocompleteService.current.getPlacePredictions
-			) {
-				const request = {
+			// Use the new AutocompleteSuggestion API
+			if (isApiAvailable) {
+				const request: AutocompleteSuggestionRequest = {
 					input,
-					sessionToken: sessionToken.current,
-					types: ["address"],
+					includedPrimaryTypes: [
+						"street_address",
+						"premise",
+						"subpremise",
+					],
 				};
 
-				autocompleteService.current.getPlacePredictions(
-					request,
-					(predictions: GooglePlace[], status: string) => {
-						if (
-							status ===
-								window.google.maps.places.PlacesServiceStatus
-									.OK &&
-							predictions
-						) {
-							setSuggestions(predictions);
-						} else if (
-							status ===
-							window.google.maps.places.PlacesServiceStatus
-								.REQUEST_DENIED
-						) {
-							console.error(
-								"Google Places API request denied. Check if Places API is enabled for your API key."
-							);
-							setSuggestions([]);
-						} else if (
-							status ===
-							window.google.maps.places.PlacesServiceStatus
-								.OVER_QUERY_LIMIT
-						) {
-							console.error("Google Places API quota exceeded.");
-							setSuggestions([]);
-						} else if (
-							status ===
-							window.google.maps.places.PlacesServiceStatus
-								.INVALID_REQUEST
-						) {
-							console.error(
-								"Invalid request to Google Places API."
-							);
-							setSuggestions([]);
-						} else {
-							setSuggestions([]);
-						}
-						setLoading(false);
-					}
+				const { suggestions: apiSuggestions } =
+					await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(
+						request
+					);
+
+				// Map new API response to internal format for backward compatibility
+				const mappedSuggestions: GooglePlace[] = apiSuggestions.map(
+					(suggestion) => ({
+						place_id: suggestion.placePrediction.placeId,
+						description: suggestion.placePrediction.text.text,
+						structured_formatting: suggestion.placePrediction
+							.structuredFormat
+							? {
+									main_text:
+										suggestion.placePrediction
+											.structuredFormat.mainText.text,
+									secondary_text:
+										suggestion.placePrediction
+											.structuredFormat.secondaryText
+											.text,
+							  }
+							: undefined,
+					})
 				);
+
+				setSuggestions(mappedSuggestions);
 			} else {
-				// No fallback suggestions are provided intentionally
-				// Users are expected to manually type their address
-				// when the Google Places API is unavailable
+				// API not available - users can manually type their address
 				setSuggestions([]);
-				setLoading(false);
 			}
 		} catch (error) {
-			console.error("Error fetching predictions:", error);
+			console.error("Error fetching place predictions:", error);
 			setSuggestions([]);
+		} finally {
 			setLoading(false);
 		}
 	};
@@ -210,7 +247,7 @@ const GooglePlacesAutocomplete = forwardRef<
 		}
 	};
 
-	const handleSuggestionClick = (suggestion: GooglePlace) => {
+	const handleSuggestionClick = async (suggestion: GooglePlace) => {
 		setShowSuggestions(false);
 
 		// Create a proper event object for onChange
@@ -222,46 +259,59 @@ const GooglePlacesAutocomplete = forwardRef<
 		} as React.ChangeEvent<HTMLInputElement>;
 		onChange(event);
 
-		// Fetch detailed place information
-		if (window.google && window.google.maps && window.google.maps.places) {
-			const placesService = new window.google.maps.places.PlacesService(
-				document.createElement("div")
-			);
+		// Fetch detailed place information using the new Place API
+		if (isApiAvailable && window.google?.maps?.places?.Place) {
+			try {
+				const place = new google.maps.places.Place({
+					id: suggestion.place_id,
+				});
 
-			const request = {
-				placeId: suggestion.place_id,
-				fields: [
-					"address_components",
-					"formatted_address",
-					"geometry",
-					"name",
-					"place_id",
-				],
-			};
+				const { place: placeDetails } = await place.fetchFields({
+					fields: [
+						"addressComponents",
+						"formattedAddress",
+						"location",
+						"displayName",
+					],
+				});
 
-			placesService.getDetails(
-				request,
-				(place: GooglePlaceDetails, status: string) => {
-					if (
-						status ===
-							window.google.maps.places.PlacesServiceStatus.OK &&
-						place
-					) {
-						if (onSelect) {
-							onSelect(suggestion.description, place);
-						}
-					} else {
-						// Fallback if detailed place info fails
-						if (onSelect) {
-							const fallbackPlace = {
-								place_id: suggestion.place_id,
-								description: suggestion.description,
-							};
-							onSelect(suggestion.description, fallbackPlace);
-						}
-					}
+				// Map new API response to legacy format for backward compatibility with consuming components
+				const mappedPlace: GooglePlaceDetails = {
+					place_id: suggestion.place_id,
+					address_components: (
+						placeDetails.addressComponents || []
+					).map((component) => ({
+						long_name: component.longText,
+						short_name: component.shortText,
+						types: component.types,
+					})),
+					formatted_address:
+						placeDetails.formattedAddress || suggestion.description,
+					geometry: placeDetails.location
+						? {
+								location: {
+									lat: () => placeDetails.location!.lat(),
+									lng: () => placeDetails.location!.lng(),
+								},
+						  }
+						: undefined,
+					name: placeDetails.displayName?.text,
+				};
+
+				if (onSelect) {
+					onSelect(suggestion.description, mappedPlace);
 				}
-			);
+			} catch (error) {
+				console.error("Error fetching place details:", error);
+				// Fallback if detailed place info fails
+				if (onSelect) {
+					const fallbackPlace = {
+						place_id: suggestion.place_id,
+						description: suggestion.description,
+					};
+					onSelect(suggestion.description, fallbackPlace);
+				}
+			}
 		} else {
 			// Fallback when Places API is not available
 			if (onSelect) {

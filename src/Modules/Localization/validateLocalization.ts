@@ -86,6 +86,7 @@ export function validateLocalization(
 			// Temporarily switch to this language to check keys
 			const originalLanguage = localization.getLanguage?.() || "en";
 
+
 			try {
 				if (typeof localization.setLanguage === "function") {
 					localization.setLanguage(language);
@@ -94,6 +95,7 @@ export function validateLocalization(
 				// Check each key from baseline
 				baselineKeys.forEach(key => {
 					const value = localization[key as keyof typeof localization];
+
 
 					// Check if key exists and has a value
 					if (
@@ -138,9 +140,11 @@ export function validateLocalization(
 export function printValidationResults(result: ValidationResult): void {
 	console.group("🌐 Localization Validation Results");
 
+
 	if (result.isValid) {
 	} else {
 		console.warn("⚠️ Missing localization keys detected!");
+
 
 		SUPPORTED_LANGUAGES.forEach(language => {
 			const missingCount = result.missingByLanguage[language];
@@ -148,13 +152,16 @@ export function printValidationResults(result: ValidationResult): void {
 				console.group(`❌ ${language.toUpperCase()} - ${missingCount} missing keys`);
 				result.missingKeys[language].forEach(key => {
 					console.info(`  - ${key}`);
+					console.info(`  - ${key}`);
 				});
 				console.groupEnd();
 			} else {
 				console.info(`✅ ${language.toUpperCase()} - All keys present`);
+				console.info(`✅ ${language.toUpperCase()} - All keys present`);
 			}
 		});
 	}
+
 
 	console.groupEnd();
 }
@@ -174,13 +181,16 @@ export function printValidationResults(result: ValidationResult): void {
 export function getValidationSummary(): string {
 	const result = validateLocalization();
 
+
 	if (result.isValid) {
 		return `✅ All ${result.totalKeys} localization keys are present in all ${SUPPORTED_LANGUAGES.length} languages.`;
 	}
 
+
 	const summaryParts: string[] = [];
 	summaryParts.push(`⚠️ Missing localization keys detected:`);
 	summaryParts.push(`Total keys: ${result.totalKeys}`);
+
 
 	SUPPORTED_LANGUAGES.forEach(language => {
 		const missingCount = result.missingByLanguage[language];
@@ -188,6 +198,7 @@ export function getValidationSummary(): string {
 			summaryParts.push(`${language.toUpperCase()}: ${missingCount} missing`);
 		}
 	});
+
 
 	return summaryParts.join("\n");
 }
@@ -218,6 +229,7 @@ export function checkKeyInAllLanguages(
 			if (typeof localization.setLanguage === "function") {
 				localization.setLanguage(language);
 			}
+
 
 			const value = localization[key as keyof typeof localization];
 			status[language] =
@@ -268,6 +280,7 @@ export function getLocalizationStats(): {
 		number
 	>;
 
+
 	SUPPORTED_LANGUAGES.forEach(language => {
 		const missing = result.missingByLanguage[language];
 		const present = result.totalKeys - missing;
@@ -286,11 +299,13 @@ export function getLocalizationStats(): {
 
 // Export for use in development/testing
 const localizationUtils = {
-	validateLocalization,
-	printValidationResults,
-	getValidationSummary,
-	checkKeyInAllLanguages,
-	getLocalizationStats,
-};
+	const localizationUtils = {
+		validateLocalization,
+		printValidationResults,
+		getValidationSummary,
+		checkKeyInAllLanguages,
+		getLocalizationStats,
+	};
 
-export default localizationUtils;
+	export default localizationUtils;
+

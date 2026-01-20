@@ -299,13 +299,12 @@ export function getLocalizationStats(): {
 
 // Export for use in development/testing
 const localizationUtils = {
-	const localizationUtils = {
-		validateLocalization,
-		printValidationResults,
-		getValidationSummary,
-		checkKeyInAllLanguages,
-		getLocalizationStats,
-	};
+	validateLocalization,
+	printValidationResults,
+	getValidationSummary,
+	checkKeyInAllLanguages,
+	getLocalizationStats,
+};
 
-	export default localizationUtils;
+export default localizationUtils;
 

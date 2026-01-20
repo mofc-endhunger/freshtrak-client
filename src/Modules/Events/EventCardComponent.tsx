@@ -180,7 +180,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 						{/* Event Number Badge + Date/Time Section */}
 						<div className="bg-text-primary text-white p-2 sm:p-3 lg:p-4 w-[80px] sm:w-[100px] lg:w-[120px] flex flex-col justify-center items-center shrink-0 relative">
 							{eventNumber && (
-								<div className="absolute top-1 left-1 sm:top-2 sm:left-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold border-2 border-white shadow-md">
+								<div className="absolute top-1 left-1 sm:top-2 sm:left-2 w-5 h-5 sm:w-6 sm:h-6 bg-secondary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold border-2 border-white shadow-md">
 									{eventNumber}
 								</div>
 							)}

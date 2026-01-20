@@ -18,6 +18,37 @@ import localization from "../Localization/LocalizationComponent";
 
 const VIEW_MODE_STORAGE_KEY = "freshtrak_event_view_mode";
 
+// Helper to check if an event has valid map coordinates
+const hasValidCoordinates = (event: {
+	latitude?: number;
+	longitude?: number;
+	agencyLatitude?: number;
+	agencyLongitude?: number;
+}): boolean => {
+	const lat = event.latitude || event.agencyLatitude;
+	const lng = event.longitude || event.agencyLongitude;
+
+	// Check if coordinates exist and are not "0.0" or 0
+	if (lat === undefined || lat === null || lng === undefined || lng === null) {
+		return false;
+	}
+
+	const latNum = typeof lat === "string" ? parseFloat(lat) : lat;
+	const lngNum = typeof lng === "string" ? parseFloat(lng) : lng;
+
+	// Invalid if 0, NaN, or very close to 0
+	if (
+		isNaN(latNum) ||
+		isNaN(lngNum) ||
+		Math.abs(latNum) < 0.0001 ||
+		Math.abs(lngNum) < 0.0001
+	) {
+		return false;
+	}
+
+	return true;
+};
+
 interface Event {
 	id: string;
 	startTime: string;
@@ -136,7 +167,7 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 	const handleMarkerClick = useCallback(
 		(event: EventLocation, _index: number) => {
 			const cardElement = cardRefsMap.current.get(event.id);
-			if (cardElement && listContainerRef.current) {
+			if (cardElement) {
 				cardElement.scrollIntoView({
 					behavior: "smooth",
 					block: "center",
@@ -304,6 +335,8 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 											event.map((ev) => {
 												const eventIndex =
 													getEventIndex(ev.id);
+												const isOnMap =
+													hasValidCoordinates(ev);
 												return (
 													<div
 														key={ev.id}
@@ -313,26 +346,40 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 																el
 															)
 														}
-														className={`transition-all duration-200 cursor-pointer ${
+														className={`transition-all duration-200 ${
+															isOnMap
+																? "cursor-pointer"
+																: ""
+														} ${
 															highlightedEventIndex ===
-															eventIndex
+																eventIndex &&
+															isOnMap
 																? "ring-2 ring-orange-400 rounded-lg"
 																: ""
 														}`}
-														onClick={() =>
-															handleCardClick(
-																ev.id
-															)
+														onClick={
+															isOnMap
+																? () =>
+																		handleCardClick(
+																			ev.id
+																		)
+																: undefined
 														}
-														onMouseEnter={() =>
-															setHighlightedEventIndex(
-																eventIndex
-															)
+														onMouseEnter={
+															isOnMap
+																? () =>
+																		setHighlightedEventIndex(
+																			eventIndex
+																		)
+																: undefined
 														}
-														onMouseLeave={() =>
-															setHighlightedEventIndex(
-																null
-															)
+														onMouseLeave={
+															isOnMap
+																? () =>
+																		setHighlightedEventIndex(
+																			null
+																		)
+																: undefined
 														}
 													>
 														<EventCardComponent
@@ -354,7 +401,10 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 																ev.agencyLongitude
 															}
 															eventNumber={
-																eventIndex + 1
+																isOnMap
+																	? eventIndex +
+																		1
+																	: undefined
 															}
 														/>
 													</div>

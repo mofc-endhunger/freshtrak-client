@@ -39,48 +39,58 @@ const milesToMeters = (miles: number): number => miles * 1609.34;
 
 // Create numbered marker icon - supports single or multiple numbers
 const createNumberedIcon = (numbers: number[]): L.DivIcon => {
-	const displayText =
-		numbers.length === 1
-			? String(numbers[0])
-			: numbers.length <= 3
-			? numbers.join(",")
-			: `${numbers[0]}+${numbers.length - 1}`;
+	const isMultiple = numbers.length > 1;
+	const firstNumber = Math.min(...numbers);
+	const count = numbers.length;
 
-	// Wider marker for multiple events
-	const width =
-		numbers.length === 1 ? 28 : Math.min(28 + (numbers.length - 1) * 8, 50);
-
-	return L.divIcon({
-		className: "numbered-marker",
-		html: `<div class="marker-number" style="min-width: ${width}px">${displayText}</div>`,
-		iconSize: [width, 28],
-		iconAnchor: [width / 2, 14],
-	});
+	if (isMultiple) {
+		// Multiple events: Show first number with count badge
+		return L.divIcon({
+			className: "numbered-marker numbered-marker-multi",
+			html: `
+				<div class="marker-number-multi">
+					<span class="marker-main-number">${firstNumber}</span>
+					<span class="marker-count-badge">×${count}</span>
+				</div>
+			`,
+			iconSize: [36, 36],
+			iconAnchor: [18, 18],
+		});
+	} else {
+		// Single event: Simple number
+		return L.divIcon({
+			className: "numbered-marker",
+			html: `<div class="marker-number">${numbers[0]}</div>`,
+			iconSize: [28, 28],
+			iconAnchor: [14, 14],
+		});
+	}
 };
 
-// Group events by location (same lat/lng)
+// Group events by location (same address)
 interface LocationGroup {
 	lat: number;
 	lng: number;
-	events: { event: EventLocation; index: number }[];
+	events: { event: EventLocation; originalIndex: number }[];
 }
 
 const groupEventsByLocation = (
-	events: EventLocation[]
+	eventsWithOriginalIndices: { event: EventLocation; originalIndex: number }[]
 ): Map<string, LocationGroup> => {
 	const groups = new Map<string, LocationGroup>();
 
-	events.forEach((event, index) => {
+	eventsWithOriginalIndices.forEach(({ event, originalIndex }) => {
 		const lat = Number(event.latitude || event.agencyLatitude);
 		const lng = Number(event.longitude || event.agencyLongitude);
 
-		// Create a key for the location (rounded to 5 decimal places for grouping nearby)
-		const key = `${lat.toFixed(5)},${lng.toFixed(5)}`;
+		// Group by normalized address string (more reliable than coordinates)
+		// This handles cases where same address has slightly different geocoded coords
+		const addressKey = `${event.eventAddress?.toLowerCase().trim()},${event.eventCity?.toLowerCase().trim()},${event.eventZip?.trim()}`;
 
-		if (!groups.has(key)) {
-			groups.set(key, { lat, lng, events: [] });
+		if (!groups.has(addressKey)) {
+			groups.set(addressKey, { lat, lng, events: [] });
 		}
-		groups.get(key)!.events.push({ event, index });
+		groups.get(addressKey)!.events.push({ event, originalIndex });
 	});
 
 	return groups;
@@ -137,13 +147,15 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 	const [isMapReady, setIsMapReady] = useState(false);
 	const [hasError, setHasError] = useState(false);
 
-	// Filter events with valid coordinates
+	// Filter events with valid coordinates, preserving original index for correct numbering
 	const eventsWithCoords = useMemo(() => {
-		return events.filter((event) => {
-			const lat = event.latitude || event.agencyLatitude;
-			const lng = event.longitude || event.agencyLongitude;
-			return isValidCoord(lat) && isValidCoord(lng);
-		});
+		return events
+			.map((event, index) => ({ event, originalIndex: index }))
+			.filter(({ event }) => {
+				const lat = event.latitude || event.agencyLatitude;
+				const lng = event.longitude || event.agencyLongitude;
+				return isValidCoord(lat) && isValidCoord(lng);
+			});
 	}, [events]);
 
 	// Clear all markers helper
@@ -168,8 +180,9 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 			const locationGroups = groupEventsByLocation(eventsWithCoords);
 
 			locationGroups.forEach((group) => {
-				const eventNumbers = group.events.map((e) => e.index + 1);
-				const eventIndices = group.events.map((e) => e.index);
+				// Use originalIndex for correct numbering that matches the list
+				const eventNumbers = group.events.map((e) => e.originalIndex + 1);
+				const eventIndices = group.events.map((e) => e.originalIndex);
 
 				const marker = L.marker([group.lat, group.lng], {
 					icon: createNumberedIcon(eventNumbers),
@@ -208,9 +221,9 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 									.map(
 										(e) =>
 											`<li class="event-popup-item" data-index="${
-												e.index
+												e.originalIndex
 											}">
-												<span class="event-number">${e.index + 1}</span>
+												<span class="event-number">${e.originalIndex + 1}</span>
 												<div class="event-item-info">
 													<span class="event-item-name">${e.event.eventName}</span>
 													<span class="event-item-datetime">${e.event.date || ""} • ${
@@ -223,9 +236,13 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 							</ul>
 						</div>`;
 
-				marker.bindPopup(popupContent, { maxWidth: 320 });
+				marker.bindPopup(popupContent, {
+					maxWidth: 320,
+					autoPan: false, // Prevent map from jumping when popup opens
+					closeButton: true,
+				});
 
-				// Store index mapping
+				// Store index mapping using originalIndex
 				eventIndices.forEach((idx) => {
 					indexToMarkerRef.current.set(idx, marker);
 				});
@@ -235,42 +252,19 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 					if (group.events.length === 1) {
 						onMarkerClick?.(
 							group.events[0].event,
-							group.events[0].index
+							group.events[0].originalIndex
 						);
 					}
 				});
 
-				marker.on("popupopen", () => {
-					const popup = marker.getPopup();
-					if (popup) {
-						const popupEl = popup.getElement();
-						if (popupEl) {
-							const listItems =
-								popupEl.querySelectorAll(".event-popup-item");
-							listItems.forEach((item) => {
-								item.addEventListener("click", (e) => {
-									const target =
-										e.currentTarget as HTMLElement;
-									const indexStr =
-										target.getAttribute("data-index");
-									if (indexStr !== null) {
-										const idx = parseInt(indexStr, 10);
-										const event = eventsWithCoords[idx];
-										if (event) {
-											onMarkerClick?.(event, idx);
-										}
-									}
-								});
-							});
-						}
-					}
-				});
+				// Note: Popup item click handlers are now managed via document-level
+				// event delegation for better reliability
 
 				marker.on("mouseover", () => {
 					if (group.events.length === 1) {
 						onMarkerHover?.(
 							group.events[0].event,
-							group.events[0].index
+							group.events[0].originalIndex
 						);
 					}
 					marker.openPopup();
@@ -309,7 +303,7 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 				if (coords) {
 					setCenterCoords(coords);
 				} else if (eventsWithCoords.length > 0) {
-					const firstEvent = eventsWithCoords[0];
+					const firstEvent = eventsWithCoords[0].event;
 					const lat =
 						firstEvent.latitude || firstEvent.agencyLatitude;
 					const lng =
@@ -338,7 +332,8 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 		return () => {
 			cancelled = true;
 		};
-	}, [zipCode]); // Only re-geocode when zipCode changes
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [zipCode]); // Only re-geocode when zipCode changes, not when events change
 
 	// Step 2: Initialize map only after geocoding is complete and we have coordinates
 	useEffect(() => {
@@ -386,9 +381,9 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 				const radiusInMeters = milesToMeters(distance);
 				const circle = L.circle([centerCoords.lat, centerCoords.lng], {
 					radius: radiusInMeters,
-					color: "#f97316",
-					fillColor: "#fed7aa",
-					fillOpacity: 0.2,
+					color: "#28CE85", // Primary green
+					fillColor: "#28CE85", // Primary green
+					fillOpacity: 0.15,
 					weight: 2,
 				}).addTo(map);
 
@@ -437,6 +432,37 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 
 		return () => clearTimeout(markerTimeout);
 	}, [eventsWithCoords, isMapReady, addMarkers]);
+
+	// Event delegation for popup item clicks - handles clicks on multi-event popup items
+	useEffect(() => {
+		const handlePopupItemClick = (e: MouseEvent) => {
+			const target = e.target as HTMLElement;
+			const popupItem = target.closest(".event-popup-item");
+			if (!popupItem) return;
+
+			const indexStr = popupItem.getAttribute("data-index");
+			if (indexStr === null) return;
+
+			const originalIdx = parseInt(indexStr, 10);
+			const eventData = eventsWithCoords.find(
+				(ev) => ev.originalIndex === originalIdx
+			);
+
+			if (eventData) {
+				e.preventDefault();
+				e.stopPropagation();
+				onMarkerClick?.(eventData.event, originalIdx);
+			}
+		};
+
+		// Add listener to document to catch clicks on Leaflet popups
+		// (popups are appended to a separate DOM layer)
+		document.addEventListener("click", handlePopupItemClick, true);
+
+		return () => {
+			document.removeEventListener("click", handlePopupItemClick, true);
+		};
+	}, [eventsWithCoords, onMarkerClick]);
 
 	// Highlight marker when highlightedIndex changes
 	useEffect(() => {

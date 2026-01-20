@@ -1,11 +1,22 @@
 /**
  * EventList Component
+ * Supports grid view (cards only) and list view (map + cards side by side)
  */
-import React from "react";
+import React, {
+	useState,
+	useEffect,
+	useMemo,
+	useRef,
+	useCallback,
+} from "react";
 import EventCardComponent from "./EventCardComponent";
+import EventMapComponent, { EventLocation } from "./EventMapComponent";
+import ViewToggle, { ViewMode } from "./ViewToggle";
 import { formatDateDayAndDate } from "../../Utils/DateFormat";
 import "../../Assets/scss/main.scss";
 import localization from "../Localization/LocalizationComponent";
+
+const VIEW_MODE_STORAGE_KEY = "freshtrak_event_view_mode";
 
 interface Event {
 	id: string;
@@ -41,6 +52,7 @@ interface EventListComponentProps {
 	events: Record<string, Event[]>;
 	showHeader?: boolean;
 	zipCode: string;
+	distance?: number;
 	targetUrl?: string;
 	registrationView?: boolean;
 	reservedEvents?: ReservedEvent[];
@@ -50,43 +62,203 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 	events,
 	showHeader = true,
 	zipCode,
+	distance = 10,
 	targetUrl,
 	registrationView,
 	reservedEvents,
 }) => {
+	const [viewMode, setViewMode] = useState<ViewMode>(() => {
+		const stored = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+		return stored === "list" || stored === "grid" ? stored : "grid";
+	});
+	const [highlightedEventIndex, setHighlightedEventIndex] = useState<
+		number | null
+	>(null);
+	const [focusedMapIndex, setFocusedMapIndex] = useState<number | null>(null);
+
+	// Refs for card elements and map container to enable scrolling
+	const cardRefsMap = useRef<Map<string, HTMLDivElement>>(new Map());
+	const listContainerRef = useRef<HTMLDivElement>(null);
+	const mapContainerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
+	}, [viewMode]);
+
 	const isRegisteredEvent = (event: Event): boolean => {
 		const found =
 			reservedEvents &&
-			reservedEvents.find(reservedEvent => {
+			reservedEvents.find((reservedEvent) => {
 				return reservedEvent.id === event.id;
 			});
 		return !!found;
 	};
 
+	// Flatten all events into a single array for map display and numbering
+	const flattenedEvents = useMemo((): EventLocation[] => {
+		const allEvents: EventLocation[] = [];
+		Object.values(events).forEach((eventGroup) => {
+			eventGroup.forEach((ev) => {
+				allEvents.push({
+					id: ev.id,
+					eventName: ev.eventName,
+					agencyName: ev.agencyName,
+					eventAddress: ev.eventAddress,
+					eventCity: ev.eventCity,
+					eventState: ev.eventState,
+					eventZip: ev.eventZip,
+					latitude: ev.latitude,
+					longitude: ev.longitude,
+					agencyLatitude: ev.agencyLatitude,
+					agencyLongitude: ev.agencyLongitude,
+					startTime: ev.startTime,
+					endTime: ev.endTime,
+					date: ev.date,
+				});
+			});
+		});
+		return allEvents;
+	}, [events]);
+
+	// Get event index in flattened array for numbering
+	const getEventIndex = (eventId: string): number => {
+		return flattenedEvents.findIndex((ev) => ev.id === eventId);
+	};
+
+	const handleMarkerHover = (
+		_event: EventLocation | null,
+		index: number | null
+	) => {
+		setHighlightedEventIndex(index);
+	};
+
+	// Handle marker click - scroll to corresponding card
+	const handleMarkerClick = useCallback(
+		(event: EventLocation, _index: number) => {
+			const cardElement = cardRefsMap.current.get(event.id);
+			if (cardElement && listContainerRef.current) {
+				cardElement.scrollIntoView({
+					behavior: "smooth",
+					block: "center",
+				});
+				// Briefly highlight the card
+				setHighlightedEventIndex(getEventIndex(event.id));
+				setTimeout(() => setHighlightedEventIndex(null), 2000);
+			}
+		},
+		[flattenedEvents]
+	);
+
+	// Handle card click - scroll to map if needed, then pan map to marker
+	const handleCardClick = useCallback(
+		(eventId: string) => {
+			const index = flattenedEvents.findIndex((ev) => ev.id === eventId);
+			if (index >= 0) {
+				// First, scroll the map into view if it's not visible
+				if (mapContainerRef.current) {
+					const mapRect =
+						mapContainerRef.current.getBoundingClientRect();
+					const isMapInView =
+						mapRect.top < window.innerHeight && mapRect.bottom > 0;
+
+					if (!isMapInView) {
+						mapContainerRef.current.scrollIntoView({
+							behavior: "smooth",
+							block: "start",
+						});
+						// Wait for scroll to complete before focusing marker
+						setTimeout(() => {
+							setFocusedMapIndex(index);
+							setTimeout(() => setFocusedMapIndex(null), 1000);
+						}, 500);
+					} else {
+						setFocusedMapIndex(index);
+						setTimeout(() => setFocusedMapIndex(null), 1000);
+					}
+				} else {
+					setFocusedMapIndex(index);
+					setTimeout(() => setFocusedMapIndex(null), 1000);
+				}
+			}
+		},
+		[flattenedEvents]
+	);
+
+	// Register card ref
+	const setCardRef = useCallback(
+		(id: string, element: HTMLDivElement | null) => {
+			if (element) {
+				cardRefsMap.current.set(id, element);
+			} else {
+				cardRefsMap.current.delete(id);
+			}
+		},
+		[]
+	);
+
+	// Grid view - original layout
+	if (viewMode === "grid") {
+		return (
+			<div className="space-y-8" aria-live="polite">
+				{showHeader && (
+					<div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+						<h2 className="text-2xl font-bold text-gray-900">
+							{localization.resource_zip_code_events} {zipCode}
+						</h2>
+						<ViewToggle
+							viewMode={viewMode}
+							onViewModeChange={setViewMode}
+						/>
+					</div>
+				)}
+				{Object.keys(events).length === 0 && (
+					<h3 className="text-xl font-semibold text-gray-700">
+						{localization.no_events_scheduled}
+					</h3>
+				)}
+				{Object.keys(events).length > 0 &&
+					Object.entries(events).map(([date, event]) => (
+						<div key={date} className="space-y-4">
+							<div className="mb-4">
+								<h3 className="text-lg font-semibold text-gray-800 mb-3">
+									{formatDateDayAndDate(date)}
+								</h3>
+							</div>
+							<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+								{event &&
+									event.map((ev) => (
+										<EventCardComponent
+											key={ev.id}
+											event={ev}
+											targetUrl={targetUrl}
+											registrationView={registrationView}
+											alreadyRegistered={isRegisteredEvent(
+												ev
+											)}
+											variant="tile"
+											agencyLatitude={ev.agencyLatitude}
+											agencyLongitude={ev.agencyLongitude}
+										/>
+									))}
+							</div>
+						</div>
+					))}
+			</div>
+		);
+	}
+
+	// List view - Map + List side by side
 	return (
-		<div className="space-y-8" aria-live="polite">
+		<div className="space-y-4" aria-live="polite">
 			{showHeader && (
-				<div className="mb-6">
-					<h2 className="text-2xl font-bold text-gray-900 sm:text-left">
+				<div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+					<h2 className="text-2xl font-bold text-gray-900">
 						{localization.resource_zip_code_events} {zipCode}
 					</h2>
-					{/* Out of scope */}
-					{/* <div className="col-lg-4 col-xl-4 d-none-xs d-none-sm">
-          <div className="switch-view d-flex justify-content-center">
-            <input id="toggle-on" className="toggle toggle-left" name="toggle" value="false" type="radio" checked onChange={onChangeHandler} />
-            <label htmlFor="toggle-on" className="btn-toggle">List</label>
-            <input id="toggle-off" className="toggle toggle-right" name="toggle" value="true" type="radio" onChange={onChangeHandler}/>
-            <label htmlFor="toggle-off" className="btn-toggle">Map</label>
-          </div>
-        </div>
-        <div className="col-lg-4 col-xl-4">
-          <div className="form-group">
-            <label>Sort by</label>
-            <select className="form-control">
-                <option>Recommended</option>
-            </select>
-          </div>
-        </div> */}
+					<ViewToggle
+						viewMode={viewMode}
+						onViewModeChange={setViewMode}
+					/>
 				</div>
 			)}
 			{Object.keys(events).length === 0 && (
@@ -94,33 +266,107 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 					{localization.no_events_scheduled}
 				</h3>
 			)}
-			{Object.keys(events).length > 0 &&
-				Object.entries(events).map(([date, event]) => (
-					<div key={date} className="space-y-4">
-						<div className="mb-4">
-							<h3 className="text-lg font-semibold text-gray-800 mb-3">
-								{formatDateDayAndDate(date)}
-							</h3>
-						</div>
-						<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-							{event &&
-								event.map(ev => (
-									<EventCardComponent
-										key={ev.id}
-										event={ev}
-										targetUrl={targetUrl}
-										registrationView={registrationView}
-										alreadyRegistered={isRegisteredEvent(
-											ev
-										)}
-										// Fallback: pass agency latitude/longitude if present
-										agencyLatitude={ev.agencyLatitude}
-										agencyLongitude={ev.agencyLongitude}
-									/>
-								))}
+			{Object.keys(events).length > 0 && (
+				<div className="flex flex-col xl:flex-row gap-4">
+					{/* Map Section */}
+					<div
+						ref={mapContainerRef}
+						className="w-full xl:w-2/5 xl:sticky xl:top-4 xl:self-start"
+					>
+						<div className="rounded-lg overflow-hidden shadow-md border border-gray-200">
+							<EventMapComponent
+								key={`map-${zipCode}-${distance}`}
+								events={flattenedEvents}
+								zipCode={zipCode}
+								distance={distance}
+								onMarkerHover={handleMarkerHover}
+								onMarkerClick={handleMarkerClick}
+								highlightedIndex={highlightedEventIndex}
+								focusedIndex={focusedMapIndex}
+								className="h-[350px] xl:h-[calc(100vh-200px)]"
+							/>
 						</div>
 					</div>
-				))}
+
+					{/* List Section */}
+					<div
+						ref={listContainerRef}
+						className="w-full xl:w-3/5 xl:max-h-[calc(100vh-200px)] xl:overflow-y-auto"
+					>
+						<div className="space-y-6">
+							{Object.entries(events).map(([date, event]) => (
+								<div key={date} className="space-y-3">
+									<h3 className="text-lg font-semibold text-gray-800 sticky top-0 bg-[#F2F0F4] py-2 z-10">
+										{formatDateDayAndDate(date)}
+									</h3>
+									<div className="flex flex-col gap-3">
+										{event &&
+											event.map((ev) => {
+												const eventIndex =
+													getEventIndex(ev.id);
+												return (
+													<div
+														key={ev.id}
+														ref={(el) =>
+															setCardRef(
+																ev.id,
+																el
+															)
+														}
+														className={`transition-all duration-200 cursor-pointer ${
+															highlightedEventIndex ===
+															eventIndex
+																? "ring-2 ring-orange-400 rounded-lg"
+																: ""
+														}`}
+														onClick={() =>
+															handleCardClick(
+																ev.id
+															)
+														}
+														onMouseEnter={() =>
+															setHighlightedEventIndex(
+																eventIndex
+															)
+														}
+														onMouseLeave={() =>
+															setHighlightedEventIndex(
+																null
+															)
+														}
+													>
+														<EventCardComponent
+															event={ev}
+															targetUrl={
+																targetUrl
+															}
+															registrationView={
+																registrationView
+															}
+															alreadyRegistered={isRegisteredEvent(
+																ev
+															)}
+															variant="list"
+															agencyLatitude={
+																ev.agencyLatitude
+															}
+															agencyLongitude={
+																ev.agencyLongitude
+															}
+															eventNumber={
+																eventIndex + 1
+															}
+														/>
+													</div>
+												);
+											})}
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

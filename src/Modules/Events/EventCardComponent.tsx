@@ -4,12 +4,19 @@
 import React, { useState } from "react";
 import { LinkContainer } from "react-router-bootstrap";
 import { useDispatch } from "react-redux";
+import { MoreVertical } from "lucide-react";
 import { setCurrentEvent } from "../../Store/Events/eventSlice";
 import { formatDateDayAndDate } from "../../Utils/DateFormat";
 import { RENDER_URL } from "../../Utils/Urls";
 import MiniMapComponent from "../General/MiniMapComponent";
 import FullMapModalComponent from "../General/FullMapModalComponent";
 import localization from "../Localization/LocalizationComponent";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
 import "../../Assets/scss/main.scss";
 
 interface Event {
@@ -39,6 +46,8 @@ interface Coordinates {
 	lng: number;
 }
 
+export type CardVariant = "tile" | "list";
+
 interface EventCardComponentProps {
 	event: Event;
 	registrationView?: boolean;
@@ -46,6 +55,8 @@ interface EventCardComponentProps {
 	agencyLatitude?: number;
 	agencyLongitude?: number;
 	targetUrl?: string;
+	variant?: CardVariant;
+	eventNumber?: number; // For map view - displays the marker number
 }
 
 const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
@@ -81,6 +92,8 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 		alreadyRegistered,
 		agencyLatitude,
 		agencyLongitude,
+		variant = "tile",
+		eventNumber,
 	} = props;
 
 	// Fallback: use agency coordinates if event coordinates are missing
@@ -111,11 +124,15 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 	};
 
 	const getButton = (buttonName: string, targetUrl: string) => {
+		const buttonClass =
+			variant === "list"
+				? "btn bg-[#392947] text-white py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px] w-full"
+				: "btn bg-[#392947] text-white px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px] w-full";
 		return (
 			<LinkContainer to={targetUrl}>
 				<button
 					type="button"
-					className="btn bg-[#392947] text-white px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px] ml-1 w-full"
+					className={buttonClass}
 					onClick={() => {
 						// Store the current search results URL before navigating to event details
 						const currentPath = window.location.pathname;
@@ -154,6 +171,240 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 		}
 	};
 
+	// List view layout - horizontal card (compact for map view)
+	if (variant === "list") {
+		return (
+			<section tabIndex={0} className="w-full">
+				<div className="bg-white rounded-lg shadow-md overflow-hidden">
+					<div className="flex flex-row">
+						{/* Event Number Badge + Date/Time Section */}
+						<div className="bg-text-primary text-white p-2 sm:p-3 lg:p-4 w-[80px] sm:w-[100px] lg:w-[120px] flex flex-col justify-center items-center shrink-0 relative">
+							{eventNumber && (
+								<div className="absolute top-1 left-1 sm:top-2 sm:left-2 w-5 h-5 sm:w-6 sm:h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold border-2 border-white shadow-md">
+									{eventNumber}
+								</div>
+							)}
+							<div className="text-[10px] sm:text-xs font-varela opacity-80 text-center mt-3 sm:mt-4">
+								{formatDateDayAndDate(date)}
+							</div>
+							<div className="text-xs sm:text-sm font-bold mt-1 text-center whitespace-nowrap">
+								{startTime}
+							</div>
+							<div className="text-xs sm:text-sm font-bold text-center whitespace-nowrap">
+								{endTime}
+							</div>
+						</div>
+
+						{/* Main Content Section */}
+						<div className="flex-1 p-2 sm:p-3 lg:p-4 flex flex-col sm:flex-row gap-2 overflow-hidden min-w-0">
+							{/* Event Info */}
+							<div className="flex-1 min-w-0">
+								<div className="font-bold text-gray-900 truncate text-xs sm:text-sm">
+									{agencyName}
+								</div>
+								<div className="font-bold text-gray-700 truncate mt-0.5 text-xs sm:text-sm">
+									{eventName}
+								</div>
+								<div className="text-[10px] sm:text-xs text-gray-500 font-varela mt-0.5 truncate">
+									{eventService}
+								</div>
+
+								{/* Address */}
+								<div className="text-[10px] sm:text-xs font-varela text-gray-600 mt-1 truncate">
+									{eventAddress}, {eventCity} {eventState}{" "}
+									{eventZip}
+								</div>
+
+								{/* Phone - only on larger screens */}
+								{phoneNumber && (
+									<div className="text-[10px] sm:text-xs font-varela text-gray-600 mt-0.5 hidden lg:block">
+										{phoneNumber}
+									</div>
+								)}
+
+								{/* Exception Note */}
+								{exceptionNote && exceptionNote !== "" && (
+									<div className="text-[10px] sm:text-xs font-varela mt-1">
+										<span className="text-gray-600">
+											{
+												localization.label_service_area_limitations
+											}
+										</span>{" "}
+										<span
+											className="text-red-600"
+											data-testid="exception-note"
+										>
+											{exceptionNote}
+										</span>
+									</div>
+								)}
+
+								{/* RSVP Status Messages */}
+								{!!showRsvpOptional && (
+									<span className="text-red-600 text-[10px] sm:text-xs block mt-1">
+										{
+											localization.text_rsvp_optional_for_event
+										}
+									</span>
+								)}
+								{!!showRsvpRequired && (
+									<span className="text-red-600 text-[10px] sm:text-xs block mt-1">
+										{
+											localization.text_rsvp_required_for_event
+										}
+									</span>
+								)}
+								{alreadyRegistered && (
+									<span className="text-red-600 text-[10px] sm:text-xs block mt-1">
+										{localization.text_already_registered}
+									</span>
+								)}
+
+								{/* Expandable Details */}
+								{showDetails && eventDetails && (
+									<div className="mt-2 p-2 bg-gray-50 rounded-lg">
+										<p className="text-[10px] sm:text-xs">
+											<b>
+												{localization.text_information}
+											</b>
+											<br />
+											{eventDetails}
+										</p>
+									</div>
+								)}
+							</div>
+
+							{/* Mobile Actions - Ellipsis Menu (visible below sm) */}
+							<div className="flex sm:hidden items-start shrink-0">
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<button
+											type="button"
+											className="p-2 hover:bg-gray-100 rounded-full"
+											aria-label="More actions"
+										>
+											<MoreVertical className="w-5 h-5 text-gray-600" />
+										</button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent
+										align="end"
+										className="bg-white"
+									>
+										{eventDetails &&
+											eventDetails.length > 0 && (
+												<DropdownMenuItem
+													onClick={() =>
+														setShowDetails(
+															!showDetails
+														)
+													}
+												>
+													{!showDetails
+														? localization.button_view_details
+														: localization.button_hide_details}
+												</DropdownMenuItem>
+											)}
+										<DropdownMenuItem
+											onClick={handleGetDirections}
+										>
+											{localization.button_get_directions}
+										</DropdownMenuItem>
+										{!!acceptReservations &&
+											!registrationView &&
+											!alreadyRegistered && (
+												<DropdownMenuItem
+													onClick={() => {
+														dispatch(
+															setCurrentEvent(
+																props.event
+															)
+														);
+														window.location.href =
+															props.targetUrl !==
+															undefined
+																? `${props.targetUrl}/${id}`
+																: `${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${id}`;
+													}}
+												>
+													{
+														localization.button_reserve_time
+													}
+												</DropdownMenuItem>
+											)}
+										{!!showRsvp &&
+											!registrationView &&
+											!alreadyRegistered && (
+												<DropdownMenuItem
+													onClick={() => {
+														dispatch(
+															setCurrentEvent(
+																props.event
+															)
+														);
+														window.location.href =
+															props.targetUrl !==
+															undefined
+																? `${props.targetUrl}/${id}`
+																: `${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${id}`;
+													}}
+												>
+													{localization.button_rsvp}
+												</DropdownMenuItem>
+											)}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</div>
+
+							{/* Desktop Actions Section (visible sm and up) */}
+							<div className="hidden sm:flex flex-col gap-1.5 w-[120px] lg:w-[140px] xl:w-[160px] shrink-0">
+								{eventDetails && eventDetails.length > 0 && (
+									<button
+										className="btn bg-gray-200 text-[#392947] py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px]"
+										onClick={(e) => {
+											e.stopPropagation();
+											setShowDetails(!showDetails);
+										}}
+									>
+										{!showDetails
+											? localization.button_view_details
+											: localization.button_hide_details}
+									</button>
+								)}
+								<button
+									className="btn bg-gray-200 text-[#392947] py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px]"
+									onClick={(e) => {
+										e.stopPropagation();
+										handleGetDirections();
+									}}
+								>
+									{localization.button_get_directions}
+								</button>
+								{ButtonView() && (
+									<div onClick={(e) => e.stopPropagation()}>
+										{ButtonView()}
+									</div>
+								)}
+							</div>
+						</div>
+					</div>
+				</div>
+				<FullMapModalComponent
+					isOpen={showMapModal}
+					onClose={handleCloseMapModal}
+					coordinates={mapCoordinates}
+					address={eventAddress}
+					city={eventCity}
+					state={eventState}
+					zip={eventZip}
+					agencyName={agencyName}
+					latitude={latitude}
+					longitude={longitude}
+				/>
+			</section>
+		);
+	}
+
+	// Tile view layout - original vertical card
 	return (
 		<section
 			className={registrationView ? "" : "lg:col-span-1 xl:col-span-1"}

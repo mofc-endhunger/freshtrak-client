@@ -221,8 +221,9 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 	return (
 		<div>
 			<section className="bg-[#F2F0F4]">
-				<div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 lg:pt-[150px] pb-16 sm:pb-24 lg:pb-[150px]">
-					<div className="text-left">
+				<div className="container mx-auto px-4 pt-24 pb-24">
+					{/* Overlapping search card - same style as EventContainer */}
+					<div className="min-h-[130px] bg-white rounded-lg shadow-md -mt-56 mb-12 mx-auto p-8 text-left sm:w-full sm:min-w-auto sm:p-6 sm:-mt-48 md:w-11/12 md:min-w-auto lg:min-w-[600px] lg:w-auto lg:max-w-[900px]">
 						<form onSubmit={handleSubmit(onSubmit)}>
 							<div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
 								<div className="space-y-2 w-full sm:w-auto sm:flex-1">
@@ -264,6 +265,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 							</div>
 						)}
 					</div>
+					{/* Rest of content */}
 					<div className="space-y-8 px-4 sm:px-8 lg:px-[105px]">
 						<LocalFoodBankComponent zipCode={zipCode} />
 						<UsersRegistrations reservedEvents={reservedEvents} />

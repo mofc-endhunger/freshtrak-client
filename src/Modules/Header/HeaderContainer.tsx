@@ -53,7 +53,7 @@ const HeaderContainer: React.FC<HeaderContainerProps> = () => {
 				<HeaderComponent shortHeader={shortHeader} />
 			) : (
 				<header
-					className="bg-[#28ce85] bg-no-repeat bg-center bg-cover h-[300px] sm:h-[400px]"
+					className="bg-[#28ce85] bg-no-repeat bg-center bg-cover h-[200px] sm:h-[300px] md:h-[350px]"
 					style={{
 						backgroundImage: `url(${require("../../Assets/img/banner-bg.png")})`,
 					}}

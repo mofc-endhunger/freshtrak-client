@@ -175,7 +175,7 @@ const EventContainer: React.FC = () => {
 		<div>
 			<section className="bg-[#F2F0F4]">
 				<div className="container mx-auto px-4 pt-24 pb-24">
-					<div className="min-h-[130px] bg-white rounded-lg shadow-md -mt-56 mb-12 mx-auto p-8 text-left sm:w-full sm:min-w-auto sm:p-6 sm:-mt-36 md:w-11/12 md:min-w-auto lg:min-w-[600px] lg:w-auto lg:max-w-[900px]">
+					<div className="min-h-[130px] bg-white rounded-lg shadow-md -mt-56 mb-12 mx-auto p-8 text-left sm:w-full sm:min-w-auto sm:p-6 sm:-mt-48 md:w-11/12 md:min-w-auto lg:min-w-[600px] lg:w-auto lg:max-w-[900px]">
 						<form onSubmit={handleSubmit(onSubmit)}>
 							<SearchComponent
 								register={register}

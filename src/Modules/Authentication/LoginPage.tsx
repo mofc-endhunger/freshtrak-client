@@ -249,15 +249,15 @@ const LoginPage: React.FC = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-50 flex items-start justify-center p-4">
-			<div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
-				{/* title */}
-				<h1 className="text-2xl font-bold mb-6 text-center">
-					{getFormTitle()}
-				</h1>
+		<section className="bg-[#F2F0F4] min-h-screen">
+			<div className="container mx-auto px-4 pt-24 pb-24">
+				{/* Overlapping login card - same style as EventContainer */}
+				<div className="min-h-[130px] bg-white rounded-lg shadow-md -mt-56 mb-12 mx-auto p-8 sm:p-6 sm:-mt-48 md:w-11/12 lg:min-w-[400px] lg:w-auto lg:max-w-[500px]">
+					{/* Title */}
+					<h1 className="text-2xl font-bold mb-6 text-center">
+						{getFormTitle()}
+					</h1>
 
-				{/* Main Card */}
-				<div className="bg-white rounded-lg  p-6">
 					{/* Tab Navigation */}
 					{currentTab !== "confirm" && (
 						<div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
@@ -393,8 +393,8 @@ const LoginPage: React.FC = () => {
 						)}
 				</div>
 
-				{/* Back to Home Link */}
-				<div className="text-center mt-6">
+				{/* Back to Home Link - outside the card */}
+				<div className="text-center">
 					<Button
 						variant="ghost"
 						onClick={() => navigate(RENDER_URL.ROOT_URL)}
@@ -404,7 +404,7 @@ const LoginPage: React.FC = () => {
 					</Button>
 				</div>
 			</div>
-		</div>
+		</section>
 	);
 };
 

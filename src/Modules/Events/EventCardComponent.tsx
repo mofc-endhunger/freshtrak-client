@@ -57,6 +57,7 @@ interface EventCardComponentProps {
 	targetUrl?: string;
 	variant?: CardVariant;
 	eventNumber?: number; // For map view - displays the marker number
+	isHighlighted?: boolean; // For map view - highlights the card when corresponding marker is hovered
 }
 
 const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
@@ -94,6 +95,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 		agencyLongitude,
 		variant = "tile",
 		eventNumber,
+		isHighlighted = false,
 	} = props;
 
 	// Fallback: use agency coordinates if event coordinates are missing
@@ -174,26 +176,42 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 	// List view layout - horizontal card (compact for map view)
 	if (variant === "list") {
 		return (
-			<section tabIndex={0} className="w-full">
-				<div className="bg-white rounded-lg shadow-md overflow-hidden">
-					<div className="flex flex-row">
-						{/* Event Number Badge + Date/Time Section */}
-						<div className="bg-text-primary text-white p-2 sm:p-3 lg:p-4 w-[80px] sm:w-[100px] lg:w-[120px] flex flex-col justify-center items-center shrink-0 relative">
-							{eventNumber && (
-								<div className="absolute top-1 left-1 sm:top-2 sm:left-2 w-5 h-5 sm:w-6 sm:h-6 bg-secondary text-white rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold border-2 border-white shadow-md">
+			<section tabIndex={0} className="w-full py-1">
+				<div className="flex flex-row items-stretch">
+					{/* Map Pin container - always rendered for alignment, content only shown if event has map coordinates */}
+					<div className="flex items-center justify-center w-10 sm:w-12 shrink-0">
+						{eventNumber && (
+							<div className="relative flex flex-col items-center">
+								{/* Pin shape */}
+								<div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md">
 									{eventNumber}
 								</div>
-							)}
-							<div className="text-[10px] sm:text-xs font-varela opacity-80 text-center mt-3 sm:mt-4">
-								{formatDateDayAndDate(date)}
+								{/* Pin point */}
+								<div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-primary -mt-0.5"></div>
 							</div>
-							<div className="text-xs sm:text-sm font-bold mt-1 text-center whitespace-nowrap">
-								{startTime}
+						)}
+					</div>
+
+					<div
+						className={`flex-1 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 ${
+							isHighlighted
+								? "ring-2 ring-orange-400"
+								: ""
+						}`}
+					>
+						<div className="flex flex-row">
+							{/* Date/Time Section */}
+							<div className="bg-text-primary text-white p-2 sm:p-3 lg:p-4 w-[70px] sm:w-[90px] lg:w-[110px] flex flex-col justify-center items-center shrink-0">
+								<div className="text-[10px] sm:text-xs font-varela opacity-80 text-center">
+									{formatDateDayAndDate(date)}
+								</div>
+								<div className="text-xs sm:text-sm font-bold mt-1 text-center whitespace-nowrap">
+									{startTime}
+								</div>
+								<div className="text-xs sm:text-sm font-bold text-center whitespace-nowrap">
+									{endTime}
+								</div>
 							</div>
-							<div className="text-xs sm:text-sm font-bold text-center whitespace-nowrap">
-								{endTime}
-							</div>
-						</div>
 
 						{/* Main Content Section */}
 						<div className="flex-1 p-2 sm:p-3 lg:p-4 flex flex-col sm:flex-row gap-2 overflow-hidden min-w-0">
@@ -386,6 +404,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 								)}
 							</div>
 						</div>
+					</div>
 					</div>
 				</div>
 				<FullMapModalComponent

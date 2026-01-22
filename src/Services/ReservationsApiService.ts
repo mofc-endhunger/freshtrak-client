@@ -303,9 +303,10 @@ export class ReservationsApiService {
 
     /**
      * Get authentication token from storage
+     * Uses getUserToken() to check both Cognito and direct token storage
      */
     private getAuthToken(): string | null {
-        return StorageService.getItem("token");
+        return StorageService.getUserToken();
     }
 
     // ========================================================================

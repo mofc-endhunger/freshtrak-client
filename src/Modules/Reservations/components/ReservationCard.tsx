@@ -51,6 +51,9 @@ interface ReservationCardProps {
 /**
  * Format date string to readable format
  * Returns "N/A" for null/invalid dates
+ * 
+ * Note: Date-only strings (YYYY-MM-DD) are parsed as UTC by JavaScript.
+ * We append T12:00:00 to treat them as local time and avoid timezone shifts.
  */
 const formatDate = (dateString: string): string => {
 	// Handle N/A or empty dates
@@ -58,7 +61,12 @@ const formatDate = (dateString: string): string => {
 		return "N/A";
 	}
 	try {
-		const date = new Date(dateString);
+		// If date is in YYYY-MM-DD format, append time to parse as local time
+		// This prevents timezone issues where UTC midnight shifts to previous day
+		const normalizedDate = /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+			? `${dateString}T12:00:00`
+			: dateString;
+		const date = new Date(normalizedDate);
 		// Check for invalid date
 		if (isNaN(date.getTime())) {
 			return "N/A";

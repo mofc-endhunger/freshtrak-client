@@ -152,9 +152,12 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 	}, [events]);
 
 	// Get event index in flattened array for numbering
-	const getEventIndex = (eventId: string): number => {
-		return flattenedEvents.findIndex((ev) => ev.id === eventId);
-	};
+	const getEventIndex = useCallback(
+		(eventId: string): number => {
+			return flattenedEvents.findIndex((ev) => ev.id === eventId);
+		},
+		[flattenedEvents]
+	);
 
 	const handleMarkerHover = (
 		_event: EventLocation | null,
@@ -177,7 +180,7 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 				setTimeout(() => setHighlightedEventIndex(null), 2000);
 			}
 		},
-		[flattenedEvents]
+		[getEventIndex]
 	);
 
 	// Handle card click - scroll to map if needed, then pan map to marker
@@ -324,7 +327,7 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 						ref={listContainerRef}
 						className="w-full xl:w-3/5 xl:max-h-[calc(100vh-200px)] xl:overflow-y-auto"
 					>
-						<div className="space-y-6">
+						<div className="space-y-6 px-4">
 							{Object.entries(events).map(([date, event]) => (
 								<div key={date} className="space-y-3">
 									<h3 className="text-lg font-semibold text-gray-800 sticky top-0 bg-[#F2F0F4] py-2 z-10">
@@ -346,17 +349,11 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 																el
 															)
 														}
-														className={`transition-all duration-200 ${
-															isOnMap
-																? "cursor-pointer"
-																: ""
-														} ${
-															highlightedEventIndex ===
-																eventIndex &&
-															isOnMap
-																? "ring-2 ring-orange-400 rounded-lg"
-																: ""
-														}`}
+											className={`${
+																isOnMap
+																	? "cursor-pointer"
+																	: ""
+															}`}
 														onClick={
 															isOnMap
 																? () =>
@@ -405,6 +402,11 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 																	? eventIndex +
 																		1
 																	: undefined
+															}
+															isHighlighted={
+																highlightedEventIndex ===
+																	eventIndex &&
+																isOnMap
 															}
 														/>
 													</div>

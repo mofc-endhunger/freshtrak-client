@@ -805,6 +805,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"There are currently no available timeslots for this event. This may be due to technical issues or other temporary conditions. Please try again later. If the issue persists, please contact support.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Give Feedback",
+		feedback_title: "Give Feedback",
+		feedback_description:
+			"Your feedback goes to your local food bank to assure you have a pleasant experience when getting resources.",
+		feedback_visit_question: "How was your visit on {date} to {location}?",
+		feedback_experience_label: "Tell us about your experience.",
+		feedback_placeholder: "Share your feedback...",
+		feedback_submit: "Submit Feedback",
+		feedback_thank_you_title: "Thank You For Providing Feedback!",
+		feedback_thank_you_message:
+			"With your help, we can improve your experience and better serve our community.",
+		feedback_close: "Close",
+		feedback_tag_kind_volunteers: "Kind Volunteers",
+		feedback_tag_good_service: "Good Service",
+		feedback_tag_clean_space: "Clean Space",
+		feedback_tag_quality_food: "Quality Food",
+		feedback_tag_efficient_shoppers: "Efficient Shoppers",
 	},
 
 	spa: {
@@ -1610,6 +1629,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Actualmente no hay horarios disponibles para este evento. Esto puede deberse a problemas técnicos u otras condiciones temporales. Por favor, intente nuevamente más tarde. Si el problema persiste, póngase en contacto con el soporte.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Dar Opinión",
+		feedback_title: "Dar Opinión",
+		feedback_description:
+			"Su opinión va a su banco de alimentos local para asegurar que tenga una experiencia agradable al obtener recursos.",
+		feedback_visit_question: "¿Cómo fue su visita el {date} a {location}?",
+		feedback_experience_label: "Cuéntenos sobre su experiencia.",
+		feedback_placeholder: "Comparta su opinión...",
+		feedback_submit: "Enviar Opinión",
+		feedback_thank_you_title: "¡Gracias Por Proporcionar Su Opinión!",
+		feedback_thank_you_message:
+			"Con su ayuda, podemos mejorar su experiencia y servir mejor a nuestra comunidad.",
+		feedback_close: "Cerrar",
+		feedback_tag_kind_volunteers: "Voluntarios Amables",
+		feedback_tag_good_service: "Buen Servicio",
+		feedback_tag_clean_space: "Espacio Limpio",
+		feedback_tag_quality_food: "Comida de Calidad",
+		feedback_tag_efficient_shoppers: "Compradores Eficientes",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -2414,6 +2452,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Ma jiro wakhtiyada la heli karo ee hadda loo baahan yahay dhacdadan. Tani waxay sabab u noqon kartaa dhibaatooyinka farsamada ama xaaladaha kale ee ku meel gaarka ah. Fadlan mar kale isku day. Haddii dhibaatadu sii waddo, fadlan la xidhiidh taageerada.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Give Feedback",
+		feedback_title: "Give Feedback",
+		feedback_description:
+			"Your feedback goes to your local food bank to assure you have a pleasant experience when getting resources.",
+		feedback_visit_question: "How was your visit on {date} to {location}?",
+		feedback_experience_label: "Tell us about your experience.",
+		feedback_placeholder: "Share your feedback...",
+		feedback_submit: "Submit Feedback",
+		feedback_thank_you_title: "Thank You For Providing Feedback!",
+		feedback_thank_you_message:
+			"With your help, we can improve your experience and better serve our community.",
+		feedback_close: "Close",
+		feedback_tag_kind_volunteers: "Kind Volunteers",
+		feedback_tag_good_service: "Good Service",
+		feedback_tag_clean_space: "Clean Space",
+		feedback_tag_quality_food: "Quality Food",
+		feedback_tag_efficient_shoppers: "Efficient Shoppers",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -3225,6 +3282,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"В настоящее время нет доступных временных слотов для этого мероприятия. Это может быть связано с техническими проблемами или другими временными условиями. Пожалуйста, попробуйте позже. Если проблема сохраняется, обратитесь в службу поддержки.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Оставить отзыв",
+		feedback_title: "Оставить отзыв",
+		feedback_description:
+			"Ваш отзыв отправляется в местный продовольственный банк, чтобы обеспечить вам приятный опыт получения ресурсов.",
+		feedback_visit_question: "Как прошел ваш визит {date} в {location}?",
+		feedback_experience_label: "Расскажите нам о своем опыте.",
+		feedback_placeholder: "Поделитесь своим отзывом...",
+		feedback_submit: "Отправить отзыв",
+		feedback_thank_you_title: "Спасибо за ваш отзыв!",
+		feedback_thank_you_message:
+			"С вашей помощью мы можем улучшить ваш опыт и лучше служить нашему сообществу.",
+		feedback_close: "Закрыть",
+		feedback_tag_kind_volunteers: "Добрые волонтеры",
+		feedback_tag_good_service: "Хорошее обслуживание",
+		feedback_tag_clean_space: "Чистое пространство",
+		feedback_tag_quality_food: "Качественная еда",
+		feedback_tag_efficient_shoppers: "Эффективные покупатели",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -4012,6 +4088,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Bu etkinlik için şu anda müsait zaman dilimi bulunmamaktadır. Bu durum teknik sorunlar veya diğer geçici koşullardan kaynaklanıyor olabilir. Lütfen daha sonra tekrar deneyin. Sorun devam ederse, lütfen destek ekibiyle iletişime geçin.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Geri Bildirim Ver",
+		feedback_title: "Geri Bildirim Ver",
+		feedback_description:
+			"Geri bildiriminiz, kaynaklar alırken keyifli bir deneyim yaşamanızı sağlamak için yerel gıda bankanıza gider.",
+		feedback_visit_question: "{date} tarihinde {location}'a ziyaretiniz nasıldı?",
+		feedback_experience_label: "Deneyiminiz hakkında bilgi verin.",
+		feedback_placeholder: "Geri bildiriminizi paylaşın...",
+		feedback_submit: "Geri Bildirim Gönder",
+		feedback_thank_you_title: "Geri Bildirim Sağladığınız İçin Teşekkürler!",
+		feedback_thank_you_message:
+			"Yardımınızla deneyiminizi geliştirebilir ve topluluğumuza daha iyi hizmet verebiliriz.",
+		feedback_close: "Kapat",
+		feedback_tag_kind_volunteers: "Nazik Gönüllüler",
+		feedback_tag_good_service: "İyi Hizmet",
+		feedback_tag_clean_space: "Temiz Alan",
+		feedback_tag_quality_food: "Kaliteli Yiyecek",
+		feedback_tag_efficient_shoppers: "Verimli Alışverişçiler",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -4777,6 +4872,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"لا توجد حاليًا فترات زمنية متاحة لهذا الحدث. قد يكون هذا بسبب مشاكل تقنية أو ظروف مؤقتة أخرى. يرجى المحاولة مرة أخرى لاحقًا. إذا استمرت المشكلة، يرجى الاتصال بالدعم.",
+
+		// FEEDBACK
+		feedback_give_feedback: "قدم ملاحظاتك",
+		feedback_title: "قدم ملاحظاتك",
+		feedback_description:
+			"تذهب ملاحظاتك إلى بنك الطعام المحلي لضمان حصولك على تجربة ممتعة عند الحصول على الموارد.",
+		feedback_visit_question: "كيف كانت زيارتك في {date} إلى {location}؟",
+		feedback_experience_label: "أخبرنا عن تجربتك.",
+		feedback_placeholder: "شارك ملاحظاتك...",
+		feedback_submit: "إرسال الملاحظات",
+		feedback_thank_you_title: "شكرًا لتقديم ملاحظاتك!",
+		feedback_thank_you_message:
+			"بمساعدتك، يمكننا تحسين تجربتك وخدمة مجتمعنا بشكل أفضل.",
+		feedback_close: "إغلاق",
+		feedback_tag_kind_volunteers: "متطوعون لطفاء",
+		feedback_tag_good_service: "خدمة جيدة",
+		feedback_tag_clean_space: "مساحة نظيفة",
+		feedback_tag_quality_food: "طعام عالي الجودة",
+		feedback_tag_efficient_shoppers: "متسوقون فعالون",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -5516,6 +5630,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"目前此活动没有可用的时间段。这可能是由于技术问题或其他临时条件造成的。请稍后再试。如果问题持续存在，请联系支持。",
+
+		// FEEDBACK
+		feedback_give_feedback: "提供反馈",
+		feedback_title: "提供反馈",
+		feedback_description:
+			"您的反馈将发送到当地的食品银行，以确保您在获取资源时有愉快的体验。",
+		feedback_visit_question: "您在{date}对{location}的访问如何？",
+		feedback_experience_label: "告诉我们您的体验。",
+		feedback_placeholder: "分享您的反馈...",
+		feedback_submit: "提交反馈",
+		feedback_thank_you_title: "感谢您提供反馈！",
+		feedback_thank_you_message:
+			"在您的帮助下，我们可以改善您的体验并更好地服务我们的社区。",
+		feedback_close: "关闭",
+		feedback_tag_kind_volunteers: "友善的志愿者",
+		feedback_tag_good_service: "良好的服务",
+		feedback_tag_clean_space: "干净的空间",
+		feedback_tag_quality_food: "优质食品",
+		feedback_tag_efficient_shoppers: "高效的购物者",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -6300,6 +6433,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"हाल यस कार्यक्रमको लागि उपलब्ध समय स्लटहरू छैनन्। यो प्राविधिक समस्याहरू वा अन्य अस्थायी अवस्थाहरूको कारणले हुन सक्छ। कृपया पछि फेरि प्रयास गर्नुहोस्। यदि समस्या जारी रहन्छ भने, कृपया समर्थनसँग सम्पर्क गर्नुहोस्।",
+
+		// FEEDBACK
+		feedback_give_feedback: "प्रतिक्रिया दें",
+		feedback_title: "प्रतिक्रिया दें",
+		feedback_description:
+			"आपकी प्रतिक्रिया आपके स्थानीय फ़ूड बैंक को जाती है ताकि संसाधन प्राप्त करते समय आपका अनुभव सुखद हो।",
+		feedback_visit_question: "{date} को {location} पर आपकी यात्रा कैसी रही?",
+		feedback_experience_label: "अपने अनुभव के बारे में बताएं।",
+		feedback_placeholder: "अपनी प्रतिक्रिया साझा करें...",
+		feedback_submit: "प्रतिक्रिया जमा करें",
+		feedback_thank_you_title: "प्रतिक्रिया देने के लिए धन्यवाद!",
+		feedback_thank_you_message:
+			"आपकी मदद से, हम आपके अनुभव को बेहतर बना सकते हैं और अपने समुदाय की बेहतर सेवा कर सकते हैं।",
+		feedback_close: "बंद करें",
+		feedback_tag_kind_volunteers: "दयालु स्वयंसेवक",
+		feedback_tag_good_service: "अच्छी सेवा",
+		feedback_tag_clean_space: "साफ जगह",
+		feedback_tag_quality_food: "गुणवत्तापूर्ण भोजन",
+		feedback_tag_efficient_shoppers: "कुशल खरीदार",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -7091,6 +7243,25 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"हाल यस कार्यक्रमको लागि उपलब्ध समय स्लटहरू छैनन्। यो प्राविधिक समस्याहरू वा अन्य अस्थायी अवस्थाहरूको कारणले हुन सक्छ। कृपया पछि फेरि प्रयास गर्नुहोस्। यदि समस्या जारी रहन्छ भने, कृपया समर्थनसँग सम्पर्क गर्नुहोस्।",
+
+		// FEEDBACK
+		feedback_give_feedback: "प्रतिक्रिया दिनुहोस्",
+		feedback_title: "प्रतिक्रिया दिनुहोस्",
+		feedback_description:
+			"तपाईंको प्रतिक्रिया तपाईंको स्थानीय खाना बैंकमा जान्छ ताकि संसाधनहरू प्राप्त गर्दा तपाईंको अनुभव सुखद होस्।",
+		feedback_visit_question: "{date} मा {location} मा तपाईंको भ्रमण कस्तो रह्यो?",
+		feedback_experience_label: "तपाईंको अनुभवको बारेमा हामीलाई बताउनुहोस्।",
+		feedback_placeholder: "तपाईंको प्रतिक्रिया साझा गर्नुहोस्...",
+		feedback_submit: "प्रतिक्रिया पेश गर्नुहोस्",
+		feedback_thank_you_title: "प्रतिक्रिया दिनुभएकोमा धन्यवाद!",
+		feedback_thank_you_message:
+			"तपाईंको मद्दतले, हामी तपाईंको अनुभव सुधार्न र हाम्रो समुदायलाई राम्रोसँग सेवा गर्न सक्छौं।",
+		feedback_close: "बन्द गर्नुहोस्",
+		feedback_tag_kind_volunteers: "दयालु स्वयंसेवकहरू",
+		feedback_tag_good_service: "राम्रो सेवा",
+		feedback_tag_clean_space: "सफा ठाउँ",
+		feedback_tag_quality_food: "गुणस्तरीय खाना",
+		feedback_tag_efficient_shoppers: "प्रभावकारी किनमेल गर्नेहरू",
 	},
 });
 

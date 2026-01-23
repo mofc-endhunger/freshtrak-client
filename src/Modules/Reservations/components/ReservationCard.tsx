@@ -23,11 +23,13 @@
  * ============================================================================
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
 import { Reservation, ReservationStatus } from "../types/reservation.types";
 import localization from "../../Localization/LocalizationComponent";
+import FeedbackContainer from "../../Feedback/FeedbackContainer";
 
 /**
  * Card variant determines the display mode
@@ -111,6 +113,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 	onClick,
 }) => {
 	const { event, date, timeslot, status } = reservation;
+	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
 	const isPast = variant === "past";
 
@@ -123,47 +126,83 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 		}
 	};
 
+	/**
+	 * Handle feedback button click
+	 */
+	const handleFeedbackClick = (e: React.MouseEvent) => {
+		e.stopPropagation(); // Prevent card click
+		setIsFeedbackOpen(true);
+	};
+
+	/**
+	 * Handle feedback modal close
+	 */
+	const handleFeedbackClose = () => {
+		setIsFeedbackOpen(false);
+	};
+
 	return (
-		<Card
-			className={`border transition-shadow py-0 rounded-sm ${
-				isPast
-					? "border-gray-200 bg-gray-50/50" // Muted styling for past
-					: "border-gray-200 hover:shadow-md" // Active styling for upcoming
-			} ${onClick ? "cursor-pointer" : ""}`}
-			onClick={handleClick}
-		>
-			<CardContent className="p-3">
-				{/* Event name */}
-				<h3
-					className={`font-noto-sans font-semibold text-base truncate mb-2 ${
-						isPast ? "text-gray-600" : "text-gray-900"
-					}`}
-				>
-					{event.name}
-				</h3>
+		<>
+			<Card
+				className={`border transition-shadow py-0 rounded-sm ${
+					isPast
+						? "border-gray-200 bg-gray-50/50" // Muted styling for past
+						: "border-gray-200 hover:shadow-md" // Active styling for upcoming
+				} ${onClick ? "cursor-pointer" : ""}`}
+				onClick={handleClick}
+			>
+				<CardContent className="p-3">
+					{/* Event name */}
+					<h3
+						className={`font-noto-sans font-semibold text-base truncate mb-2 ${
+							isPast ? "text-gray-600" : "text-gray-900"
+						}`}
+					>
+						{event.name}
+					</h3>
 
-				{/* Date and Time */}
-				<p
-					className={`font-noto-sans text-sm mb-2 ${
-						isPast ? "text-gray-500" : "text-gray-600"
-					}`}
-				>
-					{formatDate(date)} · {timeslot.start_time} - {timeslot.end_time}
-				</p>
+					{/* Date and Time */}
+					<p
+						className={`font-noto-sans text-sm mb-2 ${
+							isPast ? "text-gray-500" : "text-gray-600"
+						}`}
+					>
+						{formatDate(date)} · {timeslot.start_time} - {timeslot.end_time}
+					</p>
 
-				{/* Status badge - only for past events with completed status */}
-				{isPast && status && (
-					<div className="flex items-center gap-2">
-						<Badge
-							variant="outline"
-							className={`${getStatusBadgeClass()} text-xs border`}
-						>
-							{getStatusLabel(status)}
-						</Badge>
-					</div>
-				)}
-			</CardContent>
-		</Card>
+					{/* Status badge and feedback button - only for past events */}
+					{isPast && status && (
+						<div className="flex items-center justify-between gap-2">
+							<Badge
+								variant="outline"
+								className={`${getStatusBadgeClass()} text-xs border`}
+							>
+								{getStatusLabel(status)}
+							</Badge>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={handleFeedbackClick}
+								className="text-xs h-7 px-2 text-text-primary border-text-primary hover:bg-text-primary hover:text-white"
+							>
+								{localization.feedback_give_feedback || "Give Feedback"}
+							</Button>
+						</div>
+					)}
+				</CardContent>
+			</Card>
+
+			{/* Feedback Modal */}
+			{isPast && (
+				<FeedbackContainer
+					isOpen={isFeedbackOpen}
+					onClose={handleFeedbackClose}
+					reservationId={reservation.id?.toString() || ""}
+					locationName={event.name}
+					visitDate={formatDate(date)}
+				/>
+			)}
+		</>
 	);
 };
 

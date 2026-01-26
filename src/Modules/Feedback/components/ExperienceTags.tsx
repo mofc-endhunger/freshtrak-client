@@ -77,11 +77,11 @@ const ExperienceTags: React.FC<ExperienceTagsProps> = ({
 						onClick={() => handleTagClick(tag)}
 						onKeyDown={(e) => handleKeyDown(e, tag)}
 						className={cn(
-							"px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150",
-							"border focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-text-primary",
+							"px-4 py-2 rounded-full text-sm font-medium transition-all duration-150",
+							"border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-secondary",
 							isSelected
-								? "bg-text-primary text-white border-text-primary"
-								: "bg-white text-gray-700 border-gray-300 hover:border-text-primary hover:text-text-primary"
+								? "bg-secondary text-white border-secondary"
+								: "bg-transparent text-secondary border-gray-300 hover:border-secondary"
 						)}
 						role="checkbox"
 						aria-checked={isSelected}

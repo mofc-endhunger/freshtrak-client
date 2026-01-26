@@ -44,6 +44,12 @@ import config from "../config";
 // ============================================================================
 
 /**
+ * Toggle to enable/disable mock mode for testing
+ * Set to true to use mock data, false to use real API
+ */
+const USE_MOCK_DATA = true;
+
+/**
  * Configuration for the Reservations API service
  */
 const API_CONFIG = {
@@ -55,6 +61,86 @@ const API_CONFIG = {
     retryAttempts: 3,
     retryDelay: 1000,
 };
+
+// ============================================================================
+// MOCK DATA FOR TESTING
+// ============================================================================
+
+/**
+ * Mock past reservations for testing feedback functionality
+ */
+const MOCK_PAST_RESERVATIONS: Reservation[] = [
+    {
+        id: 1001,
+        event: {
+            id: 2001,
+            name: "Community Food Pantry - Downtown",
+        },
+        date: "2026-01-15",
+        timeslot: {
+            start_time: "10:00am",
+            end_time: "12:00pm",
+        },
+        status: "completed",
+        household_id: 100,
+        created_at: "2026-01-10T10:00:00.000Z",
+        updated_at: "2026-01-10T10:00:00.000Z",
+    },
+    {
+        id: 1002,
+        event: {
+            id: 2002,
+            name: "Fresh Produce Distribution",
+        },
+        date: "2026-01-10",
+        timeslot: {
+            start_time: "9:00am",
+            end_time: "11:00am",
+        },
+        status: "completed",
+        household_id: 100,
+        created_at: "2026-01-05T10:00:00.000Z",
+        updated_at: "2026-01-05T10:00:00.000Z",
+    },
+    {
+        id: 1003,
+        event: {
+            id: 2003,
+            name: "Holiday Food Drive",
+        },
+        date: "2026-01-05",
+        timeslot: {
+            start_time: "2:00pm",
+            end_time: "4:00pm",
+        },
+        status: "completed",
+        household_id: 100,
+        created_at: "2026-01-01T10:00:00.000Z",
+        updated_at: "2026-01-01T10:00:00.000Z",
+    },
+];
+
+/**
+ * Mock upcoming reservations for testing
+ */
+const MOCK_UPCOMING_RESERVATIONS: Reservation[] = [
+    {
+        id: 1004,
+        event: {
+            id: 2004,
+            name: "Weekly Food Distribution",
+        },
+        date: "2026-01-30",
+        timeslot: {
+            start_time: "11:00am",
+            end_time: "1:00pm",
+        },
+        status: undefined,
+        household_id: 100,
+        created_at: "2026-01-20T10:00:00.000Z",
+        updated_at: "2026-01-20T10:00:00.000Z",
+    },
+];
 
 
 /**
@@ -324,6 +410,11 @@ export class ReservationsApiService {
     async getReservations(
         filter: ReservationFilter = "all"
     ): Promise<ReservationsResponse> {
+        // Use mock data for testing
+        if (USE_MOCK_DATA) {
+            return this.getMockReservations(filter);
+        }
+
         // Determine cache key based on filter
         const cacheKey =
             filter === "upcoming"
@@ -365,6 +456,33 @@ export class ReservationsApiService {
             logError(error, context);
             throw error;
         }
+    }
+
+    /**
+     * Get mock reservations for testing
+     */
+    private getMockReservations(filter: ReservationFilter): ReservationsResponse {
+        let reservations: Reservation[];
+        let upcomingCount = MOCK_UPCOMING_RESERVATIONS.length;
+        let pastCount = MOCK_PAST_RESERVATIONS.length;
+
+        switch (filter) {
+            case "upcoming":
+                reservations = MOCK_UPCOMING_RESERVATIONS;
+                break;
+            case "past":
+                reservations = MOCK_PAST_RESERVATIONS;
+                break;
+            default:
+                reservations = [...MOCK_UPCOMING_RESERVATIONS, ...MOCK_PAST_RESERVATIONS];
+        }
+
+        return {
+            reservations,
+            total: reservations.length,
+            upcoming_count: upcomingCount,
+            past_count: pastCount,
+        };
     }
 
     /**

@@ -17,7 +17,6 @@ import { Textarea } from "../../../components/ui/textarea";
 import { StarRating } from "../../../components/ui/star-rating";
 import ExperienceTags from "./ExperienceTags";
 import { ExperienceTag, FeedbackFormData } from "../types";
-import { X } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import localization from "../../Localization/LocalizationComponent";
 
@@ -89,40 +88,33 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
 			<DialogContent
-				className="p-0 gap-0 max-w-[320px] sm:max-w-[320px] overflow-hidden"
-				showCloseButton={false}
+				className="p-0 gap-0 max-w-[320px] sm:max-w-[320px] overflow-hidden bg-white border-0 shadow-xl"
+				showCloseButton={true}
 			>
 				{/* Green Header */}
-				<DialogHeader className="bg-text-primary px-4 py-3 text-white relative">
+				<DialogHeader className="bg-text-primary px-4 py-3 text-white relative rounded-t-lg">
 					<DialogTitle className="text-base font-semibold text-white pr-8">
 						{localization.feedback_title || "Give Feedback"}
-					</DialogTitle>
-					<button
-						type="button"
-						onClick={handleClose}
-						className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm"
-						aria-label="Close"
-					>
-						<X className="w-5 h-5" />
-					</button>
-				</DialogHeader>
-
-				{/* Form Content */}
-				<form onSubmit={handleSubmit} className="p-4 space-y-5">
-					{/* Title */}
-					<div>
-						<h2 className="text-xl font-bold text-text-primary mb-2">
+						{/* Title */}
+					<div className="py-4">
+						<h2 className="text-xl font-bold text-white mb-2">
 							{localization.feedback_title || "Give Feedback"}
 						</h2>
-						<p className="text-sm text-content-text">
+						<p className="text-sm text-white leading-relaxed">
 							{localization.feedback_description ||
 								"Your feedback goes to your local food bank to assure you have a pleasant experience when getting resources."}
 						</p>
 					</div>
+					</DialogTitle>
+				</DialogHeader>
+
+				{/* Form Content */}
+				<form onSubmit={handleSubmit} className="p-5 space-y-5 bg-white">
+					
 
 					{/* Star Rating Section */}
 					<div>
-						<p className="text-sm font-semibold text-gray-900 mb-2">
+						<p className="text-sm font-semibold text-gray-800 mb-3">
 							{visitQuestion}
 						</p>
 						<StarRating
@@ -135,7 +127,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
 					{/* Experience Tags Section */}
 					<div>
-						<p className="text-sm font-semibold text-gray-900 mb-2">
+						<p className="text-sm font-semibold text-gray-800 mb-3">
 							{localization.feedback_experience_label ||
 								"Tell us about your experience."}
 						</p>
@@ -153,7 +145,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
 							}
 							value={feedbackText}
 							onChange={(e) => setFeedbackText(e.target.value)}
-							className="min-h-[100px] resize-none"
+							className="min-h-[100px] resize-none border-gray-300 focus:border-text-primary focus:ring-text-primary bg-white"
 							maxLength={1000}
 						/>
 					</div>
@@ -163,10 +155,10 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
 						type="submit"
 						disabled={isSubmitDisabled}
 						className={cn(
-							"w-full min-h-12 text-base font-semibold uppercase",
+							"w-full min-h-12 text-base font-semibold rounded-md",
 							rating > 0
-								? "bg-text-primary hover:bg-text-primary/90 text-white"
-								: "bg-gray-200 text-gray-500 cursor-not-allowed"
+								? "bg-text-primary hover:bg-text-primary text-white"
+								: "bg-gray-300 text-gray-500 cursor-not-allowed"
 						)}
 					>
 						{isSubmitting

@@ -11,7 +11,7 @@ import {
 	DialogContent,
 } from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
-import { X, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import localization from "../../Localization/LocalizationComponent";
 
 interface FeedbackConfirmationProps {
@@ -28,20 +28,11 @@ const FeedbackConfirmation: React.FC<FeedbackConfirmationProps> = ({
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<DialogContent
-				className="p-0 gap-0 max-w-[320px] sm:max-w-[320px] overflow-hidden border-0"
+				className="p-0 gap-0 max-w-[320px] sm:max-w-[320px] overflow-hidden border-0 shadow-xl rounded-lg"
 				showCloseButton={false}
 			>
 				{/* Full Green Background Content */}
-				<div className="bg-text-primary text-white p-6 min-h-[400px] flex flex-col items-center relative">
-					{/* Close Button */}
-					<button
-						type="button"
-						onClick={onClose}
-						className="absolute right-4 top-4 text-white hover:text-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm"
-						aria-label="Close"
-					>
-						<X className="w-6 h-6" />
-					</button>
+				<div className="bg-text-primary text-white p-6 min-h-[400px] flex flex-col items-center relative rounded-lg">
 
 					{/* Logo/Brand */}
 					<div className="mt-8 mb-6">
@@ -72,7 +63,7 @@ const FeedbackConfirmation: React.FC<FeedbackConfirmationProps> = ({
 						type="button"
 						onClick={onClose}
 						variant="outline"
-						className="mt-6 w-full max-w-[200px] bg-white text-text-primary hover:bg-white/90 border-white font-semibold"
+						className="mt-6 w-full max-w-[200px] bg-white text-gray-dark hover:bg-gray-100 border-white font-semibold rounded-md"
 					>
 						{localization.feedback_close || "Close"}
 					</Button>

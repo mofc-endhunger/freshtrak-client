@@ -106,6 +106,10 @@ export interface Reservation {
 	household_id: number;
 	created_at: string;
 	updated_at: string;
+	/** Event slot ID for feedback form lookup */
+	public_event_slot_id?: number;
+	/** Event date ID for feedback form lookup */
+	public_event_date_id?: number;
 }
 
 /**

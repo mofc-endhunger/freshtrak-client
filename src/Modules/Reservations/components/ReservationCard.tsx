@@ -20,6 +20,11 @@
  *     variant="past"
  *   />
  *
+ * FEEDBACK MODE:
+ * By default, uses the legacy hardcoded feedback form.
+ * Set useDynamicFeedback={true} to use the new dynamic form system
+ * which fetches form configuration from the API.
+ *
  * ============================================================================
  */
 
@@ -48,6 +53,8 @@ interface ReservationCardProps {
 	variant?: CardVariant;
 	/** Callback when card is clicked (optional) */
 	onClick?: (reservation: Reservation) => void;
+	/** Use dynamic feedback form (default: false for backward compatibility) */
+	useDynamicFeedback?: boolean;
 }
 
 /**
@@ -111,8 +118,9 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 	reservation,
 	variant = "upcoming",
 	onClick,
+	useDynamicFeedback = false,
 }) => {
-	const { event, date, timeslot, status } = reservation;
+	const { event, date, timeslot, status, public_event_slot_id, public_event_date_id } = reservation;
 	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
 	const isPast = variant === "past";
@@ -193,13 +201,28 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 			</Card>
 
 			{/* Feedback Modal */}
-			{isPast && (
+			{isPast && !useDynamicFeedback && (
 				<FeedbackContainer
 					isOpen={isFeedbackOpen}
 					onClose={handleFeedbackClose}
 					reservationId={reservation.id?.toString() || ""}
 					locationName={event.name}
 					visitDate={formatDate(date)}
+				/>
+			)}
+
+			{/* Dynamic Feedback Modal */}
+			{isPast && useDynamicFeedback && (
+				<FeedbackContainer
+					isOpen={isFeedbackOpen}
+					onClose={handleFeedbackClose}
+					useDynamicForm={true}
+					eventId={event.id}
+					eventDateId={public_event_date_id}
+					eventSlotId={public_event_slot_id}
+					locationName={event.name}
+					visitDate={formatDate(date)}
+					reservationId={reservation.id?.toString()}
 				/>
 			)}
 		</>

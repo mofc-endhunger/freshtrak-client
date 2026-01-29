@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -12,6 +12,10 @@ import "../../Assets/scss/main.scss";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import serviceCatFilter from "../../Utils/serviceCatFilter";
 import LoadingSpinner from "../General/LoadingSpinner";
+import { Button } from "../../components/ui/button";
+
+// Pagination constants
+const ITEMS_PER_PAGE = 20;
 
 interface Agency {
 	id: string;
@@ -49,44 +53,82 @@ const EventContainer: React.FC = () => {
 
 	const [serverError, setServerError] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
+	const [loadingMore, setLoadingMore] = useState<boolean>(false);
 	const [agencyData, setAgencyData] = useState<Agency[]>([]);
 	const [filteredData, setFilteredData] = useState<Agency[]>([]);
 	const [zip, setZip] = useState<string | null>(null);
+	
+	// Pagination state
+	const [page, setPage] = useState<number>(1);
+	const [hasMore, setHasMore] = useState<boolean>(true);
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const categories = serviceCatFilter(filteredData);
 
-	const getEvents = async (): Promise<void> => {
-		if (zipCode) {
-			setLoading(true);
-			try {
-				const resp = await axios.get(API_URL.EVENTS_LIST, {
-					params: {
-						zip_code: zipCode,
-						distance: distance,
-						category: serviceCat,
-					},
-				});
-				const {
-					data: { agencies },
-				} = resp;
+	const getEvents = useCallback(async (pageNum: number = 1, append: boolean = false): Promise<void> => {
+		if (!zipCode) return;
 
-				setAgencyData(agencies);
-				if (zip !== zipCode || filteredData.length === 0) {
-					setZip(zipCode);
-					setFilteredData(agencies);
-				}
-				setLoading(false);
-			} catch (err) {
-				setLoading(false);
+		// Use different loading states for initial load vs loading more
+		if (pageNum === 1) {
+			setLoading(true);
+			if (!append) {
+				setAgencyData([]); // Clear previous results on new search
 			}
+		} else {
+			setLoadingMore(true);
 		}
-	};
+
+		try {
+			const resp = await axios.get(API_URL.EVENTS_LIST, {
+				params: {
+					zip_code: zipCode,
+					distance: distance,
+					category: serviceCat,
+					page: pageNum,
+					limit: ITEMS_PER_PAGE,
+				},
+			});
+
+			const {
+				data: { agencies, meta },
+			} = resp;
+
+			// Append or replace based on whether it's a new search or load more
+			setAgencyData(prev => append ? [...prev, ...agencies] : agencies);
+			
+			if (zip !== zipCode || filteredData.length === 0) {
+				setZip(zipCode);
+				setFilteredData(prev => append ? [...prev, ...agencies] : agencies);
+			} else if (append) {
+				setFilteredData(prev => [...prev, ...agencies]);
+			}
+
+			setPage(pageNum);
+			// Handle pagination meta - check if there's more data
+			setHasMore(meta?.hasMore ?? agencies.length === ITEMS_PER_PAGE);
+
+		} catch (err) {
+			console.error("Error fetching events:", err);
+		} finally {
+			setLoading(false);
+			setLoadingMore(false);
+		}
+	}, [zipCode, distance, serviceCat, zip, filteredData.length]);
+
+	// Load more handler
+	const loadMore = useCallback(() => {
+		if (!loadingMore && hasMore) {
+			getEvents(page + 1, true);
+		}
+	}, [loadingMore, hasMore, page, getEvents]);
 
 	useEffect(() => {
 		if (zipCode) {
-			getEvents();
+			// Reset pagination on new search
+			setPage(1);
+			setHasMore(true);
+			getEvents(1, false);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [zipCode, distance, serviceCat, availability, reservations]);
@@ -197,12 +239,41 @@ const EventContainer: React.FC = () => {
 						{!loading && <ResourceList />}
 					</div>
 					{!loading && (
-						<EventListContainer
-							agencyData={agencyData}
-							zipCode={zipCode}
-							availabilityFilter={availability}
-							reservationsFilter={reservations}
-						/>
+						<>
+							<EventListContainer
+								agencyData={agencyData}
+								zipCode={zipCode}
+								availabilityFilter={availability}
+								reservationsFilter={reservations}
+							/>
+							
+							{/* Load More Button */}
+							{hasMore && agencyData.length > 0 && (
+								<div className="flex justify-center py-8">
+									<Button
+										onClick={loadMore}
+										disabled={loadingMore}
+										variant="highlightOutline"
+									>
+										{loadingMore ? (
+											<div className="flex items-center justify-center gap-2">
+												<div className="w-4 h-4 border-2 border-highlight border-t-transparent rounded-full animate-spin" />
+												<span>Loading...</span>
+											</div>
+										) : (
+											"Load More Events"
+										)}
+									</Button>
+								</div>
+							)}
+							
+							{/* No more events message */}
+							{!hasMore && agencyData.length > 0 && (
+								<p className="text-center text-gray-500 py-4">
+									No more events to load
+								</p>
+							)}
+						</>
 					)}
 					{loading && <LoadingSpinner />}
 				</div>

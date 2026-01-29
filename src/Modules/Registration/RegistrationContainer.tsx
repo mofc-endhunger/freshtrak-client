@@ -127,12 +127,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
 			setLoading(true);
-			const resp = await axios.get<{ data: Event; errors?: string[] }>(
+			const resp = await axios.get<{ event: Event; errors?: string[] }>(
 				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
 			);
 			const { data } = resp;
-			if (data && data.data) {
-				const eventData = EventFormat(data.data, eventDateId);
+			if (data && data.event) {
+				const eventData = EventFormat(data.event, eventDateId);
 				dispatch(setCurrentEvent(eventData));
 				setSelectedEvent(eventData);
 				setLoading(false);

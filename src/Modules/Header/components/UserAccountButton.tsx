@@ -143,7 +143,7 @@ const UserAccountButton: React.FC = () => {
 					className="cursor-pointer hover:bg-gray-50"
 				>
 					<Settings className="mr-2 h-4 w-4" />
-					<span>{localization.title_account_settings}</span>
+					<span>{localization.text_profile}</span>
 				</DropdownMenuItem>
 
 				<DropdownMenuSeparator />

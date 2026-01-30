@@ -76,7 +76,7 @@ jest.mock("@one-platform/opc-timeline", () => {});
 
 // Mock utilities
 jest.mock("../../../Utils/DateFormat", () => ({
-	formatDateForServer: jest.fn(date => date),
+	formatDateForServer: jest.fn((date) => date),
 }));
 
 // Create mock store
@@ -144,7 +144,9 @@ const renderWithProviders = (component: React.ReactElement) => {
 	const store = createMockStore();
 	return render(
 		<Provider store={store}>
-			<BrowserRouter>{component}</BrowserRouter>
+			<BrowserRouter future={{ v7_startTransition: true }}>
+				{component}
+			</BrowserRouter>
 		</Provider>
 	);
 };

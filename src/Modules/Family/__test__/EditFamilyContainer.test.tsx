@@ -84,7 +84,7 @@ jest.mock("../../../Testing", () => ({
 
 // Mock react-hook-form
 const mockRegister = jest.fn();
-const mockHandleSubmit = jest.fn(fn => fn);
+const mockHandleSubmit = jest.fn((fn) => fn);
 const mockGetValues = jest.fn();
 const mockReset = jest.fn();
 const mockErrors = {};
@@ -109,7 +109,7 @@ const store = mockStore({});
 const renderEditFamilyContainer = () => {
 	return render(
 		<Provider store={store}>
-			<BrowserRouter>
+			<BrowserRouter future={{ v7_startTransition: true }}>
 				<EditFamilyContainer />
 			</BrowserRouter>
 		</Provider>

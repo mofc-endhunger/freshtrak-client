@@ -239,41 +239,13 @@ const EventContainer: React.FC = () => {
 						{!loading && <ResourceList />}
 					</div>
 					{!loading && (
-						<>
-							<EventListContainer
-								agencyData={agencyData}
-								zipCode={zipCode}
-								availabilityFilter={availability}
-								reservationsFilter={reservations}
-							/>
-							
-							{/* Load More Button */}
-							{hasMore && agencyData.length > 0 && (
-								<div className="flex justify-center py-8">
-									<Button
-										onClick={loadMore}
-										disabled={loadingMore}
-										variant="highlightOutline"
-									>
-										{loadingMore ? (
-											<div className="flex items-center justify-center gap-2">
-												<div className="w-4 h-4 border-2 border-highlight border-t-transparent rounded-full animate-spin" />
-												<span>Loading...</span>
-											</div>
-										) : (
-											"Load More Events"
-										)}
-									</Button>
-								</div>
-							)}
-							
-							{/* No more events message */}
-							{!hasMore && agencyData.length > 0 && (
-								<p className="text-center text-gray-500 py-4">
-									No more events to load
-								</p>
-							)}
-						</>
+						<EventListContainer
+							agencyData={agencyData}
+							zipCode={zipCode}
+							availabilityFilter={availability}
+							reservationsFilter={reservations}
+							distance={Number(distance) || 10}
+						/>
 					)}
 					{loading && <LoadingSpinner />}
 				</div>

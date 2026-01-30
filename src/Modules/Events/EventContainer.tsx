@@ -74,7 +74,7 @@ const EventContainer: React.FC = () => {
 				} = resp;
 
 				setAgencyData(agencies);
-				if (zip !== zipCode || filteredData.length === 0) {
+				if (zip !== zipCode || (filteredData?.length ?? 0) === 0) {
 					setZip(zipCode);
 					setFilteredData(agencies);
 				}
@@ -83,7 +83,14 @@ const EventContainer: React.FC = () => {
 				setLoading(false);
 			}
 		}
-	};
+	}, [zipCode, distance, serviceCat, zip, filteredData?.length]);
+
+	// Load more handler
+	const loadMore = useCallback(() => {
+		if (!loadingMore && hasMore) {
+			getEvents(page + 1, true);
+		}
+	}, [loadingMore, hasMore, page, getEvents]);
 
 	useEffect(() => {
 		if (zipCode) {

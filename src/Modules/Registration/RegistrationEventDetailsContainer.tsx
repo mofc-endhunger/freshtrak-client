@@ -22,7 +22,7 @@ const RegistrationEventDetailsContainer: React.FC<
 	const navigate = useNavigate();
 
 	const { id: eventDateId } = useParams();
-	const [isLoading, setLoading] = useState<boolean>(false);
+	const [isLoading, setLoading] = useState<boolean>(true);
 	const [showAuthenticationModal, setshowAuthenticationModal] =
 		useState<boolean>(false);
 	// const [ setUserToken] = useState(undefined);
@@ -31,7 +31,8 @@ const RegistrationEventDetailsContainer: React.FC<
 	const [pageError, setPageError] = useState<boolean>(false);
 
 	const event = useSelector(selectEvent) as Event;
-	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
+	// Don't initialize from Redux cache - always start fresh to avoid stale data
+	const [selectedEvent, setSelectedEvent] = useState<Event>({} as Event);
 
 	// Consolidated authentication check function using StorageService
 	const isUserAuthenticated = (): boolean => {
@@ -48,6 +49,22 @@ const RegistrationEventDetailsContainer: React.FC<
 		return false;
 	};
 
+	// Fetch event data when eventDateId changes - this fixes the caching bug
+	// where stale event data from localStorage (redux-persist) was shown instead of
+	// fetching fresh data for the URL's event ID
+	useEffect(() => {
+		// Reset state when eventDateId changes
+		setIsError(false);
+		setPageError(false);
+		setSuccessful(true);
+		
+		// Always fetch fresh event data based on URL parameter
+		if (eventDateId) {
+			getEvent();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [eventDateId]);
+
 	useEffect(() => {
 		// Store the referrer URL if it's a search results page (backup for navigation)
 		if (typeof window !== "undefined" && document.referrer) {
@@ -63,10 +80,7 @@ const RegistrationEventDetailsContainer: React.FC<
 				// Ignore URL parsing errors
 			}
 		}
-		if (Object.keys(selectedEvent).length === 0 && !isError && !pageError) {
-			getEvent();
-		}
-	});
+	}, []);
 
 	// Check authentication on component mount and when authentication state might change
 	useEffect(() => {

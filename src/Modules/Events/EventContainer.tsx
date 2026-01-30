@@ -52,7 +52,6 @@ const EventContainer: React.FC = () => {
 	const [agencyData, setAgencyData] = useState<Agency[]>([]);
 	const [filteredData, setFilteredData] = useState<Agency[]>([]);
 	const [zip, setZip] = useState<string | null>(null);
-	
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -74,7 +73,7 @@ const EventContainer: React.FC = () => {
 				} = resp;
 
 				setAgencyData(agencies);
-				if (zip !== zipCode || (filteredData?.length ?? 0) === 0) {
+				if (zip !== zipCode || filteredData.length === 0) {
 					setZip(zipCode);
 					setFilteredData(agencies);
 				}

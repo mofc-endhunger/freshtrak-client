@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -12,6 +12,10 @@ import "../../Assets/scss/main.scss";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import serviceCatFilter from "../../Utils/serviceCatFilter";
 import LoadingSpinner from "../General/LoadingSpinner";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+
+// Number of agencies to render per batch for progressive loading
+const AGENCIES_PER_BATCH = 10;
 
 interface Agency {
 	id: string;
@@ -39,7 +43,8 @@ const EventContainer: React.FC = () => {
 
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
-	const availability = searchParams.get("availability") || "All";
+	// Default to "this_week" to show only events scheduled for the current week
+	const availability = searchParams.get("availability") || "this_week";
 	const reservations = searchParams.get("reservations") === "true";
 
 	const [foodBankResponse, setFoodBankResponse] = useState<boolean>(false);
@@ -53,9 +58,39 @@ const EventContainer: React.FC = () => {
 	const [filteredData, setFilteredData] = useState<Agency[]>([]);
 	const [zip, setZip] = useState<string | null>(null);
 
+	// Progressive rendering state
+	const [visibleAgencyCount, setVisibleAgencyCount] =
+		useState<number>(AGENCIES_PER_BATCH);
+	const [loadingMore, setLoadingMore] = useState<boolean>(false);
+
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const categories = serviceCatFilter(filteredData);
+
+	// Calculate visible agencies for progressive rendering
+	const visibleAgencies = agencyData.slice(0, visibleAgencyCount);
+	const hasMoreAgencies = visibleAgencyCount < agencyData.length;
+
+	// Load more agencies handler for infinite scroll
+	const loadMoreAgencies = useCallback(() => {
+		if (loadingMore || !hasMoreAgencies) return;
+
+		setLoadingMore(true);
+		// Use setTimeout to simulate async loading and allow UI to update
+		setTimeout(() => {
+			setVisibleAgencyCount(prev =>
+				Math.min(prev + AGENCIES_PER_BATCH, agencyData.length)
+			);
+			setLoadingMore(false);
+		}, 100);
+	}, [loadingMore, hasMoreAgencies, agencyData.length]);
+
+	// Infinite scroll hook
+	const { lastElementRef } = useInfiniteScroll({
+		onLoadMore: loadMoreAgencies,
+		hasMore: hasMoreAgencies,
+		isLoading: loadingMore,
+	});
 
 	const getEvents = async (): Promise<void> => {
 		if (zipCode) {
@@ -86,6 +121,8 @@ const EventContainer: React.FC = () => {
 
 	useEffect(() => {
 		if (zipCode) {
+			// Reset progressive rendering when search params change
+			setVisibleAgencyCount(AGENCIES_PER_BATCH);
 			getEvents();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -155,7 +192,9 @@ const EventContainer: React.FC = () => {
 
 		// Use query parameters for availability and reservations to avoid URL structure issues
 		const queryParams = new URLSearchParams();
-		if (availability && availability !== "All") {
+		// Always include availability in URL so we can distinguish between
+		// default (this_week) and user explicitly selecting "All"
+		if (availability) {
 			queryParams.set("availability", availability);
 		}
 		if (reservations) {
@@ -198,10 +237,13 @@ const EventContainer: React.FC = () => {
 					</div>
 					{!loading && (
 						<EventListContainer
-							agencyData={agencyData}
+							agencyData={visibleAgencies}
 							zipCode={zipCode}
 							availabilityFilter={availability}
 							reservationsFilter={reservations}
+							lastItemRef={lastElementRef}
+							loadingMore={loadingMore}
+							hasMore={hasMoreAgencies}
 						/>
 					)}
 					{loading && <LoadingSpinner />}

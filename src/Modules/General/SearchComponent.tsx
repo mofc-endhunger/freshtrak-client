@@ -57,7 +57,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 			range,
 			categories,
 			isLoading = false,
-			initialAvailability = "All",
+			initialAvailability = "this_week",
 			initialReservations = false,
 		},
 		ref
@@ -164,14 +164,14 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 												);
 												setShowFilter(true);
 												setServiceCat("");
-												setAvailability("All");
+												setAvailability("this_week");
 												setReservations(false);
 												onSubmitHandler({
 													zip_code: e.target.value,
 													distance:
 														DEFAULT_DISTANCE.toString(),
 													serviceCat: "",
-													availability: "All",
+													availability: "this_week",
 													reservations: false,
 												});
 											} else {
@@ -239,7 +239,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 									zip_code: zipCode,
 									distance: "",
 									serviceCat: "",
-									availability: "All",
+									availability: "this_week",
 									reservations: false,
 								});
 							}}

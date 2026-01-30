@@ -1,7 +1,7 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { configureStore } from "@reduxjs/toolkit";
 import RegistrationContainer from "../RegistrationContainer";
 import eventSlice from "../../../Store/Events/eventSlice";
@@ -152,7 +152,7 @@ describe("RegistrationContainer", () => {
 		// Mock axios.get to return a mock event by default
 		mockAxios.get.mockResolvedValue({
 			data: {
-				data: {
+				event: {
 					id: "1",
 					agencyName: "Test Agency",
 					date: "2024-01-01",
@@ -164,11 +164,13 @@ describe("RegistrationContainer", () => {
 		});
 	});
 
-	const renderWithProviders = (component: React.ReactElement, route = "/registration/1") => {
+	const renderWithProviders = (component: React.ReactElement, route = "/register/form/1") => {
 		return render(
 			<Provider store={store}>
 				<MemoryRouter initialEntries={[route]}>
-					{component}
+					<Routes>
+						<Route path="/register/form/:eventDateId" element={component} />
+					</Routes>
 				</MemoryRouter>
 			</Provider>
 		);
@@ -215,67 +217,46 @@ describe("RegistrationContainer", () => {
 		}, { timeout: 1000 });
 	});
 
-	test("renders registration component when user is authenticated and loaded", () => {
-		// Mock authenticated user with profile
-		const mockUserProfile = {
-			first_name: "John",
-			last_name: "Doe",
-			email: "john@example.com",
-			phone: "1234567890",
-			date_of_birth: "1990-01-01",
-			gender: "Male",
-			address_line_1: "123 Main St",
-			city: "Test City",
-			state: "CA",
-			zip_code: "12345",
-			permission_to_text: false,
-			permission_to_email: false,
-			seniors_in_household: 0,
-			adults_in_household: 1,
-			children_in_household: 0,
+	test("always fetches fresh event data based on URL eventDateId", async () => {
+		// This test verifies the fix for the caching bug where stale event data
+		// from localStorage (redux-persist) was shown instead of fetching fresh data
+		
+		// Mock axios to return event data
+		const mockEvent = {
+			id: "123",
+			agencyName: "Test Agency",
+			date: "2024-01-01",
+			startTime: "09:00",
+			endTime: "10:00",
+			acceptWalkin: true,
 		};
-
-		// Mock StorageService to return token and user profile
-		mockStorageService.getUserToken.mockReturnValue("mock-token");
-		mockStorageService.getGuestUser.mockReturnValue(mockUserProfile as any);
-		mockStorageService.isLoggedInUser.mockReturnValue(false);
-		mockStorageService.isGuestUser.mockReturnValue(true);
-
-		// Create a new store with user in Redux state
-		const storeWithUser = configureStore({
-			reducer: {
-				event: eventSlice,
-				user: userSlice,
-			},
-			preloadedState: {
-				event: {
-					event: {
-						id: "1",
-						agencyName: "Test Agency",
-						date: "2024-01-01",
-						startTime: "09:00",
-						endTime: "10:00",
-						acceptWalkin: true,
-					},
-				},
-				user: {
-					user: mockUserProfile as any, // Set user in Redux state with type assertion
-				},
-			},
+		mockAxios.get.mockResolvedValue({
+			data: { event: mockEvent },
 		});
 
-		// Render with the store that has user data
+		// Mock StorageService (user not authenticated - will show auth modal)
+		mockStorageService.getUserToken.mockReturnValue(null);
+		mockStorageService.getGuestUser.mockReturnValue(null);
+		mockStorageService.isLoggedInUser.mockReturnValue(false);
+		mockStorageService.isGuestUser.mockReturnValue(false);
+
+		// Render with a specific eventDateId in the URL
 		render(
-			<Provider store={storeWithUser}>
-				<MemoryRouter initialEntries={["/registration/1"]}>
-					<RegistrationContainer />
+			<Provider store={store}>
+				<MemoryRouter initialEntries={["/register/form/123"]}>
+					<Routes>
+						<Route path="/register/form/:eventDateId" element={<RegistrationContainer />} />
+					</Routes>
 				</MemoryRouter>
 			</Provider>
 		);
 
-		// Should render the registration component
-		expect(
-			screen.getByTestId("registration-component")
-		).toBeInTheDocument();
+		// Wait for the axios call to be made
+		await waitFor(() => {
+			// Verify axios.get was called with the URL containing the eventDateId from the URL
+			expect(mockAxios.get).toHaveBeenCalledWith(
+				expect.stringContaining("/api/event_dates/123/event_details")
+			);
+		}, { timeout: 3000 });
 	});
 });

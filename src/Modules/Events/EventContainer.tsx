@@ -97,7 +97,7 @@ const EventContainer: React.FC = () => {
 			// Append or replace based on whether it's a new search or load more
 			setAgencyData(prev => append ? [...prev, ...agencies] : agencies);
 			
-			if (zip !== zipCode || filteredData.length === 0) {
+			if (zip !== zipCode || (filteredData?.length ?? 0) === 0) {
 				setZip(zipCode);
 				setFilteredData(prev => append ? [...prev, ...agencies] : agencies);
 			} else if (append) {
@@ -114,7 +114,7 @@ const EventContainer: React.FC = () => {
 			setLoading(false);
 			setLoadingMore(false);
 		}
-	}, [zipCode, distance, serviceCat, zip, filteredData.length]);
+	}, [zipCode, distance, serviceCat, zip, filteredData?.length]);
 
 	// Load more handler
 	const loadMore = useCallback(() => {
@@ -248,7 +248,7 @@ const EventContainer: React.FC = () => {
 							/>
 							
 							{/* Load More Button */}
-							{hasMore && agencyData.length > 0 && (
+							{hasMore && agencyData?.length > 0 && (
 								<div className="flex justify-center py-8">
 									<Button
 										onClick={loadMore}
@@ -268,7 +268,7 @@ const EventContainer: React.FC = () => {
 							)}
 							
 							{/* No more events message */}
-							{!hasMore && agencyData.length > 0 && (
+							{!hasMore && agencyData?.length > 0 && (
 								<p className="text-center text-gray-500 py-4">
 									No more events to load
 								</p>

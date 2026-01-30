@@ -118,7 +118,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	const householdDataProcessedRef = useRef<boolean>(false);
 
 	const event = useSelector(selectEvent);
-	const [selectedEvent, setSelectedEvent] = useState<Event>(event);
+	// Don't initialize from Redux cache - always start fresh to avoid stale data from previous sessions
+	const [selectedEvent, setSelectedEvent] = useState<Event>({} as Event);
 
 	const currentUser = useSelector(selectUser);
 	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
@@ -152,6 +153,22 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		}
 	}, [eventDateId, dispatch]);
 
+	// Fetch event data when eventDateId changes - this fixes the caching bug
+	// where stale event data from localStorage (redux-persist) was shown instead of
+	// fetching fresh data for the URL's event ID
+	useEffect(() => {
+		// Reset state when eventDateId changes
+		setIsError(false);
+		setPageError(false);
+		setErrors([]);
+		
+		// Always fetch fresh event data based on URL parameter
+		if (eventDateId) {
+			getEvent();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [eventDateId]);
+
 	useEffect(() => {
 		const token = StorageService.getUserToken();
 		const userProfile = StorageService.getGuestUser();
@@ -159,10 +176,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 		// Only proceed if we're not in an error state
 		if (!isError && !pageError) {
-			// Check if we need to fetch event data
-			if (!selectedEvent || Object.keys(selectedEvent).length === 0) {
-				getEvent();
-			}
+			// Event fetching is now handled by the eventDateId useEffect above
 
 			// Handle user authentication and profile
 			// Check for both guest authentication (userToken) and Cognito authentication

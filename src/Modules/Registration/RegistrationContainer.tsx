@@ -40,6 +40,8 @@ import {
 	Event,
 	ApiResponse,
 } from "./types/registration.types";
+import { REGISTRATION_SUSPENDED } from "../../constants/featureFlags";
+import { RegistrationSuspendedMessage } from "../../components/shared";
 
 // Utility to sanitize user object
 function sanitizeUser(user: any): RegistrationFormData {
@@ -947,6 +949,11 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			throw e; // Re-throw the error so it can be caught by the calling component
 		}
 	};
+
+	// Check if registrations are suspended
+	if (REGISTRATION_SUSPENDED) {
+		return <RegistrationSuspendedMessage />;
+	}
 
 	if (pageError) {
 		// Format errors to match ErrorComponent interface

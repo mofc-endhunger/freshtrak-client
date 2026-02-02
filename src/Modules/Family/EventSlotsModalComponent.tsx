@@ -22,6 +22,7 @@ import { useAuth } from "../Authentication/AuthContext";
 
 import { Event } from "./types/family.types";
 import localization from "../Localization/LocalizationComponent";
+import { REGISTRATION_SUSPENDED } from "../../constants/featureFlags";
 
 // Transform household data to user data format expected by confirmation page
 const transformHouseholdDataToUserData = (
@@ -318,6 +319,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	};
 
 	useEffect(() => {
+		// Don't show modal if registrations are suspended
+		if (REGISTRATION_SUSPENDED) {
+			return;
+		}
 		if (acceptReservations === 1 && eventDateId) {
 			handleShow();
 			getEventHours(eventDateId);

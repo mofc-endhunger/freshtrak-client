@@ -11,6 +11,8 @@ import AuthenticationModalComponent from "../Authentication/AuthenticationModal"
 import { EventFormat } from "../../Utils/EventHandler";
 import { Event, EventApiResponse } from "./types/registration.types";
 import { StorageService } from "../../Utils/StorageService";
+import { REGISTRATION_SUSPENDED } from "../../constants/featureFlags";
+import { RegistrationSuspendedMessage } from "../../components/shared";
 
 interface RegistrationEventDetailsContainerProps {
 	// Add specific props as needed
@@ -169,6 +171,11 @@ const RegistrationEventDetailsContainer: React.FC<
 			? fetchUserToken()
 			: setshowAuthenticationModal(true);
 	};
+
+	// Check if registrations are suspended
+	if (REGISTRATION_SUSPENDED) {
+		return <RegistrationSuspendedMessage />;
+	}
 
 	return (
 		<Fragment>

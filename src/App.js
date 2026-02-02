@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { AuthProvider } from "./Modules/Authentication/AuthContext";
 import { HouseholdSignUpWrapper } from "./Modules/Households/components/HouseholdSignUpWrapper";
 import { StorageService } from "./Utils/StorageService";
+import { UpdateNotification } from "./components/shared/UpdateNotification";
 import "./amplify-config";
 
 // import "./Assets/scss/main.scss";
@@ -49,6 +50,7 @@ const App = () => {
 					</HouseholdSignUpWrapper>
 				</AuthProvider>
 			</div>
+			<UpdateNotification />
 		</div>
 	);
 };

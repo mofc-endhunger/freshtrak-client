@@ -14,8 +14,8 @@ import serviceCatFilter from "../../Utils/serviceCatFilter";
 import LoadingSpinner from "../General/LoadingSpinner";
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
-// Number of agencies to render per batch for progressive loading
-const AGENCIES_PER_BATCH = 10;
+// Number of events to render per batch for progressive loading
+const EVENTS_PER_BATCH = 30;
 
 interface Agency {
 	id: string;
@@ -63,37 +63,32 @@ const EventContainer: React.FC = () => {
 	const [filteredData, setFilteredData] = useState<Agency[]>([]);
 	const [zip, setZip] = useState<string | null>(null);
 
-	// Progressive rendering state
-	const [visibleAgencyCount, setVisibleAgencyCount] =
-		useState<number>(AGENCIES_PER_BATCH);
+	// Progressive rendering state - track number of events to show
+	const [visibleEventCount, setVisibleEventCount] =
+		useState<number>(EVENTS_PER_BATCH);
 	const [loadingMore, setLoadingMore] = useState<boolean>(false);
+	const [hasMoreEvents, setHasMoreEvents] = useState<boolean>(true);
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const categories = serviceCatFilter(filteredData);
 
-	// Calculate visible agencies for progressive rendering
-	const visibleAgencies = agencyData.slice(0, visibleAgencyCount);
-	const hasMoreAgencies = visibleAgencyCount < agencyData.length;
-
-	// Load more agencies handler for infinite scroll
-	const loadMoreAgencies = useCallback(() => {
-		if (loadingMore || !hasMoreAgencies) return;
+	// Load more events handler for infinite scroll
+	const loadMoreEvents = useCallback(() => {
+		if (loadingMore) return;
 
 		setLoadingMore(true);
 		// Use setTimeout to simulate async loading and allow UI to update
 		setTimeout(() => {
-			setVisibleAgencyCount(prev =>
-				Math.min(prev + AGENCIES_PER_BATCH, agencyData.length)
-			);
+			setVisibleEventCount(prev => prev + EVENTS_PER_BATCH);
 			setLoadingMore(false);
 		}, 100);
-	}, [loadingMore, hasMoreAgencies, agencyData.length]);
+	}, [loadingMore]);
 
 	// Infinite scroll hook
 	const { lastElementRef } = useInfiniteScroll({
-		onLoadMore: loadMoreAgencies,
-		hasMore: hasMoreAgencies,
+		onLoadMore: loadMoreEvents,
+		hasMore: hasMoreEvents,
 		isLoading: loadingMore,
 	});
 
@@ -127,11 +122,17 @@ const EventContainer: React.FC = () => {
 	useEffect(() => {
 		if (zipCode) {
 			// Reset progressive rendering when search params change
-			setVisibleAgencyCount(AGENCIES_PER_BATCH);
+			setVisibleEventCount(EVENTS_PER_BATCH);
 			getEvents();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [zipCode, distance, serviceCat, availability, reservations]);
+
+	// Reset visible count when filters change (so we show filtered results from the start)
+	useEffect(() => {
+		setVisibleEventCount(EVENTS_PER_BATCH);
+		setHasMoreEvents(true); // Reset to true when filters change, will be updated by EventListContainer
+	}, [availability, reservations]);
 
 	useEffect(() => {
 		if (zipCode) {
@@ -242,13 +243,14 @@ const EventContainer: React.FC = () => {
 					</div>
 					{!loading && (
 						<EventListContainer
-							agencyData={visibleAgencies}
+							agencyData={agencyData}
+							visibleEventCount={visibleEventCount}
 							zipCode={zipCode}
 							availabilityFilter={availability}
 							reservationsFilter={reservations}
 							lastItemRef={lastElementRef}
 							loadingMore={loadingMore}
-							hasMore={hasMoreAgencies}
+							onHasMoreChange={setHasMoreEvents}
 						/>
 					)}
 					{loading && <LoadingSpinner />}

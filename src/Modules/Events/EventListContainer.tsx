@@ -27,7 +27,7 @@ interface EventListContainerProps {
 const EventListContainer: React.FC<EventListContainerProps> = ({
 	zipCode,
 	agencyData,
-	availabilityFilter = "this_week",
+	availabilityFilter = "next_7_days",
 	reservationsFilter = false,
 	lastItemRef,
 	loadingMore = false,

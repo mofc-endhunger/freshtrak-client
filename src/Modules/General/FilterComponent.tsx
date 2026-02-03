@@ -188,12 +188,20 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 										</Label>
 										{/* Availability filter dropdown - filters events by time periods */}
 										<Select
-											defaultValue={
-												availability.defaultValue
+											value={
+												(() => {
+													const val = availability.defaultValue && availability.defaultValue.trim() !== ""
+														? availability.defaultValue
+														: "next_7_days";
+													// Map this_week to next_7_days for display
+													return val === "this_week" ? "next_7_days" : val;
+												})()
 											}
 											onValueChange={(value) => {
+												// Always use next_7_days instead of this_week
+												const normalizedValue = value === "this_week" ? "next_7_days" : value;
 												availability.onChangeHandler({
-													target: { value },
+													target: { value: normalizedValue },
 												});
 											}}
 										>
@@ -218,9 +226,9 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
 													{localization.option_availability_tomorrow ||
 														"Tomorrow"}
 												</SelectItem>
-												<SelectItem value="this_week">
-													{localization.option_availability_this_week ||
-														"This Week"}
+												<SelectItem value="next_7_days">
+													{localization.option_availability_next_7_days ||
+														"Next 7 Days"}
 												</SelectItem>
 												<SelectItem value="next_2_weeks">
 													{localization.option_availability_next_2_weeks ||

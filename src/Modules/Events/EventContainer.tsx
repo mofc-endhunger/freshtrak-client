@@ -43,8 +43,13 @@ const EventContainer: React.FC = () => {
 
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
-	// Default to "this_week" to show only events scheduled for the current week
-	const availability = searchParams.get("availability") || "this_week";
+	// Default to "next_7_days" to show events from today plus 7 days
+	// Map old "this_week" value to "next_7_days" for backward compatibility
+	const availabilityParam = searchParams.get("availability");
+	const availability =
+		availabilityParam === "this_week" || !availabilityParam
+			? "next_7_days"
+			: availabilityParam;
 	const reservations = searchParams.get("reservations") === "true";
 
 	const [foodBankResponse, setFoodBankResponse] = useState<boolean>(false);
@@ -193,7 +198,7 @@ const EventContainer: React.FC = () => {
 		// Use query parameters for availability and reservations to avoid URL structure issues
 		const queryParams = new URLSearchParams();
 		// Always include availability in URL so we can distinguish between
-		// default (this_week) and user explicitly selecting "All"
+		// default (next_7_days) and user explicitly selecting "All"
 		if (availability) {
 			queryParams.set("availability", availability);
 		}

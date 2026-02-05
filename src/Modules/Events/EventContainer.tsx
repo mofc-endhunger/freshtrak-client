@@ -12,10 +12,10 @@ import "../../Assets/scss/main.scss";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import serviceCatFilter from "../../Utils/serviceCatFilter";
 import LoadingSpinner from "../General/LoadingSpinner";
-import { Button } from "../../components/ui/button";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 
-// Pagination constants
-const ITEMS_PER_PAGE = 20;
+// Number of events to render per batch for progressive loading
+const EVENTS_PER_BATCH = 30;
 
 interface Agency {
 	id: string;
@@ -43,7 +43,13 @@ const EventContainer: React.FC = () => {
 
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
-	const availability = searchParams.get("availability") || "All";
+	// Default to "next_7_days" to show events from today plus 7 days
+	// Map old "this_week" value to "next_7_days" for backward compatibility
+	const availabilityParam = searchParams.get("availability");
+	const availability =
+		availabilityParam === "this_week" || !availabilityParam
+			? "next_7_days"
+			: availabilityParam;
 	const reservations = searchParams.get("reservations") === "true";
 
 	const [foodBankResponse, setFoodBankResponse] = useState<boolean>(false);
@@ -53,85 +59,80 @@ const EventContainer: React.FC = () => {
 
 	const [serverError, setServerError] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
-	const [loadingMore, setLoadingMore] = useState<boolean>(false);
 	const [agencyData, setAgencyData] = useState<Agency[]>([]);
 	const [filteredData, setFilteredData] = useState<Agency[]>([]);
 	const [zip, setZip] = useState<string | null>(null);
-	
-	// Pagination state
-	const [page, setPage] = useState<number>(1);
-	const [hasMore, setHasMore] = useState<boolean>(true);
+
+	// Progressive rendering state - track number of events to show
+	const [visibleEventCount, setVisibleEventCount] =
+		useState<number>(EVENTS_PER_BATCH);
+	const [loadingMore, setLoadingMore] = useState<boolean>(false);
+	const [hasMoreEvents, setHasMoreEvents] = useState<boolean>(true);
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const categories = serviceCatFilter(filteredData);
 
-	const getEvents = useCallback(async (pageNum: number = 1, append: boolean = false): Promise<void> => {
-		if (!zipCode) return;
+	// Load more events handler for infinite scroll
+	const loadMoreEvents = useCallback(() => {
+		if (loadingMore) return;
 
-		// Use different loading states for initial load vs loading more
-		if (pageNum === 1) {
-			setLoading(true);
-			if (!append) {
-				setAgencyData([]); // Clear previous results on new search
-			}
-		} else {
-			setLoadingMore(true);
-		}
-
-		try {
-			const resp = await axios.get(API_URL.EVENTS_LIST, {
-				params: {
-					zip_code: zipCode,
-					distance: distance,
-					category: serviceCat,
-					page: pageNum,
-					limit: ITEMS_PER_PAGE,
-				},
-			});
-
-			const {
-				data: { agencies, meta },
-			} = resp;
-
-			// Append or replace based on whether it's a new search or load more
-			setAgencyData(prev => append ? [...prev, ...agencies] : agencies);
-			
-			if (zip !== zipCode || (filteredData?.length ?? 0) === 0) {
-				setZip(zipCode);
-				setFilteredData(prev => append ? [...prev, ...agencies] : agencies);
-			} else if (append) {
-				setFilteredData(prev => [...prev, ...agencies]);
-			}
-
-			setPage(pageNum);
-			// Handle pagination meta - check if there's more data
-			setHasMore(meta?.hasMore ?? agencies.length === ITEMS_PER_PAGE);
-
-		} catch (err) {
-			console.error("Error fetching events:", err);
-		} finally {
-			setLoading(false);
+		setLoadingMore(true);
+		// Use setTimeout to simulate async loading and allow UI to update
+		setTimeout(() => {
+			setVisibleEventCount(prev => prev + EVENTS_PER_BATCH);
 			setLoadingMore(false);
-		}
-	}, [zipCode, distance, serviceCat, zip, filteredData?.length]);
+		}, 100);
+	}, [loadingMore]);
 
-	// Load more handler
-	const loadMore = useCallback(() => {
-		if (!loadingMore && hasMore) {
-			getEvents(page + 1, true);
+	// Infinite scroll hook
+	const { lastElementRef } = useInfiniteScroll({
+		onLoadMore: loadMoreEvents,
+		hasMore: hasMoreEvents,
+		isLoading: loadingMore,
+	});
+
+	const getEvents = async (): Promise<void> => {
+		if (zipCode) {
+			setLoading(true);
+			try {
+				const resp = await axios.get(API_URL.EVENTS_LIST, {
+					params: {
+						zip_code: zipCode,
+						distance: distance,
+						category: serviceCat,
+					},
+				});
+				const {
+					data: { agencies },
+				} = resp;
+
+				setAgencyData(agencies);
+				if (zip !== zipCode || filteredData.length === 0) {
+					setZip(zipCode);
+					setFilteredData(agencies);
+				}
+				setLoading(false);
+			} catch (err) {
+				setLoading(false);
+			}
 		}
-	}, [loadingMore, hasMore, page, getEvents]);
+	};
 
 	useEffect(() => {
 		if (zipCode) {
-			// Reset pagination on new search
-			setPage(1);
-			setHasMore(true);
-			getEvents(1, false);
+			// Reset progressive rendering when search params change
+			setVisibleEventCount(EVENTS_PER_BATCH);
+			getEvents();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [zipCode, distance, serviceCat, availability, reservations]);
+
+	// Reset visible count when filters change (so we show filtered results from the start)
+	useEffect(() => {
+		setVisibleEventCount(EVENTS_PER_BATCH);
+		setHasMoreEvents(true); // Reset to true when filters change, will be updated by EventListContainer
+	}, [availability, reservations]);
 
 	useEffect(() => {
 		if (zipCode) {
@@ -197,7 +198,9 @@ const EventContainer: React.FC = () => {
 
 		// Use query parameters for availability and reservations to avoid URL structure issues
 		const queryParams = new URLSearchParams();
-		if (availability && availability !== "All") {
+		// Always include availability in URL so we can distinguish between
+		// default (next_7_days) and user explicitly selecting "All"
+		if (availability) {
 			queryParams.set("availability", availability);
 		}
 		if (reservations) {
@@ -239,41 +242,16 @@ const EventContainer: React.FC = () => {
 						{!loading && <ResourceList />}
 					</div>
 					{!loading && (
-						<>
-							<EventListContainer
-								agencyData={agencyData}
-								zipCode={zipCode}
-								availabilityFilter={availability}
-								reservationsFilter={reservations}
-							/>
-							
-							{/* Load More Button */}
-							{hasMore && agencyData?.length > 0 && (
-								<div className="flex justify-center py-8">
-									<Button
-										onClick={loadMore}
-										disabled={loadingMore}
-										variant="highlightOutline"
-									>
-										{loadingMore ? (
-											<div className="flex items-center justify-center gap-2">
-												<div className="w-4 h-4 border-2 border-highlight border-t-transparent rounded-full animate-spin" />
-												<span>Loading...</span>
-											</div>
-										) : (
-											"Load More Events"
-										)}
-									</Button>
-								</div>
-							)}
-							
-							{/* No more events message */}
-							{!hasMore && agencyData?.length > 0 && (
-								<p className="text-center text-gray-500 py-4">
-									No more events to load
-								</p>
-							)}
-						</>
+						<EventListContainer
+							agencyData={agencyData}
+							visibleEventCount={visibleEventCount}
+							zipCode={zipCode}
+							availabilityFilter={availability}
+							reservationsFilter={reservations}
+							lastItemRef={lastElementRef}
+							loadingMore={loadingMore}
+							onHasMoreChange={setHasMoreEvents}
+						/>
 					)}
 					{loading && <LoadingSpinner />}
 				</div>

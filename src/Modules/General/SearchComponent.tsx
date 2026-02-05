@@ -57,7 +57,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 			range,
 			categories,
 			isLoading = false,
-			initialAvailability = "All",
+			initialAvailability = "next_7_days",
 			initialReservations = false,
 		},
 		ref
@@ -70,7 +70,9 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 		const [zipCode, setZipCode] = useState<string>(z_code);
 		const [distance, setDistance] = useState<string>(range);
 		const [serviceCat, setServiceCat] = useState<string>("");
-		const [availability, setAvailability] = useState<string>(initialAvailability);
+		const [availability, setAvailability] = useState<string>(
+			initialAvailability || "next_7_days"
+		);
 		const [reservations, setReservations] = useState<boolean>(initialReservations);
 		const [showFilter, setShowFilter] = useState<boolean>(
 			z_code !== undefined
@@ -164,14 +166,14 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 												);
 												setShowFilter(true);
 												setServiceCat("");
-												setAvailability("All");
+												setAvailability("next_7_days");
 												setReservations(false);
 												onSubmitHandler({
 													zip_code: e.target.value,
 													distance:
 														DEFAULT_DISTANCE.toString(),
 													serviceCat: "",
-													availability: "All",
+													availability: "next_7_days",
 													reservations: false,
 												});
 											} else {
@@ -239,7 +241,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 									zip_code: zipCode,
 									distance: "",
 									serviceCat: "",
-									availability: "All",
+									availability: "next_7_days",
 									reservations: false,
 								});
 							}}
@@ -278,7 +280,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 							}}
 							availability={{
 								show: showDistance,
-								defaultValue: availability,
+								defaultValue: availability || "next_7_days",
 								onChangeHandler: (e: {
 									target: { value: string };
 								}) => {

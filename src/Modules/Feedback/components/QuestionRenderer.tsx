@@ -1,124 +1,85 @@
 /**
  * QuestionRenderer Component
  *
- * Renders a single feedback question with conditional sections:
- * - Star rating (if starQuestion exists)
- * - Tags (if tagPrompt exists)
- * - Comment textarea (if commentPlaceholder exists)
- *
- * Each section is optional and renders based on the question configuration.
+ * Renders a single questionnaire question based on its type.
+ * Currently supports: scale_1_5 (star rating)
+ * Future: radio, checkbox, short_text (Survey Engine Phase 2)
  */
 
 import React, { useCallback } from "react";
 import { StarRating } from "../../../components/ui/star-rating";
-import { Textarea } from "../../../components/ui/textarea";
-import DynamicTags from "./DynamicTags";
 import { cn } from "../../../lib/utils";
-import {
-	FeedbackFormQuestion,
-	FeedbackQuestionResponseDraft,
-	QuestionRendererProps,
-} from "../types";
+import { QuestionRendererProps } from "../types";
 
 const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 	question,
-	response,
-	onResponseChange,
+	value,
+	onChange,
 	className,
 }) => {
 	/**
-	 * Handle star rating change
+	 * Handle rating change
 	 */
-	const handleStarChange = useCallback(
+	const handleRatingChange = useCallback(
 		(rating: number) => {
-			onResponseChange({
-				...response,
-				starRating: rating,
-			});
+			onChange(rating);
 		},
-		[response, onResponseChange]
+		[onChange]
 	);
 
 	/**
-	 * Handle tag selection change
+	 * Render question based on type
 	 */
-	const handleTagsChange = useCallback(
-		(tagIds: number[]) => {
-			onResponseChange({
-				...response,
-				selectedTagIds: tagIds,
-			});
-		},
-		[response, onResponseChange]
-	);
+	const renderQuestionInput = () => {
+		switch (question.type) {
+			case "scale_1_5":
+				return (
+					<StarRating
+						value={value || 0}
+						onChange={handleRatingChange}
+						size="md"
+						className="justify-start"
+						data-testid={`question-rating-${question.id}`}
+					/>
+				);
 
-	/**
-	 * Handle comment text change
-	 */
-	const handleCommentChange = useCallback(
-		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-			onResponseChange({
-				...response,
-				commentText: e.target.value,
-			});
-		},
-		[response, onResponseChange]
-	);
+			// Future Survey Engine types
+			case "radio":
+			case "checkbox":
+			case "short_text":
+				// Placeholder for Phase 2
+				return (
+					<div className="text-sm text-gray-500 italic">
+						Question type "{question.type}" not yet supported
+					</div>
+				);
 
-	const hasStarSection = !!question.starQuestion;
-	const hasTagsSection = !!question.tagPrompt && question.tags.length > 0;
-	const hasCommentSection = !!question.commentPlaceholder;
+			default:
+				return (
+					<div className="text-sm text-red-500">
+						Unknown question type: {question.type}
+					</div>
+				);
+		}
+	};
 
 	return (
 		<div
-			className={cn("space-y-4", className)}
+			className={cn("space-y-2", className)}
 			data-testid={`question-${question.id}`}
 		>
-			{/* Star Rating Section */}
-			{hasStarSection && (
-				<div data-testid={`question-${question.id}-star`}>
-					<p className="text-sm font-semibold text-gray-800 mb-3">
-						{question.starQuestion}
-					</p>
-					<StarRating
-						value={response.starRating || 0}
-						onChange={handleStarChange}
-						size="lg"
-						className="justify-start"
-						data-testid={`star-rating-${question.id}`}
-					/>
-				</div>
-			)}
+			{/* Question Prompt */}
+			<p className="text-sm font-medium text-gray-700">
+				{question.prompt}
+				{question.required && (
+					<span className="text-red-500 ml-1" aria-label="required">
+						*
+					</span>
+				)}
+			</p>
 
-			{/* Tags Section */}
-			{hasTagsSection && (
-				<div data-testid={`question-${question.id}-tags`}>
-					<p className="text-sm font-semibold text-gray-800 mb-3">
-						{question.tagPrompt}
-					</p>
-					<DynamicTags
-						tags={question.tags}
-						selectedTagIds={response.selectedTagIds}
-						onChange={handleTagsChange}
-						multiSelect={question.isTagMultiSelect}
-						data-testid={`tags-${question.id}`}
-					/>
-				</div>
-			)}
-
-			{/* Comment Section */}
-			{hasCommentSection && (
-				<div data-testid={`question-${question.id}-comment`}>
-					<Textarea
-						placeholder={question.commentPlaceholder}
-						value={response.commentText || ""}
-						onChange={handleCommentChange}
-						className="min-h-[100px] resize-none border-gray-300 focus:border-text-primary focus:ring-text-primary bg-white"
-						maxLength={1000}
-						data-testid={`comment-${question.id}`}
-					/>
-				</div>
-			)}
+			{/* Question Input */}
+			{renderQuestionInput()}
 		</div>
 	);
 };

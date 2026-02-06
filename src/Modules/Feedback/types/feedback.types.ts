@@ -2,327 +2,197 @@
  * Feedback Module Types
  *
  * TypeScript interfaces for the Feedback feature.
- * Used for collecting user feedback on their visit experiences.
+ * Aligned with backend PRD: docs/backend/feedback-prd.md
  *
  * ============================================================================
- * SCHEMA MIGRATION:
+ * API ENDPOINTS:
  * ============================================================================
- * This file contains both legacy types (ExperienceTag, etc.) and new dynamic
- * form types (FeedbackForm, FeedbackFormQuestion, etc.) to support the
- * migration to a database-driven feedback system.
  *
- * Legacy types are marked @deprecated and will be removed once migration
- * is complete.
+ * Phase 1 (Current):
+ *   GET  /reservations/:id/feedback - Returns questionnaire + existing feedback
+ *   POST /reservations/:id/feedback - Submit rating + comments + responses
+ *
+ * Phase 2 (Survey Engine - Future):
+ *   GET  /surveys/active?registration_id=123 - Get applicable survey
+ *   POST /surveys/submit - Submit survey responses
+ *
  * ============================================================================
  */
 
 // ============================================================================
-// NEW DYNAMIC FORM TYPES (feedback.txt schema)
+// BACKEND API TYPES - Phase 1 (Questionnaire-based Feedback)
 // ============================================================================
 
 /**
- * Dynamic feedback form configuration from API
- * Maps to: feedback_forms table
+ * Question type enum
+ * Phase 1: Only 'scale_1_5' is supported
+ * Phase 2 (Survey Engine): Will add 'radio', 'checkbox', 'short_text'
  */
-export interface FeedbackForm {
-	/** Unique form identifier */
-	id: number;
-	/** Internal form name */
-	name: string;
-	/** Header title displayed in modal (default: "Give Feedback") */
-	headerTitle: string;
-	/** Optional subtitle for the header */
-	headerSubtitle?: string;
-	/** Whether form is standalone (not tied to event/date/slot) */
-	isStandalone: boolean;
-	/** Whether user can submit multiple responses to this form */
-	allowMultipleResponses: boolean;
-	/** Whether the form is active */
-	isActive: boolean;
-	/** Ordered list of questions */
-	questions: FeedbackFormQuestion[];
-}
+export type QuestionType = 'scale_1_5' | 'radio' | 'checkbox' | 'short_text';
 
 /**
- * Individual question within a feedback form
- * Maps to: feedback_forms_questions table
- *
- * Each section (star rating, tags, comment) is optional based on field presence
+ * Questionnaire question from backend
+ * GET /reservations/:id/feedback → questionnaire.questions[]
  */
-export interface FeedbackFormQuestion {
+export interface QuestionnaireQuestion {
 	/** Unique question identifier */
 	id: number;
-	/** Form this question belongs to */
-	feedbackFormId: number;
-	/** Order of this question in the form (1-indexed) */
-	displayOrder: number;
-	/** If present, show star rating section with this prompt */
-	starQuestion?: string;
-	/** If present, show tags section with this prompt */
-	tagPrompt?: string;
-	/** Whether multiple tags can be selected (default: true) */
-	isTagMultiSelect: boolean;
-	/** If present, show comment section with this placeholder */
-	commentPlaceholder?: string;
-	/** Whether the question is active */
-	isActive: boolean;
-	/** Available tags for this question (if tagPrompt exists) */
-	tags: FeedbackFormQuestionTag[];
+	/** Display order (1-indexed) */
+	order: number;
+	/** Question type - Phase 1 only supports 'scale_1_5' */
+	type: QuestionType;
+	/** Question prompt text */
+	prompt: string;
+	/** Whether this question is required */
+	required: boolean;
+	/** Minimum value (for scale types) */
+	min_value?: number;
+	/** Maximum value (for scale types) */
+	max_value?: number;
 }
 
 /**
- * Tag option for a question
- * Maps to: feedback_forms_questions_tags table
+ * Questionnaire configuration from backend
+ * GET /reservations/:id/feedback → questionnaire
  */
-export interface FeedbackFormQuestionTag {
-	/** Unique tag identifier */
+export interface Questionnaire {
+	/** Questionnaire ID */
 	id: number;
-	/** Question this tag belongs to */
-	feedbackFormQuestionId: number;
-	/** Display text for the tag */
-	tagText: string;
-	/** Order of this tag in the list */
-	displayOrder: number;
-	/** Whether the tag is active */
-	isActive: boolean;
+	/** Questionnaire version number */
+	version: number;
+	/** Questionnaire title (e.g., "Post-Event Feedback") */
+	title: string;
+	/** List of questions */
+	questions: QuestionnaireQuestion[];
 }
 
 /**
- * Form assignment to event/date/slot
- * Maps to: feedback_forms_assignments table
+ * Individual question response
+ * Used in both GET response and POST request
  */
-export interface FeedbackFormAssignment {
-	/** Unique assignment identifier */
-	id: number;
-	/** Form being assigned */
-	feedbackFormId: number;
-	/** Event ID (nullable for standalone) */
-	eventId?: number;
-	/** Event date ID (nullable) */
-	eventDateId?: number;
-	/** Event slot ID (nullable) */
-	eventSlotId?: number;
-	/** Whether the assignment is active */
-	isActive: boolean;
+export interface QuestionnaireResponse {
+	/** Question ID being answered */
+	question_id: number;
+	/** Scale value (1-5 for scale_1_5 type) */
+	scale_value: number;
 }
 
 /**
- * User session for a feedback form
- * Maps to: feedback_sessions table
- *
- * Tracks user progress and allows resuming incomplete feedback
+ * GET /reservations/:id/feedback response
+ * Returns existing feedback if submitted, or questionnaire scaffold if not
  */
-export interface FeedbackSession {
-	/** Unique session identifier */
-	id: number;
-	/** Form this session is for */
-	feedbackFormId: number;
-	/** User ID (nullable for guests) */
-	userId?: number;
-	/** Event ID (nullable for standalone) */
-	eventId?: number;
-	/** Event date ID (nullable) */
-	eventDateId?: number;
-	/** Event slot ID (nullable) */
-	eventSlotId?: number;
-	/** When the session was completed (null = in progress) */
-	completedAt?: string;
-	/** Session creation timestamp */
-	createdAt: string;
-	/** Last update timestamp */
-	updatedAt: string;
-	/** Existing responses for this session (for resume) */
-	responses?: FeedbackResponse[];
+export interface FeedbackApiResponse {
+	/** Feedback ID (null if not yet submitted) */
+	id: number | null;
+	/** Registration/reservation ID */
+	registration_id: number;
+	/** Whether feedback has been submitted */
+	has_submitted: boolean;
+	/** Submission timestamp (null if not submitted) */
+	submitted_at: string | null;
+	/** Overall rating 1-5 (null if not submitted) */
+	rating: number | null;
+	/** Optional comments (null if not submitted) */
+	comments: string | null;
+	/** Questionnaire configuration */
+	questionnaire: Questionnaire;
+	/** Question responses (empty array if not submitted) */
+	responses: QuestionnaireResponse[];
 }
 
 /**
- * Response to a single question
- * Maps to: feedback_responses table
+ * POST /reservations/:id/feedback request body
  */
-export interface FeedbackResponse {
-	/** Unique response identifier */
-	id: number;
-	/** Session this response belongs to */
-	feedbackSessionId: number;
-	/** Question being answered */
-	feedbackFormQuestionId: number;
-	/** Star rating value (1-5, nullable) */
-	starRating?: number;
-	/** Comment text (nullable) */
-	commentText?: string;
-	/** Response creation timestamp */
-	createdAt: string;
-	/** Selected tags for this response */
-	selectedTags?: FeedbackResponseTag[];
-}
-
-/**
- * Selected tag for a response
- * Maps to: feedback_responses_tags table
- */
-export interface FeedbackResponseTag {
-	/** Unique identifier */
-	id: number;
-	/** Response this tag selection belongs to */
-	feedbackResponseId: number;
-	/** Tag that was selected */
-	feedbackFormQuestionTagId: number;
-	/** Selection timestamp */
-	createdAt: string;
-}
-
-/**
- * In-memory response state for a question (before submission)
- */
-export interface FeedbackQuestionResponseDraft {
-	/** Question being answered */
-	questionId: number;
-	/** Star rating value (1-5, optional) */
-	starRating?: number;
-	/** Comment text (optional) */
-	commentText?: string;
-	/** Selected tag IDs */
-	selectedTagIds: number[];
-}
-
-/**
- * Request to create a new feedback session
- */
-export interface CreateSessionRequest {
-	/** Form ID */
-	feedbackFormId: number;
-	/** Event ID (optional) */
-	eventId?: number;
-	/** Event date ID (optional) */
-	eventDateId?: number;
-	/** Event slot ID (optional) */
-	eventSlotId?: number;
-}
-
-/**
- * Request to submit responses for a session
- */
-export interface SubmitResponsesRequest {
-	/** Session ID */
-	sessionId: number;
-	/** Responses to submit */
-	responses: FeedbackQuestionResponseDraft[];
-}
-
-/**
- * API response for session operations
- */
-export interface SessionResponse {
-	/** Whether operation was successful */
-	success: boolean;
-	/** Response message */
-	message: string;
-	/** Session data (on success) */
-	session?: FeedbackSession;
-}
-
-/**
- * API response for form fetch operations
- */
-export interface FormResponse {
-	/** Whether operation was successful */
-	success: boolean;
-	/** Response message */
-	message: string;
-	/** Form data (on success) */
-	form?: FeedbackForm;
-}
-
-/**
- * Parameters for looking up a form by assignment
- */
-export interface FormAssignmentLookup {
-	/** Event ID */
-	eventId?: number;
-	/** Event date ID */
-	eventDateId?: number;
-	/** Event slot ID */
-	eventSlotId?: number;
-}
-
-// ============================================================================
-// LEGACY TYPES (deprecated - for backward compatibility)
-// ============================================================================
-
-/**
- * Experience tag identifiers
- * @deprecated Use FeedbackFormQuestionTag with dynamic tags from API instead
- */
-export type ExperienceTag =
-	| "kind_volunteers"
-	| "good_service"
-	| "clean_space"
-	| "quality_food"
-	| "efficient_shoppers";
-
-/**
- * All available experience tags
- * @deprecated Use dynamic tags from FeedbackFormQuestion.tags instead
- */
-export const EXPERIENCE_TAGS: ExperienceTag[] = [
-	"kind_volunteers",
-	"good_service",
-	"clean_space",
-	"quality_food",
-	"efficient_shoppers",
-];
-
-/**
- * Feedback form data structure
- * @deprecated Use FeedbackQuestionResponseDraft[] with dynamic forms instead
- */
-export interface FeedbackFormData {
-	/** Star rating from 1-5 */
+export interface FeedbackSubmitRequest {
+	/** Overall rating (required, 1-5) */
 	rating: number;
-	/** Selected experience tags */
-	experienceTags: ExperienceTag[];
-	/** Optional written feedback */
-	feedbackText: string;
-	/** Reservation ID this feedback is for */
-	reservationId: string;
-	/** Event/location name */
-	locationName: string;
-	/** Visit date */
-	visitDate: string;
+	/** Optional comments (max 1000 chars) */
+	comments?: string;
+	/** Question responses */
+	responses: QuestionnaireResponse[];
 }
 
 /**
- * Feedback submission request payload
+ * POST /reservations/:id/feedback success response
  */
-export interface FeedbackSubmissionRequest {
-	/** Reservation ID */
-	reservation_id: string;
-	/** Star rating (1-5) */
-	rating: number;
-	/** Selected experience tags */
-	tags: ExperienceTag[];
-	/** Written feedback text */
-	feedback_text: string;
-}
-
-/**
- * Feedback submission response
- */
-export interface FeedbackSubmissionResponse {
-	/** Whether submission was successful */
-	success: boolean;
-	/** Response message */
-	message: string;
-	/** Generated feedback ID */
-	feedback_id?: string;
+export interface FeedbackSubmitResponse {
+	/** Created feedback ID */
+	id: number;
+	/** Registration ID */
+	registration_id: number;
 	/** Submission timestamp */
-	timestamp?: string;
+	submitted_at: string;
+	/** Submitted rating */
+	rating: number;
+	/** Submitted comments */
+	comments: string | null;
 }
 
 /**
- * Feedback modal state
+ * API error response shape
  */
-export type FeedbackModalState = "form" | "confirmation" | "closed";
+export interface FeedbackApiError {
+	/** HTTP status code */
+	status: number;
+	/** Error message */
+	message: string;
+	/** Validation errors (for 422) */
+	errors?: Array<{
+		field: string;
+		message: string;
+	}>;
+}
+
+// ============================================================================
+// FRONTEND STATE TYPES
+// ============================================================================
+
+/**
+ * In-memory state for a single question response (before submission)
+ */
+export interface QuestionResponseDraft {
+	/** Question ID */
+	questionId: number;
+	/** Scale value (1-5, undefined if not answered) */
+	scaleValue?: number;
+}
+
+/**
+ * Complete feedback form state (before submission)
+ */
+export interface FeedbackFormState {
+	/** Overall rating (1-5, 0 if not set) */
+	rating: number;
+	/** Comments text */
+	comments: string;
+	/** Question responses keyed by question ID */
+	responses: Map<number, QuestionResponseDraft>;
+}
+
+/**
+ * Feedback modal state machine
+ */
+export type FeedbackModalState = 'loading' | 'form' | 'submitting' | 'confirmation' | 'error' | 'already_submitted' | 'no_survey_found';
+
+// ============================================================================
+// COMPONENT PROPS
+// ============================================================================
+
+/**
+ * Props for FeedbackContainer component
+ */
+export interface FeedbackContainerProps {
+	/** Whether the feedback flow is open */
+	isOpen: boolean;
+	/** Callback to close the feedback flow */
+	onClose: () => void;
+	/** Registration/reservation ID */
+	registrationId: number;
+	/** Event/location name (for display) */
+	locationName?: string;
+	/** Visit date (for display) */
+	visitDate?: string;
+}
 
 /**
  * Props for FeedbackModal component
@@ -332,67 +202,38 @@ export interface FeedbackModalProps {
 	isOpen: boolean;
 	/** Callback to close the modal */
 	onClose: () => void;
-	/** Reservation ID for the feedback */
-	reservationId: string;
-	/** Event/location name */
-	locationName: string;
-	/** Visit date */
-	visitDate: string;
+	/** Callback when feedback is submitted */
+	onSubmit: () => void;
+	/** Questionnaire configuration */
+	questionnaire: Questionnaire | null;
+	/** Current form state */
+	formState: FeedbackFormState;
+	/** Update overall rating */
+	onRatingChange: (rating: number) => void;
+	/** Update comments */
+	onCommentsChange: (comments: string) => void;
+	/** Update question response */
+	onQuestionResponseChange: (questionId: number, scaleValue: number) => void;
+	/** Current modal state */
+	modalState: FeedbackModalState;
+	/** Error message (if any) */
+	error?: string | null;
+	/** Location name (for display) */
+	locationName?: string;
+	/** Visit date (for display) */
+	visitDate?: string;
 }
 
 /**
- * Props for StarRating component
+ * Props for QuestionnaireRenderer component
  */
-export interface StarRatingProps {
-	/** Current rating value (0-5) */
-	value: number;
-	/** Callback when rating changes */
-	onChange: (rating: number) => void;
-	/** Whether the rating is read-only */
-	readOnly?: boolean;
-	/** Size of stars */
-	size?: "sm" | "md" | "lg";
-	/** Additional CSS classes */
-	className?: string;
-}
-
-/**
- * Props for ExperienceTags component (legacy mode)
- * @deprecated Use DynamicTagsProps for new dynamic tags component
- */
-export interface ExperienceTagsProps {
-	/** Currently selected tags */
-	selectedTags: ExperienceTag[];
-	/** Callback when tags change */
-	onChange: (tags: ExperienceTag[]) => void;
-	/** Additional CSS classes */
-	className?: string;
-}
-
-/**
- * Props for FeedbackConfirmation component
- */
-export interface FeedbackConfirmationProps {
-	/** Callback to close the confirmation */
-	onClose: () => void;
-}
-
-// ============================================================================
-// NEW COMPONENT PROPS
-// ============================================================================
-
-/**
- * Props for DynamicTags component
- */
-export interface DynamicTagsProps {
-	/** Available tags from the question config */
-	tags: FeedbackFormQuestionTag[];
-	/** Currently selected tag IDs */
-	selectedTagIds: number[];
-	/** Callback when tag selection changes */
-	onChange: (tagIds: number[]) => void;
-	/** Whether multiple tags can be selected */
-	multiSelect?: boolean;
+export interface QuestionnaireRendererProps {
+	/** Questionnaire questions */
+	questions: QuestionnaireQuestion[];
+	/** Current responses keyed by question ID */
+	responses: Map<number, QuestionResponseDraft>;
+	/** Callback when a question response changes */
+	onResponseChange: (questionId: number, scaleValue: number) => void;
 	/** Additional CSS classes */
 	className?: string;
 }
@@ -402,67 +243,156 @@ export interface DynamicTagsProps {
  */
 export interface QuestionRendererProps {
 	/** Question configuration */
-	question: FeedbackFormQuestion;
-	/** Current response draft for this question */
-	response: FeedbackQuestionResponseDraft;
+	question: QuestionnaireQuestion;
+	/** Current response value (undefined if not answered) */
+	value?: number;
 	/** Callback when response changes */
-	onResponseChange: (response: FeedbackQuestionResponseDraft) => void;
+	onChange: (value: number) => void;
 	/** Additional CSS classes */
 	className?: string;
 }
 
 /**
- * Props for DynamicFormRenderer component
+ * Props for FeedbackConfirmation component
  */
-export interface DynamicFormRendererProps {
-	/** Form configuration */
-	form: FeedbackForm;
-	/** Current response drafts (keyed by questionId) */
-	responses: Map<number, FeedbackQuestionResponseDraft>;
-	/** Callback when any response changes */
-	onResponseChange: (questionId: number, response: FeedbackQuestionResponseDraft) => void;
+export interface FeedbackConfirmationProps {
+	/** Whether the confirmation is open */
+	isOpen: boolean;
+	/** Callback to close the confirmation */
+	onClose: () => void;
+}
+
+/**
+ * Props for StarRating component
+ */
+export interface StarRatingProps {
+	/** Current rating value (0-5, 0 means not selected) */
+	value: number;
+	/** Callback when rating changes */
+	onChange?: (rating: number) => void;
+	/** Whether the rating is read-only */
+	readOnly?: boolean;
+	/** Size of stars */
+	size?: 'sm' | 'md' | 'lg';
 	/** Additional CSS classes */
 	className?: string;
 }
 
+// ============================================================================
+// SURVEY ENGINE TYPES (Phase 2 - Future)
+// ============================================================================
+
 /**
- * Props for FeedbackModal (updated for dynamic forms)
+ * Survey Engine: Answer option for radio/checkbox questions
+ * @future Phase 2 - Survey Engine
  */
-export interface DynamicFeedbackModalProps {
-	/** Whether the modal is open */
-	isOpen: boolean;
-	/** Callback to close the modal */
-	onClose: () => void;
-	/** Callback when feedback is submitted */
-	onSubmit: (responses: FeedbackQuestionResponseDraft[]) => void;
-	/** Form configuration (if null, shows loading state) */
-	form: FeedbackForm | null;
-	/** Whether submission is in progress */
-	isSubmitting?: boolean;
-	/** Whether form is loading */
-	isLoading?: boolean;
-	/** Error message to display */
-	error?: string | null;
+export interface AnswerOption {
+	/** Option ID */
+	id: number;
+	/** Question ID this option belongs to */
+	question_id: number;
+	/** Option value */
+	value: string;
+	/** Display label */
+	label: string;
+	/** Display order */
+	display_order: number;
 }
 
 /**
- * Props for FeedbackContainer (updated for dynamic forms)
+ * Survey Engine: GET /surveys/active response
+ * @future Phase 2 - Survey Engine
  */
-export interface DynamicFeedbackContainerProps {
-	/** Whether the feedback flow is open */
-	isOpen: boolean;
-	/** Callback to close the feedback flow */
-	onClose: () => void;
-	/** Event ID for form assignment lookup */
-	eventId?: number;
-	/** Event date ID for form assignment lookup */
-	eventDateId?: number;
-	/** Event slot ID for form assignment lookup */
-	eventSlotId?: number;
-	/** Reservation ID (for backward compatibility) */
-	reservationId?: string;
-	/** Location name (for backward compatibility) */
-	locationName?: string;
-	/** Visit date (for backward compatibility) */
-	visitDate?: string;
+export interface SurveyActiveResponse {
+	/** Whether a survey is available */
+	has_active: boolean;
+	/** Survey ID (if available) */
+	survey_id?: number;
+	/** Trigger ID (if available) */
+	trigger_id?: number;
+	/** Form configuration (if available) */
+	form?: {
+		id: number;
+		title: string;
+		description?: string;
+		questions: Array<QuestionnaireQuestion & {
+			options?: AnswerOption[];
+		}>;
+	};
 }
+
+/**
+ * Survey Engine: POST /surveys/submit request
+ * @future Phase 2 - Survey Engine
+ */
+export interface SurveySubmitRequest {
+	/** Survey ID */
+	survey_id: number;
+	/** Trigger ID */
+	trigger_id: number;
+	/** Registration ID (optional) */
+	registration_id?: number;
+	/** Overall rating (optional) */
+	overall_rating?: number;
+	/** Comments (optional) */
+	comments?: string;
+	/** Question responses */
+	responses: Array<{
+		question_id: number;
+		answer_value: string;
+	}>;
+}
+
+// ============================================================================
+// UTILITY TYPES
+// ============================================================================
+
+/**
+ * Create initial form state
+ */
+export const createInitialFormState = (): FeedbackFormState => ({
+	rating: 0,
+	comments: '',
+	responses: new Map(),
+});
+
+/**
+ * Check if form is valid for submission
+ */
+export const isFormValid = (
+	formState: FeedbackFormState,
+	questionnaire: Questionnaire | null
+): boolean => {
+	// Rating is required
+	if (formState.rating < 1 || formState.rating > 5) {
+		return false;
+	}
+
+	// Check required questions
+	if (questionnaire) {
+		for (const question of questionnaire.questions) {
+			if (question.required) {
+				const response = formState.responses.get(question.id);
+				if (!response?.scaleValue || response.scaleValue < 1 || response.scaleValue > 5) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+};
+
+/**
+ * Convert form state to submit request
+ */
+export const formStateToSubmitRequest = (formState: FeedbackFormState): FeedbackSubmitRequest => ({
+	rating: formState.rating,
+	comments: formState.comments || undefined,
+	responses: Array.from(formState.responses.values())
+		.filter((r) => r.scaleValue !== undefined)
+		.map((r) => ({
+			question_id: r.questionId,
+			scale_value: r.scaleValue!,
+		})),
+});

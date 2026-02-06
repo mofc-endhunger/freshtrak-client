@@ -5,40 +5,49 @@
  * COMPONENTS:
  * ============================================================================
  *
- * LEGACY (backward compatible):
- * - FeedbackContainer - Main container (supports both legacy and dynamic modes)
- * - FeedbackModal - Hardcoded feedback form modal
- * - ExperienceTags - Hardcoded experience tags
+ * Main Components:
+ * - FeedbackContainer - Main container component (manages feedback flow)
+ * - FeedbackModal - Feedback form modal with rating, questions, and comments
+ * - FeedbackConfirmation - Thank you confirmation modal
  *
- * NEW DYNAMIC FORM COMPONENTS:
- * - DynamicFeedbackModal - API-driven feedback form modal
- * - DynamicFormRenderer - Renders dynamic questions from config
- * - QuestionRenderer - Renders a single question with star/tags/comment sections
- * - DynamicTags - Dynamic tag selection component
+ * Rendering Components:
+ * - QuestionnaireRenderer - Renders all questionnaire questions
+ * - QuestionRenderer - Renders a single question (scale_1_5 type)
  *
- * CONTEXT:
- * - FeedbackSessionProvider - Context provider for session management
- * - useFeedbackSession - Hook to access session context
+ * Context:
+ * - FeedbackProvider - Context provider for state management
+ * - useFeedback - Hook to access feedback context
+ *
+ * ============================================================================
+ * USAGE:
+ * ============================================================================
+ *
+ *   import { FeedbackContainer } from "@/Modules/Feedback";
+ *
+ *   <FeedbackContainer
+ *     isOpen={isFeedbackOpen}
+ *     onClose={() => setIsFeedbackOpen(false)}
+ *     registrationId={reservation.id}
+ *     locationName={event.name}
+ *     visitDate={formattedDate}
+ *   />
  *
  * ============================================================================
  */
 
-// Main container (supports both legacy and dynamic modes)
+// Main container
 export { default as FeedbackContainer } from "./FeedbackContainer";
 
-// Legacy components (backward compatible)
+// Modal components
 export { default as FeedbackModal } from "./components/FeedbackModal";
 export { default as FeedbackConfirmation } from "./components/FeedbackConfirmation";
-export { default as ExperienceTags } from "./components/ExperienceTags";
 
-// New dynamic form components
-export { default as DynamicFeedbackModal } from "./components/DynamicFeedbackModal";
-export { default as DynamicFormRenderer } from "./components/DynamicFormRenderer";
+// Rendering components
+export { default as QuestionnaireRenderer } from "./components/QuestionnaireRenderer";
 export { default as QuestionRenderer } from "./components/QuestionRenderer";
-export { default as DynamicTags } from "./components/DynamicTags";
 
 // Context and hooks
-export { FeedbackSessionProvider, useFeedbackSession } from "./context";
+export { FeedbackProvider, useFeedback } from "./context";
 
 // Types
 export * from "./types";

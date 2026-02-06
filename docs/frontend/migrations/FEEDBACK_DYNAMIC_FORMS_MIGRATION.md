@@ -1,7 +1,7 @@
-# Feedback Module - Dynamic Forms Migration
+# Feedback Module - Backend API Alignment
 
-**Date:** January 26, 2026  
-**Version:** 1.0.0  
+**Date:** February 3, 2026  
+**Version:** 2.0.0  
 **Status:** Complete  
 
 ---
@@ -9,82 +9,136 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Architecture Changes](#architecture-changes)
-3. [File Changes Summary](#file-changes-summary)
-4. [Phase 1: TypeScript Interfaces](#phase-1-typescript-interfaces)
-5. [Phase 2: API Service Updates](#phase-2-api-service-updates)
-6. [Phase 3: Session Management Context](#phase-3-session-management-context)
-7. [Phase 4: Component Refactoring](#phase-4-component-refactoring)
-8. [Phase 5: Integration Points](#phase-5-integration-points)
-9. [Phase 6: Backend Documentation](#phase-6-backend-documentation)
-10. [Usage Guide](#usage-guide)
-11. [Migration Path](#migration-path)
-12. [Testing Considerations](#testing-considerations)
+2. [API Alignment](#api-alignment)
+3. [Architecture](#architecture)
+4. [File Changes Summary](#file-changes-summary)
+5. [TypeScript Interfaces](#typescript-interfaces)
+6. [API Service](#api-service)
+7. [Context Provider](#context-provider)
+8. [Components](#components)
+9. [Usage Guide](#usage-guide)
+10. [Testing Checklist](#testing-checklist)
 
 ---
 
 ## Overview
 
-This migration transforms the Feedback module from a hardcoded, single-form implementation to a scalable, API-driven dynamic form system. The new architecture supports:
+This document describes the migration of the Feedback module to align with the backend PRD (`docs/backend/feedback-prd.md`). The implementation supports:
 
-- **Multiple questions per form** with configurable display order
-- **Dynamic tags** defined per question (not hardcoded)
-- **Flexible form assignments** to events, dates, or slots
-- **Session management** for tracking user progress
-- **Per-question responses** with optional star rating, tags, and comments
-- **Full backward compatibility** with the existing implementation
+- **Phase 1 API:** `GET/POST /reservations/:id/feedback`
+- **Questionnaire-based questions:** Each with prompt and scale_1_5 rating
+- **Overall rating + comments:** Top-level required/optional fields
+- **Future-ready:** Stubs for Phase 2 Survey Engine
 
-### Goals
+### What Changed
 
-1. Support the proposed database schema from `docs/frontend/features/feedback.txt`
-2. Maintain backward compatibility with existing code
-3. Prepare for backend API integration (currently using mock data)
-4. Keep tags functionality (requesting backend team support)
+| Aspect | Before | After |
+|--------|--------|-------|
+| **GET Endpoint** | `/feedback/forms/by-assignment` | `/reservations/:id/feedback` |
+| **POST Endpoint** | `/feedback/sessions/:id/responses` | `/reservations/:id/feedback` |
+| **Session Concept** | Full session tracking | Direct submit (no session) |
+| **Question Types** | star/tags/comment per question | `scale_1_5` only (Phase 1) |
+| **Overall Rating** | Per-question | Top-level required field |
+| **Tags/Options** | Fully implemented | Deferred to Survey Engine |
+| **Identifier** | Event/slot/date IDs | Registration ID |
 
-### Non-Goals
+### What Was Removed
 
-- Breaking changes to existing components
-- Removal of legacy code (deprecated but preserved)
-- Backend implementation (frontend-only migration)
+- `DynamicFeedbackModal.tsx` - Consolidated into `FeedbackModal.tsx`
+- `DynamicFormRenderer.tsx` - Replaced by `QuestionnaireRenderer.tsx`
+- `DynamicTags.tsx` - Deferred to Survey Engine Phase 2
+- `FeedbackSessionContext.tsx` - Replaced by `FeedbackContext.tsx`
+- Session-based API methods - Replaced by direct feedback endpoints
+- `useDynamicFeedback` prop - No longer needed
 
 ---
 
-## Architecture Changes
+## API Alignment
 
-### Before (Legacy)
+### Phase 1: Current Backend
+
+```
+GET  /reservations/:id/feedback    → Returns questionnaire + existing feedback
+POST /reservations/:id/feedback    → Submit rating + comments + responses
+```
+
+### Phase 2: Survey Engine (Future)
+
+```
+GET  /surveys/active?registration_id=123  → Get applicable survey
+POST /surveys/submit                       → Submit survey responses
+```
+
+### Response Shape
+
+```typescript
+// GET /reservations/:id/feedback
+interface FeedbackApiResponse {
+  id: number | null;                    // null if not submitted
+  registration_id: number;
+  has_submitted: boolean;
+  submitted_at: string | null;
+  rating: number | null;                // Overall 1-5 rating
+  comments: string | null;
+  questionnaire: {
+    id: number;
+    version: number;
+    title: string;
+    questions: Array<{
+      id: number;
+      order: number;
+      type: 'scale_1_5';
+      prompt: string;
+      required: boolean;
+    }>;
+  };
+  responses: Array<{
+    question_id: number;
+    scale_value: number;
+  }>;
+}
+
+// POST /reservations/:id/feedback
+interface FeedbackSubmitRequest {
+  rating: number;           // Required 1-5
+  comments?: string;        // Optional, max 1000 chars
+  responses: Array<{
+    question_id: number;
+    scale_value: number;
+  }>;
+}
+```
+
+---
+
+## Architecture
+
+### Component Hierarchy
 
 ```
 FeedbackContainer
-└── FeedbackModal (hardcoded layout)
-    ├── StarRating (single)
-    ├── ExperienceTags (hardcoded EXPERIENCE_TAGS array)
-    └── Textarea (single)
-```
-
-### After (Dynamic)
-
-```
-FeedbackContainer
-├── [Legacy Mode] FeedbackModal (unchanged)
-└── [Dynamic Mode] FeedbackSessionProvider
-    └── DynamicFeedbackModal
-        └── DynamicFormRenderer
-            └── QuestionRenderer (for each question)
-                ├── StarRating (if starQuestion exists)
-                ├── DynamicTags (if tagPrompt exists)
-                └── Textarea (if commentPlaceholder exists)
+└── FeedbackProvider (context)
+    ├── FeedbackModal (form/loading/error/already_submitted states)
+    │   ├── StarRating (overall rating - required)
+    │   ├── QuestionnaireRenderer
+    │   │   └── QuestionRenderer (for each question)
+    │   │       └── StarRating (scale_1_5)
+    │   └── Textarea (comments - optional)
+    └── FeedbackConfirmation (thank you modal)
 ```
 
 ### Data Flow
 
 ```
-1. FeedbackContainer opens
-2. API call: getFormByAssignment({ eventId, eventDateId, eventSlotId })
-3. Form config received with questions and tags
-4. FeedbackSessionProvider creates session via API
-5. User fills out form (responses stored in context)
-6. Submit: API call with all question responses
-7. Success: Show confirmation modal
+1. FeedbackContainer opens with registrationId
+2. FeedbackProvider mounts
+3. API call: GET /reservations/:id/feedback
+4. Check has_submitted:
+   - true  → Show "already submitted" state with existing data
+   - false → Show empty form
+5. User fills rating (required) + questions + comments (optional)
+6. Submit: POST /reservations/:id/feedback
+7. Success → Show FeedbackConfirmation
 ```
 
 ---
@@ -93,595 +147,427 @@ FeedbackContainer
 
 | Action | File | Description |
 |--------|------|-------------|
-| Modified | `src/Modules/Feedback/types/feedback.types.ts` | Added 15+ new interfaces |
-| Modified | `src/Services/FeedbackApiService.ts` | Added 5 new API methods with mocks |
-| Created | `src/Modules/Feedback/context/FeedbackSessionContext.tsx` | Session management context |
-| Created | `src/Modules/Feedback/context/index.ts` | Context exports |
-| Created | `src/Modules/Feedback/components/DynamicTags.tsx` | Dynamic tags component |
-| Created | `src/Modules/Feedback/components/QuestionRenderer.tsx` | Single question renderer |
-| Created | `src/Modules/Feedback/components/DynamicFormRenderer.tsx` | Multi-question form renderer |
-| Created | `src/Modules/Feedback/components/DynamicFeedbackModal.tsx` | New modal component |
-| Modified | `src/Modules/Feedback/FeedbackContainer.tsx` | Dual-mode support |
-| Modified | `src/Modules/Feedback/index.ts` | Export new components |
-| Modified | `src/Modules/Reservations/types/reservation.types.ts` | Added slot/date IDs |
-| Modified | `src/Modules/Reservations/components/ReservationCard.tsx` | Dynamic feedback prop |
-| Created | `docs/backend/FEEDBACK_TAGS_REQUEST.md` | Backend API request |
+| Rewrite | `src/Modules/Feedback/types/feedback.types.ts` | Match backend response shapes |
+| Rewrite | `src/Services/FeedbackApiService.ts` | Use `/reservations/:id/feedback` endpoints |
+| Create | `src/Modules/Feedback/context/FeedbackContext.tsx` | Simplified state management |
+| Update | `src/Modules/Feedback/components/QuestionRenderer.tsx` | Handle `scale_1_5` type only |
+| Create | `src/Modules/Feedback/components/QuestionnaireRenderer.tsx` | Render backend questionnaire format |
+| Rewrite | `src/Modules/Feedback/components/FeedbackModal.tsx` | Single modal with rating + questions + comments |
+| Rewrite | `src/Modules/Feedback/FeedbackContainer.tsx` | Unified approach (no dual-mode) |
+| Update | `src/Modules/Reservations/components/ReservationCard.tsx` | Remove `useDynamicFeedback` prop |
+| Delete | `src/Modules/Feedback/components/DynamicFeedbackModal.tsx` | Consolidated into FeedbackModal |
+| Delete | `src/Modules/Feedback/components/DynamicTags.tsx` | Deferred to Survey Engine |
+| Delete | `src/Modules/Feedback/components/DynamicFormRenderer.tsx` | Replaced by QuestionnaireRenderer |
+| Delete | `src/Modules/Feedback/context/FeedbackSessionContext.tsx` | Replaced by FeedbackContext |
 
 ---
 
-## Phase 1: TypeScript Interfaces
+## TypeScript Interfaces
 
 **File:** `src/Modules/Feedback/types/feedback.types.ts`
 
-### New Interfaces Added
+### API Types
 
-#### Form Configuration Types
+| Type | Purpose |
+|------|---------|
+| `QuestionType` | `'scale_1_5' \| 'radio' \| 'checkbox' \| 'short_text'` |
+| `QuestionnaireQuestion` | Question config (id, order, type, prompt, required) |
+| `Questionnaire` | Full questionnaire (id, version, title, questions) |
+| `QuestionnaireResponse` | Single question answer (question_id, scale_value) |
+| `FeedbackApiResponse` | GET response shape |
+| `FeedbackSubmitRequest` | POST request shape |
+| `FeedbackSubmitResponse` | POST success response |
+| `FeedbackApiError` | Error response shape |
 
-| Interface | Purpose | Key Fields |
-|-----------|---------|------------|
-| `FeedbackForm` | Form configuration from API | `id`, `headerTitle`, `headerSubtitle`, `questions[]` |
-| `FeedbackFormQuestion` | Single question config | `starQuestion?`, `tagPrompt?`, `commentPlaceholder?`, `tags[]` |
-| `FeedbackFormQuestionTag` | Tag option for a question | `id`, `tagText`, `displayOrder` |
-| `FeedbackFormAssignment` | Form-to-event mapping | `eventId?`, `eventDateId?`, `eventSlotId?` |
+### Frontend State Types
 
-#### Session & Response Types
+| Type | Purpose |
+|------|---------|
+| `QuestionResponseDraft` | In-memory question answer (questionId, scaleValue) |
+| `FeedbackFormState` | Complete form state (rating, comments, responses Map) |
+| `FeedbackModalState` | Modal state machine states |
 
-| Interface | Purpose | Key Fields |
-|-----------|---------|------------|
-| `FeedbackSession` | User session tracking | `id`, `feedbackFormId`, `completedAt?`, `responses?` |
-| `FeedbackResponse` | Stored response (from API) | `starRating?`, `commentText?`, `selectedTags?` |
-| `FeedbackResponseTag` | Tag selection record | `feedbackFormQuestionTagId` |
-| `FeedbackQuestionResponseDraft` | In-memory response state | `starRating?`, `commentText?`, `selectedTagIds[]` |
+### Component Props
 
-#### API Request/Response Types
-
-| Interface | Purpose |
-|-----------|---------|
-| `CreateSessionRequest` | Create new session payload |
-| `SubmitResponsesRequest` | Submit responses payload |
-| `SessionResponse` | API response for session operations |
-| `FormResponse` | API response for form fetch |
-| `FormAssignmentLookup` | Query params for form lookup |
-
-#### Component Props Types
-
-| Interface | Component |
-|-----------|-----------|
-| `DynamicTagsProps` | `DynamicTags` |
+| Type | Component |
+|------|-----------|
+| `FeedbackContainerProps` | `FeedbackContainer` |
+| `FeedbackModalProps` | `FeedbackModal` |
+| `QuestionnaireRendererProps` | `QuestionnaireRenderer` |
 | `QuestionRendererProps` | `QuestionRenderer` |
-| `DynamicFormRendererProps` | `DynamicFormRenderer` |
-| `DynamicFeedbackModalProps` | `DynamicFeedbackModal` |
-| `DynamicFeedbackContainerProps` | `FeedbackContainer` (dynamic mode) |
+| `FeedbackConfirmationProps` | `FeedbackConfirmation` |
+| `StarRatingProps` | `StarRating` |
 
-### Deprecated Types
+### Utility Functions
 
-The following types are marked `@deprecated` but preserved for backward compatibility:
+```typescript
+// Create empty form state
+createInitialFormState(): FeedbackFormState
 
-- `ExperienceTag` - Use `FeedbackFormQuestionTag` instead
-- `EXPERIENCE_TAGS` - Use dynamic tags from API
-- `FeedbackFormData` - Use `FeedbackQuestionResponseDraft[]`
-- `ExperienceTagsProps` - Use `DynamicTagsProps`
+// Check if form is valid for submission
+isFormValid(formState, questionnaire): boolean
+
+// Convert form state to API request
+formStateToSubmitRequest(formState): FeedbackSubmitRequest
+```
 
 ---
 
-## Phase 2: API Service Updates
+## API Service
 
 **File:** `src/Services/FeedbackApiService.ts`
 
-### New API Methods
-
-#### `getForm(formId: number): Promise<FormResponse>`
-
-Fetches form configuration by ID.
+### Configuration
 
 ```typescript
-const response = await feedbackApiService.getForm(1);
-if (response.success) {
-  console.log(response.form); // FeedbackForm
+const USE_MOCK_DATA = true;  // Toggle for development
+const MOCK_DELAY = 500;      // Simulated network delay
+```
+
+### Methods
+
+#### `getFeedback(registrationId: number): Promise<FeedbackApiResponse>`
+
+Fetches feedback and questionnaire for a registration.
+
+```typescript
+const response = await feedbackApiService.getFeedback(12345);
+
+if (response.has_submitted) {
+  // Show existing feedback
+  console.log(response.rating, response.comments);
+} else {
+  // Show empty form with questionnaire
+  console.log(response.questionnaire.questions);
 }
 ```
 
-#### `getFormByAssignment(params: FormAssignmentLookup): Promise<FormResponse>`
+#### `submitFeedback(registrationId: number, data: FeedbackSubmitRequest): Promise<FeedbackSubmitResponse>`
 
-Fetches form configuration by event/date/slot assignment.
-
-```typescript
-const response = await feedbackApiService.getFormByAssignment({
-  eventId: 123,
-  eventDateId: 456,
-  eventSlotId: 789,
-});
-```
-
-**Lookup Priority:**
-1. Exact slot match (`eventSlotId`)
-2. Date match (`eventDateId`)
-3. Event match (`eventId`)
-4. Default form (no assignment)
-
-#### `createSession(request: CreateSessionRequest): Promise<SessionResponse>`
-
-Creates a new feedback session.
+Submits feedback for a registration.
 
 ```typescript
-const response = await feedbackApiService.createSession({
-  feedbackFormId: 1,
-  eventId: 123,
-});
-if (response.success) {
-  console.log(response.session.id); // Session ID
-}
-```
-
-#### `getSession(sessionId: number): Promise<SessionResponse>`
-
-Retrieves session with existing responses (for resume functionality).
-
-```typescript
-const response = await feedbackApiService.getSession(12345);
-if (response.success) {
-  console.log(response.session.responses); // Existing responses
-}
-```
-
-#### `submitSessionResponses(request: SubmitResponsesRequest): Promise<SessionResponse>`
-
-Submits all responses for a session.
-
-```typescript
-const response = await feedbackApiService.submitSessionResponses({
-  sessionId: 12345,
+const result = await feedbackApiService.submitFeedback(12345, {
+  rating: 5,
+  comments: "Great experience!",
   responses: [
-    { questionId: 1, starRating: 5, selectedTagIds: [1, 2] },
-    { questionId: 2, commentText: "Great!" },
+    { question_id: 101, scale_value: 5 },
+    { question_id: 102, scale_value: 4 },
   ],
 });
 ```
 
-### Mock Data
+**Error Handling:**
+- `409 Conflict` - Feedback already submitted
+- `422 Validation Error` - Invalid data
 
-Two mock forms are provided for testing:
-
-1. **MOCK_DEFAULT_FORM (ID: 1)** - Matches current hardcoded layout
-   - Single question with star rating, tags, and comment
-
-2. **MOCK_MULTI_QUESTION_FORM (ID: 2)** - Multi-question example
-   - Q1: Star rating only
-   - Q2: Tags for "what you liked"
-   - Q3: Tags for "what to improve"
-   - Q4: Comment only
-
-### Storage Keys
+### Survey Engine Stubs (Future)
 
 ```typescript
-const SESSIONS_STORAGE_KEY = "freshtrak_feedback_sessions";
-const RESPONSES_STORAGE_KEY = "freshtrak_feedback_responses";
+getActiveSurvey(registrationId): Promise<SurveyActiveResponse>
+submitSurvey(data): Promise<{ success: boolean; message: string }>
+```
+
+### Mock Questionnaire
+
+```typescript
+{
+  id: 1,
+  version: 1,
+  title: "Post-Event Feedback",
+  questions: [
+    { id: 101, order: 1, type: "scale_1_5", prompt: "How satisfied were you with check-in?", required: true },
+    { id: 102, order: 2, type: "scale_1_5", prompt: "How satisfied were you with wait time?", required: true },
+    { id: 103, order: 3, type: "scale_1_5", prompt: "How satisfied were you with overall service?", required: true },
+  ]
+}
 ```
 
 ---
 
-## Phase 3: Session Management Context
+## Context Provider
 
-**File:** `src/Modules/Feedback/context/FeedbackSessionContext.tsx`
-
-### Purpose
-
-Manages feedback session state, tracks in-progress responses, and handles submission.
+**File:** `src/Modules/Feedback/context/FeedbackContext.tsx`
 
 ### Context Value
 
 ```typescript
-interface FeedbackSessionContextValue {
+interface FeedbackContextValue {
   // State
-  form: FeedbackForm | null;
-  session: FeedbackSession | null;
-  responses: Map<number, FeedbackQuestionResponseDraft>;
-  isLoading: boolean;
-  isSubmitting: boolean;
-  error: string | null;
+  registrationId: number;
+  questionnaire: Questionnaire | null;
+  existingFeedback: FeedbackApiResponse | null;
+  formState: FeedbackFormState;
+  modalState: FeedbackModalState;
   canSubmit: boolean;
+  error: string | null;
 
-  // Methods
-  updateResponse: (questionId: number, response: FeedbackQuestionResponseDraft) => void;
-  getResponse: (questionId: number) => FeedbackQuestionResponseDraft;
+  // Actions
+  setRating: (rating: number) => void;
+  setComments: (comments: string) => void;
+  setQuestionResponse: (questionId: number, scaleValue: number) => void;
   submitFeedback: () => Promise<boolean>;
-  resetResponses: () => void;
+  resetForm: () => void;
   clearError: () => void;
+  reload: () => Promise<void>;
 }
 ```
 
-### Provider Props
+### Modal States
+
+| State | Description |
+|-------|-------------|
+| `loading` | Fetching feedback from API |
+| `form` | Showing empty form |
+| `submitting` | Submission in progress |
+| `confirmation` | Success - show thank you |
+| `error` | API error occurred |
+| `already_submitted` | Feedback was already submitted |
+
+### Validation
 
 ```typescript
-interface FeedbackSessionProviderProps {
-  form: FeedbackForm | null;
-  eventId?: number;
-  eventDateId?: number;
-  eventSlotId?: number;
-  onSubmitSuccess?: () => void;
-  onSubmitError?: (error: string) => void;
-  children: React.ReactNode;
-}
+const canSubmit = isFormValid(formState, questionnaire);
+// Returns true if:
+// 1. rating is between 1-5
+// 2. All required questions have valid scale values
 ```
-
-### Key Behaviors
-
-1. **Auto-initialization:** When `form` prop changes, initializes empty responses for all questions
-2. **Session creation:** Automatically creates session via API when form is available
-3. **Validation:** `canSubmit` returns `true` only if at least one star rating is provided
-4. **Submission:** Filters out empty responses before submitting
 
 ### Usage
 
 ```tsx
-<FeedbackSessionProvider
-  form={formConfig}
-  eventId={123}
-  onSubmitSuccess={() => setModalState("confirmation")}
+<FeedbackProvider
+  registrationId={12345}
+  onSubmitSuccess={() => console.log("Success!")}
+  onSubmitError={(error) => console.error(error)}
 >
-  <DynamicFeedbackModal isOpen={true} onClose={handleClose} />
-</FeedbackSessionProvider>
+  <MyFeedbackUI />
+</FeedbackProvider>
+
+// In child component:
+const { formState, setRating, submitFeedback } = useFeedback();
 ```
 
 ---
 
-## Phase 4: Component Refactoring
+## Components
 
-### DynamicTags
-
-**File:** `src/Modules/Feedback/components/DynamicTags.tsx`
-
-Renders tag selection from dynamic tag list (replaces hardcoded `ExperienceTags`).
-
-#### Props
-
-```typescript
-interface DynamicTagsProps {
-  tags: FeedbackFormQuestionTag[];
-  selectedTagIds: number[];
-  onChange: (tagIds: number[]) => void;
-  multiSelect?: boolean;  // default: true
-  className?: string;
-}
-```
-
-#### Features
-
-- Sorts tags by `displayOrder`
-- Supports single-select and multi-select modes
-- Same styling as legacy `ExperienceTags`
-- Accessible: `role="checkbox"` (multi) or `role="radio"` (single)
-
----
-
-### QuestionRenderer
-
-**File:** `src/Modules/Feedback/components/QuestionRenderer.tsx`
-
-Renders a single question with conditional sections.
-
-#### Props
-
-```typescript
-interface QuestionRendererProps {
-  question: FeedbackFormQuestion;
-  response: FeedbackQuestionResponseDraft;
-  onResponseChange: (response: FeedbackQuestionResponseDraft) => void;
-  className?: string;
-}
-```
-
-#### Conditional Rendering Logic
-
-```typescript
-const hasStarSection = !!question.starQuestion;
-const hasTagsSection = !!question.tagPrompt && question.tags.length > 0;
-const hasCommentSection = !!question.commentPlaceholder;
-```
-
-| Field | Section Rendered |
-|-------|-----------------|
-| `starQuestion` | StarRating component with prompt |
-| `tagPrompt` + `tags[]` | DynamicTags component with prompt |
-| `commentPlaceholder` | Textarea with placeholder |
-
----
-
-### DynamicFormRenderer
-
-**File:** `src/Modules/Feedback/components/DynamicFormRenderer.tsx`
-
-Renders all questions from form configuration.
-
-#### Props
-
-```typescript
-interface DynamicFormRendererProps {
-  form: FeedbackForm;
-  responses: Map<number, FeedbackQuestionResponseDraft>;
-  onResponseChange: (questionId: number, response: FeedbackQuestionResponseDraft) => void;
-  className?: string;
-}
-```
-
-#### Features
-
-- Filters inactive questions (`isActive: true`)
-- Sorts by `displayOrder`
-- Handles empty form state with message
-
----
-
-### DynamicFeedbackModal
-
-**File:** `src/Modules/Feedback/components/DynamicFeedbackModal.tsx`
-
-Modal dialog using dynamic form configuration.
-
-#### Props
-
-```typescript
-interface DynamicFeedbackModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  locationName?: string;
-  visitDate?: string;
-}
-```
-
-#### Features
-
-- **Must be wrapped with `FeedbackSessionProvider`**
-- Uses `useFeedbackSession()` hook for state
-- Dynamic header from `form.headerTitle` and `form.headerSubtitle`
-- Placeholder replacement: `{date}` and `{location}` in `starQuestion`
-- Loading state with spinner
-- Error display
-- Submit button disabled until `canSubmit` is true
-
----
-
-### FeedbackContainer (Updated)
+### FeedbackContainer
 
 **File:** `src/Modules/Feedback/FeedbackContainer.tsx`
 
-Updated to support both legacy and dynamic modes.
-
-#### Mode Selection
-
-```typescript
-// Legacy mode (default)
-<FeedbackContainer
-  isOpen={true}
-  onClose={handleClose}
-  reservationId="123"
-  locationName="Food Bank"
-  visitDate="Jan 15, 2026"
-/>
-
-// Dynamic mode
-<FeedbackContainer
-  isOpen={true}
-  onClose={handleClose}
-  useDynamicForm={true}
-  eventId={123}
-  eventDateId={456}
-  eventSlotId={789}
-  locationName="Food Bank"
-  visitDate="Jan 15, 2026"
-/>
-```
-
-#### Internal Components
-
-- `LegacyFeedbackContainer` - Original implementation (unchanged behavior)
-- `DynamicFeedbackContainer` - New implementation with:
-  - Form fetch on open
-  - `FeedbackSessionProvider` wrapper
-  - Session lifecycle management
-
----
-
-## Phase 5: Integration Points
-
-### ReservationCard Updates
-
-**File:** `src/Modules/Reservations/components/ReservationCard.tsx`
-
-#### New Prop
-
-```typescript
-interface ReservationCardProps {
-  reservation: Reservation;
-  variant?: "upcoming" | "past";
-  onClick?: (reservation: Reservation) => void;
-  useDynamicFeedback?: boolean;  // NEW - default: false
-}
-```
-
-#### Usage
+Main entry point for feedback flow.
 
 ```tsx
-// Legacy feedback (current behavior)
-<ReservationCard reservation={reservation} variant="past" />
-
-// Dynamic feedback (new feature)
-<ReservationCard
-  reservation={reservation}
-  variant="past"
-  useDynamicFeedback={true}
-/>
-```
-
-### Reservation Type Updates
-
-**File:** `src/Modules/Reservations/types/reservation.types.ts`
-
-Added fields for form lookup:
-
-```typescript
-interface Reservation {
-  // ... existing fields
-  public_event_slot_id?: number;  // NEW
-  public_event_date_id?: number;  // NEW
-}
-```
-
----
-
-## Phase 6: Backend Documentation
-
-**File:** `docs/backend/FEEDBACK_TAGS_REQUEST.md`
-
-Created comprehensive request document for backend team including:
-
-- Proposed schema additions (`feedback_forms_questions_tags`, `feedback_responses_tags`)
-- Modified API contracts with tag support
-- Validation rules
-- Migration strategy (phased approach)
-- Default tag set for seeding
-- Questions for backend team
-
----
-
-## Usage Guide
-
-### Enable Dynamic Feedback for a Component
-
-```tsx
-import { FeedbackContainer } from "../../Modules/Feedback";
-
-// In your component
 <FeedbackContainer
   isOpen={isFeedbackOpen}
   onClose={() => setIsFeedbackOpen(false)}
-  useDynamicForm={true}
-  eventId={event.id}
-  eventDateId={eventDate?.id}
-  eventSlotId={eventSlot?.id}
+  registrationId={reservation.id}
   locationName={event.name}
   visitDate={formattedDate}
 />
 ```
 
-### Access Session Context in Custom Components
+**Props:**
+
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `isOpen` | boolean | Yes | Modal visibility |
+| `onClose` | function | Yes | Close callback |
+| `registrationId` | number | Yes | Registration/reservation ID |
+| `locationName` | string | No | Event name for display |
+| `visitDate` | string | No | Visit date for display |
+
+### FeedbackModal
+
+**File:** `src/Modules/Feedback/components/FeedbackModal.tsx`
+
+Renders the feedback form with all states.
+
+**Structure:**
+1. Header (questionnaire title)
+2. Overall Rating (required 1-5 stars)
+3. Questionnaire Questions (each with prompt + stars)
+4. Comments (optional textarea)
+5. Submit button
+
+**States Handled:**
+- Loading spinner
+- Error with retry button
+- Already submitted with existing data
+- Form with validation
+- Submitting with spinner
+
+### QuestionnaireRenderer
+
+**File:** `src/Modules/Feedback/components/QuestionnaireRenderer.tsx`
+
+Renders all questionnaire questions.
 
 ```tsx
-import { useFeedbackSession } from "../../Modules/Feedback";
-
-const MyCustomComponent = () => {
-  const {
-    form,
-    responses,
-    updateResponse,
-    submitFeedback,
-    canSubmit,
-    isSubmitting,
-  } = useFeedbackSession();
-
-  // Custom logic here
-};
+<QuestionnaireRenderer
+  questions={questionnaire.questions}
+  responses={formState.responses}
+  onResponseChange={setQuestionResponse}
+/>
 ```
 
-### Add New Mock Form for Testing
+### QuestionRenderer
 
-In `src/Services/FeedbackApiService.ts`:
+**File:** `src/Modules/Feedback/components/QuestionRenderer.tsx`
 
-```typescript
-const MY_CUSTOM_FORM: FeedbackForm = {
-  id: 100,
-  name: "custom_form",
-  headerTitle: "Custom Feedback",
-  // ... other fields
-};
+Renders a single question based on type.
 
-// Add to MOCK_FORMS map
-MOCK_FORMS.set(100, MY_CUSTOM_FORM);
+```tsx
+<QuestionRenderer
+  question={question}
+  value={response?.scaleValue}
+  onChange={(value) => handleChange(question.id, value)}
+/>
+```
+
+**Supported Types:**
+- `scale_1_5` - Star rating (1-5)
+- `radio`, `checkbox`, `short_text` - Placeholder for Phase 2
+
+### FeedbackConfirmation
+
+**File:** `src/Modules/Feedback/components/FeedbackConfirmation.tsx`
+
+Thank you modal shown after successful submission.
+
+```tsx
+<FeedbackConfirmation
+  isOpen={showConfirmation}
+  onClose={handleClose}
+/>
 ```
 
 ---
 
-## Migration Path
+## Usage Guide
 
-### For Existing Code
+### Basic Usage
 
-**No changes required.** The legacy mode is default and backward compatible.
+```tsx
+import { FeedbackContainer } from "@/Modules/Feedback";
 
-### For New Features
+const MyComponent = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const reservation = useReservation();
 
-1. Set `useDynamicFeedback={true}` on `ReservationCard`
-2. Or use `useDynamicForm={true}` on `FeedbackContainer`
-3. Ensure reservation data includes `public_event_slot_id` and `public_event_date_id`
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>Give Feedback</Button>
+      
+      <FeedbackContainer
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        registrationId={reservation.id}
+        locationName={reservation.event.name}
+        visitDate={formatDate(reservation.date)}
+      />
+    </>
+  );
+};
+```
 
-### When Backend API is Ready
+### With ReservationCard
 
-1. Set `USE_MOCK_DATA = false` in `FeedbackApiService.ts`
-2. Verify API response format matches interfaces
-3. Test full flow: fetch form → create session → submit responses
+```tsx
+// ReservationCard automatically handles feedback for past reservations
+<ReservationCard
+  reservation={reservation}
+  variant="past"
+/>
+```
+
+### Switching to Real API
+
+1. Open `src/Services/FeedbackApiService.ts`
+2. Set `USE_MOCK_DATA = false`
+3. Verify backend is running at configured base URL
 
 ---
 
-## Testing Considerations
+## Testing Checklist
 
-### Unit Tests Needed
+### API Tests
 
-1. **Types:** Type guards for new interfaces
-2. **API Service:** Mock implementations return correct data
-3. **Context:** State management and submission logic
-4. **Components:** Conditional rendering based on question config
+- [ ] GET feedback returns questionnaire for new registration
+- [ ] GET feedback returns existing data for submitted feedback
+- [ ] POST feedback creates new feedback record
+- [ ] POST feedback returns 409 for duplicate submission
+- [ ] POST feedback returns 422 for validation errors (missing rating)
+
+### Component Tests
+
+- [ ] Modal shows loading state initially
+- [ ] Modal shows form when feedback not submitted
+- [ ] Modal shows existing data when already submitted
+- [ ] Overall rating is required (button disabled without it)
+- [ ] Question ratings work independently
+- [ ] Comments textarea has character limit (1000)
+- [ ] Submit button shows spinner during submission
+- [ ] Confirmation modal shows on success
+- [ ] Error message displays on failure
 
 ### Integration Tests
 
-1. Full flow with mock API
-2. Legacy mode unchanged behavior
-3. Dynamic mode with various form configurations
-4. Error handling (network failures, validation errors)
+- [ ] Full flow: Open → Load → Fill → Submit → Confirmation
+- [ ] Already submitted flow: Open → Load → Show existing
+- [ ] Error flow: Open → Load → Fill → Error → Retry
 
-### Manual Testing Checklist
+### Manual Testing
 
-- [ ] Legacy feedback flow still works
-- [ ] Dynamic mode opens and loads form
-- [ ] Questions render conditionally based on config
-- [ ] Tag selection works (single and multi-select)
-- [ ] Star rating required validation
-- [ ] Submission succeeds and shows confirmation
-- [ ] Error states display correctly
-- [ ] Modal closes and resets state properly
+- [ ] Open feedback modal from ReservationCard
+- [ ] Complete all ratings and submit
+- [ ] Verify confirmation modal appears
+- [ ] Close and reopen - should show "already submitted"
+- [ ] Clear mock data and test again
 
 ---
 
-## Appendix: Component Hierarchy
+## Appendix: File Structure
 
 ```
 src/Modules/Feedback/
 ├── index.ts                              # Module exports
-├── FeedbackContainer.tsx                 # Main container (dual-mode)
+├── FeedbackContainer.tsx                 # Main container
 ├── components/
-│   ├── FeedbackModal.tsx                 # Legacy modal (unchanged)
-│   ├── FeedbackConfirmation.tsx          # Success modal (unchanged)
-│   ├── ExperienceTags.tsx                # Legacy tags (deprecated)
-│   ├── DynamicFeedbackModal.tsx          # NEW: Dynamic modal
-│   ├── DynamicFormRenderer.tsx           # NEW: Multi-question renderer
-│   ├── QuestionRenderer.tsx              # NEW: Single question renderer
-│   └── DynamicTags.tsx                   # NEW: Dynamic tags component
+│   ├── FeedbackModal.tsx                 # Form modal
+│   ├── FeedbackConfirmation.tsx          # Thank you modal
+│   ├── QuestionnaireRenderer.tsx         # Multi-question renderer
+│   └── QuestionRenderer.tsx              # Single question renderer
 ├── context/
 │   ├── index.ts                          # Context exports
-│   └── FeedbackSessionContext.tsx        # NEW: Session management
+│   └── FeedbackContext.tsx               # State management
 └── types/
     ├── index.ts                          # Type exports
     └── feedback.types.ts                 # All interfaces
+
+src/Services/
+└── FeedbackApiService.ts                 # API service with mock data
 ```
 
 ---
 
 ## Changelog
 
+### v2.0.0 (February 3, 2026)
+
+- **BREAKING:** Aligned with backend PRD endpoints
+- **BREAKING:** Changed from event/slot IDs to registrationId
+- Removed session-based API (createSession, getSession, submitSessionResponses)
+- Consolidated modals into single FeedbackModal
+- Replaced DynamicFormRenderer with QuestionnaireRenderer
+- Removed DynamicTags (deferred to Survey Engine Phase 2)
+- Simplified context to direct submission model
+- Added support for "already submitted" state
+- Added Survey Engine stubs for Phase 2
+
 ### v1.0.0 (January 26, 2026)
 
-- Initial migration to dynamic form system
-- Added new TypeScript interfaces for schema
-- Implemented API service with mock data
-- Created session management context
-- Built dynamic form components
-- Updated integration points
-- Created backend request documentation
+- Initial dynamic form system with session management
+- Dual-mode support (legacy + dynamic)
+- Full tags implementation

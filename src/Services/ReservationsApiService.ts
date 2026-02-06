@@ -29,7 +29,6 @@ import {
     ReservationApiResponse,
     ReservationsApiListResponse,
     ReservationFilter,
-    ReservationStatus,
 } from "../Modules/Reservations/types";
 import {
     retryWithBackoff,
@@ -47,7 +46,7 @@ import config from "../config";
  * Toggle to enable/disable mock mode for testing
  * Set to true to use mock data, false to use real API
  */
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 
 /**
  * Configuration for the Reservations API service
@@ -68,77 +67,87 @@ const API_CONFIG = {
 
 /**
  * Mock past reservations for testing feedback functionality
+ * Based on real API response format (with IDs converted to numbers)
  */
 const MOCK_PAST_RESERVATIONS: Reservation[] = [
     {
-        id: 1001,
+        id: 39912,
         event: {
-            id: 2001,
-            name: "Community Food Pantry - Downtown",
+            id: 23,
+            name: "Grove City Food Pantry",
         },
         date: "2026-01-15",
         timeslot: {
-            start_time: "10:00am",
-            end_time: "12:00pm",
+            start_time: "12:00pm",
+            end_time: "12:59pm",
         },
         status: "completed",
-        household_id: 100,
+        household_id: 260,
         created_at: "2026-01-10T10:00:00.000Z",
         updated_at: "2026-01-10T10:00:00.000Z",
+        public_event_slot_id: 2026416,
+        public_event_date_id: 397867,
     },
     {
-        id: 1002,
+        id: 39913,
         event: {
-            id: 2002,
+            id: 24,
             name: "Fresh Produce Distribution",
         },
         date: "2026-01-10",
         timeslot: {
             start_time: "9:00am",
-            end_time: "11:00am",
+            end_time: "9:59am",
         },
         status: "completed",
-        household_id: 100,
+        household_id: 260,
         created_at: "2026-01-05T10:00:00.000Z",
         updated_at: "2026-01-05T10:00:00.000Z",
+        public_event_slot_id: 2026417,
+        public_event_date_id: 397868,
     },
     {
-        id: 1003,
+        id: 39914,
         event: {
-            id: 2003,
+            id: 25,
             name: "Holiday Food Drive",
         },
         date: "2026-01-05",
         timeslot: {
             start_time: "2:00pm",
-            end_time: "4:00pm",
+            end_time: "2:59pm",
         },
         status: "completed",
-        household_id: 100,
+        household_id: 260,
         created_at: "2026-01-01T10:00:00.000Z",
         updated_at: "2026-01-01T10:00:00.000Z",
+        public_event_slot_id: 2026418,
+        public_event_date_id: 397869,
     },
 ];
 
 /**
  * Mock upcoming reservations for testing
+ * Based on real API response format (with IDs converted to numbers)
  */
 const MOCK_UPCOMING_RESERVATIONS: Reservation[] = [
     {
-        id: 1004,
+        id: 39919,
         event: {
-            id: 2004,
-            name: "Weekly Food Distribution",
+            id: 23,
+            name: "Grove City Food Pantry",
         },
-        date: "2026-01-30",
+        date: "2026-02-10",
         timeslot: {
-            start_time: "11:00am",
-            end_time: "1:00pm",
+            start_time: "1:00pm",
+            end_time: "1:59pm",
         },
         status: undefined,
-        household_id: 100,
-        created_at: "2026-01-20T10:00:00.000Z",
-        updated_at: "2026-01-20T10:00:00.000Z",
+        household_id: 260,
+        created_at: "2026-02-03T21:35:03.000Z",
+        updated_at: "2026-02-03T21:35:03.000Z",
+        public_event_slot_id: 2026399,
+        public_event_date_id: 397858,
     },
 ];
 
@@ -197,34 +206,12 @@ function formatTimeFromISO(timeString: string): string {
 }
 
 /**
- * Derive reservation status from date
- * Only returns "completed" for past events (date < today)
- * Returns undefined for upcoming events or invalid dates
- *
- * @param dateString - Date string in "YYYY-MM-DD" format or null
- * @returns "completed" for past events, undefined otherwise
- */
-function deriveStatus(dateString: string | null): ReservationStatus | undefined {
-    if (!dateString) {
-        return undefined; // No date - no status
-    }
-    const eventDate = new Date(dateString);
-    if (isNaN(eventDate.getTime())) {
-        return undefined; // Invalid date - no status
-    }
-    const today = new Date();
-    // Set to start of day for accurate comparison
-    today.setHours(0, 0, 0, 0);
-    eventDate.setHours(0, 0, 0, 0);
-    return eventDate < today ? "completed" : undefined;
-}
-
-/**
  * Transform a single API reservation to frontend format
  * Handles nullable fields gracefully with "N/A" placeholders
+ * Note: Status is not set here - it's assigned based on which API method was called
  *
  * @param apiReservation - Raw API response object
- * @returns Reservation for frontend display
+ * @returns Reservation for frontend display (status will be undefined)
  */
 function transformReservation(apiReservation: ReservationApiResponse): Reservation {
     // Handle nullable timeslot
@@ -246,10 +233,12 @@ function transformReservation(apiReservation: ReservationApiResponse): Reservati
         },
         date: apiReservation.date ?? "N/A",
         timeslot,
-        status: deriveStatus(apiReservation.date),
+        status: undefined, // Status assigned by API method (past vs upcoming)
         household_id: apiReservation.household_id,
         created_at: apiReservation.created_at,
         updated_at: apiReservation.updated_at,
+        public_event_slot_id: apiReservation.public_event_slot_id,
+        public_event_date_id: apiReservation.public_event_date_id,
     };
 }
 
@@ -460,6 +449,7 @@ export class ReservationsApiService {
 
     /**
      * Get mock reservations for testing
+     * Assigns status based on filter type (matching backend behavior)
      */
     private getMockReservations(filter: ReservationFilter): ReservationsResponse {
         let reservations: Reservation[];
@@ -468,13 +458,24 @@ export class ReservationsApiService {
 
         switch (filter) {
             case "upcoming":
-                reservations = MOCK_UPCOMING_RESERVATIONS;
+                reservations = [...MOCK_UPCOMING_RESERVATIONS];
+                // Upcoming reservations have no status
+                reservations.forEach((r) => {
+                    r.status = undefined;
+                });
                 break;
             case "past":
-                reservations = MOCK_PAST_RESERVATIONS;
+                reservations = [...MOCK_PAST_RESERVATIONS];
+                // Past reservations are completed
+                reservations.forEach((r) => {
+                    r.status = "completed";
+                });
                 break;
             default:
-                reservations = [...MOCK_UPCOMING_RESERVATIONS, ...MOCK_PAST_RESERVATIONS];
+                reservations = [
+                    ...MOCK_UPCOMING_RESERVATIONS.map((r) => ({ ...r, status: undefined })),
+                    ...MOCK_PAST_RESERVATIONS.map((r) => ({ ...r, status: "completed" as const })),
+                ];
         }
 
         return {
@@ -489,24 +490,36 @@ export class ReservationsApiService {
      * Get upcoming reservations only
      *
      * Convenience method that calls getReservations with "upcoming" filter.
-     * Returns reservations where date >= today.
+     * Backend already filters to return only upcoming reservations (date >= today).
+     * Status remains undefined for upcoming reservations.
      *
      * @returns Promise<ReservationsResponse>
      */
     async getUpcomingReservations(): Promise<ReservationsResponse> {
-        return this.getReservations("upcoming");
+        const data = await this.getReservations("upcoming");
+        // Ensure status is undefined for upcoming (should already be from transform)
+        data.reservations.forEach((r) => {
+            r.status = undefined;
+        });
+        return data;
     }
 
     /**
      * Get past reservations (history)
      *
      * Convenience method that calls getReservations with "past" filter.
-     * Returns reservations where date < today.
+     * Backend already filters to return only past reservations (date < today).
+     * Assigns "completed" status to all past reservations.
      *
      * @returns Promise<ReservationsResponse>
      */
     async getPastReservations(): Promise<ReservationsResponse> {
-        return this.getReservations("past");
+        const data = await this.getReservations("past");
+        // Backend already filtered to past - assign completed status
+        data.reservations.forEach((r) => {
+            r.status = "completed";
+        });
+        return data;
     }
 
     // ========================================================================

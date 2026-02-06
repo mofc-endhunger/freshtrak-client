@@ -1,5 +1,5 @@
 export {
-	FeedbackSessionProvider,
-	useFeedbackSession,
-	default as FeedbackSessionContext,
-} from "./FeedbackSessionContext";
+    FeedbackProvider,
+    useFeedback,
+    default as FeedbackContext,
+} from "./FeedbackContext";

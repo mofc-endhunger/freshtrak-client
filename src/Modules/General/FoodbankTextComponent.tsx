@@ -1,4 +1,5 @@
 import React from "react";
+import { sanitizeHtml } from "../../Utils/sanitizeHtml";
 
 interface FoodbankTextComponentProps {
 	text?: string;
@@ -23,7 +24,12 @@ const FoodbankTextComponent: React.FC<FoodbankTextComponentProps> = ({
 				/>
 			</div>
 			<div className="flex-1 min-w-0">
-				<p className="text-xs">{text}</p>
+				<div
+					className="text-xs"
+					dangerouslySetInnerHTML={{
+						__html: sanitizeHtml(text ?? ""),
+					}}
+				/>
 			</div>
 			<div className="w-full sm:w-auto break-words">
 				<a

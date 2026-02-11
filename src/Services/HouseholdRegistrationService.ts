@@ -77,10 +77,11 @@ export class HouseholdRegistrationService {
       };
 
       // Build payload with counts nested for registered users
+      // Coerce IDs to numbers - API expects numeric event_date_id and event_slot_id
       const payload: Record<string, any> = {
-        event_id: timeslotData.eventId,
-        event_date_id: timeslotData.eventDateId,
-        event_slot_id: timeslotData.eventSlotId,
+        event_id: Number(timeslotData.eventId) || timeslotData.eventId,
+        event_date_id: Number(timeslotData.eventDateId) || parseInt(String(timeslotData.eventDateId), 10),
+        event_slot_id: Number(timeslotData.eventSlotId) || parseInt(String(timeslotData.eventSlotId), 10),
       };
 
       // Add counts in nested format for registered users

@@ -16,7 +16,7 @@ const store = mockStore({});
 // and does not show in reality
 const originalWarn = console.warn.bind(console.warn);
 beforeAll(() => {
-	console.warn = msg =>
+	console.warn = (msg) =>
 		!msg.toString().includes("Deprecation warning") && originalWarn(msg);
 });
 afterAll(() => {
@@ -36,7 +36,7 @@ describe("EventListContainer", () => {
 					<MemoryRouter>
 						<EventListContainer searchData={{}} />
 					</MemoryRouter>
-				</Provider>
+				</Provider>,
 			);
 		}).not.toThrowError();
 	});
@@ -48,7 +48,7 @@ describe("EventListContainer", () => {
 				<MemoryRouter>
 					<EventListContainer zipCode={mockAgency.zip} />
 				</MemoryRouter>
-			</Provider>
+			</Provider>,
 		);
 		await waitFor(() => {
 			getByText(/No Events Currently Scheduled/i);
@@ -64,9 +64,10 @@ describe("EventListContainer", () => {
 					<EventListContainer
 						agencyData={testData}
 						zipCode={mockAgency.zip}
+						availabilityFilter="All"
 					/>
 				</MemoryRouter>
-			</Provider>
+			</Provider>,
 		);
 		await waitFor(() => {
 			getByText(eventName);

@@ -56,7 +56,9 @@ describe("EventListContainer", () => {
 	});
 
 	test("Successful Api with Events dates", async () => {
-		// No need to mock axios for this test, just pass agencyData
+		// No need to mock axios for this test, just pass agencyData.
+		// Use availabilityFilter="All" so test is not flaky: test-data-bot uses
+		// random future dates which may fall outside the default "next_7_days".
 		const eventName = testData[0].events[0].name;
 		const { getByText } = render(
 			<Provider store={store}>

@@ -21,6 +21,7 @@ import {
 	DialogHeader,
 } from "../../components/ui/dialog";
 import localization from "../Localization/LocalizationComponent";
+import { sanitizeHtml } from "../../Utils/sanitizeHtml";
 import { Printer, Download } from "lucide-react";
 import PrintableConfirmationCard, {
 	generateConfirmationCardPNG,
@@ -335,7 +336,14 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 											}{" "}
 										</b>
 									</h5>
-									<p className="mb-5">{event.eventDetails}</p>
+									<p
+										className="mb-5"
+										dangerouslySetInnerHTML={{
+											__html: sanitizeHtml(
+												event.eventDetails
+											),
+										}}
+									/>
 								</>
 							)}
 

@@ -23,9 +23,7 @@ const QuestionnaireRenderer: React.FC<QuestionnaireRendererProps> = ({
 		[onResponseChange]
 	);
 
-	const getQuestionValue = (questionId: number): number | undefined => {
-		return responses.get(questionId)?.scale_value;
-	};
+	const draftFor = (questionId: number) => responses.get(questionId);
 
 	const sortedQuestions = [...questions].sort((a, b) => a.order - b.order);
 
@@ -38,14 +36,18 @@ const QuestionnaireRenderer: React.FC<QuestionnaireRendererProps> = ({
 			className={cn("space-y-4", className)}
 			data-testid="questionnaire-renderer"
 		>
-			{sortedQuestions.map((question) => (
-				<QuestionRenderer
-					key={question.id}
-					question={question}
-					value={getQuestionValue(question.id)}
-					onChange={(payload) => handleResponseChange(question.id, payload)}
-				/>
-			))}
+			{sortedQuestions.map((question) => {
+				const draft = draftFor(question.id);
+				return (
+					<QuestionRenderer
+						key={question.id}
+						question={question}
+						value={draft?.scale_value}
+						answerValue={draft?.answer_value}
+						onChange={(payload) => handleResponseChange(question.id, payload)}
+					/>
+				);
+			})}
 		</div>
 	);
 };

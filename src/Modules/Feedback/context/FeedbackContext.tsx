@@ -159,7 +159,11 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 					responses: new Map(
 						response.responses.map((r) => [
 							r.question_id,
-							{ question_id: r.question_id, scale_value: r.scale_value },
+							{
+								question_id: r.question_id,
+								scale_value: r.scale_value,
+								answer_value: r.answer_value,
+							},
 						])
 					),
 				};
@@ -206,10 +210,11 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 	const setQuestionResponse = useCallback((questionId: number, payload: QuestionResponsePayload) => {
 		setFormState((prev) => {
 			const newResponses = new Map(prev.responses);
-			newResponses.set(questionId, {
-				question_id: questionId,
-				scale_value: payload.scaleValue,
-			});
+			const existing = newResponses.get(questionId) ?? { question_id: questionId };
+			const next: typeof existing = { ...existing };
+			if ('scaleValue' in payload) next.scale_value = payload.scaleValue;
+			if ('answerValue' in payload) next.answer_value = payload.answerValue;
+			newResponses.set(questionId, next);
 			return { ...prev, responses: newResponses };
 		});
 	}, []);

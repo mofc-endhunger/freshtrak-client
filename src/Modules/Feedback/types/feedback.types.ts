@@ -55,7 +55,11 @@ export interface FeedbackApiResponse {
 	rating: number | null;
 	comments: string | null;
 	questionnaire: Questionnaire;
-	responses: Array<{ question_id: number; scale_value: number }>;
+	responses: Array<{
+		question_id: number;
+		scale_value?: number;
+		answer_value?: string;
+	}>;
 }
 
 /**
@@ -64,7 +68,11 @@ export interface FeedbackApiResponse {
 export interface FeedbackSubmitRequest {
 	rating: number;
 	comments?: string;
-	responses: Array<{ question_id: number; scale_value: number }>;
+	responses: Array<{
+		question_id: number;
+		scale_value?: number;
+		answer_value?: string;
+	}>;
 }
 
 /**
@@ -108,7 +116,10 @@ export interface FeedbackApiError {
  */
 export interface QuestionResponseDraft {
 	question_id: number;
+	/** For scale/likert questions (1-5 or 1-10) */
 	scale_value?: number;
+	/** For numeric, multiselect, single choice (string value or comma-separated ids) */
+	answer_value?: string;
 }
 
 /**
@@ -177,9 +188,11 @@ export interface FeedbackModalProps {
 }
 
 /**
- * Payload for updating a single question response (scale only for this backend)
+ * Payload for updating a single question response
  */
-export type QuestionResponsePayload = { scaleValue: number };
+export type QuestionResponsePayload =
+	| { scaleValue: number }
+	| { answerValue: string };
 
 /**
  * Props for QuestionnaireRenderer component
@@ -196,7 +209,10 @@ export interface QuestionnaireRendererProps {
  */
 export interface QuestionRendererProps {
 	question: QuestionnaireQuestion;
+	/** For scale/likert questions */
 	value?: number;
+	/** For numeric, multiselect, single choice */
+	answerValue?: string;
 	onChange: (payload: QuestionResponsePayload) => void;
 	className?: string;
 }
@@ -305,6 +321,13 @@ export const createInitialFormState = (): FeedbackFormState => ({
 	responses: new Map(),
 });
 
+/** Question types that use scale_value (1-5 or 1-10) */
+const SCALE_TYPES = ['scale_1_5', 'likert_5', 'scale_1_10', 'likert_10'];
+
+export function isScaleQuestionType(type: string): boolean {
+	return SCALE_TYPES.includes(type);
+}
+
 /**
  * Check if form is valid for submission
  */
@@ -318,21 +341,37 @@ export const isFormValid = (
 	for (const question of questionnaire.questions) {
 		if (!question.required) continue;
 		const draft = formState.responses.get(question.id);
-		if (!draft?.scale_value || draft.scale_value < 1 || draft.scale_value > 5) {
-			return false;
+		if (isScaleQuestionType(question.type)) {
+			if (!draft?.scale_value || draft.scale_value < 1 || draft.scale_value > 5) {
+				return false;
+			}
+		} else {
+			// numeric, multiselect, single_choice, etc. use answer_value
+			const av = draft?.answer_value?.trim();
+			if (av === undefined || av === '') return false;
+			if (question.type === 'numeric' && Number.isNaN(Number(av))) return false;
 		}
 	}
 	return true;
 };
 
 /**
- * Convert form state to submit request (backend shape: question_id + scale_value)
+ * Convert form state to submit request (backend shape: question_id + scale_value and/or answer_value)
  */
 export const formStateToSubmitRequest = (formState: FeedbackFormState): FeedbackSubmitRequest => {
-	const responses: Array<{ question_id: number; scale_value: number }> = [];
+	const responses: FeedbackSubmitRequest['responses'] = [];
 	formState.responses.forEach((draft) => {
+		const item: { question_id: number; scale_value?: number; answer_value?: string } = {
+			question_id: draft.question_id,
+		};
 		if (draft.scale_value !== undefined && draft.scale_value >= 1 && draft.scale_value <= 5) {
-			responses.push({ question_id: draft.question_id, scale_value: draft.scale_value });
+			item.scale_value = draft.scale_value;
+		}
+		if (draft.answer_value !== undefined && draft.answer_value.trim() !== '') {
+			item.answer_value = draft.answer_value.trim();
+		}
+		if (item.scale_value !== undefined || item.answer_value !== undefined) {
+			responses.push(item);
 		}
 	});
 	return {

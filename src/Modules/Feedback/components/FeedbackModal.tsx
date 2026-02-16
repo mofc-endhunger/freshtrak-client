@@ -78,7 +78,12 @@ const AlreadySubmittedContent: React.FC<{
 			</p>
 			<div className="mb-4">
 				<p className="text-sm text-gray-500 mb-2">Your rating:</p>
-				<StarRating value={rating} readOnly size="lg" className="justify-center" />
+				<StarRating
+					value={rating}
+					readOnly
+					size="lg"
+					className="justify-center"
+				/>
 			</div>
 			{comments && (
 				<div className="text-left bg-gray-50 p-3 rounded-md">
@@ -87,7 +92,10 @@ const AlreadySubmittedContent: React.FC<{
 				</div>
 			)}
 		</div>
-		<Button onClick={onClose} className="w-full bg-text-primary hover:bg-text-primary/90">
+		<Button
+			onClick={onClose}
+			className="w-full bg-text-primary hover:bg-text-primary/90"
+		>
 			Close
 		</Button>
 	</div>
@@ -117,7 +125,7 @@ const FeedbackFormContent: React.FC<{
 			e.preventDefault();
 			await submitFeedback();
 		},
-		[submitFeedback]
+		[submitFeedback],
 	);
 
 	const isSubmitting = modalState === "submitting";
@@ -162,15 +170,16 @@ const FeedbackFormContent: React.FC<{
 
 			{/* Comments Section (Optional) */}
 			<div>
-			<label className="text-sm font-semibold text-gray-800 mb-2 block">
-				Additional Comments
-				<span className="text-gray-400 font-normal ml-1">
-					(optional)
-				</span>
-			</label>
+				<label className="text-sm font-semibold text-gray-800 mb-2 block">
+					Additional Comments
+					<span className="text-gray-400 font-normal ml-1">
+						(optional)
+					</span>
+				</label>
 				<Textarea
 					placeholder={
-						localization.feedback_placeholder || "Share your feedback..."
+						localization.feedback_placeholder ||
+						"Share your feedback..."
 					}
 					value={formState.comments}
 					onChange={(e) => setComments(e.target.value)}
@@ -198,18 +207,18 @@ const FeedbackFormContent: React.FC<{
 					"w-full min-h-12 text-base font-semibold rounded-md",
 					canSubmit
 						? "bg-text-primary hover:bg-text-primary/90 text-white"
-						: "bg-gray-300 text-gray-500 cursor-not-allowed"
+						: "bg-gray-300 text-gray-500 cursor-not-allowed",
 				)}
 				data-testid="submit-feedback"
 			>
-			{isSubmitting ? (
-				<>
-					<Loader2 className="w-4 h-4 mr-2 animate-spin" />
-					Submitting...
-				</>
-			) : (
-				localization.feedback_submit || "Submit Feedback"
-			)}
+				{isSubmitting ? (
+					<>
+						<Loader2 className="w-4 h-4 mr-2 animate-spin" />
+						Submitting...
+					</>
+				) : (
+					localization.feedback_submit || "Submit Feedback"
+				)}
 			</Button>
 		</form>
 	);
@@ -226,7 +235,8 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 	locationName,
 	visitDate,
 }) => {
-	const { questionnaire, modalState, existingFeedback, error, reload } = useFeedback();
+	const { questionnaire, modalState, existingFeedback, error, reload } =
+		useFeedback();
 
 	const handleClose = () => {
 		onClose();
@@ -238,15 +248,23 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 				return <LoadingContent />;
 
 			case "error":
-				return <ErrorContent error={error || "An error occurred"} onRetry={reload} />;
+				return (
+					<ErrorContent
+						error={error || "An error occurred"}
+						onRetry={reload}
+					/>
+				);
 
 			case "no_survey_found":
 				return (
 					<div className="p-5 text-center space-y-4">
 						<p className="text-gray-700">
-							No survey found for this reservation.
+							No questions available for this survey.
 						</p>
-						<Button onClick={handleClose} className="w-full bg-text-primary hover:bg-text-primary/90">
+						<Button
+							onClick={handleClose}
+							className="w-full bg-text-primary hover:bg-text-primary/90"
+						>
 							Close
 						</Button>
 					</div>
@@ -281,9 +299,7 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 
 	// Get title from questionnaire or use default
 	const title =
-		questionnaire?.title ||
-		localization.feedback_title ||
-		"Give Feedback";
+		questionnaire?.title || localization.feedback_title || "Give Feedback";
 
 	const description =
 		localization.feedback_description ||
@@ -300,7 +316,9 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 					<DialogTitle className="text-base font-semibold text-white pr-8">
 						{title}
 						<div className="py-3">
-							<h2 className="text-lg font-bold text-white mb-1">{title}</h2>
+							<h2 className="text-lg font-bold text-white mb-1">
+								{title}
+							</h2>
 							<p className="text-sm text-white/90 leading-relaxed font-normal">
 								{description}
 							</p>

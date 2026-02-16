@@ -45,6 +45,8 @@ import {
 	FeedbackFormState,
 	FeedbackModalState,
 	FeedbackApiResponse,
+	QuestionResponseDraft,
+	QuestionResponsePayload,
 	createInitialFormState,
 	isFormValid,
 	formStateToSubmitRequest,
@@ -79,8 +81,8 @@ interface FeedbackContextValue {
 	setRating: (rating: number) => void;
 	/** Set comments text */
 	setComments: (comments: string) => void;
-	/** Set question response */
-	setQuestionResponse: (questionId: number, scaleValue: number) => void;
+	/** Set question response (questionId, payload) */
+	setQuestionResponse: (questionId: number, payload: QuestionResponsePayload) => void;
 	/** Submit feedback */
 	submitFeedback: () => Promise<boolean>;
 	/** Reset form state */
@@ -137,47 +139,36 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 		setError(null);
 
 		try {
-			// GET uses registrationId
 			const response = await feedbackApiService.getFeedback(registrationId);
-			
-			// Check if id is null - no survey found
-			if (response.id === null) {
-				setModalState("no_survey_found");
-				setQuestionnaire(null);
-				setExistingFeedback(null);
-				setFeedbackId(null);
-				return;
-			}
 
-			// Store feedback ID for POST request
 			setFeedbackId(response.id);
 			setQuestionnaire(response.questionnaire);
 			setExistingFeedback(response);
 
+			// No renderable content: empty questions = misconfigured survey, show friendly message
+			if (!response.questionnaire.questions?.length) {
+				setModalState("no_survey_found");
+				return;
+			}
+
 			if (response.has_submitted) {
-				// Already submitted - show existing data
 				setModalState("already_submitted");
-				
-				// Populate form state with existing data for display
 				const newFormState: FeedbackFormState = {
 					rating: response.rating || 0,
 					comments: response.comments || "",
 					responses: new Map(
 						response.responses.map((r) => [
 							r.question_id,
-							{ questionId: r.question_id, scaleValue: r.scale_value },
+							{ question_id: r.question_id, scale_value: r.scale_value },
 						])
 					),
 				};
 				setFormState(newFormState);
 			} else {
-				// Not submitted - show form
 				setModalState("form");
-				
-				// Initialize empty form state
 				const newFormState = createInitialFormState();
 				response.questionnaire.questions.forEach((q) => {
-					newFormState.responses.set(q.id, { questionId: q.id });
+					newFormState.responses.set(q.id, { question_id: q.id });
 				});
 				setFormState(newFormState);
 			}
@@ -212,10 +203,13 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 	/**
 	 * Set question response
 	 */
-	const setQuestionResponse = useCallback((questionId: number, scaleValue: number) => {
+	const setQuestionResponse = useCallback((questionId: number, payload: QuestionResponsePayload) => {
 		setFormState((prev) => {
 			const newResponses = new Map(prev.responses);
-			newResponses.set(questionId, { questionId, scaleValue });
+			newResponses.set(questionId, {
+				question_id: questionId,
+				scale_value: payload.scaleValue,
+			});
 			return { ...prev, responses: newResponses };
 		});
 	}, []);
@@ -236,7 +230,7 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 			return false;
 		}
 
-		if (!feedbackId) {
+		if (!questionnaire || !registrationId) {
 			setError("No survey available");
 			return false;
 		}
@@ -246,22 +240,19 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 
 		try {
 			const request = formStateToSubmitRequest(formState);
-			// POST uses feedbackId (from GET response) instead of registrationId
-			await feedbackApiService.submitFeedback(feedbackId, request);
-			
+			await feedbackApiService.submitFeedback(registrationId, request);
 			setModalState("confirmation");
 			onSubmitSuccess?.();
 			return true;
 		} catch (err: any) {
 			console.error("Failed to submit feedback:", err);
-			
 			const errorMessage = err.message || "Failed to submit feedback";
 			setError(errorMessage);
 			setModalState("error");
 			onSubmitError?.(errorMessage);
 			return false;
 		}
-	}, [canSubmit, formState, feedbackId, onSubmitSuccess, onSubmitError]);
+	}, [canSubmit, formState, questionnaire, registrationId, onSubmitSuccess, onSubmitError]);
 
 	/**
 	 * Reset form state
@@ -270,7 +261,7 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 		const newFormState = createInitialFormState();
 		if (questionnaire) {
 			questionnaire.questions.forEach((q) => {
-				newFormState.responses.set(q.id, { questionId: q.id });
+				newFormState.responses.set(q.id, { question_id: q.id });
 			});
 		}
 		setFormState(newFormState);

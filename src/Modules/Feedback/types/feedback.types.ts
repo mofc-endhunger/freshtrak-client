@@ -1,115 +1,70 @@
 /**
  * Feedback Module Types
  *
- * TypeScript interfaces for the Feedback feature.
- * Aligned with backend PRD: docs/backend/feedback-prd.md
+ * Aligned with feedback-ui-integration.md (backend contract).
+ * GET response and POST body use the same shape: question id, question_id, scale_value, options id/value/label/order.
  *
- * ============================================================================
- * API ENDPOINTS:
- * ============================================================================
- *
- * Phase 1 (Current):
- *   GET  /reservations/:id/feedback - Returns questionnaire + existing feedback
- *   POST /reservations/:id/feedback - Submit rating + comments + responses
- *
- * Phase 2 (Survey Engine - Future):
- *   GET  /surveys/active?registration_id=123 - Get applicable survey
- *   POST /surveys/submit - Submit survey responses
- *
- * ============================================================================
+ *   GET  /reservations/:registrationId/feedback
+ *   POST /reservations/:registrationId/feedback
  */
 
 // ============================================================================
-// BACKEND API TYPES - Phase 1 (Questionnaire-based Feedback)
+// BACKEND API TYPES (feedback-ui-integration.md)
 // ============================================================================
 
 /**
- * Question type enum
- * Phase 1: Only 'scale_1_5' is supported
- * Phase 2 (Survey Engine): Will add 'radio', 'checkbox', 'short_text'
+ * Question option shape from backend
  */
-export type QuestionType = 'scale_1_5' | 'radio' | 'checkbox' | 'short_text';
+export interface FeedbackQuestionOption {
+	id: number;
+	value: string;
+	label: string;
+	order: number;
+}
 
 /**
  * Questionnaire question from backend
- * GET /reservations/:id/feedback → questionnaire.questions[]
  */
 export interface QuestionnaireQuestion {
-	/** Unique question identifier */
 	id: number;
-	/** Display order (1-indexed) */
 	order: number;
-	/** Question type - Phase 1 only supports 'scale_1_5' */
-	type: QuestionType;
-	/** Question prompt text */
+	type: string;
 	prompt: string;
-	/** Whether this question is required */
 	required: boolean;
-	/** Minimum value (for scale types) */
-	min_value?: number;
-	/** Maximum value (for scale types) */
-	max_value?: number;
+	options?: FeedbackQuestionOption[];
 }
 
 /**
  * Questionnaire configuration from backend
- * GET /reservations/:id/feedback → questionnaire
  */
 export interface Questionnaire {
-	/** Questionnaire ID */
 	id: number;
-	/** Questionnaire version number */
 	version: number;
-	/** Questionnaire title (e.g., "Post-Event Feedback") */
 	title: string;
-	/** List of questions */
 	questions: QuestionnaireQuestion[];
 }
 
 /**
- * Individual question response
- * Used in both GET response and POST request
- */
-export interface QuestionnaireResponse {
-	/** Question ID being answered */
-	question_id: number;
-	/** Scale value (1-5 for scale_1_5 type) */
-	scale_value: number;
-}
-
-/**
  * GET /reservations/:id/feedback response
- * Returns existing feedback if submitted, or questionnaire scaffold if not
  */
 export interface FeedbackApiResponse {
-	/** Feedback ID (null if not yet submitted) */
 	id: number | null;
-	/** Registration/reservation ID */
 	registration_id: number;
-	/** Whether feedback has been submitted */
 	has_submitted: boolean;
-	/** Submission timestamp (null if not submitted) */
 	submitted_at: string | null;
-	/** Overall rating 1-5 (null if not submitted) */
 	rating: number | null;
-	/** Optional comments (null if not submitted) */
 	comments: string | null;
-	/** Questionnaire configuration */
 	questionnaire: Questionnaire;
-	/** Question responses (empty array if not submitted) */
-	responses: QuestionnaireResponse[];
+	responses: Array<{ question_id: number; scale_value: number }>;
 }
 
 /**
  * POST /reservations/:id/feedback request body
  */
 export interface FeedbackSubmitRequest {
-	/** Overall rating (required, 1-5) */
 	rating: number;
-	/** Optional comments (max 1000 chars) */
 	comments?: string;
-	/** Question responses */
-	responses: QuestionnaireResponse[];
+	responses: Array<{ question_id: number; scale_value: number }>;
 }
 
 /**
@@ -149,23 +104,20 @@ export interface FeedbackApiError {
 
 /**
  * In-memory state for a single question response (before submission)
+ * Keyed by question id.
  */
 export interface QuestionResponseDraft {
-	/** Question ID */
-	questionId: number;
-	/** Scale value (1-5, undefined if not answered) */
-	scaleValue?: number;
+	question_id: number;
+	scale_value?: number;
 }
 
 /**
  * Complete feedback form state (before submission)
  */
 export interface FeedbackFormState {
-	/** Overall rating (1-5, 0 if not set) */
 	rating: number;
-	/** Comments text */
 	comments: string;
-	/** Question responses keyed by question ID */
+	/** Responses keyed by question id */
 	responses: Map<number, QuestionResponseDraft>;
 }
 
@@ -212,8 +164,8 @@ export interface FeedbackModalProps {
 	onRatingChange: (rating: number) => void;
 	/** Update comments */
 	onCommentsChange: (comments: string) => void;
-	/** Update question response */
-	onQuestionResponseChange: (questionId: number, scaleValue: number) => void;
+	/** Update question response (questionId, payload) */
+	onQuestionResponseChange: (questionId: number, payload: QuestionResponsePayload) => void;
 	/** Current modal state */
 	modalState: FeedbackModalState;
 	/** Error message (if any) */
@@ -225,16 +177,17 @@ export interface FeedbackModalProps {
 }
 
 /**
+ * Payload for updating a single question response (scale only for this backend)
+ */
+export type QuestionResponsePayload = { scaleValue: number };
+
+/**
  * Props for QuestionnaireRenderer component
  */
 export interface QuestionnaireRendererProps {
-	/** Questionnaire questions */
 	questions: QuestionnaireQuestion[];
-	/** Current responses keyed by question ID */
 	responses: Map<number, QuestionResponseDraft>;
-	/** Callback when a question response changes */
-	onResponseChange: (questionId: number, scaleValue: number) => void;
-	/** Additional CSS classes */
+	onResponseChange: (questionId: number, payload: QuestionResponsePayload) => void;
 	className?: string;
 }
 
@@ -242,13 +195,9 @@ export interface QuestionnaireRendererProps {
  * Props for QuestionRenderer component
  */
 export interface QuestionRendererProps {
-	/** Question configuration */
 	question: QuestionnaireQuestion;
-	/** Current response value (undefined if not answered) */
 	value?: number;
-	/** Callback when response changes */
-	onChange: (value: number) => void;
-	/** Additional CSS classes */
+	onChange: (payload: QuestionResponsePayload) => void;
 	className?: string;
 }
 
@@ -363,36 +312,32 @@ export const isFormValid = (
 	formState: FeedbackFormState,
 	questionnaire: Questionnaire | null
 ): boolean => {
-	// Rating is required
-	if (formState.rating < 1 || formState.rating > 5) {
-		return false;
-	}
+	if (formState.rating < 1 || formState.rating > 5) return false;
+	if (!questionnaire) return true;
 
-	// Check required questions
-	if (questionnaire) {
-		for (const question of questionnaire.questions) {
-			if (question.required) {
-				const response = formState.responses.get(question.id);
-				if (!response?.scaleValue || response.scaleValue < 1 || response.scaleValue > 5) {
-					return false;
-				}
-			}
+	for (const question of questionnaire.questions) {
+		if (!question.required) continue;
+		const draft = formState.responses.get(question.id);
+		if (!draft?.scale_value || draft.scale_value < 1 || draft.scale_value > 5) {
+			return false;
 		}
 	}
-
 	return true;
 };
 
 /**
- * Convert form state to submit request
+ * Convert form state to submit request (backend shape: question_id + scale_value)
  */
-export const formStateToSubmitRequest = (formState: FeedbackFormState): FeedbackSubmitRequest => ({
-	rating: formState.rating,
-	comments: formState.comments || undefined,
-	responses: Array.from(formState.responses.values())
-		.filter((r) => r.scaleValue !== undefined)
-		.map((r) => ({
-			question_id: r.questionId,
-			scale_value: r.scaleValue!,
-		})),
-});
+export const formStateToSubmitRequest = (formState: FeedbackFormState): FeedbackSubmitRequest => {
+	const responses: Array<{ question_id: number; scale_value: number }> = [];
+	formState.responses.forEach((draft) => {
+		if (draft.scale_value !== undefined && draft.scale_value >= 1 && draft.scale_value <= 5) {
+			responses.push({ question_id: draft.question_id, scale_value: draft.scale_value });
+		}
+	});
+	return {
+		rating: formState.rating,
+		comments: formState.comments || undefined,
+		responses,
+	};
+};

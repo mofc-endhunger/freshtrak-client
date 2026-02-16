@@ -1,9 +1,8 @@
 /**
  * QuestionRenderer Component
  *
- * Renders a single questionnaire question based on its type.
- * Currently supports: scale_1_5 (star rating)
- * Future: radio, checkbox, short_text (Survey Engine Phase 2)
+ * Renders a single questionnaire question. Backend (feedback-ui-integration.md) uses
+ * scale_1_5 with optional options (id, value, label, order) for labels.
  */
 
 import React, { useCallback } from "react";
@@ -17,58 +16,18 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 	onChange,
 	className,
 }) => {
-	/**
-	 * Handle rating change
-	 */
+	const scaleValue = typeof value === "number" ? value : 0;
+
 	const handleRatingChange = useCallback(
-		(rating: number) => {
-			onChange(rating);
-		},
+		(rating: number) => onChange({ scaleValue: rating }),
 		[onChange]
 	);
-
-	/**
-	 * Render question based on type
-	 */
-	const renderQuestionInput = () => {
-		switch (question.type) {
-			case "scale_1_5":
-				return (
-					<StarRating
-						value={value || 0}
-						onChange={handleRatingChange}
-						size="md"
-						className="justify-start"
-						data-testid={`question-rating-${question.id}`}
-					/>
-				);
-
-			// Future Survey Engine types
-			case "radio":
-			case "checkbox":
-			case "short_text":
-				// Placeholder for Phase 2
-				return (
-					<div className="text-sm text-gray-500 italic">
-						Question type "{question.type}" not yet supported
-					</div>
-				);
-
-			default:
-				return (
-					<div className="text-sm text-red-500">
-						Unknown question type: {question.type}
-					</div>
-				);
-		}
-	};
 
 	return (
 		<div
 			className={cn("space-y-2", className)}
 			data-testid={`question-${question.id}`}
 		>
-			{/* Question Prompt */}
 			<p className="text-sm font-medium text-gray-700">
 				{question.prompt}
 				{question.required && (
@@ -77,9 +36,24 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 					</span>
 				)}
 			</p>
-
-			{/* Question Input */}
-			{renderQuestionInput()}
+			<StarRating
+				value={scaleValue}
+				onChange={handleRatingChange}
+				size="md"
+				className="justify-start"
+				data-testid={`question-rating-${question.id}`}
+			/>
+			{question.options && question.options.length > 0 && (
+				<div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+					{[...question.options]
+						.sort((a, b) => a.order - b.order)
+						.map((opt) => (
+							<span key={opt.id}>
+								{opt.value}: {opt.label}
+							</span>
+						))}
+				</div>
+			)}
 		</div>
 	);
 };

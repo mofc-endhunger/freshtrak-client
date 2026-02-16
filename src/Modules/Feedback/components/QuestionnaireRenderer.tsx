@@ -8,7 +8,7 @@
 import React, { useCallback } from "react";
 import QuestionRenderer from "./QuestionRenderer";
 import { cn } from "../../../lib/utils";
-import { QuestionnaireRendererProps } from "../types";
+import { QuestionnaireRendererProps, QuestionResponsePayload } from "../types";
 
 const QuestionnaireRenderer: React.FC<QuestionnaireRendererProps> = ({
 	questions,
@@ -16,24 +16,17 @@ const QuestionnaireRenderer: React.FC<QuestionnaireRendererProps> = ({
 	onResponseChange,
 	className,
 }) => {
-	/**
-	 * Handle response change for a specific question
-	 */
 	const handleResponseChange = useCallback(
-		(questionId: number, scaleValue: number) => {
-			onResponseChange(questionId, scaleValue);
+		(questionId: number, payload: QuestionResponsePayload) => {
+			onResponseChange(questionId, payload);
 		},
 		[onResponseChange]
 	);
 
-	/**
-	 * Get current value for a question
-	 */
 	const getQuestionValue = (questionId: number): number | undefined => {
-		return responses.get(questionId)?.scaleValue;
+		return responses.get(questionId)?.scale_value;
 	};
 
-	// Sort questions by order
 	const sortedQuestions = [...questions].sort((a, b) => a.order - b.order);
 
 	if (sortedQuestions.length === 0) {
@@ -50,7 +43,7 @@ const QuestionnaireRenderer: React.FC<QuestionnaireRendererProps> = ({
 					key={question.id}
 					question={question}
 					value={getQuestionValue(question.id)}
-					onChange={(value) => handleResponseChange(question.id, value)}
+					onChange={(payload) => handleResponseChange(question.id, payload)}
 				/>
 			))}
 		</div>

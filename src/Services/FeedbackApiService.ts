@@ -34,6 +34,7 @@ import {
     FeedbackSubmitResponse,
     FeedbackApiError,
     Questionnaire,
+    QuestionnaireQuestion,
     SurveyActiveResponse,
     SurveySubmitRequest,
 } from "../Modules/Feedback/types";
@@ -55,9 +56,8 @@ const USE_MOCK_DATA = false;
 const API_CONFIG = {
     baseUrl: config.REGISTRATION_API || "",
     endpoints: {
-        // Phase 1: Reservation-based feedback
+        /** GET and POST feedback (id = reservation id) */
         feedback: (registrationId: number) => `api/reservations/${registrationId}/feedback`,
-        // Phase 2: Survey Engine (future)
         surveysActive: "surveys/active",
         surveysSubmit: "surveys/submit",
     },
@@ -79,7 +79,7 @@ const MOCK_FEEDBACK_STORAGE_KEY = "freshtrak_feedback_mock";
 // ============================================================================
 
 /**
- * Default questionnaire matching backend PRD
+ * Default questionnaire - backend shape (id, type, options id/value/label/order)
  */
 const MOCK_QUESTIONNAIRE: Questionnaire = {
     id: 1,
@@ -92,8 +92,13 @@ const MOCK_QUESTIONNAIRE: Questionnaire = {
             type: "scale_1_5",
             prompt: "How satisfied were you with check-in?",
             required: true,
-            min_value: 1,
-            max_value: 5,
+            options: [
+                { id: 1, value: "1", label: "Very dissatisfied", order: 1 },
+                { id: 2, value: "2", label: "Dissatisfied", order: 2 },
+                { id: 3, value: "3", label: "Neutral", order: 3 },
+                { id: 4, value: "4", label: "Satisfied", order: 4 },
+                { id: 5, value: "5", label: "Very satisfied", order: 5 },
+            ],
         },
         {
             id: 102,
@@ -101,8 +106,6 @@ const MOCK_QUESTIONNAIRE: Questionnaire = {
             type: "scale_1_5",
             prompt: "How satisfied were you with wait time?",
             required: true,
-            min_value: 1,
-            max_value: 5,
         },
         {
             id: 103,
@@ -110,10 +113,8 @@ const MOCK_QUESTIONNAIRE: Questionnaire = {
             type: "scale_1_5",
             prompt: "How satisfied were you with overall service?",
             required: true,
-            min_value: 1,
-            max_value: 5,
         },
-    ],
+    ] as QuestionnaireQuestion[],
 };
 
 // ============================================================================
@@ -241,11 +242,8 @@ export class FeedbackApiService {
     }
 
     /**
-     * Submit feedback for a registration
-     * POST /reservations/:id/feedback
-     *
-     * @throws Error with status 409 if feedback already submitted
-     * @throws Error with status 422 for validation errors
+     * Submit feedback
+     * POST /reservations/:registrationId/feedback (id = reservation id, same as GET)
      */
     async submitFeedback(
         registrationId: number,
@@ -264,15 +262,14 @@ export class FeedbackApiService {
     private async getFeedbackMock(registrationId: number): Promise<FeedbackApiResponse> {
         await delay(MOCK_DELAY);
 
-        // Check for existing feedback
         const existing = getMockFeedback(registrationId);
         if (existing) {
             return existing;
         }
 
-        // Return empty scaffold
+        // Return empty scaffold with survey instance id so client can POST
         return {
-            id: null,
+            id: registrationId,
             registration_id: registrationId,
             has_submitted: false,
             submitted_at: null,
@@ -289,7 +286,6 @@ export class FeedbackApiService {
     ): Promise<FeedbackSubmitResponse> {
         await delay(MOCK_DELAY);
 
-        // Check for duplicate submission
         const existing = getMockFeedback(registrationId);
         if (existing?.has_submitted) {
             const error: FeedbackApiError = {
@@ -299,7 +295,6 @@ export class FeedbackApiService {
             throw error;
         }
 
-        // Validate rating
         if (data.rating < 1 || data.rating > 5) {
             const error: FeedbackApiError = {
                 status: 422,
@@ -309,15 +304,12 @@ export class FeedbackApiService {
             throw error;
         }
 
-        // Validate required questions
         const requiredQuestionIds = MOCK_QUESTIONNAIRE.questions
             .filter((q) => q.required)
             .map((q) => q.id);
-
-        const answeredQuestionIds = new Set(data.responses.map((r) => r.question_id));
-        const missingQuestions = requiredQuestionIds.filter((id) => !answeredQuestionIds.has(id));
-
-        if (missingQuestions.length > 0) {
+        const answeredIds = new Set(data.responses.map((r) => r.question_id));
+        const missing = requiredQuestionIds.filter((id) => !answeredIds.has(id));
+        if (missing.length > 0) {
             const error: FeedbackApiError = {
                 status: 422,
                 message: "Validation error",
@@ -326,7 +318,6 @@ export class FeedbackApiService {
             throw error;
         }
 
-        // Create feedback
         const feedbackId = Date.now();
         const submittedAt = new Date().toISOString();
 
@@ -341,7 +332,6 @@ export class FeedbackApiService {
             responses: data.responses,
         };
 
-        // Store in mock storage
         storeMockFeedback(registrationId, feedback);
 
         return {

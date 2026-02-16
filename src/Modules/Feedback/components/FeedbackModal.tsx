@@ -308,11 +308,11 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
 			<DialogContent
-				className="p-0 gap-0 max-w-[360px] sm:max-w-[360px] overflow-hidden bg-white border-0 shadow-xl"
+				className="p-0 gap-0 max-w-[360px] sm:max-w-[360px] max-h-[90vh] flex flex-col overflow-hidden bg-white border-0 shadow-xl"
 				showCloseButton={true}
 			>
 				{/* Green Header */}
-				<DialogHeader className="bg-text-primary px-4 py-3 text-white relative rounded-t-lg">
+				<DialogHeader className="flex-shrink-0 bg-text-primary px-4 py-3 text-white relative rounded-t-lg">
 					<DialogTitle className="text-base font-semibold text-white pr-8">
 						{title}
 						<div className="py-3">
@@ -326,8 +326,10 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 					</DialogTitle>
 				</DialogHeader>
 
-				{/* Content */}
-				{renderContent()}
+				{/* Scrollable content */}
+				<div className="flex-1 min-h-0 overflow-y-auto">
+					{renderContent()}
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

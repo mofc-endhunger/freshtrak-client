@@ -136,7 +136,7 @@ const FeedbackFormContent: React.FC<{
 		"How was your visit{date}{location}?"
 	)
 		.replace("{date}", visitDate ? ` on ${visitDate}` : "")
-		.replace("{location}", locationName ? ` to ${locationName}` : "");
+		.replace("{location}", locationName ? `${locationName}` : "");
 
 	return (
 		<form onSubmit={handleSubmit} className="p-5 space-y-5 bg-white">

@@ -32,6 +32,8 @@ export interface QuestionnaireQuestion {
 	prompt: string;
 	required: boolean;
 	options?: FeedbackQuestionOption[];
+	/** Same shape as options; API may send one or both (types_answer / survey payload) */
+	answers?: FeedbackQuestionOption[];
 }
 
 /**
@@ -63,16 +65,20 @@ export interface FeedbackApiResponse {
 }
 
 /**
+ * Single response item in POST body (backend only accepts question_id + scale_value)
+ */
+export interface FeedbackSubmitResponseItem {
+	question_id: number;
+	scale_value?: number;
+}
+
+/**
  * POST /reservations/:id/feedback request body
  */
 export interface FeedbackSubmitRequest {
 	rating: number;
 	comments?: string;
-	responses: Array<{
-		question_id: number;
-		scale_value?: number;
-		answer_value?: string;
-	}>;
+	responses: FeedbackSubmitResponseItem[];
 }
 
 /**
@@ -321,8 +327,20 @@ export const createInitialFormState = (): FeedbackFormState => ({
 	responses: new Map(),
 });
 
-/** Question types that use scale_value (1-5 or 1-10) */
-const SCALE_TYPES = ['scale_1_5', 'likert_5', 'scale_1_10', 'likert_10'];
+/** Question types that use scale_value (1-5 or 1-10) — matches types_answer.answer_type_code */
+const SCALE_TYPES = [
+	'scale_1_5',
+	'likert_5',
+	'likert_10',
+	'scale_1_10',
+	'star_rating',
+	'probability_5',
+	'frequency_5',
+	'agreement_5',
+	'quality_5',
+	'comparison_5',
+	'emoji_rating',
+];
 
 export function isScaleQuestionType(type: string): boolean {
 	return SCALE_TYPES.includes(type);
@@ -335,7 +353,6 @@ export const isFormValid = (
 	formState: FeedbackFormState,
 	questionnaire: Questionnaire | null
 ): boolean => {
-	if (formState.rating < 1 || formState.rating > 5) return false;
 	if (!questionnaire) return true;
 
 	for (const question of questionnaire.questions) {
@@ -356,26 +373,65 @@ export const isFormValid = (
 };
 
 /**
- * Convert form state to submit request (backend shape: question_id + scale_value and/or answer_value)
+ * Convert form state to submit request (backend only accepts question_id + scale_value 1-5)
  */
-export const formStateToSubmitRequest = (formState: FeedbackFormState): FeedbackSubmitRequest => {
-	const responses: FeedbackSubmitRequest['responses'] = [];
-	formState.responses.forEach((draft) => {
-		const item: { question_id: number; scale_value?: number; answer_value?: string } = {
-			question_id: draft.question_id,
+export const formStateToSubmitRequest = (
+	formState: FeedbackFormState,
+	questionnaire: Questionnaire | null
+): FeedbackSubmitRequest => {
+	const responses: FeedbackSubmitResponseItem[] = [];
+	if (!questionnaire) {
+		return {
+			rating: formState.rating,
+			comments: formState.comments || undefined,
+			responses: [],
 		};
+	}
+
+	const getQuestion = (questionId: number) =>
+		questionnaire.questions.find((q) => q.id === questionId);
+
+	formState.responses.forEach((draft) => {
+		const question = getQuestion(draft.question_id);
+
+		// Scale / likert 1-5 (stored as scale_value)
 		if (draft.scale_value !== undefined && draft.scale_value >= 1 && draft.scale_value <= 5) {
-			item.scale_value = draft.scale_value;
+			responses.push({
+				question_id: draft.question_id,
+				scale_value: draft.scale_value,
+			});
+			return;
 		}
-		if (draft.answer_value !== undefined && draft.answer_value.trim() !== '') {
-			item.answer_value = draft.answer_value.trim();
+
+		const answerStr = draft.answer_value?.trim();
+		if (answerStr === undefined || answerStr === '') return;
+
+		// Scale 1-10: map to 1-5 for backend (Max(5))
+		const numVal = parseInt(answerStr, 10);
+		if (
+			question &&
+			['likert_10', 'scale_1_10'].includes(question.type) &&
+			Number.isFinite(numVal) &&
+			numVal >= 1 &&
+			numVal <= 10
+		) {
+			const scale1to5 = Math.round((numVal / 10) * 5) || 1;
+			responses.push({
+				question_id: draft.question_id,
+				scale_value: Math.min(5, Math.max(1, scale1to5)),
+			});
+			return;
 		}
-		if (item.scale_value !== undefined || item.answer_value !== undefined) {
-			responses.push(item);
-		}
+
+		// Other types (choice, free text, numeric, multiselect): send scale_value 1 to indicate answered
+		responses.push({
+			question_id: draft.question_id,
+			scale_value: 1,
+		});
 	});
+
 	return {
-		rating: formState.rating,
+		rating: Math.min(5, Math.max(1, formState.rating || 1)),
 		comments: formState.comments || undefined,
 		responses,
 	};

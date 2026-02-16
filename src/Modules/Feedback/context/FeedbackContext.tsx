@@ -244,7 +244,7 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 		setError(null);
 
 		try {
-			const request = formStateToSubmitRequest(formState);
+			const request = formStateToSubmitRequest(formState, questionnaire);
 			await feedbackApiService.submitFeedback(registrationId, request);
 			setModalState("confirmation");
 			onSubmitSuccess?.();

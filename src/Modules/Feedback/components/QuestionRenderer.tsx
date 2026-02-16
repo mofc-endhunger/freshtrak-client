@@ -1,9 +1,10 @@
 /**
  * QuestionRenderer Component
  *
- * Renders a single questionnaire question. Branches on question.type to show
- * the appropriate input: stars (scale_1_5, likert_5), Select dropdown (likert_10,
- * single_choice, multiple_choice), number (numeric), or checkboxes (multiselect, multi_choice).
+ * Renders based on answer_type_code from freshtrak_private.types_answer:
+ * free_text, numeric, decimal, multi_choice (radio), select_list (dropdown),
+ * likert_5, likert_10, star_rating, emoji_rating, probability_5, frequency_5,
+ * agreement_5, quality_5, comparison_5, yes_no_unsure. Legacy type strings supported.
  */
 
 import React, { useCallback } from "react";
@@ -11,6 +12,7 @@ import { StarRating } from "../../../components/ui/star-rating";
 import { Checkbox } from "../../../components/ui/checkbox";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import { Textarea } from "../../../components/ui/textarea";
 import {
 	Select,
 	SelectContent,
@@ -22,25 +24,47 @@ import { cn } from "../../../lib/utils";
 import { QuestionRendererProps, isScaleQuestionType } from "../types";
 import type { FeedbackQuestionOption } from "../types";
 
-const SCALE_1_5_TYPES = ["scale_1_5", "likert_5"];
-const SCALE_1_10_TYPES = ["scale_1_10", "likert_10"];
-const MULTISELECT_TYPES = ["multiselect", "multi_choice"];
-const SINGLE_CHOICE_TYPES = ["single_choice", "radio", "multiple_choice"];
+// answer_type_code from types_answer (freshtrak_private)
+const STAR_OR_SCALE_5 = [
+	"likert_5",
+	"star_rating",
+	"scale_1_5",
+	"probability_5",
+	"frequency_5",
+	"agreement_5",
+	"quality_5",
+	"comparison_5",
+	"emoji_rating",
+];
+const SCALE_10 = ["likert_10", "scale_1_10"];
+const DROPDOWN_SELECT_ONE = [
+	"select_list",
+	"single_choice",
+	"radio",
+	"multiple_choice",
+	"yes_no_unsure",
+];
+const RADIO_SELECT_ONE = ["multi_choice"];
+const CHECKBOX_MULTIPLE = ["multiselect"];
 
-function isScale1_5(type: string): boolean {
-	return SCALE_1_5_TYPES.includes(type);
+function isStarOrScale5(type: string): boolean {
+	return STAR_OR_SCALE_5.includes(type);
 }
 
-function isScale1_10(type: string): boolean {
-	return SCALE_1_10_TYPES.includes(type);
+function isScale10(type: string): boolean {
+	return SCALE_10.includes(type);
 }
 
-function isMultiselect(type: string): boolean {
-	return MULTISELECT_TYPES.includes(type);
+function isDropdownSelectOne(type: string): boolean {
+	return DROPDOWN_SELECT_ONE.includes(type);
 }
 
-function isSingleChoice(type: string): boolean {
-	return SINGLE_CHOICE_TYPES.includes(type);
+function isRadioSelectOne(type: string): boolean {
+	return RADIO_SELECT_ONE.includes(type);
+}
+
+function isCheckboxMultiple(type: string): boolean {
+	return CHECKBOX_MULTIPLE.includes(type);
 }
 
 const QuestionRenderer: React.FC<QuestionRendererProps> = ({
@@ -63,9 +87,10 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		[onChange],
 	);
 
-	const sortedOptions = question.options
-		? [...question.options].sort((a, b) => a.order - b.order)
-		: [];
+	// API may send options and/or answers (same shape: id, value, label, order)
+	const optionsList = question.options ?? question.answers ?? [];
+	const sortedOptions =
+		optionsList.length > 0 ? [...optionsList].sort((a, b) => a.order - b.order) : [];
 
 	const promptLabel = (
 		<p className="text-sm font-medium text-gray-700">
@@ -78,8 +103,27 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		</p>
 	);
 
-	// Scale 1–5 (stars)
-	if (isScale1_5(question.type)) {
+	// free_text (answer_type_code)
+	if (question.type === "free_text") {
+		return (
+			<div
+				className={cn("space-y-2", className)}
+				data-testid={`question-${question.id}`}
+			>
+				{promptLabel}
+				<Textarea
+					value={answerStr}
+					onChange={(e) => handleAnswerChange(e.target.value)}
+					placeholder="Your answer"
+					className="min-h-[80px] resize-none"
+					data-testid={`question-text-${question.id}`}
+				/>
+			</div>
+		);
+	}
+
+	// Star / scale 1–5 (likert_5, star_rating, probability_5, etc.)
+	if (isStarOrScale5(question.type)) {
 		return (
 			<div
 				className={cn("space-y-2", className)}
@@ -106,8 +150,8 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
-	// Scale 1–10 (shadcn Select)
-	if (isScale1_10(question.type)) {
+	// Scale 1–10 (likert_10)
+	if (isScale10(question.type)) {
 		const parsed = answerStr !== "" ? parseInt(answerStr, 10) : NaN;
 		const validNum =
 			Number.isFinite(parsed) && parsed >= 1 && parsed <= 10
@@ -129,7 +173,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 					>
 						<SelectValue placeholder="Select 1–10" />
 					</SelectTrigger>
-					<SelectContent>
+					<SelectContent className="z-[10002]">
 						{Array.from({ length: 10 }, (_, i) => i + 1).map(
 							(n) => (
 								<SelectItem key={n} value={String(n)}>
@@ -152,7 +196,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
-	// Numeric
+	// Numeric (whole number)
 	if (question.type === "numeric") {
 		return (
 			<div
@@ -171,8 +215,59 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
+	// Decimal
+	if (question.type === "decimal") {
+		return (
+			<div
+				className={cn("space-y-2", className)}
+				data-testid={`question-${question.id}`}
+			>
+				{promptLabel}
+				<Input
+					type="number"
+					step="0.01"
+					value={answerStr}
+					onChange={(e) => handleAnswerChange(e.target.value)}
+					className="max-w-[8rem]"
+					data-testid={`question-decimal-${question.id}`}
+				/>
+			</div>
+		);
+	}
+
+	// multi_choice (DB: radio, select one)
+	if (isRadioSelectOne(question.type) && sortedOptions.length > 0) {
+		return (
+			<div
+				className={cn("space-y-2", className)}
+				data-testid={`question-${question.id}`}
+			>
+				{promptLabel}
+				<div className="flex flex-col gap-2">
+					{sortedOptions.map((opt) => (
+						<Label
+							key={opt.id}
+							className="flex items-center gap-2 cursor-pointer font-normal text-gray-700"
+						>
+							<input
+								type="radio"
+								name={`question-${question.id}`}
+								value={opt.value}
+								checked={answerStr === opt.value}
+								onChange={() => handleAnswerChange(opt.value)}
+								className="size-4 border-gray-300 text-text-primary focus:ring-text-primary"
+								data-testid={`question-option-${question.id}-${opt.id}`}
+							/>
+							{opt.label}
+						</Label>
+					))}
+				</div>
+			</div>
+		);
+	}
+
 	// Multiselect (checkboxes) – store comma-separated option values
-	if (isMultiselect(question.type) && sortedOptions.length > 0) {
+	if (isCheckboxMultiple(question.type) && sortedOptions.length > 0) {
 		const selectedSet = new Set(
 			answerStr
 				? answerStr
@@ -212,8 +307,8 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
-	// Single choice / multiple_choice (shadcn Select dropdown)
-	if (isSingleChoice(question.type) && sortedOptions.length > 0) {
+	// select_list / multiple_choice (dropdown, select one)
+	if (isDropdownSelectOne(question.type) && sortedOptions.length > 0) {
 		return (
 			<div
 				className={cn("space-y-2", className)}
@@ -225,17 +320,18 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 					onValueChange={(v) => handleAnswerChange(v ?? "")}
 				>
 					<SelectTrigger
-						className="w-full"
+						className="w-full min-w-0 overflow-hidden [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:text-left"
 						data-testid={`question-select-${question.id}`}
 					>
 						<SelectValue placeholder="Select an option" />
 					</SelectTrigger>
-					<SelectContent>
+					<SelectContent className="z-[10002] bg-white max-w-[min(20rem,100vw)]">
 						{sortedOptions.map((opt) => (
 							<SelectItem
 								key={opt.id}
 								value={opt.value}
 								data-testid={`question-option-${question.id}-${opt.id}`}
+								className="hover:bg-gray-100 break-words"
 							>
 								{opt.label}
 							</SelectItem>

@@ -96,12 +96,16 @@ const EventContainer: React.FC = () => {
 		if (zipCode) {
 			setLoading(true);
 			try {
+				// When "All distances" is selected, omit distance so backend uses findByZip (no radius filter).
+				const params: Record<string, string> = {
+					zip_code: zipCode,
+					...(serviceCat && { category: serviceCat }),
+				};
+				if (distance && distance !== "All distances") {
+					params.distance = String(distance);
+				}
 				const resp = await axios.get(API_URL.EVENTS_LIST, {
-					params: {
-						zip_code: zipCode,
-						distance: distance,
-						category: serviceCat,
-					},
+					params,
 				});
 				const {
 					data: { agencies },

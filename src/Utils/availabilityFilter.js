@@ -20,7 +20,8 @@ export const filterEventsByAvailability = (
 	const today = moment().startOf("day");
 	const tomorrow = moment().add(1, "day").startOf("day");
 	const next7Days = moment().add(7, "days").endOf("day");
-	const endOfNext2Weeks = moment().add(2, "weeks").endOf("week");
+	// Next 2 weeks = today through 14 days from today (not end-of-week)
+	const endOfNext2Weeks = moment().add(14, "days").endOf("day");
 	const endOfMonth = moment().endOf("month");
 	const endOfNextMonth = moment().add(1, "month").endOf("month");
 
@@ -45,16 +46,19 @@ export const filterEventsByAvailability = (
 				eventDate.isSameOrBefore(next7Days, "day");
 			break;
 			case "next_2_weeks":
+				// Include today through 14 days from today (matches "Next 7 Days" behavior)
 				shouldInclude =
-					eventDate.isAfter(today, "day") &&
+					eventDate.isSameOrAfter(today, "day") &&
 					eventDate.isSameOrBefore(endOfNext2Weeks, "day");
 				break;
 			case "this_month":
+				// Include today through end of current month
 				shouldInclude =
-					eventDate.isAfter(today, "day") &&
+					eventDate.isSameOrAfter(today, "day") &&
 					eventDate.isSameOrBefore(endOfMonth, "day");
 				break;
 			case "next_month":
+				// First day of next month through end of next month
 				shouldInclude =
 					eventDate.isAfter(endOfMonth, "day") &&
 					eventDate.isSameOrBefore(endOfNextMonth, "day");

@@ -90,7 +90,9 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 	// API may send options and/or answers (same shape: id, value, label, order)
 	const optionsList = question.options ?? question.answers ?? [];
 	const sortedOptions =
-		optionsList.length > 0 ? [...optionsList].sort((a, b) => a.order - b.order) : [];
+		optionsList.length > 0
+			? [...optionsList].sort((a, b) => a.order - b.order)
+			: [];
 
 	const promptLabel = (
 		<p className="text-sm font-medium text-gray-700">
@@ -164,7 +166,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 			>
 				{promptLabel}
 				<Select
-					value={validNum || undefined}
+					value={validNum || ""}
 					onValueChange={(v) => handleAnswerChange(v ?? "")}
 				>
 					<SelectTrigger
@@ -173,7 +175,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 					>
 						<SelectValue placeholder="Select 1–10" />
 					</SelectTrigger>
-					<SelectContent className="z-[10002]">
+					<SelectContent className="z-[10002] bg-white max-w-[min(20rem,100vw)]">
 						{Array.from({ length: 10 }, (_, i) => i + 1).map(
 							(n) => (
 								<SelectItem key={n} value={String(n)}>
@@ -196,8 +198,18 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
-	// Numeric (whole number)
+	// Numeric (whole number) — non-negative only
 	if (question.type === "numeric") {
+		const handleNumericChange = (raw: string) => {
+			if (raw === "") {
+				handleAnswerChange(raw);
+				return;
+			}
+			if (raw.startsWith("-")) return;
+			const n = parseInt(raw, 10);
+			if (!Number.isNaN(n) && n < 0) return;
+			handleAnswerChange(raw);
+		};
 		return (
 			<div
 				className={cn("space-y-2", className)}
@@ -206,8 +218,9 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 				{promptLabel}
 				<Input
 					type="number"
+					min={0}
 					value={answerStr}
-					onChange={(e) => handleAnswerChange(e.target.value)}
+					onChange={(e) => handleNumericChange(e.target.value)}
 					className="max-w-[8rem]"
 					data-testid={`question-numeric-${question.id}`}
 				/>
@@ -215,8 +228,18 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
-	// Decimal
+	// Decimal — non-negative only
 	if (question.type === "decimal") {
+		const handleDecimalChange = (raw: string) => {
+			if (raw === "" || raw === ".") {
+				handleAnswerChange(raw);
+				return;
+			}
+			if (raw.startsWith("-")) return;
+			const n = parseFloat(raw);
+			if (!Number.isNaN(n) && n < 0) return;
+			handleAnswerChange(raw);
+		};
 		return (
 			<div
 				className={cn("space-y-2", className)}
@@ -225,9 +248,10 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 				{promptLabel}
 				<Input
 					type="number"
+					min={0}
 					step="0.01"
 					value={answerStr}
-					onChange={(e) => handleAnswerChange(e.target.value)}
+					onChange={(e) => handleDecimalChange(e.target.value)}
 					className="max-w-[8rem]"
 					data-testid={`question-decimal-${question.id}`}
 				/>
@@ -316,7 +340,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 			>
 				{promptLabel}
 				<Select
-					value={answerStr || undefined}
+					value={answerStr || ""}
 					onValueChange={(v) => handleAnswerChange(v ?? "")}
 				>
 					<SelectTrigger

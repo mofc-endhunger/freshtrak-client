@@ -824,6 +824,13 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "Clean Space",
 		feedback_tag_quality_food: "Quality Food",
 		feedback_tag_efficient_shoppers: "Efficient Shoppers",
+		feedback_already_submitted_message:
+			"You have already submitted feedback for this visit.",
+		feedback_comments_label: "Additional Comments",
+		feedback_submitting: "Submitting...",
+		feedback_error_generic: "An error occurred",
+		feedback_no_questions: "No questions available for this survey.",
+		feedback_required_aria: "required",
 	},
 
 	spa: {
@@ -1648,6 +1655,13 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "Espacio Limpio",
 		feedback_tag_quality_food: "Comida de Calidad",
 		feedback_tag_efficient_shoppers: "Compradores Eficientes",
+		feedback_already_submitted_message:
+			"Ya ha enviado comentarios sobre esta visita.",
+		feedback_comments_label: "Comentarios adicionales",
+		feedback_submitting: "Enviando...",
+		feedback_error_generic: "Ocurrió un error",
+		feedback_no_questions: "No hay preguntas disponibles para esta encuesta.",
+		feedback_required_aria: "requerido",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -2471,6 +2485,13 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "Clean Space",
 		feedback_tag_quality_food: "Quality Food",
 		feedback_tag_efficient_shoppers: "Efficient Shoppers",
+		feedback_already_submitted_message:
+			"You have already submitted feedback for this visit.",
+		feedback_comments_label: "Additional Comments",
+		feedback_submitting: "Submitting...",
+		feedback_error_generic: "An error occurred",
+		feedback_no_questions: "No questions available for this survey.",
+		feedback_required_aria: "required",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -3301,6 +3322,13 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "Чистое пространство",
 		feedback_tag_quality_food: "Качественная еда",
 		feedback_tag_efficient_shoppers: "Эффективные покупатели",
+		feedback_already_submitted_message:
+			"Вы уже отправили отзыв об этом визите.",
+		feedback_comments_label: "Дополнительные комментарии",
+		feedback_submitting: "Отправка...",
+		feedback_error_generic: "Произошла ошибка",
+		feedback_no_questions: "Нет доступных вопросов для этого опроса.",
+		feedback_required_aria: "обязательное поле",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -4107,6 +4135,13 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "Temiz Alan",
 		feedback_tag_quality_food: "Kaliteli Yiyecek",
 		feedback_tag_efficient_shoppers: "Verimli Alışverişçiler",
+		feedback_already_submitted_message:
+			"Bu ziyaret için zaten geri bildirim gönderdiniz.",
+		feedback_comments_label: "Ek Yorumlar",
+		feedback_submitting: "Gönderiliyor...",
+		feedback_error_generic: "Bir hata oluştu",
+		feedback_no_questions: "Bu anket için soru bulunmamaktadır.",
+		feedback_required_aria: "zorunlu",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -4891,6 +4926,13 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "مساحة نظيفة",
 		feedback_tag_quality_food: "طعام عالي الجودة",
 		feedback_tag_efficient_shoppers: "متسوقون فعالون",
+		feedback_already_submitted_message:
+			"لقد قمت بالفعل بإرسال ملاحظاتك حول هذه الزيارة.",
+		feedback_comments_label: "تعليقات إضافية",
+		feedback_submitting: "جاري الإرسال...",
+		feedback_error_generic: "حدث خطأ",
+		feedback_no_questions: "لا توجد أسئلة متاحة لهذا الاستبيان.",
+		feedback_required_aria: "مطلوب",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -5649,6 +5691,12 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "干净的空间",
 		feedback_tag_quality_food: "优质食品",
 		feedback_tag_efficient_shoppers: "高效的购物者",
+		feedback_already_submitted_message: "您已提交过此次访问的反馈。",
+		feedback_comments_label: "其他评论",
+		feedback_submitting: "提交中...",
+		feedback_error_generic: "发生错误",
+		feedback_no_questions: "此调查暂无可用问题。",
+		feedback_required_aria: "必填",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -6452,6 +6500,13 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "साफ जगह",
 		feedback_tag_quality_food: "गुणवत्तापूर्ण भोजन",
 		feedback_tag_efficient_shoppers: "कुशल खरीदार",
+		feedback_already_submitted_message:
+			"आपने पहले ही इस विज़िट के लिए प्रतिक्रिया जमा कर दी है।",
+		feedback_comments_label: "अतिरिक्त टिप्पणियाँ",
+		feedback_submitting: "जमा हो रहा है...",
+		feedback_error_generic: "एक त्रुटि हुई",
+		feedback_no_questions: "इस सर्वेक्षण के लिए कोई प्रश्न उपलब्ध नहीं है।",
+		feedback_required_aria: "आवश्यक",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -7262,6 +7317,13 @@ let localization = new LocalizedStrings({
 		feedback_tag_clean_space: "सफा ठाउँ",
 		feedback_tag_quality_food: "गुणस्तरीय खाना",
 		feedback_tag_efficient_shoppers: "प्रभावकारी किनमेल गर्नेहरू",
+		feedback_already_submitted_message:
+			"तपाईंले यो भ्रमणको लागि पहिले नै प्रतिक्रिया पेश गर्नुभएको छ।",
+		feedback_comments_label: "थप टिप्पणीहरू",
+		feedback_submitting: "पेश गर्दैछ...",
+		feedback_error_generic: "त्रुटि भयो",
+		feedback_no_questions: "यो सर्वेक्षणको लागि कुनै प्रश्न उपलब्ध छैन।",
+		feedback_required_aria: "आवश्यक",
 	},
 });
 

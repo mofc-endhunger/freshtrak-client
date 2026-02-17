@@ -16,6 +16,7 @@ import React, { useCallback } from "react";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 } from "../../../components/ui/dialog";
@@ -58,7 +59,7 @@ const ErrorContent: React.FC<{ error: string; onRetry: () => void }> = ({
 	<div className="p-5 text-center space-y-4">
 		<p className="text-red-600">{error}</p>
 		<Button onClick={onRetry} variant="outline">
-			Try Again
+			{localization.button_try_again}
 		</Button>
 	</div>
 );
@@ -67,36 +68,19 @@ const ErrorContent: React.FC<{ error: string; onRetry: () => void }> = ({
  * Already submitted state content
  */
 const AlreadySubmittedContent: React.FC<{
-	rating: number;
-	comments: string | null;
 	onClose: () => void;
-}> = ({ rating, comments, onClose }) => (
+}> = ({ onClose }) => (
 	<div className="p-5 space-y-4">
 		<div className="text-center">
 			<p className="text-gray-700 mb-4">
-				You have already submitted feedback for this visit.
+				{localization.feedback_already_submitted_message}
 			</p>
-			<div className="mb-4">
-				<p className="text-sm text-gray-500 mb-2">Your rating:</p>
-				<StarRating
-					value={rating}
-					readOnly
-					size="lg"
-					className="justify-center"
-				/>
-			</div>
-			{comments && (
-				<div className="text-left bg-gray-50 p-3 rounded-md">
-					<p className="text-sm text-gray-500 mb-1">Your comments:</p>
-					<p className="text-sm text-gray-700">{comments}</p>
-				</div>
-			)}
 		</div>
 		<Button
 			onClick={onClose}
 			className="w-full bg-text-primary hover:bg-text-primary/90"
 		>
-			Close
+			{localization.feedback_close}
 		</Button>
 	</div>
 );
@@ -130,13 +114,13 @@ const FeedbackFormContent: React.FC<{
 
 	const isSubmitting = modalState === "submitting";
 
-	// Format the overall rating question
+	// Format the overall rating question (template uses {date} and {location})
 	const overallRatingQuestion = (
 		localization.feedback_visit_question ||
-		"How was your visit{date}{location}?"
+		"How was your visit on {date} to {location}?"
 	)
-		.replace("{date}", visitDate ? ` on ${visitDate}` : "")
-		.replace("{location}", locationName ? `${locationName}` : "");
+		.replace("{date}", visitDate || "")
+		.replace("{location}", locationName || "");
 
 	return (
 		<form onSubmit={handleSubmit} className="p-5 space-y-5 bg-white">
@@ -144,8 +128,11 @@ const FeedbackFormContent: React.FC<{
 			<div>
 				<p className="text-sm font-semibold text-gray-800 mb-3">
 					{overallRatingQuestion}
-					<span className="text-red-500 ml-1" aria-label="required">
-						*
+					<span
+						className="text-red-500 ml-1"
+						aria-label={localization.feedback_required_aria}
+					>
+						{localization.label_required}
 					</span>
 				</p>
 				<StarRating
@@ -171,16 +158,13 @@ const FeedbackFormContent: React.FC<{
 			{/* Comments Section (Optional) */}
 			<div>
 				<label className="text-sm font-semibold text-gray-800 mb-2 block">
-					Additional Comments
+					{localization.feedback_comments_label}
 					<span className="text-gray-400 font-normal ml-1">
-						(optional)
+						{localization.label_optional}
 					</span>
 				</label>
 				<Textarea
-					placeholder={
-						localization.feedback_placeholder ||
-						"Share your feedback..."
-					}
+					placeholder={localization.feedback_placeholder}
 					value={formState.comments}
 					onChange={(e) => setComments(e.target.value)}
 					className="min-h-[100px] resize-none border-gray-300 focus:border-text-primary focus:ring-text-primary bg-white"
@@ -214,10 +198,10 @@ const FeedbackFormContent: React.FC<{
 				{isSubmitting ? (
 					<>
 						<Loader2 className="w-4 h-4 mr-2 animate-spin" />
-						Submitting...
+						{localization.feedback_submitting}
 					</>
 				) : (
-					localization.feedback_submit || "Submit Feedback"
+					localization.feedback_submit
 				)}
 			</Button>
 		</form>
@@ -235,8 +219,7 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 	locationName,
 	visitDate,
 }) => {
-	const { questionnaire, modalState, existingFeedback, error, reload } =
-		useFeedback();
+	const { questionnaire, modalState, error, reload } = useFeedback();
 
 	const handleClose = () => {
 		onClose();
@@ -250,7 +233,7 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 			case "error":
 				return (
 					<ErrorContent
-						error={error || "An error occurred"}
+						error={error || localization.feedback_error_generic}
 						onRetry={reload}
 					/>
 				);
@@ -259,25 +242,19 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 				return (
 					<div className="p-5 text-center space-y-4">
 						<p className="text-gray-700">
-							No questions available for this survey.
+							{localization.feedback_no_questions}
 						</p>
 						<Button
 							onClick={handleClose}
 							className="w-full bg-text-primary hover:bg-text-primary/90"
 						>
-							Close
+							{localization.feedback_close}
 						</Button>
 					</div>
 				);
 
 			case "already_submitted":
-				return (
-					<AlreadySubmittedContent
-						rating={existingFeedback?.rating || 0}
-						comments={existingFeedback?.comments || null}
-						onClose={handleClose}
-					/>
-				);
+				return <AlreadySubmittedContent onClose={handleClose} />;
 
 			case "form":
 			case "submitting":
@@ -299,11 +276,9 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 
 	// Get title from questionnaire or use default
 	const title =
-		questionnaire?.title || localization.feedback_title || "Give Feedback";
+		questionnaire?.title || localization.feedback_title;
 
-	const description =
-		localization.feedback_description ||
-		"Your feedback helps us improve our services.";
+	const description = localization.feedback_description;
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -319,9 +294,9 @@ const FeedbackModal: React.FC<FeedbackModalInternalProps> = ({
 							<h2 className="text-lg font-bold text-white mb-1">
 								{title}
 							</h2>
-							<p className="text-sm text-white/90 leading-relaxed font-normal">
+							<DialogDescription className="text-sm text-white/90 leading-relaxed font-normal">
 								{description}
-							</p>
+							</DialogDescription>
 						</div>
 					</DialogTitle>
 				</DialogHeader>

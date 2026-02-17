@@ -48,7 +48,7 @@ import config from "../config";
  * Toggle to enable/disable mock mode
  * Set to false when backend endpoint is available
  */
-const USE_MOCK_DATA = false;
+const USE_MOCK_DATA = true;
 
 /**
  * Configuration for the Feedback API service
@@ -79,18 +79,19 @@ const MOCK_FEEDBACK_STORAGE_KEY = "freshtrak_feedback_mock";
 // ============================================================================
 
 /**
- * Default questionnaire - backend shape (id, type, options id/value/label/order)
+ * Mock questionnaire with one question of each type for testing.
+ * Backend shape: id, type, options id/value/label/order.
  */
 const MOCK_QUESTIONNAIRE: Questionnaire = {
     id: 1,
     version: 1,
-    title: "Post-Event Feedback",
+    title: "Post-Event Feedback (All Question Types)",
     questions: [
         {
             id: 101,
             order: 1,
             type: "scale_1_5",
-            prompt: "How satisfied were you with check-in?",
+            prompt: "How satisfied were you with check-in? (scale 1–5)",
             required: true,
             options: [
                 { id: 1, value: "1", label: "Very dissatisfied", order: 1 },
@@ -103,16 +104,70 @@ const MOCK_QUESTIONNAIRE: Questionnaire = {
         {
             id: 102,
             order: 2,
-            type: "scale_1_5",
-            prompt: "How satisfied were you with wait time?",
-            required: true,
+            type: "scale_1_10",
+            prompt: "Rate your overall experience from 1 to 10.",
+            required: false,
         },
         {
             id: 103,
             order: 3,
-            type: "scale_1_5",
-            prompt: "How satisfied were you with overall service?",
+            type: "free_text",
+            prompt: "Any additional comments? (free text)",
+            required: false,
+        },
+        {
+            id: 104,
+            order: 4,
+            type: "numeric",
+            prompt: "How many people in your household did we serve? (numeric)",
             required: true,
+        },
+        {
+            id: 105,
+            order: 5,
+            type: "decimal",
+            prompt: "Estimated wait time in hours, if any (e.g. 0.5)? (decimal)",
+            required: false,
+        },
+        {
+            id: 106,
+            order: 6,
+            type: "multi_choice",
+            prompt: "How did you hear about us? (radio – select one)",
+            required: true,
+            options: [
+                { id: 10, value: "friend", label: "Friend or family", order: 1 },
+                { id: 11, value: "social", label: "Social media", order: 2 },
+                { id: 12, value: "flyer", label: "Flyer or poster", order: 3 },
+                { id: 13, value: "211", label: "211 or referral", order: 4 },
+                { id: 14, value: "other", label: "Other", order: 5 },
+            ],
+        },
+        {
+            id: 107,
+            order: 7,
+            type: "multiselect",
+            prompt: "What types of food did you receive? (check all that apply)",
+            required: false,
+            options: [
+                { id: 20, value: "produce", label: "Produce", order: 1 },
+                { id: 21, value: "dairy", label: "Dairy", order: 2 },
+                { id: 22, value: "protein", label: "Protein", order: 3 },
+                { id: 23, value: "grains", label: "Grains", order: 4 },
+                { id: 24, value: "shelf_stable", label: "Shelf-stable", order: 5 },
+            ],
+        },
+        {
+            id: 108,
+            order: 8,
+            type: "select_list",
+            prompt: "Would you recommend this site to others? (dropdown)",
+            required: true,
+            options: [
+                { id: 30, value: "yes", label: "Yes", order: 1 },
+                { id: 31, value: "maybe", label: "Maybe", order: 2 },
+                { id: 32, value: "no", label: "No", order: 3 },
+            ],
         },
     ] as QuestionnaireQuestion[],
 };

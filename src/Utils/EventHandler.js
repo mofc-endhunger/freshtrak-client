@@ -15,8 +15,8 @@ export const EventDateSorterByDate = eventObj => {
 	Object.keys(eventObj)
 		.sort((a, b) => {
 			return (
-				moment(a, "YYYY/MM/DD").toDate() -
-				moment(b, "YYYY/MM/DD").toDate()
+				moment(a, ["YYYY-MM-DD", "YYYY/MM/DD"]).toDate() -
+				moment(b, ["YYYY-MM-DD", "YYYY/MM/DD"]).toDate()
 			);
 		})
 		.forEach(key => {

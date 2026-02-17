@@ -28,8 +28,8 @@ export const filterEventsByAvailability = (
 	const filteredEvents = {};
 
 	Object.keys(eventsByDate).forEach(dateKey => {
-		// EventHandler uses YYYY/MM/DD format for date keys
-		const eventDate = moment(dateKey, "YYYY/MM/DD");
+		// API sends YYYY-MM-DD; support both for compatibility
+		const eventDate = moment(dateKey, ["YYYY-MM-DD", "YYYY/MM/DD"]);
 
 		let shouldInclude = false;
 

@@ -1,5 +1,5 @@
-@import "./variables";
-@import "./mixins";
+@use "./variables" as *;
+@use "./mixins" as *;
 
 .btn {
 	min-height: 50px;
@@ -76,7 +76,9 @@
 	position: relative;
 	text-align: center;
 	background: $switch-button;
-	transition: background 600ms ease, color 600ms ease;
+	transition:
+		background 600ms ease,
+		color 600ms ease;
 	font-weight: 700;
 	margin-bottom: 0;
 	z-index: 0;

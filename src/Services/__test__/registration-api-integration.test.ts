@@ -54,8 +54,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       const endTime = Date.now();
@@ -63,12 +63,13 @@ describe('Registration API Integration Tests', () => {
 
       expect(responseTime).toBeLessThan(3000); // Less than 3 seconds
       expect(result.success).toBe(true);
+      // Service coerces event_date_id and event_slot_id to numbers for API
       expect(mockedAxios.post).toHaveBeenCalledWith(
         API_URL.CREATE_RESERVATION,
         {
           event_id: 'event-123',
-          event_date_id: 'date-456',
-          event_slot_id: 'slot-789',
+          event_date_id: 456,
+          event_slot_id: 789,
         },
         {
           headers: {
@@ -92,8 +93,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -118,8 +119,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result.success).toBe(true);
@@ -147,8 +148,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -173,8 +174,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -202,8 +203,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -232,8 +233,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -258,8 +259,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -280,8 +281,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -302,8 +303,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -328,16 +329,17 @@ describe('Registration API Integration Tests', () => {
 
       await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
+      // Service coerces event_date_id and event_slot_id to numbers for API
       expect(mockedAxios.post).toHaveBeenCalledWith(
         API_URL.CREATE_RESERVATION,
         {
           event_id: 'event-123',
-          event_date_id: 'date-456',
-          event_slot_id: 'slot-789',
+          event_date_id: 456,
+          event_slot_id: 789,
         },
         expect.objectContaining({
           headers: {
@@ -406,8 +408,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({
@@ -443,8 +445,8 @@ describe('Registration API Integration Tests', () => {
 
       const result = await householdRegistrationService.registerWithHousehold({
         eventId: 'event-123',
-        eventDateId: 'date-456',
-        eventSlotId: 'slot-789',
+        eventDateId: '456',
+        eventSlotId: '789',
       });
 
       expect(result).toEqual({

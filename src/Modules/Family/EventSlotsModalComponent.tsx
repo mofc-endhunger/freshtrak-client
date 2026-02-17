@@ -230,13 +230,24 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		setHouseholdError(null);
 
 		try {
-			// Register directly with household data
+			// Register directly with household data (include counts - API requires it for registered users)
+			const counts = householdData?.counts
+				? {
+						seniors: householdData.counts.seniors ?? 0,
+						adults: householdData.counts.adults ?? 0,
+						children: householdData.counts.children ?? 0,
+				  }
+				: { seniors: 0, adults: 0, children: 0 };
+
 			const result =
-				await householdRegistrationService.registerWithHousehold({
-					eventId: event?.eventId || "",
-					eventDateId: eventDateId || "",
-					eventSlotId: selectedSlot.event_slot_id,
-				});
+				await householdRegistrationService.registerWithHousehold(
+					{
+						eventId: event?.eventId || "",
+						eventDateId: eventDateId || "",
+						eventSlotId: selectedSlot.event_slot_id,
+					},
+					counts
+				);
 
 			if (result.success) {
 				// Registration successful - navigate to confirmation page

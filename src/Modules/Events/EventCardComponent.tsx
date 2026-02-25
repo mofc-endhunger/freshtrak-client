@@ -17,6 +17,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
+import { sanitizeHtml } from "../../Utils/sanitizeHtml";
 import "../../Assets/scss/main.scss";
 
 interface Event {
@@ -476,9 +477,10 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 							<span
 								className="text-red-600"
 								data-testid="exception-note"
-							>
-								{exceptionNote}
-							</span>
+								dangerouslySetInnerHTML={{
+									__html: sanitizeHtml(exceptionNote),
+								}}
+							/>
 							<br />
 						</div>
 					)}
@@ -487,7 +489,11 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 							<p>
 								<b> {localization.text_information} </b>
 								<br />
-								{eventDetails}
+								<span
+									dangerouslySetInnerHTML={{
+										__html: sanitizeHtml(eventDetails),
+									}}
+								/>
 							</p>
 						</div>
 					)}

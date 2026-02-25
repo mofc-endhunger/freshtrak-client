@@ -379,14 +379,21 @@ describe("EventSlotsModalComponent Accessibility", () => {
 	});
 
 	describe("Keyboard Navigation", () => {
-		it("should be navigable with keyboard", async () => {
-			const user = userEvent.setup();
-			renderWithRouter(<EventSlotsModalComponent {...defaultProps} />);
+		it("should have focusable interactive elements", async () => {
+			// Render with a selected slot so Continue button is enabled and focusable
+			renderWithRouter(
+				<EventSlotsModalComponent
+					{...defaultProps}
+					selectedSlotId="slot1"
+				/>
+			);
 
 			await waitFor(() => {
 				const radioButtons = screen.getAllByRole("radio");
 				expect(radioButtons).toHaveLength(2);
 			});
+
+			const user = userEvent.setup();
 
 			// Tab to first focusable element (first radio button — no close button rendered)
 			await user.tab();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -12,6 +12,10 @@ import "../../Assets/scss/main.scss";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
 import serviceCatFilter from "../../Utils/serviceCatFilter";
 import LoadingSpinner from "../General/LoadingSpinner";
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+
+// Number of events to render per batch for progressive loading
+const EVENTS_PER_BATCH = 30;
 
 interface Agency {
 	id: string;
@@ -39,7 +43,13 @@ const EventContainer: React.FC = () => {
 
 	const location = useLocation();
 	const searchParams = new URLSearchParams(location.search);
-	const availability = searchParams.get("availability") || "All";
+	// Default to "next_7_days" to show events from today plus 7 days
+	// Map old "this_week" value to "next_7_days" for backward compatibility
+	const availabilityParam = searchParams.get("availability");
+	const availability =
+		availabilityParam === "this_week" || !availabilityParam
+			? "next_7_days"
+			: availabilityParam;
 	const reservations = searchParams.get("reservations") === "true";
 
 	const [foodBankResponse, setFoodBankResponse] = useState<boolean>(false);
@@ -53,20 +63,49 @@ const EventContainer: React.FC = () => {
 	const [filteredData, setFilteredData] = useState<Agency[]>([]);
 	const [zip, setZip] = useState<string | null>(null);
 
+	// Progressive rendering state - track number of events to show
+	const [visibleEventCount, setVisibleEventCount] =
+		useState<number>(EVENTS_PER_BATCH);
+	const [loadingMore, setLoadingMore] = useState<boolean>(false);
+	const [hasMoreEvents, setHasMoreEvents] = useState<boolean>(true);
+
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const categories = serviceCatFilter(filteredData);
+
+	// Load more events handler for infinite scroll
+	const loadMoreEvents = useCallback(() => {
+		if (loadingMore) return;
+
+		setLoadingMore(true);
+		// Use setTimeout to simulate async loading and allow UI to update
+		setTimeout(() => {
+			setVisibleEventCount(prev => prev + EVENTS_PER_BATCH);
+			setLoadingMore(false);
+		}, 100);
+	}, [loadingMore]);
+
+	// Infinite scroll hook
+	const { lastElementRef } = useInfiniteScroll({
+		onLoadMore: loadMoreEvents,
+		hasMore: hasMoreEvents,
+		isLoading: loadingMore,
+	});
 
 	const getEvents = async (): Promise<void> => {
 		if (zipCode) {
 			setLoading(true);
 			try {
+				// When "All distances" is selected, omit distance so backend uses findByZip (no radius filter).
+				const params: Record<string, string> = {
+					zip_code: zipCode,
+					...(serviceCat && { category: serviceCat }),
+				};
+				if (distance && distance !== "All distances") {
+					params.distance = String(distance);
+				}
 				const resp = await axios.get(API_URL.EVENTS_LIST, {
-					params: {
-						zip_code: zipCode,
-						distance: distance,
-						category: serviceCat,
-					},
+					params,
 				});
 				const {
 					data: { agencies },
@@ -86,10 +125,18 @@ const EventContainer: React.FC = () => {
 
 	useEffect(() => {
 		if (zipCode) {
+			// Reset progressive rendering when search params change
+			setVisibleEventCount(EVENTS_PER_BATCH);
 			getEvents();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [zipCode, distance, serviceCat, availability, reservations]);
+
+	// Reset visible count when filters change (so we show filtered results from the start)
+	useEffect(() => {
+		setVisibleEventCount(EVENTS_PER_BATCH);
+		setHasMoreEvents(true); // Reset to true when filters change, will be updated by EventListContainer
+	}, [availability, reservations]);
 
 	useEffect(() => {
 		if (zipCode) {
@@ -155,7 +202,9 @@ const EventContainer: React.FC = () => {
 
 		// Use query parameters for availability and reservations to avoid URL structure issues
 		const queryParams = new URLSearchParams();
-		if (availability && availability !== "All") {
+		// Always include availability in URL so we can distinguish between
+		// default (next_7_days) and user explicitly selecting "All"
+		if (availability) {
 			queryParams.set("availability", availability);
 		}
 		if (reservations) {
@@ -199,10 +248,14 @@ const EventContainer: React.FC = () => {
 					{!loading && (
 						<EventListContainer
 							agencyData={agencyData}
+							visibleEventCount={visibleEventCount}
 							zipCode={zipCode}
 							availabilityFilter={availability}
 							reservationsFilter={reservations}
 							distance={Number(distance) || 10}
+							lastItemRef={lastElementRef}
+							loadingMore={loadingMore}
+							onHasMoreChange={setHasMoreEvents}
 						/>
 					)}
 					{loading && <LoadingSpinner />}

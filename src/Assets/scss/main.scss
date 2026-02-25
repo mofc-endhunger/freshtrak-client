@@ -1,6 +1,6 @@
-@import "./variables";
-@import "./mixins";
-@import "./form-elements";
+@use "./variables" as *;
+@use "./mixins" as *;
+@use "./form-elements";
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Varela+Round&display=swap");
 

@@ -16,7 +16,7 @@ const store = mockStore({});
 // and does not show in reality
 const originalWarn = console.warn.bind(console.warn);
 beforeAll(() => {
-	console.warn = msg =>
+	console.warn = (msg) =>
 		!msg.toString().includes("Deprecation warning") && originalWarn(msg);
 });
 afterAll(() => {
@@ -36,7 +36,7 @@ describe("EventListContainer", () => {
 					<MemoryRouter>
 						<EventListContainer searchData={{}} />
 					</MemoryRouter>
-				</Provider>
+				</Provider>,
 			);
 		}).not.toThrowError();
 	});
@@ -48,7 +48,7 @@ describe("EventListContainer", () => {
 				<MemoryRouter>
 					<EventListContainer zipCode={mockAgency.zip} />
 				</MemoryRouter>
-			</Provider>
+			</Provider>,
 		);
 		await waitFor(() => {
 			getByText(/No Events Currently Scheduled/i);
@@ -56,7 +56,9 @@ describe("EventListContainer", () => {
 	});
 
 	test("Successful Api with Events dates", async () => {
-		// No need to mock axios for this test, just pass agencyData
+		// No need to mock axios for this test, just pass agencyData.
+		// Use availabilityFilter="All" so test is not flaky: test-data-bot uses
+		// random future dates which may fall outside the default "next_7_days".
 		const eventName = testData[0].events[0].name;
 		const { getByText } = render(
 			<Provider store={store}>
@@ -64,9 +66,10 @@ describe("EventListContainer", () => {
 					<EventListContainer
 						agencyData={testData}
 						zipCode={mockAgency.zip}
+						availabilityFilter="All"
 					/>
 				</MemoryRouter>
-			</Provider>
+			</Provider>,
 		);
 		await waitFor(() => {
 			getByText(eventName);

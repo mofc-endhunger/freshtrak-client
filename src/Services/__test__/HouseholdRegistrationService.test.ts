@@ -44,8 +44,8 @@ describe('HouseholdRegistrationService', () => {
   describe('registerWithHousehold', () => {
     const mockTimeslotData = {
       eventId: 'event123',
-      eventDateId: 'date456',
-      eventSlotId: 'slot789',
+      eventDateId: '456',
+      eventSlotId: '789',
     };
 
     it('successfully registers with household data', async () => {
@@ -62,12 +62,13 @@ describe('HouseholdRegistrationService', () => {
       expect(result.message).toBe('Registration completed successfully');
       expect(result.data).toEqual(mockResponse.data);
 
+      // Service coerces event_date_id and event_slot_id to numbers for API
       expect(mockedAxios.post).toHaveBeenCalledWith(
         'https://api.example.com/registrations',
         {
           event_id: 'event123',
-          event_date_id: 'date456',
-          event_slot_id: 'slot789',
+          event_date_id: 456,
+          event_slot_id: 789,
         },
         {
           headers: {

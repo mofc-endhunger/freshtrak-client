@@ -87,6 +87,9 @@ interface EventListComponentProps {
 	targetUrl?: string;
 	registrationView?: boolean;
 	reservedEvents?: ReservedEvent[];
+	lastItemRef?: (node: HTMLElement | null) => void;
+	loadingMore?: boolean;
+	hasMore?: boolean;
 }
 
 const EventListComponent: React.FC<EventListComponentProps> = ({
@@ -97,6 +100,9 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 	targetUrl,
 	registrationView,
 	reservedEvents,
+	lastItemRef,
+	loadingMore = false,
+	hasMore = false,
 }) => {
 	const [viewMode, setViewMode] = useState<ViewMode>(() => {
 		const stored = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
@@ -328,93 +334,123 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 						className="w-full xl:w-3/5 xl:max-h-[calc(100vh-200px)] xl:overflow-y-auto"
 					>
 						<div className="space-y-6 px-4">
-							{Object.entries(events).map(([date, event]) => (
-								<div key={date} className="space-y-3">
-									<h3 className="text-lg font-semibold text-gray-800 sticky top-0 bg-[#F2F0F4] py-2 z-10">
-										{formatDateDayAndDate(date)}
-									</h3>
-									<div className="flex flex-col gap-3">
-										{event &&
-											event.map((ev) => {
-												const eventIndex =
-													getEventIndex(ev.id);
-												const isOnMap =
-													hasValidCoordinates(ev);
-												return (
-													<div
-														key={ev.id}
-														ref={(el) =>
-															setCardRef(
-																ev.id,
-																el
-															)
-														}
-											className={`${
-																isOnMap
-																	? "cursor-pointer"
-																	: ""
-															}`}
-														onClick={
-															isOnMap
-																? () =>
-																		handleCardClick(
-																			ev.id
-																		)
-																: undefined
-														}
-														onMouseEnter={
-															isOnMap
-																? () =>
-																		setHighlightedEventIndex(
-																			eventIndex
-																		)
-																: undefined
-														}
-														onMouseLeave={
-															isOnMap
-																? () =>
-																		setHighlightedEventIndex(
-																			null
-																		)
-																: undefined
-														}
-													>
-														<EventCardComponent
-															event={ev}
-															targetUrl={
-																targetUrl
-															}
-															registrationView={
-																registrationView
-															}
-															alreadyRegistered={isRegisteredEvent(
-																ev
-															)}
-															variant="list"
-															agencyLatitude={
-																ev.agencyLatitude
-															}
-															agencyLongitude={
-																ev.agencyLongitude
-															}
-															eventNumber={
-																isOnMap
-																	? eventIndex +
-																		1
-																	: undefined
-															}
-															isHighlighted={
-																highlightedEventIndex ===
-																	eventIndex &&
-																isOnMap
-															}
-														/>
-													</div>
-												);
-											})}
+							{(() => {
+								const dateEntries = Object.entries(events);
+								const lastDateIndex = dateEntries.length - 1;
+
+								return dateEntries.map(([date, event], dateIndex) => {
+									const isLastDateGroup = dateIndex === lastDateIndex;
+									const lastEventIndex = event.length - 1;
+
+									return (
+										<div key={date} className="space-y-3">
+											<h3 className="text-lg font-semibold text-gray-800 sticky top-0 bg-[#F2F0F4] py-2 z-10">
+												{formatDateDayAndDate(date)}
+											</h3>
+											<div className="flex flex-col gap-3">
+												{event &&
+													event.map((ev, evIdx) => {
+														const eventIndex =
+															getEventIndex(ev.id);
+														const isOnMap =
+															hasValidCoordinates(ev);
+														const isLastItem =
+															isLastDateGroup &&
+															evIdx === lastEventIndex;
+														return (
+															<div
+																key={ev.id}
+																ref={(el) => {
+																	setCardRef(ev.id, el);
+																	if (isLastItem && lastItemRef) {
+																		lastItemRef(el);
+																	}
+																}}
+																className={`${
+																	isOnMap
+																		? "cursor-pointer"
+																		: ""
+																}`}
+																onClick={
+																	isOnMap
+																		? () =>
+																				handleCardClick(
+																					ev.id
+																				)
+																		: undefined
+																}
+																onMouseEnter={
+																	isOnMap
+																		? () =>
+																				setHighlightedEventIndex(
+																					eventIndex
+																				)
+																		: undefined
+																}
+																onMouseLeave={
+																	isOnMap
+																		? () =>
+																				setHighlightedEventIndex(
+																					null
+																				)
+																		: undefined
+																}
+															>
+																<EventCardComponent
+																	event={ev}
+																	targetUrl={
+																		targetUrl
+																	}
+																	registrationView={
+																		registrationView
+																	}
+																	alreadyRegistered={isRegisteredEvent(
+																		ev
+																	)}
+																	variant="list"
+																	agencyLatitude={
+																		ev.agencyLatitude
+																	}
+																	agencyLongitude={
+																		ev.agencyLongitude
+																	}
+																	eventNumber={
+																		isOnMap
+																			? eventIndex +
+																				1
+																			: undefined
+																	}
+																	isHighlighted={
+																		highlightedEventIndex ===
+																			eventIndex &&
+																		isOnMap
+																	}
+																/>
+															</div>
+														);
+													})}
+											</div>
+										</div>
+									);
+								});
+							})()}
+
+							{/* Loading indicator for infinite scroll */}
+							{loadingMore && (
+								<div className="flex justify-center py-6">
+									<div className="flex items-center space-x-2 text-gray-600">
+										<div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+										<span>{localization.loading_more_events || "Loading more events..."}</span>
 									</div>
 								</div>
-							))}
+							)}
+
+							{/* End of results indicator */}
+							{!hasMore && Object.keys(events).length > 0 && !loadingMore && (
+								<div className="text-center py-4 text-gray-500">
+									<span>{localization.no_more_events || "No more events to load"}</span>
+								</div>
+							)}
 						</div>
 					</div>
 				</div>

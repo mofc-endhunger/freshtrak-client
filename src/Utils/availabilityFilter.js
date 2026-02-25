@@ -19,8 +19,9 @@ export const filterEventsByAvailability = (
 
 	const today = moment().startOf("day");
 	const tomorrow = moment().add(1, "day").startOf("day");
-	const endOfWeek = moment().endOf("week");
-	const endOfNext2Weeks = moment().add(2, "weeks").endOf("week");
+	const next7Days = moment().add(7, "days").endOf("day");
+	// Next 2 weeks = today through 14 days from today (not end-of-week)
+	const endOfNext2Weeks = moment().add(14, "days").endOf("day");
 	const endOfMonth = moment().endOf("month");
 	const endOfNextMonth = moment().add(1, "month").endOf("month");
 
@@ -39,22 +40,25 @@ export const filterEventsByAvailability = (
 			case "tomorrow":
 				shouldInclude = eventDate.isSame(tomorrow, "day");
 				break;
-			case "this_week":
-				shouldInclude =
-					eventDate.isAfter(today, "day") &&
-					eventDate.isSameOrBefore(endOfWeek, "day");
-				break;
+		case "next_7_days":
+			shouldInclude =
+				eventDate.isSameOrAfter(today, "day") &&
+				eventDate.isSameOrBefore(next7Days, "day");
+			break;
 			case "next_2_weeks":
+				// Include today through 14 days from today (matches "Next 7 Days" behavior)
 				shouldInclude =
-					eventDate.isAfter(today, "day") &&
+					eventDate.isSameOrAfter(today, "day") &&
 					eventDate.isSameOrBefore(endOfNext2Weeks, "day");
 				break;
 			case "this_month":
+				// Include today through end of current month
 				shouldInclude =
-					eventDate.isAfter(today, "day") &&
+					eventDate.isSameOrAfter(today, "day") &&
 					eventDate.isSameOrBefore(endOfMonth, "day");
 				break;
 			case "next_month":
+				// First day of next month through end of next month
 				shouldInclude =
 					eventDate.isAfter(endOfMonth, "day") &&
 					eventDate.isSameOrBefore(endOfNextMonth, "day");
@@ -109,7 +113,7 @@ export const getAvailabilityOptions = () => [
 	{ value: "All", label: "All" },
 	{ value: "today", label: "Today" },
 	{ value: "tomorrow", label: "Tomorrow" },
-	{ value: "this_week", label: "This Week" },
+	{ value: "next_7_days", label: "Next 7 Days" },
 	{ value: "next_2_weeks", label: "Next 2 Weeks" },
 	{ value: "this_month", label: "This Month" },
 	{ value: "next_month", label: "Next Month" },

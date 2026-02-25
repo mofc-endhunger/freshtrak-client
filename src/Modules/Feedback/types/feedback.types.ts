@@ -1,438 +1,265 @@
 /**
  * Feedback Module Types
  *
- * Aligned with feedback-ui-integration.md (backend contract).
- * GET response and POST body use the same shape: question id, question_id, scale_value, options id/value/label/order.
- *
- *   GET  /reservations/:registrationId/feedback
- *   POST /reservations/:registrationId/feedback
+ * Aligned with the new survey client-bundle API:
+ *   GET  /api/surveys/client-bundle?registration_id=...&language_id=...
+ *   POST /api/surveys/submit
  */
 
 // ============================================================================
-// BACKEND API TYPES (feedback-ui-integration.md)
+// CLIENT-BUNDLE RESPONSE (GET /api/surveys/client-bundle)
 // ============================================================================
 
-/**
- * Question option shape from backend
- */
-export interface FeedbackQuestionOption {
+export interface SurveyAnswerType {
+	id: number;
+	name: string;
+	code: string;
+}
+
+export interface SurveyQuestion {
+	id: number;
+	type: string;
+	prompt: string;
+	order: number;
+	section_id: number | null;
+	required: boolean;
+	options: SurveyQuestionOption[];
+	answerType: SurveyAnswerType;
+}
+
+export interface SurveyQuestionOption {
 	id: number;
 	value: string;
 	label: string;
-	order: number;
+	display_order: number;
 }
 
-/**
- * Questionnaire question from backend
- */
-export interface QuestionnaireQuestion {
-	id: number;
-	order: number;
-	type: string;
-	prompt: string;
-	required: boolean;
-	options?: FeedbackQuestionOption[];
-	/** Same shape as options; API may send one or both (types_answer / survey payload) */
-	answers?: FeedbackQuestionOption[];
-}
-
-/**
- * Questionnaire configuration from backend
- */
-export interface Questionnaire {
-	id: number;
-	version: number;
-	title: string;
-	questions: QuestionnaireQuestion[];
-}
-
-/**
- * GET /reservations/:id/feedback response
- */
-export interface FeedbackApiResponse {
+export interface SurveySection {
 	id: number | null;
-	registration_id: number;
-	has_submitted: boolean;
-	submitted_at: string | null;
-	rating: number | null;
-	comments: string | null;
-	questionnaire: Questionnaire;
-	responses: Array<{
-		question_id: number;
-		scale_value?: number;
-		answer_value?: string;
-	}>;
+	order: number;
+	title: string | null;
+	questions: SurveyQuestion[];
 }
 
-/**
- * Single response item in POST body (backend only accepts question_id + scale_value)
- */
-export interface FeedbackSubmitResponseItem {
+export interface SurveyPreviousResponse {
 	question_id: number;
-	scale_value?: number;
+	answer_id: number | null;
+	answer_value: string | null;
+	answer_text: string | null;
 }
 
-/**
- * POST /reservations/:id/feedback request body
- */
-export interface FeedbackSubmitRequest {
-	rating: number;
-	comments?: string;
-	responses: FeedbackSubmitResponseItem[];
-}
-
-/**
- * POST /reservations/:id/feedback success response
- */
-export interface FeedbackSubmitResponse {
-	/** Created feedback ID */
+export interface Survey {
 	id: number;
-	/** Registration ID */
-	registration_id: number;
-	/** Submission timestamp */
-	submitted_at: string;
-	/** Submitted rating */
-	rating: number;
-	/** Submitted comments */
-	comments: string | null;
+	title: string;
+	language_id: number;
+	questions: SurveyQuestion[];
+	sections: SurveySection[];
+	previous_responses: SurveyPreviousResponse[];
 }
 
-/**
- * API error response shape
- */
-export interface FeedbackApiError {
-	/** HTTP status code */
-	status: number;
-	/** Error message */
+export interface SurveyTrigger {
+	id: number;
+	type: string;
+}
+
+export interface SurveyProgress {
+	family_id: number;
+	status: string;
+	next_section_id: number | null;
+}
+
+export interface SurveyEngine {
+	survey_id: number;
+	language_id: number;
+	sections: SurveySection[];
+	questions: SurveyQuestion[];
+	questionsById: Record<string, SurveyQuestion>;
+	optionsByQuestionId: Record<string, SurveyQuestionOption[]>;
+	rules: {
+		skipLogic: any[];
+		requiredByQuestionId: Record<string, boolean>;
+	};
+}
+
+/** Full response from GET /api/surveys/client-bundle */
+export interface ClientBundleResponse {
+	has_active: boolean;
+	survey: Survey;
+	trigger: SurveyTrigger;
+	progress: SurveyProgress;
+	engine: SurveyEngine;
+}
+
+// ============================================================================
+// SUBMIT REQUEST / RESPONSE (POST /api/surveys/submit)
+// ============================================================================
+
+export interface SurveySubmitAnswer {
+	question_id: number;
+	answer_value: string;
+}
+
+export interface SurveySubmitRequest {
+	survey_id: number;
+	trigger_id: number;
+	registration_id?: number;
+	is_final?: boolean;
+	overall_rating?: number;
+	comments?: string;
+	responses: SurveySubmitAnswer[];
+}
+
+export interface SurveySubmitResponse {
+	success: boolean;
 	message: string;
-	/** Validation errors (for 422) */
-	errors?: Array<{
-		field: string;
-		message: string;
-	}>;
+}
+
+// ============================================================================
+// API ERROR
+// ============================================================================
+
+export interface FeedbackApiError {
+	status: number;
+	message: string;
+	errors?: Array<{ field: string; message: string }>;
 }
 
 // ============================================================================
 // FRONTEND STATE TYPES
 // ============================================================================
 
-/**
- * In-memory state for a single question response (before submission)
- * Keyed by question id.
- */
+/** In-memory draft for a single question before submission. */
 export interface QuestionResponseDraft {
 	question_id: number;
-	/** For scale/likert questions (1-5 or 1-10) */
-	scale_value?: number;
-	/** For numeric, multiselect, single choice (string value or comma-separated ids) */
 	answer_value?: string;
 }
 
-/**
- * Complete feedback form state (before submission)
- */
+/** Complete form state before submission. */
 export interface FeedbackFormState {
-	rating: number;
+	overall_rating: number;
 	comments: string;
-	/** Responses keyed by question id */
 	responses: Map<number, QuestionResponseDraft>;
 }
 
-/**
- * Feedback modal state machine
- */
-export type FeedbackModalState = 'loading' | 'form' | 'submitting' | 'confirmation' | 'error' | 'already_submitted' | 'no_survey_found';
+export type FeedbackModalState =
+	| "loading"
+	| "form"
+	| "submitting"
+	| "confirmation"
+	| "error"
+	| "already_submitted"
+	| "no_survey_found";
 
 // ============================================================================
 // COMPONENT PROPS
 // ============================================================================
 
-/**
- * Props for FeedbackContainer component
- */
 export interface FeedbackContainerProps {
-	/** Whether the feedback flow is open */
 	isOpen: boolean;
-	/** Callback to close the feedback flow */
 	onClose: () => void;
-	/** Registration/reservation ID */
 	registrationId: number;
-	/** Event/location name (for display) */
 	locationName?: string;
-	/** Visit date (for display) */
 	visitDate?: string;
+	/** Called after the survey is successfully submitted as final */
+	onSubmitComplete?: () => void;
 }
 
-/**
- * Props for FeedbackModal component
- */
 export interface FeedbackModalProps {
-	/** Whether the modal is open */
 	isOpen: boolean;
-	/** Callback to close the modal */
 	onClose: () => void;
-	/** Callback when feedback is submitted */
-	onSubmit: () => void;
-	/** Questionnaire configuration */
-	questionnaire: Questionnaire | null;
-	/** Current form state */
-	formState: FeedbackFormState;
-	/** Update overall rating */
-	onRatingChange: (rating: number) => void;
-	/** Update comments */
-	onCommentsChange: (comments: string) => void;
-	/** Update question response (questionId, payload) */
-	onQuestionResponseChange: (questionId: number, payload: QuestionResponsePayload) => void;
-	/** Current modal state */
-	modalState: FeedbackModalState;
-	/** Error message (if any) */
-	error?: string | null;
-	/** Location name (for display) */
 	locationName?: string;
-	/** Visit date (for display) */
 	visitDate?: string;
 }
 
-/**
- * Payload for updating a single question response
- */
-export type QuestionResponsePayload =
-	| { scaleValue: number }
-	| { answerValue: string };
+export type QuestionResponsePayload = { answerValue: string };
 
-/**
- * Props for QuestionnaireRenderer component
- */
 export interface QuestionnaireRendererProps {
-	questions: QuestionnaireQuestion[];
+	questions: SurveyQuestion[];
 	responses: Map<number, QuestionResponseDraft>;
 	onResponseChange: (questionId: number, payload: QuestionResponsePayload) => void;
 	className?: string;
 }
 
-/**
- * Props for QuestionRenderer component
- */
 export interface QuestionRendererProps {
-	question: QuestionnaireQuestion;
-	/** For scale/likert questions */
-	value?: number;
-	/** For numeric, multiselect, single choice */
+	question: SurveyQuestion;
 	answerValue?: string;
 	onChange: (payload: QuestionResponsePayload) => void;
 	className?: string;
 }
 
-/**
- * Props for FeedbackConfirmation component
- */
 export interface FeedbackConfirmationProps {
-	/** Whether the confirmation is open */
 	isOpen: boolean;
-	/** Callback to close the confirmation */
 	onClose: () => void;
 }
 
-/**
- * Props for StarRating component
- */
 export interface StarRatingProps {
-	/** Current rating value (0-5, 0 means not selected) */
 	value: number;
-	/** Callback when rating changes */
 	onChange?: (rating: number) => void;
-	/** Whether the rating is read-only */
 	readOnly?: boolean;
-	/** Size of stars */
-	size?: 'sm' | 'md' | 'lg';
-	/** Additional CSS classes */
+	size?: "sm" | "md" | "lg";
 	className?: string;
 }
 
 // ============================================================================
-// SURVEY ENGINE TYPES (Phase 2 - Future)
+// UTILITY FUNCTIONS
 // ============================================================================
 
-/**
- * Survey Engine: Answer option for radio/checkbox questions
- * @future Phase 2 - Survey Engine
- */
-export interface AnswerOption {
-	/** Option ID */
-	id: number;
-	/** Question ID this option belongs to */
-	question_id: number;
-	/** Option value */
-	value: string;
-	/** Display label */
-	label: string;
-	/** Display order */
-	display_order: number;
-}
-
-/**
- * Survey Engine: GET /surveys/active response
- * @future Phase 2 - Survey Engine
- */
-export interface SurveyActiveResponse {
-	/** Whether a survey is available */
-	has_active: boolean;
-	/** Survey ID (if available) */
-	survey_id?: number;
-	/** Trigger ID (if available) */
-	trigger_id?: number;
-	/** Form configuration (if available) */
-	form?: {
-		id: number;
-		title: string;
-		description?: string;
-		questions: Array<QuestionnaireQuestion & {
-			options?: AnswerOption[];
-		}>;
-	};
-}
-
-/**
- * Survey Engine: POST /surveys/submit request
- * @future Phase 2 - Survey Engine
- */
-export interface SurveySubmitRequest {
-	/** Survey ID */
-	survey_id: number;
-	/** Trigger ID */
-	trigger_id: number;
-	/** Registration ID (optional) */
-	registration_id?: number;
-	/** Overall rating (optional) */
-	overall_rating?: number;
-	/** Comments (optional) */
-	comments?: string;
-	/** Question responses */
-	responses: Array<{
-		question_id: number;
-		answer_value: string;
-	}>;
-}
-
-// ============================================================================
-// UTILITY TYPES
-// ============================================================================
-
-/**
- * Create initial form state
- */
 export const createInitialFormState = (): FeedbackFormState => ({
-	rating: 0,
-	comments: '',
+	overall_rating: 0,
+	comments: "",
 	responses: new Map(),
 });
 
-/** Question types that use scale_value (1-5 or 1-10) — matches types_answer.answer_type_code */
-const SCALE_TYPES = [
-	'scale_1_5',
-	'likert_5',
-	'likert_10',
-	'scale_1_10',
-	'star_rating',
-	'probability_5',
-	'frequency_5',
-	'agreement_5',
-	'quality_5',
-	'comparison_5',
-	'emoji_rating',
-];
+/** Question types where the answer is a numeric scale value */
+const SCALE_TYPES = new Set([
+	"likert_5",
+	"likert_10",
+	"scale_1_5",
+	"scale_1_10",
+	"star_rating",
+]);
 
 export function isScaleQuestionType(type: string): boolean {
-	return SCALE_TYPES.includes(type);
+	return SCALE_TYPES.has(type);
 }
 
-/**
- * Check if form is valid for submission
- */
+/** Check whether all required questions have an answer. */
 export const isFormValid = (
 	formState: FeedbackFormState,
-	questionnaire: Questionnaire | null
+	questions: SurveyQuestion[] | null,
 ): boolean => {
-	if (!questionnaire) return true;
-
-	for (const question of questionnaire.questions) {
-		if (!question.required) continue;
-		const draft = formState.responses.get(question.id);
-		if (isScaleQuestionType(question.type)) {
-			if (!draft?.scale_value || draft.scale_value < 1 || draft.scale_value > 5) {
-				return false;
-			}
-		} else {
-			// numeric, multiselect, single_choice, etc. use answer_value
-			const av = draft?.answer_value?.trim();
-			if (av === undefined || av === '') return false;
-			if (question.type === 'numeric' && Number.isNaN(Number(av))) return false;
-		}
+	if (!questions) return true;
+	for (const q of questions) {
+		if (!q.required) continue;
+		const draft = formState.responses.get(q.id);
+		const val = draft?.answer_value?.trim();
+		if (val === undefined || val === "") return false;
 	}
 	return true;
 };
 
-/**
- * Convert form state to submit request (backend only accepts question_id + scale_value 1-5)
- */
-export const formStateToSubmitRequest = (
+/** Build the POST payload from form state. */
+export const buildSubmitRequest = (
 	formState: FeedbackFormState,
-	questionnaire: Questionnaire | null
-): FeedbackSubmitRequest => {
-	const responses: FeedbackSubmitResponseItem[] = [];
-	if (!questionnaire) {
-		return {
-			rating: formState.rating,
-			comments: formState.comments || undefined,
-			responses: [],
-		};
-	}
-
-	const getQuestion = (questionId: number) =>
-		questionnaire.questions.find((q) => q.id === questionId);
-
+	surveyId: number,
+	triggerId: number,
+	registrationId: number,
+	isFinal = true,
+): SurveySubmitRequest => {
+	const responses: SurveySubmitAnswer[] = [];
 	formState.responses.forEach((draft) => {
-		const question = getQuestion(draft.question_id);
-
-		// Scale / likert 1-5 (stored as scale_value)
-		if (draft.scale_value !== undefined && draft.scale_value >= 1 && draft.scale_value <= 5) {
-			responses.push({
-				question_id: draft.question_id,
-				scale_value: draft.scale_value,
-			});
-			return;
+		const val = draft.answer_value?.trim();
+		if (val !== undefined && val !== "") {
+			responses.push({ question_id: draft.question_id, answer_value: val });
 		}
-
-		const answerStr = draft.answer_value?.trim();
-		if (answerStr === undefined || answerStr === '') return;
-
-		// Scale 1-10: map to 1-5 for backend (Max(5))
-		const numVal = parseInt(answerStr, 10);
-		if (
-			question &&
-			['likert_10', 'scale_1_10'].includes(question.type) &&
-			Number.isFinite(numVal) &&
-			numVal >= 1 &&
-			numVal <= 10
-		) {
-			const scale1to5 = Math.round((numVal / 10) * 5) || 1;
-			responses.push({
-				question_id: draft.question_id,
-				scale_value: Math.min(5, Math.max(1, scale1to5)),
-			});
-			return;
-		}
-
-		// Other types (choice, free text, numeric, multiselect): send scale_value 1 to indicate answered
-		responses.push({
-			question_id: draft.question_id,
-			scale_value: 1,
-		});
 	});
-
 	return {
-		rating: Math.min(5, Math.max(1, formState.rating || 1)),
-		comments: formState.comments || undefined,
+		survey_id: surveyId,
+		trigger_id: triggerId,
+		registration_id: registrationId,
+		is_final: isFinal,
+		...(formState.overall_rating > 0 && { overall_rating: formState.overall_rating }),
+		...(formState.comments.trim() && { comments: formState.comments.trim() }),
 		responses,
 	};
 };

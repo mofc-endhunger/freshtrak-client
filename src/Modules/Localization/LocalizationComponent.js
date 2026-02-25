@@ -104,17 +104,21 @@ let localization = new LocalizedStrings({
 		// CANCEL RESERVATION
 		button_cancel_reservation: "Cancel Reservation",
 		title_cancel_reservation: "Cancel Reservation",
-		message_cancel_confirmation: "Are you sure you want to cancel your reservation for this event?",
-		message_cancel_warning: "Your slot may be given to someone else and you may need to re-register.",
+		message_cancel_confirmation:
+			"Are you sure you want to cancel your reservation for this event?",
+		message_cancel_warning:
+			"Your slot may be given to someone else and you may need to re-register.",
 		button_keep_reservation: "Keep Reservation",
 		button_confirm_cancel: "Yes, Cancel",
-		message_cancel_success: "Your reservation has been cancelled successfully.",
+		message_cancel_success:
+			"Your reservation has been cancelled successfully.",
 		message_cancel_error: "Unable to cancel reservation. Please try again.",
 
 		// PAST EVENTS / HISTORY
 		title_past_events: "Past Events",
 		text_no_past_events: "No past events found.",
-		text_past_events_description: "Your event history from the last 2 weeks.",
+		text_past_events_description:
+			"Your event history from the last 2 weeks.",
 		status_cancelled: "Cancelled",
 		status_confirmed: "Confirmed",
 
@@ -233,7 +237,7 @@ let localization = new LocalizedStrings({
 		label_race: "Race",
 		label_ethnicity: "Ethnicity",
 		label_preferred_language: "Preferred Language",
-		label_preferred_language_required: "Preferred Language *",
+		label_preferred_language_required: "Preferred Language",
 		label_household_language: "Household Language",
 		label_fallback_language: "Fallback Language",
 		label_member_language_settings: "Member Language Settings",
@@ -938,17 +942,22 @@ let localization = new LocalizedStrings({
 		// CANCEL RESERVATION
 		button_cancel_reservation: "Cancelar Reservación",
 		title_cancel_reservation: "Cancelar Reservación",
-		message_cancel_confirmation: "¿Está seguro de que desea cancelar su reservación para este evento?",
-		message_cancel_warning: "Su lugar puede ser dado a otra persona y es posible que deba registrarse nuevamente.",
+		message_cancel_confirmation:
+			"¿Está seguro de que desea cancelar su reservación para este evento?",
+		message_cancel_warning:
+			"Su lugar puede ser dado a otra persona y es posible que deba registrarse nuevamente.",
 		button_keep_reservation: "Mantener Reservación",
 		button_confirm_cancel: "Sí, Cancelar",
-		message_cancel_success: "Su reservación ha sido cancelada exitosamente.",
-		message_cancel_error: "No se pudo cancelar la reservación. Por favor intente de nuevo.",
+		message_cancel_success:
+			"Su reservación ha sido cancelada exitosamente.",
+		message_cancel_error:
+			"No se pudo cancelar la reservación. Por favor intente de nuevo.",
 
 		// PAST EVENTS / HISTORY
 		title_past_events: "Eventos Pasados",
 		text_no_past_events: "No se encontraron eventos pasados.",
-		text_past_events_description: "Su historial de eventos de las últimas 2 semanas.",
+		text_past_events_description:
+			"Su historial de eventos de las últimas 2 semanas.",
 		status_cancelled: "Cancelado",
 		status_confirmed: "Confirmado",
 
@@ -1660,7 +1669,8 @@ let localization = new LocalizedStrings({
 		feedback_comments_label: "Comentarios adicionales",
 		feedback_submitting: "Enviando...",
 		feedback_error_generic: "Ocurrió un error",
-		feedback_no_questions: "No hay preguntas disponibles para esta encuesta.",
+		feedback_no_questions:
+			"No hay preguntas disponibles para esta encuesta.",
 		feedback_required_aria: "requerido",
 	},
 	som: {
@@ -1767,17 +1777,22 @@ let localization = new LocalizedStrings({
 		// CANCEL RESERVATION
 		button_cancel_reservation: "Jooji Ballanqaadka",
 		title_cancel_reservation: "Jooji Ballanqaadka",
-		message_cancel_confirmation: "Ma hubtaa inaad joojisey ballanqaadkaaga dhacdadan?",
-		message_cancel_warning: "Booska aad haysatay waxaa la siin karaa qof kale waxaadna u baahan kartaa inaad mar kale is diiwaan geliso.",
+		message_cancel_confirmation:
+			"Ma hubtaa inaad joojisey ballanqaadkaaga dhacdadan?",
+		message_cancel_warning:
+			"Booska aad haysatay waxaa la siin karaa qof kale waxaadna u baahan kartaa inaad mar kale is diiwaan geliso.",
 		button_keep_reservation: "Hay Ballanqaadka",
 		button_confirm_cancel: "Haa, Jooji",
-		message_cancel_success: "Ballanqaadkaaga si guul leh ayaa loo joojiyay.",
-		message_cancel_error: "Lama joojin karo ballanqaadka. Fadlan isku day mar kale.",
+		message_cancel_success:
+			"Ballanqaadkaaga si guul leh ayaa loo joojiyay.",
+		message_cancel_error:
+			"Lama joojin karo ballanqaadka. Fadlan isku day mar kale.",
 
 		// PAST EVENTS / HISTORY
 		title_past_events: "Dhacdooyinkii Hore",
 		text_no_past_events: "Lama helin dhacdooyin hore.",
-		text_past_events_description: "Taariikhda dhacdooyinkaaga 2-dii toddobaad ee la soo dhaafay.",
+		text_past_events_description:
+			"Taariikhda dhacdooyinkaaga 2-dii toddobaad ee la soo dhaafay.",
 		status_cancelled: "La Joojiyay",
 		status_confirmed: "La Xaqiijiyay",
 
@@ -1985,6 +2000,7 @@ let localization = new LocalizedStrings({
 		placeholder_select_race: "Jinsiyada dooro",
 		placeholder_select_ethnicity: "Qabiilka dooro",
 		placeholder_select_suffix: "Suufiyada dooro",
+		placeholder_state_code: "NY",
 		placeholder_select_distance: "Fogaanta dooro",
 		placeholder_select_household_language: "Luqadda qoyska dooro",
 		placeholder_select_fallback_language: "Luqadda gadaal dooro",
@@ -2216,6 +2232,8 @@ let localization = new LocalizedStrings({
 		aria_decrease_kids: "Tirada carruurta yarayn",
 		aria_increase_kids: "Tirada carruurta kordhin",
 		aria_continue_as_guest: "Marti ah sii wadi",
+		aria_expand_collapse: "furi/xidh",
+		aria_processing_registration: "Diiwaangelinta waa la hagaajiyaa",
 		aria_close_map: "Khariidada xidh",
 		aria_view_larger_map: "Khariidada weyn ka eeg guji",
 		aria_back_button: "badhanka dib u noqosha",
@@ -2357,6 +2375,13 @@ let localization = new LocalizedStrings({
 		dialog_choose_time_slot_title: "Waqti Dooro",
 		dialog_choose_time_slot_description:
 			"Waqti la heli karo u dooro diiwaangelintaada.",
+		dialog_confirm_account_title: "Akoon Xaqiiji",
+		dialog_reset_password_title: "Erifka Dib u Deji",
+		dialog_confirm_new_password_title: "Erifka Cusub Xaqiiji",
+		error_title_registration_error: "Khalad Diiwaangelin",
+		button_review_update_instead: "Dib u Eeg oo Cusbooneysii",
+		button_no_review_update: "Maya, dib u eeg oo cusbooneysii",
+		button_yes_register: "Haa, diiwaangeli",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "Shuruudaha Isticmaalka FreshTrak",
@@ -2391,6 +2416,12 @@ let localization = new LocalizedStrings({
 			"Ma jiro macluumaadka cinwaanka la heli karo",
 		text_head_of_household: "Madaxa Qoyska",
 		text_freshtrak_user: "Isticmaale FreshTrak",
+		text_no_household_info_available:
+			"Ma jiro macluumaadka qoyska la heli karo.",
+		title_resource_events: "Dhacdooyinka Kheyraadka",
+		title_events_today: "Dhacdooyinka Maanta",
+		title_events_next_7_days: "Dhacdooyinka 7-da maalmood ee soo socda",
+		title_events_next_30_days: "Dhacdooyinka 30-da maalmood ee soo socda",
 
 		// MAP & LOCATION
 		map_unavailable: "Khariidada ma heli karto",
@@ -2468,30 +2499,30 @@ let localization = new LocalizedStrings({
 			"Ma jiro wakhtiyada la heli karo ee hadda loo baahan yahay dhacdadan. Tani waxay sabab u noqon kartaa dhibaatooyinka farsamada ama xaaladaha kale ee ku meel gaarka ah. Fadlan mar kale isku day. Haddii dhibaatadu sii waddo, fadlan la xidhiidh taageerada.",
 
 		// FEEDBACK
-		feedback_give_feedback: "Give Feedback",
-		feedback_title: "Give Feedback",
+		feedback_give_feedback: "Faallo Bixi",
+		feedback_title: "Faallo Bixi",
 		feedback_description:
-			"Your feedback goes to your local food bank to assure you have a pleasant experience when getting resources.",
-		feedback_visit_question: "How was your visit on {date} to {location}?",
-		feedback_experience_label: "Tell us about your experience.",
-		feedback_placeholder: "Share your feedback...",
-		feedback_submit: "Submit Feedback",
-		feedback_thank_you_title: "Thank You For Providing Feedback!",
+			"Faalladaada waxay taga bankiga cuntada maxalliga ah si loo xaqiijiyo inaad khibrad wanaagsan hesho markaad kheyraadka hesho.",
+		feedback_visit_question: "Sidee booqashadaada {date} ee {location} aheed?",
+		feedback_experience_label: "Wax nooga sheeg khibraddaada.",
+		feedback_placeholder: "Faalladaada wadaag...",
+		feedback_submit: "Faallo Dir",
+		feedback_thank_you_title: "Waad Ku Mahadsan Tahay Faallo Bixinta!",
 		feedback_thank_you_message:
-			"With your help, we can improve your experience and better serve our community.",
-		feedback_close: "Close",
-		feedback_tag_kind_volunteers: "Kind Volunteers",
-		feedback_tag_good_service: "Good Service",
-		feedback_tag_clean_space: "Clean Space",
-		feedback_tag_quality_food: "Quality Food",
-		feedback_tag_efficient_shoppers: "Efficient Shoppers",
+			"Caawintaada, waxaan hagaajin karnaa khibraddaada oo u adeegno si wanaagsan bulshadeena.",
+		feedback_close: "Xidh",
+		feedback_tag_kind_volunteers: "Tabarucayaal Naxariis Leh",
+		feedback_tag_good_service: "Adeeg Wanaagsan",
+		feedback_tag_clean_space: "Meesha Nadiifka Ah",
+		feedback_tag_quality_food: "Cunto Tayo Leh",
+		feedback_tag_efficient_shoppers: "Iibsadayaal Wax Ku Ool Ah",
 		feedback_already_submitted_message:
-			"You have already submitted feedback for this visit.",
-		feedback_comments_label: "Additional Comments",
-		feedback_submitting: "Submitting...",
-		feedback_error_generic: "An error occurred",
-		feedback_no_questions: "No questions available for this survey.",
-		feedback_required_aria: "required",
+			"Horayba waad faallo u direy booqashadaan.",
+		feedback_comments_label: "Faallooyin Dheeraad Ah",
+		feedback_submitting: "La gudbinayaa...",
+		feedback_error_generic: "Khalad ayaa dhacay",
+		feedback_no_questions: "Su'aalo ma jiraan loogu talagalay sahaninkan.",
+		feedback_required_aria: "loo baahan yahay",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -2600,17 +2631,21 @@ let localization = new LocalizedStrings({
 		// CANCEL RESERVATION
 		button_cancel_reservation: "Отменить бронирование",
 		title_cancel_reservation: "Отменить бронирование",
-		message_cancel_confirmation: "Вы уверены, что хотите отменить бронирование на это мероприятие?",
-		message_cancel_warning: "Ваше место может быть передано другому человеку, и вам может потребоваться зарегистрироваться снова.",
+		message_cancel_confirmation:
+			"Вы уверены, что хотите отменить бронирование на это мероприятие?",
+		message_cancel_warning:
+			"Ваше место может быть передано другому человеку, и вам может потребоваться зарегистрироваться снова.",
 		button_keep_reservation: "Сохранить бронирование",
 		button_confirm_cancel: "Да, отменить",
 		message_cancel_success: "Ваше бронирование успешно отменено.",
-		message_cancel_error: "Не удалось отменить бронирование. Пожалуйста, попробуйте снова.",
+		message_cancel_error:
+			"Не удалось отменить бронирование. Пожалуйста, попробуйте снова.",
 
 		// PAST EVENTS / HISTORY
 		title_past_events: "Прошедшие мероприятия",
 		text_no_past_events: "Прошедшие мероприятия не найдены.",
-		text_past_events_description: "История ваших мероприятий за последние 2 недели.",
+		text_past_events_description:
+			"История ваших мероприятий за последние 2 недели.",
 		status_cancelled: "Отменено",
 		status_confirmed: "Подтверждено",
 
@@ -3434,12 +3469,15 @@ let localization = new LocalizedStrings({
 		// CANCEL RESERVATION
 		button_cancel_reservation: "Rezervasyonu İptal Et",
 		title_cancel_reservation: "Rezervasyonu İptal Et",
-		message_cancel_confirmation: "Bu etkinlik için rezervasyonunuzu iptal etmek istediğinizden emin misiniz?",
-		message_cancel_warning: "Yeriniz başka birine verilebilir ve tekrar kayıt olmanız gerekebilir.",
+		message_cancel_confirmation:
+			"Bu etkinlik için rezervasyonunuzu iptal etmek istediğinizden emin misiniz?",
+		message_cancel_warning:
+			"Yeriniz başka birine verilebilir ve tekrar kayıt olmanız gerekebilir.",
 		button_keep_reservation: "Rezervasyonu Koru",
 		button_confirm_cancel: "Evet, İptal Et",
 		message_cancel_success: "Rezervasyonunuz başarıyla iptal edildi.",
-		message_cancel_error: "Rezervasyon iptal edilemedi. Lütfen tekrar deneyin.",
+		message_cancel_error:
+			"Rezervasyon iptal edilemedi. Lütfen tekrar deneyin.",
 
 		// PAST EVENTS / HISTORY
 		title_past_events: "Geçmiş Etkinlikler",
@@ -4122,11 +4160,13 @@ let localization = new LocalizedStrings({
 		feedback_title: "Geri Bildirim Ver",
 		feedback_description:
 			"Geri bildiriminiz, kaynaklar alırken keyifli bir deneyim yaşamanızı sağlamak için yerel gıda bankanıza gider.",
-		feedback_visit_question: "{date} tarihinde {location}'a ziyaretiniz nasıldı?",
+		feedback_visit_question:
+			"{date} tarihinde {location}'a ziyaretiniz nasıldı?",
 		feedback_experience_label: "Deneyiminiz hakkında bilgi verin.",
 		feedback_placeholder: "Geri bildiriminizi paylaşın...",
 		feedback_submit: "Geri Bildirim Gönder",
-		feedback_thank_you_title: "Geri Bildirim Sağladığınız İçin Teşekkürler!",
+		feedback_thank_you_title:
+			"Geri Bildirim Sağladığınız İçin Teşekkürler!",
 		feedback_thank_you_message:
 			"Yardımınızla deneyiminizi geliştirebilir ve topluluğumuza daha iyi hizmet verebiliriz.",
 		feedback_close: "Kapat",
@@ -4244,8 +4284,10 @@ let localization = new LocalizedStrings({
 		// CANCEL RESERVATION
 		button_cancel_reservation: "إلغاء الحجز",
 		title_cancel_reservation: "إلغاء الحجز",
-		message_cancel_confirmation: "هل أنت متأكد أنك تريد إلغاء حجزك لهذا الحدث؟",
-		message_cancel_warning: "قد يُعطى مكانك لشخص آخر وقد تحتاج إلى التسجيل مرة أخرى.",
+		message_cancel_confirmation:
+			"هل أنت متأكد أنك تريد إلغاء حجزك لهذا الحدث؟",
+		message_cancel_warning:
+			"قد يُعطى مكانك لشخص آخر وقد تحتاج إلى التسجيل مرة أخرى.",
 		button_keep_reservation: "الاحتفاظ بالحجز",
 		button_confirm_cancel: "نعم، إلغاء",
 		message_cancel_success: "تم إلغاء حجزك بنجاح.",
@@ -5033,7 +5075,8 @@ let localization = new LocalizedStrings({
 		button_cancel_reservation: "取消预约",
 		title_cancel_reservation: "取消预约",
 		message_cancel_confirmation: "您确定要取消此活动的预约吗？",
-		message_cancel_warning: "您的名额可能会被分配给其他人，您可能需要重新注册。",
+		message_cancel_warning:
+			"您的名额可能会被分配给其他人，您可能需要重新注册。",
 		button_keep_reservation: "保留预约",
 		button_confirm_cancel: "是的，取消",
 		message_cancel_success: "您的预约已成功取消。",
@@ -5801,17 +5844,21 @@ let localization = new LocalizedStrings({
 		// CANCEL RESERVATION
 		button_cancel_reservation: "आरक्षण रद्द करें",
 		title_cancel_reservation: "आरक्षण रद्द करें",
-		message_cancel_confirmation: "क्या आप वाकई इस कार्यक्रम के लिए अपना आरक्षण रद्द करना चाहते हैं?",
-		message_cancel_warning: "आपकी जगह किसी और को दी जा सकती है और आपको फिर से पंजीकरण करना पड़ सकता है।",
+		message_cancel_confirmation:
+			"क्या आप वाकई इस कार्यक्रम के लिए अपना आरक्षण रद्द करना चाहते हैं?",
+		message_cancel_warning:
+			"आपकी जगह किसी और को दी जा सकती है और आपको फिर से पंजीकरण करना पड़ सकता है।",
 		button_keep_reservation: "आरक्षण रखें",
 		button_confirm_cancel: "हाँ, रद्द करें",
 		message_cancel_success: "आपका आरक्षण सफलतापूर्वक रद्द कर दिया गया है।",
-		message_cancel_error: "आरक्षण रद्द करने में असमर्थ। कृपया पुनः प्रयास करें।",
+		message_cancel_error:
+			"आरक्षण रद्द करने में असमर्थ। कृपया पुनः प्रयास करें।",
 
 		// PAST EVENTS / HISTORY
 		title_past_events: "पिछले कार्यक्रम",
 		text_no_past_events: "कोई पिछले कार्यक्रम नहीं मिले।",
-		text_past_events_description: "पिछले 2 सप्ताह का आपका कार्यक्रम इतिहास।",
+		text_past_events_description:
+			"पिछले 2 सप्ताह का आपका कार्यक्रम इतिहास।",
 		status_cancelled: "रद्द",
 		status_confirmed: "पुष्टि",
 
@@ -6487,7 +6534,8 @@ let localization = new LocalizedStrings({
 		feedback_title: "प्रतिक्रिया दें",
 		feedback_description:
 			"आपकी प्रतिक्रिया आपके स्थानीय फ़ूड बैंक को जाती है ताकि संसाधन प्राप्त करते समय आपका अनुभव सुखद हो।",
-		feedback_visit_question: "{date} को {location} पर आपकी यात्रा कैसी रही?",
+		feedback_visit_question:
+			"{date} को {location} पर आपकी यात्रा कैसी रही?",
 		feedback_experience_label: "अपने अनुभव के बारे में बताएं।",
 		feedback_placeholder: "अपनी प्रतिक्रिया साझा करें...",
 		feedback_submit: "प्रतिक्रिया जमा करें",
@@ -6611,12 +6659,15 @@ let localization = new LocalizedStrings({
 		// CANCEL RESERVATION
 		button_cancel_reservation: "आरक्षण रद्द गर्नुहोस्",
 		title_cancel_reservation: "आरक्षण रद्द गर्नुहोस्",
-		message_cancel_confirmation: "के तपाईं यो कार्यक्रमको लागि आफ्नो आरक्षण रद्द गर्न चाहनुहुन्छ?",
-		message_cancel_warning: "तपाईंको स्थान अरू कसैलाई दिन सकिन्छ र तपाईंले फेरि दर्ता गर्नुपर्ने हुन सक्छ।",
+		message_cancel_confirmation:
+			"के तपाईं यो कार्यक्रमको लागि आफ्नो आरक्षण रद्द गर्न चाहनुहुन्छ?",
+		message_cancel_warning:
+			"तपाईंको स्थान अरू कसैलाई दिन सकिन्छ र तपाईंले फेरि दर्ता गर्नुपर्ने हुन सक्छ।",
 		button_keep_reservation: "आरक्षण राख्नुहोस्",
 		button_confirm_cancel: "हो, रद्द गर्नुहोस्",
 		message_cancel_success: "तपाईंको आरक्षण सफलतापूर्वक रद्द गरियो।",
-		message_cancel_error: "आरक्षण रद्द गर्न असमर्थ। कृपया फेरि प्रयास गर्नुहोस्।",
+		message_cancel_error:
+			"आरक्षण रद्द गर्न असमर्थ। कृपया फेरि प्रयास गर्नुहोस्।",
 
 		// PAST EVENTS / HISTORY
 		title_past_events: "विगतका कार्यक्रमहरू",
@@ -7304,7 +7355,8 @@ let localization = new LocalizedStrings({
 		feedback_title: "प्रतिक्रिया दिनुहोस्",
 		feedback_description:
 			"तपाईंको प्रतिक्रिया तपाईंको स्थानीय खाना बैंकमा जान्छ ताकि संसाधनहरू प्राप्त गर्दा तपाईंको अनुभव सुखद होस्।",
-		feedback_visit_question: "{date} मा {location} मा तपाईंको भ्रमण कस्तो रह्यो?",
+		feedback_visit_question:
+			"{date} मा {location} मा तपाईंको भ्रमण कस्तो रह्यो?",
 		feedback_experience_label: "तपाईंको अनुभवको बारेमा हामीलाई बताउनुहोस्।",
 		feedback_placeholder: "तपाईंको प्रतिक्रिया साझा गर्नुहोस्...",
 		feedback_submit: "प्रतिक्रिया पेश गर्नुहोस्",

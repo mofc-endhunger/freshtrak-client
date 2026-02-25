@@ -1,8 +1,7 @@
 /**
  * QuestionnaireRenderer Component
  *
- * Renders all questions from a questionnaire configuration.
- * Each question is rendered using QuestionRenderer.
+ * Renders all questions from the survey, sorted by order.
  */
 
 import React, { useCallback } from "react";
@@ -20,10 +19,8 @@ const QuestionnaireRenderer: React.FC<QuestionnaireRendererProps> = ({
 		(questionId: number, payload: QuestionResponsePayload) => {
 			onResponseChange(questionId, payload);
 		},
-		[onResponseChange]
+		[onResponseChange],
 	);
-
-	const draftFor = (questionId: number) => responses.get(questionId);
 
 	const sortedQuestions = [...questions].sort((a, b) => a.order - b.order);
 
@@ -32,17 +29,13 @@ const QuestionnaireRenderer: React.FC<QuestionnaireRendererProps> = ({
 	}
 
 	return (
-		<div
-			className={cn("space-y-4", className)}
-			data-testid="questionnaire-renderer"
-		>
+		<div className={cn("space-y-4", className)} data-testid="questionnaire-renderer">
 			{sortedQuestions.map((question) => {
-				const draft = draftFor(question.id);
+				const draft = responses.get(question.id);
 				return (
 					<QuestionRenderer
 						key={question.id}
 						question={question}
-						value={draft?.scale_value}
 						answerValue={draft?.answer_value}
 						onChange={(payload) => handleResponseChange(question.id, payload)}
 					/>

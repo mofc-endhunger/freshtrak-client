@@ -163,6 +163,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				suffix = "",
 				date_of_birth = "",
 				gender = "",
+				preferred_language = "en",
 				address_line_1 = "",
 				address_line_2 = "",
 				city = "",
@@ -209,6 +210,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 					? convertDateFormat(date_of_birth)
 					: "",
 				gender,
+				preferred_language: preferred_language || "en",
 				address_line_1,
 				address_line_2,
 				city,

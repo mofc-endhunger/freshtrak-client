@@ -1,11 +1,11 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import mainLogo from "../../Assets/img/logo.png";
 import localization from "../Localization/LocalizationComponent";
-import { setCurrentLanguage } from "../../Store/languageSlice";
+import { setCurrentLanguage, selectLanguage } from "../../Store/languageSlice";
 import CountryListComponent from "../Localization/countryListComponent";
 import { useAuth } from "../Authentication/AuthContext";
 import { StorageService } from "../../Utils/StorageService";
@@ -52,6 +52,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 	const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 	const [showMobileMenu, setMobileMenu] = useState<boolean>(false);
 	const dispatch = useDispatch();
+	const currentLanguage = useSelector(selectLanguage);
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { isAuthenticated, user } = useAuth();
@@ -116,6 +117,14 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 		localization.setLanguage(data.value);
 		dispatch(setCurrentLanguage(data.value));
 	};
+
+	// Keep localization singleton in sync with the persisted Redux language
+	// (covers page refresh: Redux restores from localStorage, this sets the strings)
+	useEffect(() => {
+		if (currentLanguage && currentLanguage !== "en") {
+			localization.setLanguage(currentLanguage);
+		}
+	}, [currentLanguage]);
 
 	useEffect(() => {
 		// Check authentication status - check for cognitoUser and valid token
@@ -209,7 +218,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 						</div>
 
 						<div className="flex items-center space-x-2 md:space-x-4 ml-auto w-full justify-end">
-							<CountryListComponent change={change} />
+							<CountryListComponent change={change} currentLanguage={currentLanguage} />
 							{/* Show authentication buttons on all pages except login page */}
 							{!isLoginPage && (
 								<>

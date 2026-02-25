@@ -45,7 +45,6 @@ export type {
   MemberFormData,
   HouseholdEditFormData,
   FormComponentProps,
-  HouseholdSetupWizardProps,
   MemberFormProps,
   HouseholdEditFormProps,
   ValidationSchema,

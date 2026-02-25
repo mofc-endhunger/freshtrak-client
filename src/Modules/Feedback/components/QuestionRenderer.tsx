@@ -1,10 +1,11 @@
 /**
  * QuestionRenderer Component
  *
- * Renders based on answer_type_code from freshtrak_private.types_answer:
+ * Renders a single survey question based on its answerType.code:
  * free_text, numeric, decimal, multi_choice (radio), select_list (dropdown),
- * likert_5, likert_10, star_rating, emoji_rating, probability_5, frequency_5,
- * agreement_5, quality_5, comparison_5, yes_no_unsure. Legacy type strings supported.
+ * multiselect (checkboxes), likert_5, likert_10, star_rating, etc.
+ *
+ * All values are stored as answer_value (string).
  */
 
 import React, { useCallback } from "react";
@@ -21,11 +22,9 @@ import {
 	SelectValue,
 } from "../../../components/ui/select";
 import { cn } from "../../../lib/utils";
-import { QuestionRendererProps, isScaleQuestionType } from "../types";
-import type { FeedbackQuestionOption } from "../types";
+import type { QuestionRendererProps, SurveyQuestionOption } from "../types";
 
-// answer_type_code from types_answer (freshtrak_private)
-const STAR_OR_SCALE_5 = [
+const STAR_OR_SCALE_5 = new Set([
 	"likert_5",
 	"star_rating",
 	"scale_1_5",
@@ -35,63 +34,36 @@ const STAR_OR_SCALE_5 = [
 	"quality_5",
 	"comparison_5",
 	"emoji_rating",
-];
-const SCALE_10 = ["likert_10", "scale_1_10"];
-const DROPDOWN_SELECT_ONE = [
+]);
+const SCALE_10 = new Set(["likert_10", "scale_1_10"]);
+const DROPDOWN_SELECT_ONE = new Set([
 	"select_list",
 	"single_choice",
 	"radio",
 	"multiple_choice",
 	"yes_no_unsure",
-];
-const RADIO_SELECT_ONE = ["multi_choice"];
-const CHECKBOX_MULTIPLE = ["multiselect"];
-
-function isStarOrScale5(type: string): boolean {
-	return STAR_OR_SCALE_5.includes(type);
-}
-
-function isScale10(type: string): boolean {
-	return SCALE_10.includes(type);
-}
-
-function isDropdownSelectOne(type: string): boolean {
-	return DROPDOWN_SELECT_ONE.includes(type);
-}
-
-function isRadioSelectOne(type: string): boolean {
-	return RADIO_SELECT_ONE.includes(type);
-}
-
-function isCheckboxMultiple(type: string): boolean {
-	return CHECKBOX_MULTIPLE.includes(type);
-}
+]);
+const RADIO_SELECT_ONE = new Set(["multi_choice"]);
+const CHECKBOX_MULTIPLE = new Set(["multiselect"]);
 
 const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 	question,
-	value,
 	answerValue,
 	onChange,
 	className,
 }) => {
-	const scaleValue = typeof value === "number" ? value : 0;
 	const answerStr = answerValue ?? "";
+	const type = question.type;
 
-	const handleRatingChange = useCallback(
-		(rating: number) => onChange({ scaleValue: rating }),
-		[onChange],
-	);
-
-	const handleAnswerChange = useCallback(
+	const handleChange = useCallback(
 		(v: string) => onChange({ answerValue: v }),
 		[onChange],
 	);
 
-	// API may send options and/or answers (same shape: id, value, label, order)
-	const optionsList = question.options ?? question.answers ?? [];
+	const options = question.options ?? [];
 	const sortedOptions =
-		optionsList.length > 0
-			? [...optionsList].sort((a, b) => a.order - b.order)
+		options.length > 0
+			? [...options].sort((a, b) => a.display_order - b.display_order)
 			: [];
 
 	const promptLabel = (
@@ -105,167 +77,105 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		</p>
 	);
 
-	// free_text (answer_type_code)
-	if (question.type === "free_text") {
+	// free_text
+	if (type === "free_text") {
 		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
+			<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 				{promptLabel}
 				<Textarea
 					value={answerStr}
-					onChange={(e) => handleAnswerChange(e.target.value)}
+					onChange={(e) => handleChange(e.target.value)}
 					placeholder="Your answer"
 					className="min-h-[80px] resize-none"
-					data-testid={`question-text-${question.id}`}
 				/>
 			</div>
 		);
 	}
 
-	// Star / scale 1–5 (likert_5, star_rating, probability_5, etc.)
-	if (isStarOrScale5(question.type)) {
+	// Star / scale 1-5
+	if (STAR_OR_SCALE_5.has(type)) {
+		const numVal = answerStr !== "" ? parseInt(answerStr, 10) : 0;
 		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
+			<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 				{promptLabel}
 				<StarRating
-					value={scaleValue}
-					onChange={handleRatingChange}
+					value={Number.isFinite(numVal) ? numVal : 0}
+					onChange={(rating) => handleChange(String(rating))}
 					size="md"
 					className="justify-start"
-					data-testid={`question-rating-${question.id}`}
 				/>
-				{sortedOptions.length > 0 && (
-					<div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-						{sortedOptions.map((opt) => (
-							<span key={opt.id}>
-								{opt.value}: {opt.label}
-							</span>
-						))}
-					</div>
-				)}
 			</div>
 		);
 	}
 
-	// Scale 1–10 (likert_10)
-	if (isScale10(question.type)) {
-		const parsed = answerStr !== "" ? parseInt(answerStr, 10) : NaN;
-		const validNum =
-			Number.isFinite(parsed) && parsed >= 1 && parsed <= 10
-				? String(parsed)
-				: "";
+	// Scale 1-10 dropdown
+	if (SCALE_10.has(type)) {
 		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
+			<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 				{promptLabel}
-				<Select
-					value={validNum || ""}
-					onValueChange={(v) => handleAnswerChange(v ?? "")}
-				>
-					<SelectTrigger
-						className="w-full max-w-[8rem]"
-						data-testid={`question-select-${question.id}`}
-					>
+				<Select value={answerStr || ""} onValueChange={(v) => handleChange(v ?? "")}>
+					<SelectTrigger className="w-full max-w-[8rem]">
 						<SelectValue placeholder="Select 1–10" />
 					</SelectTrigger>
 					<SelectContent className="z-[10002] bg-white max-w-[min(20rem,100vw)]">
-						{Array.from({ length: 10 }, (_, i) => i + 1).map(
-							(n) => (
-								<SelectItem key={n} value={String(n)}>
-									{n}
-								</SelectItem>
-							),
-						)}
+						{Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+							<SelectItem key={n} value={String(n)}>
+								{n}
+							</SelectItem>
+						))}
 					</SelectContent>
 				</Select>
-				{sortedOptions.length > 0 && (
-					<div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-						{sortedOptions.map((opt) => (
-							<span key={opt.id}>
-								{opt.value}: {opt.label}
-							</span>
-						))}
-					</div>
-				)}
 			</div>
 		);
 	}
 
-	// Numeric (whole number) — non-negative only
-	if (question.type === "numeric") {
-		const handleNumericChange = (raw: string) => {
-			if (raw === "") {
-				handleAnswerChange(raw);
-				return;
-			}
+	// numeric (whole number)
+	if (type === "numeric") {
+		const handleNumeric = (raw: string) => {
+			if (raw === "") { handleChange(raw); return; }
 			if (raw.startsWith("-")) return;
-			const n = parseInt(raw, 10);
-			if (!Number.isNaN(n) && n < 0) return;
-			handleAnswerChange(raw);
+			handleChange(raw);
 		};
 		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
+			<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 				{promptLabel}
 				<Input
 					type="number"
 					min={0}
 					value={answerStr}
-					onChange={(e) => handleNumericChange(e.target.value)}
+					onChange={(e) => handleNumeric(e.target.value)}
 					className="max-w-[8rem]"
-					data-testid={`question-numeric-${question.id}`}
 				/>
 			</div>
 		);
 	}
 
-	// Decimal — non-negative only
-	if (question.type === "decimal") {
-		const handleDecimalChange = (raw: string) => {
-			if (raw === "" || raw === ".") {
-				handleAnswerChange(raw);
-				return;
-			}
+	// decimal
+	if (type === "decimal") {
+		const handleDecimal = (raw: string) => {
+			if (raw === "" || raw === ".") { handleChange(raw); return; }
 			if (raw.startsWith("-")) return;
-			const n = parseFloat(raw);
-			if (!Number.isNaN(n) && n < 0) return;
-			handleAnswerChange(raw);
+			handleChange(raw);
 		};
 		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
+			<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 				{promptLabel}
 				<Input
 					type="number"
 					min={0}
 					step="0.01"
 					value={answerStr}
-					onChange={(e) => handleDecimalChange(e.target.value)}
+					onChange={(e) => handleDecimal(e.target.value)}
 					className="max-w-[8rem]"
-					data-testid={`question-decimal-${question.id}`}
 				/>
 			</div>
 		);
 	}
 
-	// multi_choice (DB: radio, select one)
-	if (isRadioSelectOne(question.type) && sortedOptions.length > 0) {
+	// multi_choice (radio group)
+	if (RADIO_SELECT_ONE.has(type) && sortedOptions.length > 0) {
 		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
+			<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 				{promptLabel}
 				<div className="flex flex-col gap-2">
 					{sortedOptions.map((opt) => (
@@ -278,9 +188,8 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 								name={`question-${question.id}`}
 								value={opt.value}
 								checked={answerStr === opt.value}
-								onChange={() => handleAnswerChange(opt.value)}
+								onChange={() => handleChange(opt.value)}
 								className="size-4 border-gray-300 text-text-primary focus:ring-text-primary"
-								data-testid={`question-option-${question.id}-${opt.id}`}
 							/>
 							{opt.label}
 						</Label>
@@ -290,27 +199,19 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
-	// Multiselect (checkboxes) – store comma-separated option values
-	if (isCheckboxMultiple(question.type) && sortedOptions.length > 0) {
+	// multiselect (checkboxes) - comma-separated values
+	if (CHECKBOX_MULTIPLE.has(type) && sortedOptions.length > 0) {
 		const selectedSet = new Set(
-			answerStr
-				? answerStr
-						.split(",")
-						.map((s) => s.trim())
-						.filter(Boolean)
-				: [],
+			answerStr ? answerStr.split(",").map((s) => s.trim()).filter(Boolean) : [],
 		);
-		const toggle = (opt: FeedbackQuestionOption) => {
+		const toggle = (opt: SurveyQuestionOption) => {
 			const next = new Set(selectedSet);
 			if (next.has(opt.value)) next.delete(opt.value);
 			else next.add(opt.value);
-			handleAnswerChange([...next].join(","));
+			handleChange([...next].join(","));
 		};
 		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
+			<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 				{promptLabel}
 				<div className="flex flex-col gap-2">
 					{sortedOptions.map((opt) => (
@@ -321,7 +222,6 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 							<Checkbox
 								checked={selectedSet.has(opt.value)}
 								onCheckedChange={() => toggle(opt)}
-								data-testid={`question-option-${question.id}-${opt.id}`}
 							/>
 							{opt.label}
 						</Label>
@@ -331,21 +231,14 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
-	// select_list / multiple_choice (dropdown, select one)
-	if (isDropdownSelectOne(question.type) && sortedOptions.length > 0) {
+	// select_list (dropdown, select one)
+	if (DROPDOWN_SELECT_ONE.has(type) && sortedOptions.length > 0) {
 		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
+			<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 				{promptLabel}
-				<Select
-					value={answerStr || ""}
-					onValueChange={(v) => handleAnswerChange(v ?? "")}
-				>
+				<Select value={answerStr || ""} onValueChange={(v) => handleChange(v ?? "")}>
 					<SelectTrigger
 						className="w-full min-w-0 overflow-hidden [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:text-left"
-						data-testid={`question-select-${question.id}`}
 					>
 						<SelectValue placeholder="Select an option" />
 					</SelectTrigger>
@@ -354,7 +247,6 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 							<SelectItem
 								key={opt.id}
 								value={opt.value}
-								data-testid={`question-option-${question.id}-${opt.id}`}
 								className="hover:bg-gray-100 break-words"
 							>
 								{opt.label}
@@ -366,47 +258,15 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 		);
 	}
 
-	// Fallback: treat as scale 1–5 (backward compatibility)
-	if (isScaleQuestionType(question.type)) {
-		return (
-			<div
-				className={cn("space-y-2", className)}
-				data-testid={`question-${question.id}`}
-			>
-				{promptLabel}
-				<StarRating
-					value={scaleValue}
-					onChange={handleRatingChange}
-					size="md"
-					className="justify-start"
-					data-testid={`question-rating-${question.id}`}
-				/>
-				{sortedOptions.length > 0 && (
-					<div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-						{sortedOptions.map((opt) => (
-							<span key={opt.id}>
-								{opt.value}: {opt.label}
-							</span>
-						))}
-					</div>
-				)}
-			</div>
-		);
-	}
-
-	// Unknown type: show a single text/number input so something is collectible
+	// Fallback: text input
 	return (
-		<div
-			className={cn("space-y-2", className)}
-			data-testid={`question-${question.id}`}
-		>
+		<div className={cn("space-y-2", className)} data-testid={`question-${question.id}`}>
 			{promptLabel}
 			<Input
 				type="text"
 				value={answerStr}
-				onChange={(e) => handleAnswerChange(e.target.value)}
+				onChange={(e) => handleChange(e.target.value)}
 				placeholder="Your answer"
-				data-testid={`question-text-${question.id}`}
 			/>
 		</div>
 	);

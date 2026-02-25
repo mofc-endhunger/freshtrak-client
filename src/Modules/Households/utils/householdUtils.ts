@@ -330,20 +330,20 @@ export const validateAddress = (address: {
 };
 
 /**
- * Get language display name
+ * Get language display name (uses shared language codes: en, spa, som, etc.)
  */
 export const getLanguageDisplayName = (language: LanguagePreference): string => {
   const languageNames: Record<LanguagePreference, string> = {
     en: 'English',
-    es: 'Spanish',
-    fr: 'French',
-    de: 'German',
-    it: 'Italian',
-    pt: 'Portuguese',
-    zh: 'Chinese',
-    ja: 'Japanese',
-    ko: 'Korean',
-    ar: 'Arabic',
+    spa: 'Español',
+    som: 'Soomaali',
+    rus: 'Русский',
+    tur: 'Türkçe',
+    ara: 'العربية',
+    zho: '中文',
+    hin: 'हिन्दी',
+    nep: 'नेपाली',
+    tgl: 'Tagalog',
   };
 
   return languageNames[language] || language;

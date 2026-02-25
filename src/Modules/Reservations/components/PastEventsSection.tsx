@@ -18,7 +18,7 @@
  * ============================================================================
  */
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { History, AlertCircle } from "lucide-react";
 import ReservationCard from "./ReservationCard";
 import { Reservation, ReservationsResponse } from "../types/reservation.types";
@@ -54,49 +54,39 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 		[]
 	);
 
-	/**
-	 * Fetch past reservations on mount
-	 *
-	 * Calls GET /reservations and filters for past events
-	 * (where derived status = "completed")
-	 */
-	useEffect(() => {
-		const fetchPastReservations = async () => {
-			setIsLoading(true);
-			setError(null);
+	const fetchPastReservations = useCallback(async () => {
+		setIsLoading(true);
+		setError(null);
 
-			try {
-				// Fetch past reservations from API
-				const data: ReservationsResponse =
-					await reservationsApiService.getPastReservations();
+		try {
+			const data: ReservationsResponse =
+				await reservationsApiService.getPastReservations();
 
-				// Sort by date descending (most recent first)
-				// Handle "N/A" or invalid dates by placing them at the end
-				const sortedReservations = [...data.reservations].sort(
-					(a, b) => {
-						const dateA = a.date && a.date !== "N/A" ? new Date(a.date).getTime() : 0;
-						const dateB = b.date && b.date !== "N/A" ? new Date(b.date).getTime() : 0;
-						// Handle invalid dates (NaN)
-						const validA = !isNaN(dateA) ? dateA : 0;
-						const validB = !isNaN(dateB) ? dateB : 0;
-						return validB - validA;
-					}
-				);
+			const sortedReservations = [...data.reservations].sort(
+				(a, b) => {
+					const dateA = a.date && a.date !== "N/A" ? new Date(a.date).getTime() : 0;
+					const dateB = b.date && b.date !== "N/A" ? new Date(b.date).getTime() : 0;
+					const validA = !isNaN(dateA) ? dateA : 0;
+					const validB = !isNaN(dateB) ? dateB : 0;
+					return validB - validA;
+				}
+			);
 
-				setPastReservations(sortedReservations);
-			} catch (err: any) {
-				console.error("Error fetching past reservations:", err);
-				setError(
-					localization.error_loading_reservations ||
-						"Failed to load past events"
-				);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchPastReservations();
+			setPastReservations(sortedReservations);
+		} catch (err: any) {
+			console.error("Error fetching past reservations:", err);
+			setError(
+				localization.error_loading_reservations ||
+					"Failed to load past events"
+			);
+		} finally {
+			setIsLoading(false);
+		}
 	}, [reservationsApiService]);
+
+	useEffect(() => {
+		fetchPastReservations();
+	}, [fetchPastReservations]);
 
 	/**
 	 * Handle event card click
@@ -151,16 +141,17 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 				{/* Past Events List */}
 				{!error && pastReservations.length > 0 && (
 					<div className="space-y-4 w-full md:w-1/2">
-						{pastReservations.map((reservation) => (
-							<ReservationCard
-								key={reservation.id}
-								reservation={reservation}
-								variant="past"
-								onClick={
-									onEventClick ? handleEventClick : undefined
-								}
-							/>
-						))}
+					{pastReservations.map((reservation) => (
+						<ReservationCard
+							key={reservation.id}
+							reservation={reservation}
+							variant="past"
+							onClick={
+								onEventClick ? handleEventClick : undefined
+							}
+							onFeedbackSubmitted={fetchPastReservations}
+						/>
+					))}
 					</div>
 				)}
 			</LoadingCard>

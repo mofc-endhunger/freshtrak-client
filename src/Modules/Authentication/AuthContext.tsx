@@ -13,6 +13,11 @@ import {
 import { AuthContextType } from "./types/authentication.types";
 import { StorageService, CognitoUser } from "../../Utils/StorageService";
 import { persistor } from "../../Store/store";
+import { useDispatch } from "react-redux";
+import { setCurrentLanguage } from "../../Store/languageSlice";
+import { setLanguage } from "../Localization/localizationUtils";
+import { getLanguageOptionById } from "../Localization/languageOptions";
+import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -21,6 +26,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+	const dispatch = useDispatch();
 	const [user, setUser] = useState<any | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	// Whether the user needs to complete household setup (null = not yet determined)
@@ -361,15 +367,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				StorageService.setItem("cognitoUser", userData);
 				StorageService.setItem("isLoggedIn", "true");
 
-				// Set userToken for registration system compatibility
-				if (accessToken) {
-					StorageService.setUserToken(accessToken);
-				} else {
-					console.warn(
-						"⚠️ AuthContext - No accessToken available to set userToken"
-					);
+			// Set userToken for registration system compatibility
+			if (accessToken) {
+				StorageService.setUserToken(accessToken);
+			} else {
+				console.warn(
+					"⚠️ AuthContext - No accessToken available to set userToken"
+				);
+			}
+			StorageService.removeItem("household_signup_state");
+
+			// Restore the user's preferred language from their profile
+			try {
+				const householdsApi = new HouseholdsApiService();
+				const profile = await householdsApi.getUsersMe();
+				if (profile?.language_id) {
+					const langCode = getLanguageOptionById(Number(profile.language_id))?.code ?? "en";
+					dispatch(setCurrentLanguage(langCode));
+					setLanguage(langCode);
 				}
-				StorageService.removeItem("household_signup_state");
+			} catch {
+				// Non-critical: language stays at default if profile fetch fails
+			}
 			}
 		} catch (error: any) {
 			console.warn("Sign in error:", error);

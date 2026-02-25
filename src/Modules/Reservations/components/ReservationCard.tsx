@@ -48,12 +48,14 @@ interface ReservationCardProps {
 	variant?: CardVariant;
 	/** Callback when card is clicked (optional) */
 	onClick?: (reservation: Reservation) => void;
+	/** Called after feedback is successfully submitted (final) */
+	onFeedbackSubmitted?: () => void;
 }
 
 /**
  * Format date string to readable format
  * Returns "N/A" for null/invalid dates
- * 
+ *
  * Note: Date-only strings (YYYY-MM-DD) are parsed as UTC by JavaScript.
  * We append T12:00:00 to treat them as local time and avoid timezone shifts.
  */
@@ -111,11 +113,17 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 	reservation,
 	variant = "upcoming",
 	onClick,
+	onFeedbackSubmitted,
 }) => {
-	const { event, date, timeslot, status } = reservation;
+	const { event, date, timeslot, status, survey } = reservation;
 	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
 	const isPast = variant === "past";
+
+	const showFeedbackButton =
+		isPast &&
+		survey != null &&
+		(survey.status === "in_progress" || survey.status === "scheduled");
 
 	/**
 	 * Handle card click
@@ -167,10 +175,11 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 							isPast ? "text-gray-500" : "text-gray-600"
 						}`}
 					>
-						{formatDate(date)} · {timeslot.start_time} - {timeslot.end_time}
+						{formatDate(date)} · {timeslot.start_time} -{" "}
+						{timeslot.end_time}
 					</p>
 
-					{/* Status badge and feedback button - only for past events */}
+					{/* Status badge and feedback button - only for past events with available survey */}
 					{isPast && status && (
 						<div className="flex items-center justify-between gap-2">
 							<Badge
@@ -179,14 +188,17 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 							>
 								{getStatusLabel(status)}
 							</Badge>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={handleFeedbackClick}
-								className="text-xs h-7 px-2 text-text-primary border-text-primary hover:bg-text-primary hover:text-white"
-							>
-								{localization.feedback_give_feedback || "Give Feedback"}
-							</Button>
+							{showFeedbackButton && (
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={handleFeedbackClick}
+									className="text-xs h-7 px-2 text-text-primary border-text-primary hover:bg-text-primary hover:text-white"
+								>
+									{localization.feedback_give_feedback ||
+										"Give Feedback"}
+								</Button>
+							)}
 						</div>
 					)}
 				</CardContent>
@@ -194,13 +206,14 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 
 			{/* Feedback Modal */}
 			{isPast && (
-				<FeedbackContainer
-					isOpen={isFeedbackOpen}
-					onClose={handleFeedbackClose}
-					registrationId={reservation.id || 0}
-					locationName={event.name}
-					visitDate={formatDate(date)}
-				/>
+			<FeedbackContainer
+				isOpen={isFeedbackOpen}
+				onClose={handleFeedbackClose}
+				registrationId={reservation.id || 0}
+				locationName={event.name}
+				visitDate={formatDate(date)}
+				onSubmitComplete={onFeedbackSubmitted}
+			/>
 			)}
 		</>
 	);

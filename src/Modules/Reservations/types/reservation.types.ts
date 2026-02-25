@@ -17,6 +17,27 @@
  */
 
 // ============================================================================
+// SURVEY AVAILABILITY TYPES
+// ============================================================================
+
+/**
+ * Survey status for a reservation, as returned by the backend.
+ *  - in_progress: survey is active / within feedback window, not yet submitted
+ *  - completed:   feedback already submitted
+ *  - scheduled:   survey exists but not yet active
+ */
+export type ReservationSurveyStatus =
+	| "in_progress"
+	| "completed"
+	| "scheduled";
+
+/** Survey data attached to a reservation (from GET /reservations) */
+export interface ReservationSurvey {
+	id: number;
+	status: ReservationSurveyStatus;
+}
+
+// ============================================================================
 // BACKEND API RESPONSE TYPES (Raw API Schema)
 // ============================================================================
 
@@ -53,6 +74,8 @@ export interface ReservationApiResponse {
 	household_id: number;
 	created_at: string; // ISO timestamp
 	updated_at: string; // ISO timestamp
+	/** Survey availability for this reservation (populated by backend when available) */
+	survey?: ReservationSurvey;
 }
 
 /**
@@ -110,6 +133,8 @@ export interface Reservation {
 	public_event_slot_id?: number;
 	/** Event date ID for feedback form lookup */
 	public_event_date_id?: number;
+	/** Survey availability — show "Give Feedback" only when status === 'available' */
+	survey?: ReservationSurvey;
 }
 
 /**

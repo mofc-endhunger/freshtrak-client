@@ -87,6 +87,7 @@ const MOCK_PAST_RESERVATIONS: Reservation[] = [
         updated_at: "2026-01-10T10:00:00.000Z",
         public_event_slot_id: 2026416,
         public_event_date_id: 397867,
+        survey: { id: 1, status: "in_progress" }, // Active survey
     },
     {
         id: 39913,
@@ -105,6 +106,7 @@ const MOCK_PAST_RESERVATIONS: Reservation[] = [
         updated_at: "2026-01-05T10:00:00.000Z",
         public_event_slot_id: 2026417,
         public_event_date_id: 397868,
+        survey: { id: 1, status: "completed" }, // Already submitted feedback
     },
     {
         id: 39914,
@@ -123,6 +125,7 @@ const MOCK_PAST_RESERVATIONS: Reservation[] = [
         updated_at: "2026-01-01T10:00:00.000Z",
         public_event_slot_id: 2026418,
         public_event_date_id: 397869,
+        survey: { id: 1, status: "scheduled" }, // Not yet active
     },
 ];
 
@@ -239,6 +242,8 @@ function transformReservation(apiReservation: ReservationApiResponse): Reservati
         updated_at: apiReservation.updated_at,
         public_event_slot_id: apiReservation.public_event_slot_id,
         public_event_date_id: apiReservation.public_event_date_id,
+        // Pass through survey availability when backend provides it
+        ...(apiReservation.survey !== undefined && { survey: apiReservation.survey }),
     };
 }
 

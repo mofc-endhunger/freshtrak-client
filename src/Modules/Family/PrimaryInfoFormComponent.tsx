@@ -10,6 +10,7 @@ import {
 import localization from "../Localization/LocalizationComponent";
 import { Button } from "../../components/ui/button";
 import { validateDobText, formatDateInput } from "./utils/dateValidation";
+import { getTranslatedLanguageOptions } from "../Localization/languageOptions";
 
 // Component props interface
 interface PrimaryInfoFormComponentProps {
@@ -173,7 +174,9 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					<option value="Jr">{localization.option_suffix_jr}</option>
 					<option value="Sr">{localization.option_suffix_sr}</option>
 					<option value="II">{localization.option_suffix_ii}</option>
-					<option value="III">{localization.option_suffix_iii}</option>
+					<option value="III">
+						{localization.option_suffix_iii}
+					</option>
 					<option value="IV">{localization.option_suffix_iv}</option>
 					<option value="V">{localization.option_suffix_v}</option>
 				</select>
@@ -216,7 +219,7 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					>
 						{String(
 							errors.date_of_birth?.message ||
-								localization.error_please_enter_valid_date
+								localization.error_please_enter_valid_date,
 						)}
 					</span>
 				)}
@@ -246,9 +249,15 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					{...register("gender", { required: true })}
 				>
 					<option value=""></option>
-					<option value="male">{localization.option_gender_male}</option>
-					<option value="female">{localization.option_gender_female}</option>
-					<option value="other">{localization.option_gender_other}</option>
+					<option value="male">
+						{localization.option_gender_male}
+					</option>
+					<option value="female">
+						{localization.option_gender_female}
+					</option>
+					<option value="other">
+						{localization.option_gender_other}
+					</option>
 					<option value="not_specify">
 						{localization.option_gender_prefer_not_to_say}
 					</option>
@@ -262,6 +271,51 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					</span>
 				)}
 			</div>
+
+			{/* Preferred Language (household setup only) */}
+			{isHouseholdSetup && (
+				<div className="space-y-2">
+					<label
+						htmlFor="preferred_language"
+						className="block text-sm font-medium text-gray-700"
+					>
+						{localization.label_preferred_language ||
+							"Preferred language"}
+						<span className="text-red-500 ml-1">*</span>
+					</label>
+					<select
+						className={`
+            w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
+            ${
+				errors?.preferred_language
+					? "border-red-500 focus:ring-red-500 focus:border-red-500"
+					: ""
+			}
+          `}
+						id="preferred_language"
+						data-testid="preferred-language-select"
+						{...register("preferred_language", {
+							required: isHouseholdSetup,
+						})}
+					>
+						{getTranslatedLanguageOptions().map((opt) => (
+							<option key={opt.id} value={opt.code}>
+								{opt.text}
+							</option>
+						))}
+					</select>
+					{errors?.preferred_language && (
+						<span
+							className="text-sm text-red-600"
+							data-testid="preferred-language-error"
+						>
+							{localization.error_please_select_valid_language ||
+								"Please select a language"}
+						</span>
+					)}
+				</div>
+			)}
 
 			{/* Continue Button */}
 			{!isHouseholdSetup && (

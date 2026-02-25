@@ -18,6 +18,7 @@ import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 import { RegistrationFormData } from "../../Registration/types/registration.types";
 import { ApiHouseholdMember } from "../types/api.types";
 import { getGenderFromId } from "../utils/householdUtils";
+import { getLanguageCodes, getLanguageOptionById } from "../../Localization/languageOptions";
 import localization from "../../Localization/LocalizationComponent";
 
 interface HouseholdRegistrationComponentProps {
@@ -112,6 +113,14 @@ const HouseholdRegistrationComponent: React.FC<
 				// These counts represent additional household members (not including head of household)
 				const apiCounts = userData.counts || { seniors: 0, adults: 0, children: 0 };
 				
+				const preferredLang =
+					(userData.preferred_language && getLanguageCodes().includes(userData.preferred_language)
+						? userData.preferred_language
+						: null)
+					?? (typeof userData.language_id === "number"
+						? getLanguageOptionById(userData.language_id)?.code
+						: undefined)
+					?? "en";
 				setPrefilledData({
 					first_name: primaryMember.first_name || "",
 					last_name: primaryMember.last_name || "",
@@ -122,6 +131,7 @@ const HouseholdRegistrationComponent: React.FC<
 					gender: getGenderForForm(
 						primaryMember.gender_id || null
 					),
+					preferred_language: preferredLang,
 					phone: userData.phone || "",
 					email: userData.email || "",
 					address_line_1: userData.address_line_1 || "",

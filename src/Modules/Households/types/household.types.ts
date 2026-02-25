@@ -94,7 +94,9 @@ export interface CreateHouseholdRequest {
   city: string;
   state: string;
   zip_code: string;
-  preferred_language: string;
+  /** Backend language table id; send id (not code) for POST/PATCH */
+  language_id?: number;
+  preferred_language?: string;
   notes?: string;
   primary_first_name: string;
   primary_last_name: string;
@@ -143,6 +145,9 @@ export interface UpdateHouseholdRequest {
   // Contact preferences
   permission_to_text: boolean | null;
   permission_to_email: boolean | null;
+  preferred_language?: string | null;
+  /** Backend language table id; sent on PATCH so backend can return in GET /users/me */
+  language_id?: number;
 }
 
 // Member creation request
@@ -206,8 +211,8 @@ export interface HouseholdAuditEntry {
   created_at: string;
 }
 
-// Language preference options
-export type LanguagePreference = 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'zh' | 'ja' | 'ko' | 'ar';
+// Language preference options (codes must match shared LANGUAGE_OPTIONS in Localization/languageOptions)
+export type LanguagePreference = 'en' | 'spa' | 'som' | 'rus' | 'tur' | 'ara' | 'zho' | 'hin' | 'nep' | 'tgl';
 
 // Utility types for age calculation
 export interface AgeCalculation {

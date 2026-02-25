@@ -8,17 +8,17 @@
  */
 
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Navigate } from "react-router-dom";
 import { useAuth } from "../Authentication/AuthContext";
 import { RENDER_URL } from "../../Utils/Urls";
-import { HouseholdDashboard } from "./HouseholdDashboard";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
-import { Household } from "./types/household.types";
 import HouseholdRegistrationComponent from "./components/HouseholdRegistrationComponent";
-import { AuthGuard } from "./components/AuthGuard";
 import { Button } from "../../components/ui/button";
-import { Settings } from "lucide-react";
 import { getGenderId } from "./utils/householdUtils";
+import { getLanguageOptionByCode, getLanguageOptionById } from "../Localization/languageOptions";
+import { setLanguage } from "../Localization/localizationUtils";
+import { setCurrentLanguage } from "../../Store/languageSlice";
+import { useDispatch } from "react-redux";
 import { storeHouseholdToLocalStorage } from "../../Utils/UserRecordHelper";
 import { StorageService } from "../../Utils/StorageService";
 import LoadingSpinner from "../General/LoadingSpinner";
@@ -31,9 +31,9 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 	className = "",
 }) => {
 	const { user, isAuthenticated } = useAuth();
+	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
-	const [household, setHousehold] = useState<Household | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [showSetupWizard, setShowSetupWizard] = useState(false);
@@ -76,7 +76,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							zip_code: "",
 							primary_date_of_birth: "",
 							permission_to_email: true,
-							preferred_language: "en",
+							language_id: 1, // English id in backend language table
 							adult_count: 0,
 							child_count: 0,
 							senior_count: 0,
@@ -105,61 +105,12 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				}
 			}
 
-			try {
-				setIsLoading(true);
-				setError(null);
-
-				// Get household ID from localStorage
-				const householdId =
-					StorageService.getItem<string>("householdId");
-				if (!householdId) {
-					throw new Error("No household ID found");
-				}
-
-				// Get household data
-				const householdResponse =
-					await householdsApiService.getHousehold(
-						parseInt(householdId)
-					);
-				setHousehold(householdResponse.data);
-			} catch (error: any) {
-				console.error("Error loading household data:", error);
-				setError(error.message || "Failed to load household data");
-			} finally {
-				setIsLoading(false);
-			}
+			// Not on setup route; no dashboard to show, redirect will happen
+			setIsLoading(false);
 		};
 
 		loadHouseholdData();
 	}, [isAuthenticated, user, householdsApiService, searchParams]);
-
-	// Handle household update
-	const handleHouseholdUpdate = async (householdData: any) => {
-		if (!household?.id) return;
-
-		try {
-			// Get current household data from /users/me to ensure we have complete object
-			const currentHouseholdData =
-				await householdsApiService.getUsersMe();
-
-			// Merge current data with updates, excluding updated_at
-			const { updated_at, ...currentDataWithoutTimestamp } =
-				currentHouseholdData;
-			const updateData = {
-				...currentDataWithoutTimestamp,
-				...householdData,
-			};
-
-			const response = await householdsApiService.updateHousehold(
-				household.id,
-				updateData
-			);
-			setHousehold(response.data);
-		} catch (error: any) {
-			console.error("Error updating household:", error);
-			setError(error.message || "Failed to update household");
-		}
-	};
 
 	// Handle setup completion
 	const handleSetupComplete = async (registrationData: any) => {
@@ -172,9 +123,12 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				await householdsApiService.getUsersMe();
 
 			// Update only the fields that were changed, keeping the rest from current data
-			// Exclude updated_at from the request
-			const { updated_at, ...currentDataWithoutTimestamp } =
+			// Exclude updated_at, language_id, preferred_language (API expects language_id only, not code)
+			const { updated_at, language_id: _currentLangId, preferred_language: _omitLangCode, ...currentDataWithoutTimestamp } =
 				currentHouseholdData;
+			const langCode = registrationData.preferred_language || currentHouseholdData.preferred_language || "en";
+			const languageOption = getLanguageOptionByCode(langCode);
+			const languageId = languageOption?.id ?? (_currentLangId !== undefined && _currentLangId !== null ? _currentLangId : undefined);
 			const updateData = {
 				...currentDataWithoutTimestamp,
 				address_line_1: registrationData.address_line_1 || null,
@@ -184,6 +138,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				zip_code: registrationData.zip_code || null,
 				phone: registrationData.phone || null,
 				email: registrationData.email || null,
+				...(languageId !== undefined && { language_id: languageId }),
 				// Contact preferences
 				permission_to_text: registrationData.permission_to_text ?? null,
 				permission_to_email:
@@ -357,6 +312,11 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				updateData
 			);
 
+			// Sync site language with the selected preference
+			const savedLangCode = getLanguageOptionById(languageId ?? 0)?.code ?? "en";
+			dispatch(setCurrentLanguage(savedLangCode));
+			setLanguage(savedLangCode);
+
 			// Set household completion status flag after successful PATCH
 			const currentSignUpState = StorageService.getHouseholdSignUpState();
 			StorageService.setHouseholdSignUpState({
@@ -429,51 +389,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 		);
 	}
 
-	// Show household dashboard
-	return (
-		<AuthGuard>
-			<div className={`min-h-screen bg-gray-50 ${className}`}>
-				<div className="max-w-7xl mx-auto p-4">
-					{/* Header */}
-					<div className="mb-8">
-						<div className="flex items-center justify-between">
-							<div>
-								<h1 className="text-3xl font-bold text-gray-900">
-									Household Management
-								</h1>
-								<p className="text-gray-600 mt-2">
-									Manage your family members and household
-									information
-								</p>
-							</div>
-							<div className="flex space-x-3">
-								<Button
-									variant="outline"
-									onClick={() =>
-										navigate(RENDER_URL.ACCOUNT_URL)
-									}
-								>
-									<Settings className="w-4 h-4 mr-2" />
-									Account Settings
-								</Button>
-							</div>
-						</div>
-					</div>
-
-					{/* Household Dashboard */}
-					{household && (
-						<HouseholdDashboard
-							household={household}
-							members={household.members || []}
-							onMemberStatusChange={async () => {}}
-							onHouseholdUpdate={handleHouseholdUpdate}
-							onError={setError}
-						/>
-					)}
-				</div>
-			</div>
-		</AuthGuard>
-	);
+	// Dashboard URL is not used; redirect to Account
+	return <Navigate to={RENDER_URL.ACCOUNT_URL} replace />;
 };
 
 export default HouseholdContainer;

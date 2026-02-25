@@ -45,9 +45,25 @@ import {
 	AlertCircle,
 } from "lucide-react";
 import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
-import { Household, LanguagePreference } from "../types/household.types";
+import { Household, LanguagePreference, UpdateHouseholdRequest } from "../types/household.types";
 import { useHouseholdSignUpIntegration } from "../services/HouseholdSignUpIntegration";
 import localization from "../../Localization/LocalizationComponent";
+import { LANGUAGE_OPTIONS, getLanguageOptionByCode, getLanguageOptionById, getLanguageCodes, getTranslatedLanguageOptions } from "../../Localization/languageOptions";
+import { setLanguage } from "../../Localization/localizationUtils";
+import { setCurrentLanguage } from "../../../Store/languageSlice";
+import { useDispatch } from "react-redux";
+
+/** Resolve a language code from whatever the API gave us (preferred_language string or language_id number). */
+function resolveLanguageCode(household: { preferred_language?: string | null; language_id?: number | null }): string {
+	const codes = getLanguageCodes();
+	if (household.preferred_language && codes.includes(household.preferred_language)) {
+		return household.preferred_language;
+	}
+	if (typeof household.language_id === "number") {
+		return getLanguageOptionById(household.language_id)?.code ?? "en";
+	}
+	return "en";
+}
 
 // Form validation schema - using function to access localization
 const getHouseholdInfoSchema = () =>
@@ -62,19 +78,7 @@ const getHouseholdInfoSchema = () =>
 		preferred_language: z
 			.string()
 			.refine(
-				(val) =>
-					[
-						"en",
-						"es",
-						"fr",
-						"de",
-						"it",
-						"pt",
-						"zh",
-						"ja",
-						"ko",
-						"ar",
-					].includes(val),
+				(val) => getTranslatedLanguageOptions().some((o) => o.code === val),
 				{ message: localization.error_please_select_valid_language }
 			),
 		notes: z.string().optional(),
@@ -87,6 +91,8 @@ interface HouseholdInfoManagerProps {
 	onUpdate?: (updatedHousehold: Household) => void;
 	onCancel?: () => void;
 	className?: string;
+	/** When true, show the edit form immediately (e.g. when opened from dashboard "Edit") so preferred language dropdown is visible without an extra click. */
+	defaultEditMode?: boolean;
 }
 
 export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
@@ -94,8 +100,10 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 	onUpdate,
 	onCancel,
 	className = "",
+	defaultEditMode = false,
 }) => {
-	const [isEditing, setIsEditing] = useState(false);
+	const dispatch = useDispatch();
+	const [isEditing, setIsEditing] = useState(defaultEditMode);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -120,8 +128,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 			city: household.city,
 			state: household.state,
 			zip_code: household.zip_code,
-			preferred_language:
-				household.preferred_language as LanguagePreference,
+			preferred_language: resolveLanguageCode(household) as LanguagePreference,
 			notes: household.notes || "",
 		},
 	});
@@ -132,23 +139,29 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 		setHasUnsavedChanges(isDirty);
 	}, [isDirty]);
 
-	// Language options
-	const languageOptions = [
-		{ value: "en", label: localization.option_language_english },
-		{ value: "es", label: localization.option_language_spanish },
-		{ value: "fr", label: localization.option_language_french },
-		{ value: "de", label: localization.option_language_german },
-		{ value: "it", label: localization.option_language_italian },
-		{ value: "pt", label: localization.option_language_portuguese },
-		{ value: "zh", label: localization.option_language_chinese },
-		{ value: "ja", label: localization.option_language_japanese },
-		{ value: "ko", label: localization.option_language_korean },
-		{ value: "ar", label: localization.option_language_arabic },
-	];
+	// Language options (shared list with header/household setup)
+	const languageOptions = useMemo(
+		() =>
+			getTranslatedLanguageOptions().map((opt) => ({
+				value: opt.code,
+				label: opt.text,
+			})),
+		[]
+	);
 
 	const handleEdit = () => {
 		setIsEditing(true);
 		setError(null);
+		// Reset form with current household so preferred_language is in sync (e.g. after API load)
+		reset({
+			address_line_1: household.address_line_1,
+			address_line_2: household.address_line_2 || "",
+			city: household.city,
+			state: household.state,
+			zip_code: household.zip_code,
+			preferred_language: resolveLanguageCode(household) as LanguagePreference,
+			notes: household.notes || "",
+		});
 	};
 
 	const handleCancel = () => {
@@ -185,35 +198,36 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 				await householdsApiService.getUsersMe();
 
 			// Prepare update data - merge current data with address updates
-			// Exclude updated_at from the request
-			const { updated_at, ...currentDataWithoutTimestamp } =
+			// Exclude updated_at, preferred_language (API expects language_id only, not code)
+			const { updated_at, preferred_language: _omitLangCode, ...currentDataWithoutTimestamp } =
 				currentHouseholdData;
-			const updateData = {
+			const languageOption = getLanguageOptionByCode(data.preferred_language);
+			const updatePayload = {
 				...currentDataWithoutTimestamp,
 				address_line_1: data.address_line_1 || null,
 				address_line_2: data.address_line_2 || null,
 				city: data.city || null,
 				state: data.state || null,
 				zip_code: data.zip_code || null,
-			};
-
-			// Optimistic update
-			// const optimisticHousehold = {
-			// 	...household,
-			// 	...updateData,
-			// 	updated_at: new Date().toISOString(),
-			// };
+				...(languageOption?.id !== undefined && { language_id: languageOption.id }),
+			} as UpdateHouseholdRequest;
 
 			// Update via API
 			const response = await householdsApiService.updateHousehold(
 				householdId,
-				updateData
+				updatePayload
 			);
 
 			// Success - update local state
 			setIsEditing(false);
 			setHasUnsavedChanges(false);
 			onUpdate?.(response.data);
+
+			// Sync site language with the saved preference
+			const savedLang = getLanguageOptionById(languageOption?.id ?? 0);
+			const langCode = savedLang?.code ?? "en";
+			dispatch(setCurrentLanguage(langCode));
+			setLanguage(langCode);
 
 			// Show success feedback
 			setTimeout(() => {
@@ -459,7 +473,11 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 							{localization.label_preferred_language_required}
 						</Label>
 						<Select
-							value={watchedValues.preferred_language}
+							value={
+								languageOptions.some((o) => o.value === watchedValues.preferred_language)
+									? watchedValues.preferred_language
+									: "en"
+							}
 							onValueChange={(value) =>
 								setValue(
 									"preferred_language",
@@ -468,6 +486,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 							}
 						>
 							<SelectTrigger
+								id="preferred_language"
 								className={
 									errors.preferred_language
 										? "border-red-500"
@@ -480,7 +499,7 @@ export const HouseholdInfoManager: React.FC<HouseholdInfoManagerProps> = ({
 									}
 								/>
 							</SelectTrigger>
-							<SelectContent>
+							<SelectContent className="z-[10000]" position="popper">
 								{languageOptions.map((option) => (
 									<SelectItem
 										key={option.value}

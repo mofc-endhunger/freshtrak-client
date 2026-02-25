@@ -344,6 +344,7 @@ export class HouseholdsApiService {
           state: data.state || '',
           zip_code: data.zip_code || '',
           preferred_language: data.preferred_language || 'en',
+          ...(data.language_id !== undefined && { language_id: data.language_id }),
           notes: data.notes || '',
           members: [],
           counts: { children: 0, adults: 1, seniors: 0, total: 1 },
@@ -357,7 +358,7 @@ export class HouseholdsApiService {
     }
 
     // Map the data to the new API format
-    const apiData = {
+    const apiData: Record<string, unknown> = {
       first_name: data.primary_first_name || '',
       last_name: data.primary_last_name || '',
       phone: data.phone || null,
@@ -369,6 +370,9 @@ export class HouseholdsApiService {
       permission_to_email: data.permission_to_email !== undefined ? data.permission_to_email : null,
       children_in_household: data.children_in_household !== undefined ? data.children_in_household : null,
     };
+    if (data.language_id !== undefined) {
+      apiData.language_id = data.language_id;
+    }
 
     const requestFn = () => this.axiosInstance.post(API_CONFIG.endpoints.createHousehold, apiData);
 

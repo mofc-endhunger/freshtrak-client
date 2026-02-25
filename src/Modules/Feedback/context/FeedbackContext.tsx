@@ -1,35 +1,10 @@
 /**
  * FeedbackContext
  *
- * Context provider for managing feedback form state and submission.
- * Aligned with backend PRD: docs/backend/feedback-prd.md
- *
- * ============================================================================
- * USAGE:
- * ============================================================================
- *
- * Wrap your feedback modal/container with the provider:
- *
- *   <FeedbackProvider
- *     registrationId={12345}
- *     onSubmitSuccess={() => { ... }}
- *   >
- *     <FeedbackModal />
- *   </FeedbackProvider>
- *
- * Then use the hook in child components:
- *
- *   const {
- *     questionnaire,
- *     formState,
- *     modalState,
- *     setRating,
- *     setComments,
- *     setQuestionResponse,
- *     submitFeedback,
- *   } = useFeedback();
- *
- * ============================================================================
+ * Context provider for managing the survey feedback form state and submission.
+ * Uses the new client-bundle API:
+ *   GET  /api/surveys/client-bundle?registration_id=...&language_id=...
+ *   POST /api/surveys/submit
  */
 
 import React, {
@@ -40,70 +15,48 @@ import React, {
 	useMemo,
 	useEffect,
 } from "react";
+import { useSelector } from "react-redux";
 import {
-	Questionnaire,
+	ClientBundleResponse,
+	SurveyQuestion,
 	FeedbackFormState,
 	FeedbackModalState,
-	FeedbackApiResponse,
-	QuestionResponseDraft,
 	QuestionResponsePayload,
 	createInitialFormState,
 	isFormValid,
-	formStateToSubmitRequest,
+	buildSubmitRequest,
 } from "../types";
 import { feedbackApiService } from "../../../Services/FeedbackApiService";
+import { selectLanguage } from "../../../Store/languageSlice";
+import { getLanguageOptionByCode } from "../../Localization/languageOptions";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-/**
- * Context value interface
- */
 interface FeedbackContextValue {
-	/** Registration ID */
 	registrationId: number;
-	/** Feedback ID from GET response (used for POST request) */
-	feedbackId: number | null;
-	/** Questionnaire configuration (null while loading) */
-	questionnaire: Questionnaire | null;
-	/** Existing feedback data (if already submitted) */
-	existingFeedback: FeedbackApiResponse | null;
-	/** Current form state */
+	bundle: ClientBundleResponse | null;
+	questions: SurveyQuestion[];
+	surveyTitle: string;
 	formState: FeedbackFormState;
-	/** Current modal state */
 	modalState: FeedbackModalState;
-	/** Whether form is valid for submission */
 	canSubmit: boolean;
-	/** Error message (if any) */
 	error: string | null;
-	/** Set overall rating (1-5) */
 	setRating: (rating: number) => void;
-	/** Set comments text */
 	setComments: (comments: string) => void;
-	/** Set question response (questionId, payload) */
 	setQuestionResponse: (questionId: number, payload: QuestionResponsePayload) => void;
-	/** Submit feedback */
 	submitFeedback: () => Promise<boolean>;
-	/** Reset form state */
+	saveProgress: () => void;
 	resetForm: () => void;
-	/** Clear error */
 	clearError: () => void;
-	/** Reload feedback data */
 	reload: () => Promise<void>;
 }
 
-/**
- * Provider props
- */
 interface FeedbackProviderProps {
-	/** Registration ID */
 	registrationId: number;
-	/** Callback on successful submission */
 	onSubmitSuccess?: () => void;
-	/** Callback on submission error */
 	onSubmitError?: (error: string) => void;
-	/** Children components */
 	children: React.ReactNode;
 }
 
@@ -123,119 +76,96 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 	onSubmitError,
 	children,
 }) => {
-	// State
-	const [feedbackId, setFeedbackId] = useState<number | null>(null);
-	const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(null);
-	const [existingFeedback, setExistingFeedback] = useState<FeedbackApiResponse | null>(null);
+	const currentLanguage = useSelector(selectLanguage) as string;
+
+	const [bundle, setBundle] = useState<ClientBundleResponse | null>(null);
 	const [formState, setFormState] = useState<FeedbackFormState>(createInitialFormState());
 	const [modalState, setModalState] = useState<FeedbackModalState>("loading");
 	const [error, setError] = useState<string | null>(null);
 
-	/**
-	 * Load feedback data from API
-	 */
-	const loadFeedback = useCallback(async () => {
+	const questions = useMemo<SurveyQuestion[]>(() => {
+		if (!bundle?.survey?.questions) return [];
+		return [...bundle.survey.questions].sort((a, b) => a.order - b.order);
+	}, [bundle]);
+
+	const surveyTitle = bundle?.survey?.title ?? "";
+
+	const loadBundle = useCallback(async () => {
 		setModalState("loading");
 		setError(null);
 
+		const langOption = getLanguageOptionByCode(currentLanguage);
+		const languageId = langOption?.id ?? 1;
+
 		try {
-			const response = await feedbackApiService.getFeedback(registrationId);
+			const response = await feedbackApiService.getClientBundle(registrationId, languageId);
+			setBundle(response);
 
-			setFeedbackId(response.id);
-			setQuestionnaire(response.questionnaire);
-			setExistingFeedback(response);
-
-			// No renderable content: empty questions = misconfigured survey, show friendly message
-			if (!response.questionnaire.questions?.length) {
+			if (!response.has_active || !response.survey?.questions?.length) {
 				setModalState("no_survey_found");
 				return;
 			}
 
-			if (response.has_submitted) {
+			if (response.progress?.status === "completed") {
 				setModalState("already_submitted");
-				const newFormState: FeedbackFormState = {
-					rating: response.rating || 0,
-					comments: response.comments || "",
-					responses: new Map(
-						response.responses.map((r) => [
-							r.question_id,
-							{
-								question_id: r.question_id,
-								scale_value: r.scale_value,
-								answer_value: r.answer_value,
-							},
-						])
-					),
-				};
-				setFormState(newFormState);
-			} else {
-				setModalState("form");
-				const newFormState = createInitialFormState();
-				response.questionnaire.questions.forEach((q) => {
-					newFormState.responses.set(q.id, { question_id: q.id });
-				});
-				setFormState(newFormState);
+				return;
 			}
+
+			setModalState("form");
+			const newFormState = createInitialFormState();
+			const prevMap = new Map<number, string>();
+			(response.survey.previous_responses ?? []).forEach((pr) => {
+				if (pr.question_id && pr.answer_value) {
+					prevMap.set(pr.question_id, pr.answer_value);
+				}
+			});
+			response.survey.questions.forEach((q) => {
+				const prev = prevMap.get(q.id);
+				newFormState.responses.set(q.id, {
+					question_id: q.id,
+					...(prev !== undefined && { answer_value: prev }),
+				});
+			});
+			setFormState(newFormState);
 		} catch (err: any) {
-			console.error("Failed to load feedback:", err);
+			console.error("Failed to load survey bundle:", err);
 			setError(err.message || "Failed to load feedback form");
 			setModalState("error");
 		}
-	}, [registrationId]);
+	}, [registrationId, currentLanguage]);
 
-	/**
-	 * Load feedback on mount
-	 */
 	useEffect(() => {
-		loadFeedback();
-	}, [loadFeedback]);
+		loadBundle();
+	}, [loadBundle]);
 
-	/**
-	 * Set overall rating
-	 */
 	const setRating = useCallback((rating: number) => {
-		setFormState((prev) => ({ ...prev, rating }));
+		setFormState((prev) => ({ ...prev, overall_rating: rating }));
 	}, []);
 
-	/**
-	 * Set comments
-	 */
 	const setComments = useCallback((comments: string) => {
 		setFormState((prev) => ({ ...prev, comments }));
 	}, []);
 
-	/**
-	 * Set question response
-	 */
 	const setQuestionResponse = useCallback((questionId: number, payload: QuestionResponsePayload) => {
 		setFormState((prev) => {
 			const newResponses = new Map(prev.responses);
 			const existing = newResponses.get(questionId) ?? { question_id: questionId };
-			const next: typeof existing = { ...existing };
-			if ('scaleValue' in payload) next.scale_value = payload.scaleValue;
-			if ('answerValue' in payload) next.answer_value = payload.answerValue;
-			newResponses.set(questionId, next);
+			newResponses.set(questionId, { ...existing, answer_value: payload.answerValue });
 			return { ...prev, responses: newResponses };
 		});
 	}, []);
 
-	/**
-	 * Check if form can be submitted
-	 */
 	const canSubmit = useMemo(() => {
-		return isFormValid(formState, questionnaire);
-	}, [formState, questionnaire]);
+		return isFormValid(formState, questions.length > 0 ? questions : null);
+	}, [formState, questions]);
 
-	/**
-	 * Submit feedback
-	 */
 	const submitFeedback = useCallback(async (): Promise<boolean> => {
 		if (!canSubmit) {
 			setError("Please complete all required fields");
 			return false;
 		}
 
-		if (!questionnaire || !registrationId) {
+		if (!bundle?.survey || !registrationId) {
 			setError("No survey available");
 			return false;
 		}
@@ -244,39 +174,58 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 		setError(null);
 
 		try {
-			const request = formStateToSubmitRequest(formState, questionnaire);
-			await feedbackApiService.submitFeedback(registrationId, request);
+			const request = buildSubmitRequest(
+				formState,
+				bundle.survey.id,
+				bundle.trigger.id,
+				registrationId,
+				true,
+			);
+			await feedbackApiService.submitSurvey(request);
 			setModalState("confirmation");
 			onSubmitSuccess?.();
 			return true;
 		} catch (err: any) {
-			console.error("Failed to submit feedback:", err);
+			console.error("Failed to submit survey:", err);
 			const errorMessage = err.message || "Failed to submit feedback";
 			setError(errorMessage);
 			setModalState("error");
 			onSubmitError?.(errorMessage);
 			return false;
 		}
-	}, [canSubmit, formState, questionnaire, registrationId, onSubmitSuccess, onSubmitError]);
+	}, [canSubmit, formState, bundle, registrationId, onSubmitSuccess, onSubmitError]);
 
-	/**
-	 * Reset form state
-	 */
+	const saveProgress = useCallback(() => {
+		if (!bundle?.survey || !registrationId) return;
+		const hasAnyAnswer = Array.from(formState.responses.values()).some(
+			(d) => d.answer_value?.trim(),
+		);
+		if (!hasAnyAnswer) return;
+
+		const request = buildSubmitRequest(
+			formState,
+			bundle.survey.id,
+			bundle.trigger.id,
+			registrationId,
+			false,
+		);
+		feedbackApiService.submitSurvey(request).catch((err) => {
+			console.warn("Failed to save survey progress:", err);
+		});
+	}, [formState, bundle, registrationId]);
+
 	const resetForm = useCallback(() => {
 		const newFormState = createInitialFormState();
-		if (questionnaire) {
-			questionnaire.questions.forEach((q) => {
+		if (bundle?.survey?.questions) {
+			bundle.survey.questions.forEach((q) => {
 				newFormState.responses.set(q.id, { question_id: q.id });
 			});
 		}
 		setFormState(newFormState);
 		setError(null);
 		setModalState("form");
-	}, [questionnaire]);
+	}, [bundle]);
 
-	/**
-	 * Clear error
-	 */
 	const clearError = useCallback(() => {
 		setError(null);
 		if (modalState === "error") {
@@ -284,20 +233,16 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 		}
 	}, [modalState]);
 
-	/**
-	 * Reload feedback data
-	 */
 	const reload = useCallback(async () => {
-		await loadFeedback();
-	}, [loadFeedback]);
+		await loadBundle();
+	}, [loadBundle]);
 
-	// Context value
 	const value = useMemo<FeedbackContextValue>(
 		() => ({
 			registrationId,
-			feedbackId,
-			questionnaire,
-			existingFeedback,
+			bundle,
+			questions,
+			surveyTitle,
 			formState,
 			modalState,
 			canSubmit,
@@ -306,15 +251,16 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 			setComments,
 			setQuestionResponse,
 			submitFeedback,
+			saveProgress,
 			resetForm,
 			clearError,
 			reload,
 		}),
 		[
 			registrationId,
-			feedbackId,
-			questionnaire,
-			existingFeedback,
+			bundle,
+			questions,
+			surveyTitle,
 			formState,
 			modalState,
 			canSubmit,
@@ -323,10 +269,11 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 			setComments,
 			setQuestionResponse,
 			submitFeedback,
+			saveProgress,
 			resetForm,
 			clearError,
 			reload,
-		]
+		],
 	);
 
 	return (
@@ -340,9 +287,6 @@ export const FeedbackProvider: React.FC<FeedbackProviderProps> = ({
 // HOOK
 // ============================================================================
 
-/**
- * Hook to access feedback context
- */
 export const useFeedback = (): FeedbackContextValue => {
 	const context = useContext(FeedbackContext);
 	if (context === undefined) {

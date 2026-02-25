@@ -32,33 +32,32 @@ import { FeedbackContainerProps } from "./types";
 const FeedbackContainerInternal: React.FC<{
 	isOpen: boolean;
 	onClose: () => void;
+	onSubmitComplete?: () => void;
 	locationName?: string;
 	visitDate?: string;
-}> = ({ isOpen, onClose, locationName, visitDate }) => {
-	const { modalState } = useFeedback();
+}> = ({ isOpen, onClose, onSubmitComplete, locationName, visitDate }) => {
+	const { modalState, saveProgress } = useFeedback();
 	const [showConfirmation, setShowConfirmation] = useState(false);
 
-	// Track when we transition to confirmation state
 	useEffect(() => {
 		if (modalState === "confirmation") {
 			setShowConfirmation(true);
 		}
 	}, [modalState]);
 
-	/**
-	 * Handle closing the feedback flow
-	 */
 	const handleClose = useCallback(() => {
+		if (modalState === "form") {
+			saveProgress();
+		}
 		setShowConfirmation(false);
 		onClose();
-	}, [onClose]);
+	}, [onClose, modalState, saveProgress]);
 
-	/**
-	 * Handle closing the confirmation
-	 */
 	const handleConfirmationClose = useCallback(() => {
-		handleClose();
-	}, [handleClose]);
+		setShowConfirmation(false);
+		onClose();
+		onSubmitComplete?.();
+	}, [onClose, onSubmitComplete]);
 
 	// Don't render anything if not open
 	if (!isOpen && !showConfirmation) {
@@ -95,16 +94,12 @@ const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
 	registrationId,
 	locationName,
 	visitDate,
+	onSubmitComplete,
 }) => {
-	const handleSubmitSuccess = useCallback(() => {
-		// Confirmation modal will be shown automatically via modalState
-	}, []);
-
 	const handleSubmitError = useCallback((error: string) => {
 		console.error("Feedback submission error:", error);
 	}, []);
 
-	// Don't render provider if not open (to avoid unnecessary API calls)
 	if (!isOpen) {
 		return null;
 	}
@@ -112,12 +107,12 @@ const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
 	return (
 		<FeedbackProvider
 			registrationId={registrationId}
-			onSubmitSuccess={handleSubmitSuccess}
 			onSubmitError={handleSubmitError}
 		>
 			<FeedbackContainerInternal
 				isOpen={isOpen}
 				onClose={onClose}
+				onSubmitComplete={onSubmitComplete}
 				locationName={locationName}
 				visitDate={visitDate}
 			/>

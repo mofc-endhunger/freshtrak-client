@@ -388,27 +388,15 @@ describe("EventSlotsModalComponent Accessibility", () => {
 				expect(radioButtons).toHaveLength(2);
 			});
 
-			// Tab to first focusable element (close button)
-			await user.tab();
-			const closeButton = screen.getByRole("button", { name: /close/i });
-			expect(closeButton).toHaveFocus();
-
-			// Tab to first radio button
+			// Tab to first focusable element (first radio button — no close button rendered)
 			await user.tab();
 			const firstRadio = screen.getByDisplayValue("slot1");
 			expect(firstRadio).toHaveFocus();
 
-			// Tab to second radio button
+			// Tab to Go Back button
 			await user.tab();
 			const backButton = screen.getByText("Go Back");
 			expect(backButton).toHaveFocus();
-
-			// Tab to continue button
-			await user.tab();
-			const dialogCloseButton = screen.getByRole("button", {
-				name: /close/i,
-			});
-			expect(dialogCloseButton).toHaveFocus();
 		});
 
 		it("should handle arrow key navigation for radio buttons", async () => {
@@ -521,7 +509,8 @@ describe("EventSlotsModalComponent Accessibility", () => {
 				expect(dialog).toBeInTheDocument();
 				expect(radiogroup).toBeInTheDocument();
 				expect(radioButtons).toHaveLength(2);
-				expect(buttons).toHaveLength(3);
+				// 2 buttons: "Go Back" and "Save and Continue" (close button is hidden via showCloseButton={false})
+				expect(buttons).toHaveLength(2);
 			});
 		});
 

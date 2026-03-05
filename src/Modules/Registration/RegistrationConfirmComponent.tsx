@@ -43,6 +43,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 	const navigate = useNavigate();
 	const currentUser = useSelector(selectUser) as RegistrationFormData | null;
 	const user_data = location.state?.user || currentUser || {};
+	const isCaseManager: boolean = location.state?.isCaseManager === true;
 
 	const dispatch = useDispatch();
 	const event = useSelector(selectEvent) as Event;
@@ -120,9 +121,10 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedEvent]);
 
-	// Show guest signin modal for guest users only
+	// Show guest signin modal for guest users only (not for case managers)
 	useEffect(() => {
-		// Only show modal if user is a guest user (not a Cognito user)
+		if (isCaseManager) return;
+
 		const isGuest = StorageService.isGuestUser();
 		const isCognito = StorageService.isLoggedInUser();
 
@@ -346,6 +348,23 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 									/>
 								</>
 							)}
+
+						{isCaseManager && location.state?.eventDateId && (
+							<div className="flex justify-center mt-6">
+								<Button
+									type="button"
+									variant="default"
+									className="min-w-48"
+									onClick={() =>
+										navigate(
+											`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${location.state.eventDateId}`
+										)
+									}
+								>
+									{localization.cm_register_another}
+								</Button>
+							</div>
+						)}
 
 						<Link to={RENDER_URL.ROOT_URL}>
 							<div className="flex justify-center mt-4">

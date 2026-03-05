@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Authentication/AuthContext";
 import { RENDER_URL } from "../../../Utils/Urls";
+import { StorageService } from "../../../Utils/StorageService";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -86,6 +87,8 @@ const UserAccountButton: React.FC = () => {
 		navigate(RENDER_URL.ROOT_URL);
 	};
 
+	const isCaseManager = StorageService.isCaseManager();
+
 	if (!user) {
 		return null;
 	}
@@ -125,6 +128,11 @@ const UserAccountButton: React.FC = () => {
 							<p className="text-xs text-gray-500 truncate">
 								{user.email}
 							</p>
+							{isCaseManager && (
+								<span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 rounded">
+									{localization.cm_badge}
+								</span>
+							)}
 						</div>
 					</div>
 				</div>
@@ -138,13 +146,15 @@ const UserAccountButton: React.FC = () => {
 					<span>{localization.menu_home}</span>
 				</DropdownMenuItem>
 
-				<DropdownMenuItem
-					onClick={handleAccountClick}
-					className="cursor-pointer hover:bg-gray-50"
-				>
-					<Settings className="mr-2 h-4 w-4" />
-					<span>{localization.title_account_settings}</span>
-				</DropdownMenuItem>
+				{!isCaseManager && (
+					<DropdownMenuItem
+						onClick={handleAccountClick}
+						className="cursor-pointer hover:bg-gray-50"
+					>
+						<Settings className="mr-2 h-4 w-4" />
+						<span>{localization.title_account_settings}</span>
+					</DropdownMenuItem>
+				)}
 
 				<DropdownMenuSeparator />
 

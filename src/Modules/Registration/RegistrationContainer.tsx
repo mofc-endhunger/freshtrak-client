@@ -545,7 +545,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	};
 
 	// Helper function to determine user type
-	const determineUserType = (): "guest" | "cognito" => {
+	const determineUserType = (): "guest" | "cognito" | "case_manager" => {
+		if (StorageService.isCaseManager()) {
+			return "case_manager";
+		}
 		if (StorageService.isLoggedInUser()) {
 			return "cognito";
 		}
@@ -707,7 +710,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	// Helper function to handle errors gracefully
 	const handleRegistrationError = (
 		error: any,
-		userType: "guest" | "cognito"
+		userType: "guest" | "cognito" | "case_manager"
 	) => {
 		console.error(`${userType} registration error:`, error);
 
@@ -762,7 +765,9 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		const userType = determineUserType();
 
 		try {
-			if (userType === "guest") {
+			if (userType === "case_manager") {
+				// Case manager flow: skip profile update; backend creates the registrant
+			} else if (userType === "guest") {
 				// Existing guest flow
 				// Get identification_code from stored user profile
 				const userProfile = StorageService.getGuestUser();
@@ -804,8 +809,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			// Handle authentication errors specifically
 			if (
 				handleAuthError(e, {
-					userType,
-					redirectPath: userType === "cognito" ? "/login" : "/",
+					userType: userType === "case_manager" ? "cognito" : userType,
+					redirectPath: userType === "cognito" || userType === "case_manager" ? "/login" : "/",
 					showToast,
 				})
 			) {
@@ -834,7 +839,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 		// Add counts in appropriate format based on user type
 		// Guest users: flat fields (seniors, adults, children)
-		// Registered users: nested counts object
+		// Registered users and case managers: nested counts object
 		const countsPayload =
 			userType === "guest"
 				? {
@@ -850,9 +855,29 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						},
 				  };
 
+		// For case managers, include registrant info so the backend creates a user on their behalf
+		const registrantPayload =
+			userType === "case_manager"
+				? {
+						registrant: {
+							first_name: updatedUser.first_name,
+							last_name: updatedUser.last_name,
+							phone: updatedUser.phone,
+							address_line_1: updatedUser.address_line_1,
+							address_line_2: updatedUser.address_line_2,
+							city: updatedUser.city,
+							state: updatedUser.state,
+							zip_code: updatedUser.zip_code,
+							seniors: updatedUser.seniors_in_household || 0,
+							adults: updatedUser.adults_in_household || 0,
+							children: updatedUser.children_in_household || 0,
+						},
+				  }
+				: {};
+
 		await axios.post<ApiResponse<any>>(
 			CREATE_RESERVATION,
-			{ ...basePayload, ...countsPayload },
+			{ ...basePayload, ...countsPayload, ...registrantPayload },
 			{ headers }
 		);
 			TagManager.dataLayer({
@@ -882,6 +907,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						end_time: location.state?.event_slot?.end_time,
 						event_slot_id: event_slot_id,
 					},
+					isCaseManager: userType === "case_manager",
 				},
 			});
 		} catch (e: any) {
@@ -890,8 +916,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			// Handle authentication errors specifically
 			if (
 				handleAuthError(e, {
-					userType,
-					redirectPath: userType === "cognito" ? "/login" : "/",
+					userType: userType === "case_manager" ? "cognito" : userType,
+					redirectPath: userType === "cognito" || userType === "case_manager" ? "/login" : "/",
 					showToast,
 				})
 			) {

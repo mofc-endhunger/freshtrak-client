@@ -43,4 +43,5 @@ export const RENDER_URL = {
 	HOUSEHOLD_SETUP_URL: "/households/setup",
 	LOGIN_URL: "/login",
 	USER_HOME_URL: "/user-home",
+	CASE_MANAGER_LOGIN_URL: "/case-manager/login",
 };

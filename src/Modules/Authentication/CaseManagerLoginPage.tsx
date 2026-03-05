@@ -11,11 +11,14 @@ import { RENDER_URL } from "../../Utils/Urls";
 import { StorageService } from "../../Utils/StorageService";
 import { useAuth } from "./AuthContext";
 import localization from "../Localization/LocalizationComponent";
+import { HomeIcon } from "lucide-react";
 
 const getSchema = () =>
 	z.object({
 		email: z.string().email(localization.error_please_enter_valid_email),
-		password: z.string().min(1, { message: localization.error_password_required }),
+		password: z
+			.string()
+			.min(1, { message: localization.error_password_required }),
 	});
 
 interface FormData {
@@ -81,7 +84,7 @@ const CaseManagerLoginPage: React.FC = () => {
 				// ignore sign-out errors during cleanup
 			}
 			setErrorMessage(
-				error?.message || localization.cm_login_error_generic
+				error?.message || localization.cm_login_error_generic,
 			);
 		} finally {
 			setIsSubmitting(false);
@@ -157,13 +160,22 @@ const CaseManagerLoginPage: React.FC = () => {
 					</Button>
 				</form>
 
-				<div className="text-center mt-6">
+				<div className="flex flex-col gap-2 text-center mt-6">
+					<Button
+						variant="ghost"
+						onClick={() => navigate(RENDER_URL.LOGIN_URL)}
+						className="text-gray-600 hover:text-gray-900"
+					>
+						← {localization.button_back || "Back"}
+					</Button>
 					<Button
 						variant="ghost"
 						onClick={() => navigate(RENDER_URL.ROOT_URL)}
 						className="text-gray-600 hover:text-gray-900"
 					>
-						← {localization.button_back_to_home || "Back to Home"}
+						{/* Home icon */}
+						<HomeIcon className="w-4 h-4" />
+						{localization.button_back_to_home || "Back to Home"}
 					</Button>
 				</div>
 			</div>

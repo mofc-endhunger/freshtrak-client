@@ -249,8 +249,11 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 								onOpenChange={setMobileMenu}
 							>
 								<DialogTrigger asChild>
-									<button
-										className="md:hidden text-white p-2 hover:bg-white/10 rounded-md transition-colors"
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										className="md:hidden text-white hover:bg-white/10"
 										aria-label={
 											localization.aria_open_mobile_menu
 										}
@@ -268,7 +271,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
 												d="M4 6h16M4 12h16M4 18h16"
 											/>
 										</svg>
-									</button>
+									</Button>
 								</DialogTrigger>
 								<DialogContent className="w-[300px] bg-primary text-white border-none">
 									<DialogHeader>

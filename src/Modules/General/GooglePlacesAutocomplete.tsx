@@ -1,4 +1,5 @@
 import React, { useState, useEffect, forwardRef } from "react";
+import { Input } from "../../components/ui/input";
 import localization from "../Localization/LocalizationComponent";
 
 interface GooglePlacesAutocompleteProps {
@@ -333,10 +334,9 @@ const GooglePlacesAutocomplete = forwardRef<
 
 	return (
 		<div className="places-autocomplete-container">
-			<input
+			<Input
 				ref={ref}
 				type="text"
-				className={className}
 				id={id}
 				name={name}
 				value={value}

@@ -1,10 +1,19 @@
 import React, { Fragment } from "react";
 import localization from "../Localization/LocalizationComponent";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "../../components/ui/select";
+import { Label } from "../../components/ui/label";
 
 interface StateDropdownProps {
 	register: any;
 	errors?: any;
 	value?: string;
+	onChange?: (value: string) => void;
 }
 
 // Mapping of state codes to localization keys
@@ -67,34 +76,44 @@ const StateDropdownComponent: React.FC<StateDropdownProps> = ({
 	register,
 	errors = {},
 	value,
+	onChange,
 }) => (
 	<Fragment>
 		<div className="ml-2 space-y-2">
-			<label
+			<Label
 				htmlFor="state"
 				className="block text-sm font-medium text-gray-700"
 			>
 				{localization.state}
 				<span className="text-red-500 ml-1">*</span>
-			</label>
-			<select
-				className={`w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
-					errors?.state
-						? "border-red-500 focus:ring-red-500 focus:border-red-500"
-						: "border-gray-300"
-				}`}
-				id="state"
-				name="state"
-				defaultValue={value}
-				{...register("state", { required: true })}
+			</Label>
+			<Select
+				value={value || ""}
+				onValueChange={(selectedValue) => {
+					if (onChange) onChange(selectedValue);
+					// Trigger form registration onChange if available
+					const registerResult = register("state", { required: true });
+					if (registerResult.onChange) {
+						registerResult.onChange({
+							target: { value: selectedValue, name: "state" },
+						});
+					}
+				}}
 			>
-				<option value=""></option>
-				{Object.entries(STATE_LOCALIZATION_MAP).map(([code, label]) => (
-					<option key={code} value={code}>
-						{label}
-					</option>
-				))}
-			</select>
+				<SelectTrigger
+					id="state"
+					className={errors?.state ? "border-red-500 focus:ring-red-500" : ""}
+				>
+					<SelectValue placeholder="Select State" />
+				</SelectTrigger>
+				<SelectContent>
+					{Object.entries(STATE_LOCALIZATION_MAP).map(([code, label]) => (
+						<SelectItem key={code} value={code}>
+							{label}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
 			{errors?.state && (
 				<span className="text-sm text-red-600">
 					{localization.error_field_required}

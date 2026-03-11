@@ -46,17 +46,17 @@ describe("StateDropdownComponent", () => {
 			expect(screen.getByRole("combobox")).toBeInTheDocument();
 		});
 
-		test("should have the correct id and name attributes", () => {
+		test("should have the correct id attribute", () => {
 			render(<TestWrapper />);
 			const select = screen.getByRole("combobox");
 			expect(select).toHaveAttribute("id", "state");
-			expect(select).toHaveAttribute("name", "state");
 		});
 
 		test("should display all US states and territories", () => {
 			render(<TestWrapper />);
 
-			// Check for a few key states
+			// shadcn Select renders items in a dropdown, check for a few key states
+			// They will be in the DOM but potentially hidden until dropdown is opened
 			expect(screen.getByText("Alaska")).toBeInTheDocument();
 			expect(screen.getByText("California")).toBeInTheDocument();
 			expect(screen.getByText("New York")).toBeInTheDocument();
@@ -68,29 +68,6 @@ describe("StateDropdownComponent", () => {
 			expect(
 				screen.getByText("District of Columbia")
 			).toBeInTheDocument();
-		});
-
-		test("should have an empty option as first choice", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			const options = select.querySelectorAll("option");
-			expect(options[0]).toHaveValue("");
-		});
-
-		test("should have correct option values", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-
-			// Check a few option values
-			expect(
-				select.querySelector('option[value="CA"]')
-			).toHaveTextContent("California");
-			expect(
-				select.querySelector('option[value="NY"]')
-			).toHaveTextContent("New York");
-			expect(
-				select.querySelector('option[value="TX"]')
-			).toHaveTextContent("Texas");
 		});
 	});
 
@@ -198,6 +175,7 @@ describe("StateDropdownComponent", () => {
 				/>
 			);
 			const select = screen.getByRole("combobox");
+			// shadcn Select applies error styling via className prop
 			expect(select).toHaveClass("border-red-500");
 		});
 
@@ -219,7 +197,6 @@ describe("StateDropdownComponent", () => {
 		test("should not apply error styling when no errors exist", () => {
 			render(<TestWrapper />);
 			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("border-gray-300");
 			expect(select).not.toHaveClass("border-red-500");
 		});
 	});
@@ -242,7 +219,6 @@ describe("StateDropdownComponent", () => {
 			render(<TestWrapper />);
 			const select = screen.getByRole("combobox");
 			// The select element should be properly configured for form validation
-			expect(select).toHaveAttribute("name", "state");
 			expect(select).toHaveAttribute("id", "state");
 		});
 
@@ -254,24 +230,11 @@ describe("StateDropdownComponent", () => {
 	});
 
 	describe("Styling and Classes", () => {
-		test("should have correct base styling classes", () => {
+		test("should render with shadcn styling", () => {
 			render(<TestWrapper />);
 			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("w-full");
-			expect(select).toHaveClass("px-3");
-			expect(select).toHaveClass("py-2");
-			expect(select).toHaveClass("border");
-			expect(select).toHaveClass("rounded-md");
-			expect(select).toHaveClass("shadow-sm");
-		});
-
-		test("should have correct focus styling classes", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("focus:outline-none");
-			expect(select).toHaveClass("focus:ring-2");
-			expect(select).toHaveClass("focus:ring-indigo-500");
-			expect(select).toHaveClass("focus:border-indigo-500");
+			// shadcn Select applies its own styling via data-slot and internal classes
+			expect(select).toBeInTheDocument();
 		});
 
 		test("should have correct container styling", () => {

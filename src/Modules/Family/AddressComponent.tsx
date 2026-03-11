@@ -8,6 +8,8 @@ import {
 import StateDropdownComponent from "./StateDropdownComponent";
 import localization from "../Localization/LocalizationComponent";
 import GooglePlacesAutocomplete from "../General/GooglePlacesAutocomplete";
+import { Label } from "../../components/ui/label";
+import { Input } from "../../components/ui/input";
 
 // Component props interface
 interface AddressComponentProps {
@@ -119,15 +121,15 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 				{localization.register_where_you_live}
 			</h2>
 
-			{/* Street Address Field */}
-			<div className="space-y-2">
-				<label
-					htmlFor="address_line_1"
-					className="block text-sm font-medium text-gray-700"
-				>
-					{localization.street_address}
-					<span className="text-red-500 ml-1">*</span>
-				</label>
+		{/* Street Address Field */}
+		<div className="space-y-2">
+			<Label
+				htmlFor="address_line_1"
+				className="block text-sm font-medium text-gray-700"
+			>
+				{localization.street_address}
+				<span className="text-red-500 ml-1">*</span>
+			</Label>
 				<GooglePlacesAutocomplete
 					value={addressLine1}
 					onSelect={handleSelect}
@@ -157,58 +159,52 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 				)}
 			</div>
 
-			{/* Address Line 2 Field */}
-			<div className="space-y-2">
-				<label
-					htmlFor="address_line_2"
-					className="block text-sm font-medium text-gray-700"
-				>
-					{localization.lot_suite}
-				</label>
-				<input
-					type="text"
-					className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-								placeholder-gray-400 focus:outline-none focus:ring-2
-								focus:ring-indigo-500 focus:border-indigo-500"
-					id="address_line_2"
-					data-testid="address-line-2-input"
-					{...register("address_line_2")}
-				/>
-			</div>
+		{/* Address Line 2 Field */}
+		<div className="space-y-2">
+			<Label
+				htmlFor="address_line_2"
+				className="block text-sm font-medium text-gray-700"
+			>
+				{localization.lot_suite}
+			</Label>
+			<Input
+				type="text"
+				id="address_line_2"
+				data-testid="address-line-2-input"
+				{...register("address_line_2")}
+			/>
+		</div>
 
 			{/* City, State, Zip Row */}
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-				{/* City Field */}
-				<div className="space-y-2">
-					<label
-						htmlFor="city"
-						className="block text-sm font-medium text-gray-700"
+			{/* City Field */}
+			<div className="space-y-2">
+				<Label
+					htmlFor="city"
+					className="block text-sm font-medium text-gray-700"
+				>
+					{localization.city}
+					<span className="text-red-500 ml-1">*</span>
+				</Label>
+				<Input
+					type="text"
+					id="city"
+					defaultValue={cityName}
+					data-testid="city-input"
+					className={
+						errors.city ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
+					}
+					{...register("city", { required: true })}
+				/>
+				{errors.city && (
+					<span
+						className="text-sm text-red-600"
+						data-testid="city-error"
 					>
-						{localization.city}
-						<span className="text-red-500 ml-1">*</span>
-					</label>
-					<input
-						type="text"
-						className={`
-							w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-							placeholder-gray-400 focus:outline-none focus:ring-2
-							focus:ring-indigo-500 focus:border-indigo-500
-							${errors.city ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""}
-						`}
-						id="city"
-						defaultValue={cityName}
-						data-testid="city-input"
-						{...register("city", { required: true })}
-					/>
-					{errors.city && (
-						<span
-							className="text-sm text-red-600"
-							data-testid="city-error"
-						>
-							{localization.error_field_required}
-						</span>
-					)}
-				</div>
+						{localization.error_field_required}
+					</span>
+				)}
+			</div>
 
 				{/* State Dropdown */}
 				<div className="space-y-2">
@@ -219,41 +215,34 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 					/>
 				</div>
 
-				{/* Zip Code Field */}
-				<div className="space-y-2">
-					<label
-						htmlFor="zip_code"
-						className="block text-sm font-medium text-gray-700"
+			{/* Zip Code Field */}
+			<div className="space-y-2">
+				<Label
+					htmlFor="zip_code"
+					className="block text-sm font-medium text-gray-700"
+				>
+					{localization.zip_code}
+					<span className="text-red-500 ml-1">*</span>
+				</Label>
+				<Input
+					type="text"
+					defaultValue={zip}
+					id="zip_code"
+					data-testid="zip-code-input"
+					className={
+						errors.zip_code ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
+					}
+					{...register("zip_code", { required: true })}
+				/>
+				{errors.zip_code && (
+					<span
+						className="text-sm text-red-600"
+						data-testid="zip-code-error"
 					>
-						{localization.zip_code}
-						<span className="text-red-500 ml-1">*</span>
-					</label>
-					<input
-						type="text"
-						className={`
-							w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-							placeholder-gray-400 focus:outline-none focus:ring-2
-							focus:ring-indigo-500 focus:border-indigo-500
-							${
-								errors.zip_code
-									? "border-red-500 focus:ring-red-500 focus:border-red-500"
-									: ""
-							}
-						`}
-						defaultValue={zip}
-						id="zip_code"
-						data-testid="zip-code-input"
-						{...register("zip_code", { required: true })}
-					/>
-					{errors.zip_code && (
-						<span
-							className="text-sm text-red-600"
-							data-testid="zip-code-error"
-						>
-							{localization.error_field_required}
-						</span>
-					)}
-				</div>
+						{localization.error_field_required}
+					</span>
+				)}
+			</div>
 			</div>
 		</div>
 	);

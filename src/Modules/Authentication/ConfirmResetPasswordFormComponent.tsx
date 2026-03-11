@@ -157,20 +157,21 @@ const ConfirmResetPasswordFormComponent: React.FC<
 					)}
 				</Button>
 
-				{onBackToReset && (
-					<div className="text-center">
-						<p className="text-sm text-gray-600">
-							Didn't receive the code?{" "}
-							<button
-								type="button"
-								onClick={onBackToReset}
-								className="text-primary hover:underline font-medium"
-							>
-								Resend Code
-							</button>
-						</p>
-					</div>
-				)}
+			{onBackToReset && (
+				<div className="text-center">
+					<p className="text-sm text-gray-600">
+						Didn't receive the code?{" "}
+						<Button
+							type="button"
+							variant="link"
+							onClick={onBackToReset}
+							className="text-primary hover:underline font-medium p-0 h-auto"
+						>
+							Resend Code
+						</Button>
+					</p>
+				</div>
+			)}
 			</div>
 		</form>
 	);

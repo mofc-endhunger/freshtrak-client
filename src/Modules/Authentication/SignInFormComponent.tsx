@@ -128,17 +128,17 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 				)}
 			</div>
 
-			{onForgotPassword && (
-				<div className="text-right">
-					<button
-						type="button"
-						onClick={onForgotPassword}
-						className="text-sm text-primary hover:underline"
-					>
-						{localization.button_forgot_password}
-					</button>
-				</div>
-			)}
+		{onForgotPassword && (
+			<div className="text-right">
+				<Button
+					type="button"
+					variant="link"
+					onClick={onForgotPassword}
+				>
+					{localization.button_forgot_password}
+				</Button>
+			</div>
+		)}
 
 			<div className="space-y-3">
 				<Button
@@ -156,20 +156,21 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
 					)}
 				</Button>
 
-				{onSwitchToSignUp && (
-					<div className="text-center">
-						<p className="text-sm text-gray-600">
-							{localization.description_dont_have_account}{" "}
-							<button
-								type="button"
-								onClick={onSwitchToSignUp}
-								className="text-primary hover:underline font-medium"
-							>
-								{localization.button_sign_up}
-							</button>
-						</p>
-					</div>
-				)}
+			{onSwitchToSignUp && (
+				<div className="text-center">
+					<p className="text-sm text-gray-600">
+						{localization.description_dont_have_account}{" "}
+						<Button
+							type="button"
+							variant="link"
+							onClick={onSwitchToSignUp}
+							className="h-auto p-0 font-medium"
+						>
+							{localization.button_sign_up}
+						</Button>
+					</p>
+				</div>
+			)}
 			</div>
 		</form>
 	);

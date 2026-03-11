@@ -192,20 +192,21 @@ const SignUpFormComponent: React.FC<SignUpFormComponentProps> = ({
 					)}
 				</Button>
 
-				{onSwitchToSignIn && (
-					<div className="text-center">
-						<p className="text-sm text-gray-600">
-							{localization.description_already_have_account}{" "}
-							<button
-								type="button"
-								onClick={onSwitchToSignIn}
-								className="text-primary hover:underline font-medium"
-							>
-								{localization.button_sign_in || "Sign In"}
-							</button>
-						</p>
-					</div>
-				)}
+			{onSwitchToSignIn && (
+				<div className="text-center">
+					<p className="text-sm text-gray-600">
+						{localization.description_already_have_account}{" "}
+						<Button
+							type="button"
+							variant="link"
+							onClick={onSwitchToSignIn}
+							className="h-auto p-0 font-medium"
+						>
+							{localization.button_sign_in || "Sign In"}
+						</Button>
+					</p>
+				</div>
+			)}
 			</div>
 		</form>
 	);

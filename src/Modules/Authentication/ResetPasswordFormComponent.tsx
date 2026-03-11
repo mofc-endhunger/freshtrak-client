@@ -95,20 +95,21 @@ const ResetPasswordFormComponent: React.FC<ResetPasswordFormComponentProps> = ({
 					)}
 				</Button>
 
-				{onBackToSignIn && (
-					<div className="text-center">
-						<p className="text-sm text-gray-600">
-							{localization.description_remember_password}{" "}
-							<button
-								type="button"
-								onClick={onBackToSignIn}
-								className="text-primary hover:underline font-medium"
-							>
-								{localization.button_sign_in || "Sign In"}
-							</button>
-						</p>
-					</div>
-				)}
+			{onBackToSignIn && (
+				<div className="text-center">
+					<p className="text-sm text-gray-600">
+						{localization.description_remember_password}{" "}
+						<Button
+							type="button"
+							variant="link"
+							onClick={onBackToSignIn}
+							className="text-primary hover:underline font-medium p-0 h-auto"
+						>
+							{localization.button_sign_in || "Sign In"}
+						</Button>
+					</p>
+				</div>
+			)}
 			</div>
 		</form>
 	);

@@ -2,6 +2,7 @@ import React, { Fragment, useState } from "react";
 
 import { EventNearByComponentProps } from "./types/home.types";
 import localization from "../Localization/LocalizationComponent";
+import { Button } from "../../components/ui/button";
 
 /**
  * EventNearByComponent - Custom accordion component for displaying resource events
@@ -37,27 +38,28 @@ const EventNearByComponent: React.FC<EventNearByComponentProps> = props => {
 				{localization.title_resource_events || "Resource Events"}
 			</h2>
 			<div className="space-y-4">
-				{/* Accordion Item 1: Events Today */}
-				<div className="border border-gray-200 rounded-lg overflow-hidden">
-					<button
-						onClick={() => toggleAccordion("0")}
-						className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between"
-						aria-expanded={isActive("0")}
-						aria-controls="accordion-content-0"
+			{/* Accordion Item 1: Events Today */}
+			<div className="border border-gray-200 rounded-lg overflow-hidden">
+				<Button
+					onClick={() => toggleAccordion("0")}
+					variant="ghost"
+					className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between h-auto"
+					aria-expanded={isActive("0")}
+					aria-controls="accordion-content-0"
+				>
+					<span className="font-medium text-gray-900 text-sm sm:text-base">
+						{localization.title_events_today || "Events Today"}
+					</span>
+					<span
+						role="img"
+						aria-label={localization.aria_expand_collapse}
+						className={`transform transition-transform duration-200 ${
+							isActive("0") ? "rotate-180" : ""
+						}`}
 					>
-						<span className="font-medium text-gray-900 text-sm sm:text-base">
-							{localization.title_events_today || "Events Today"}
-						</span>
-						<span
-							role="img"
-							aria-label={localization.aria_expand_collapse}
-							className={`transform transition-transform duration-200 ${
-								isActive("0") ? "rotate-180" : ""
-							}`}
-						>
-							👇🏻
-						</span>
-					</button>
+						👇🏻
+					</span>
+				</Button>
 					{isActive("0") && (
 						<div
 							id="accordion-content-0"
@@ -68,27 +70,28 @@ const EventNearByComponent: React.FC<EventNearByComponentProps> = props => {
 					)}
 				</div>
 
-				{/* Accordion Item 2: Events for Next 7 days */}
-				<div className="border border-gray-200 rounded-lg overflow-hidden">
-					<button
-						onClick={() => toggleAccordion("1")}
-						className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between"
-						aria-expanded={isActive("1")}
-						aria-controls="accordion-content-1"
+			{/* Accordion Item 2: Events for Next 7 days */}
+			<div className="border border-gray-200 rounded-lg overflow-hidden">
+				<Button
+					onClick={() => toggleAccordion("1")}
+					variant="ghost"
+					className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between h-auto"
+					aria-expanded={isActive("1")}
+					aria-controls="accordion-content-1"
+				>
+					<span className="font-medium text-gray-900 text-sm sm:text-base">
+						{localization.title_events_next_7_days || "Events for Next 7 days"}
+					</span>
+					<span
+						role="img"
+						aria-label={localization.aria_expand_collapse}
+						className={`transform transition-transform duration-200 ${
+							isActive("1") ? "rotate-180" : ""
+						}`}
 					>
-						<span className="font-medium text-gray-900 text-sm sm:text-base">
-							{localization.title_events_next_7_days || "Events for Next 7 days"}
-						</span>
-						<span
-							role="img"
-							aria-label={localization.aria_expand_collapse}
-							className={`transform transition-transform duration-200 ${
-								isActive("1") ? "rotate-180" : ""
-							}`}
-						>
-							👇🏻
-						</span>
-					</button>
+						👇🏻
+					</span>
+				</Button>
 					{isActive("1") && (
 						<div
 							id="accordion-content-1"
@@ -99,27 +102,28 @@ const EventNearByComponent: React.FC<EventNearByComponentProps> = props => {
 					)}
 				</div>
 
-				{/* Accordion Item 3: Events for Next 30 days */}
-				<div className="border border-gray-200 rounded-lg overflow-hidden">
-					<button
-						onClick={() => toggleAccordion("2")}
-						className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between"
-						aria-expanded={isActive("2")}
-						aria-controls="accordion-content-2"
+			{/* Accordion Item 3: Events for Next 30 days */}
+			<div className="border border-gray-200 rounded-lg overflow-hidden">
+				<Button
+					onClick={() => toggleAccordion("2")}
+					variant="ghost"
+					className="w-full px-4 sm:px-6 py-3 sm:py-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-between h-auto"
+					aria-expanded={isActive("2")}
+					aria-controls="accordion-content-2"
+				>
+					<span className="font-medium text-gray-900 text-sm sm:text-base">
+						{localization.title_events_next_30_days || "Events for Next 30 days"}
+					</span>
+					<span
+						role="img"
+						aria-label={localization.aria_expand_collapse}
+						className={`transform transition-transform duration-200 ${
+							isActive("2") ? "rotate-180" : ""
+						}`}
 					>
-						<span className="font-medium text-gray-900 text-sm sm:text-base">
-							{localization.title_events_next_30_days || "Events for Next 30 days"}
-						</span>
-						<span
-							role="img"
-							aria-label={localization.aria_expand_collapse}
-							className={`transform transition-transform duration-200 ${
-								isActive("2") ? "rotate-180" : ""
-							}`}
-						>
-							👇🏻
-						</span>
-					</button>
+						👇🏻
+					</span>
+				</Button>
 					{isActive("2") && (
 						<div
 							id="accordion-content-2"

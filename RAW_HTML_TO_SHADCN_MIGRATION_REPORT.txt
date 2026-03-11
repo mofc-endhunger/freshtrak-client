@@ -1,0 +1,250 @@
+FreshTrak Client: Raw HTML to shadcn/ui Migration Analysis
+============================================================
+
+EXECUTIVE SUMMARY
+-----------------
+This analysis identifies all raw HTML elements and Bootstrap components 
+that should be replaced with shadcn/ui components.
+
+KEY FINDINGS:
+- Raw <button> elements: 25+ instances across 10+ files
+- Raw <input> elements: 20+ instances across 8+ files  
+- Raw <select> elements: 5 instances across 4 files
+- Raw <label> elements: 4 instances
+- Bootstrap classes: btn, form-group, form-control, btn-toggle
+- react-router-bootstrap LinkContainer: 2 files
+- Priority: HIGH
+
+CRITICAL FILES REQUIRING UPDATES (Complete replacement needed)
+==============================================================
+
+1. src/Modules/Family/PrimaryInfoFormComponent.tsx
+   Lines: 70-92, 101-220+
+   Issues:
+   - Raw <input type="text"> for first_name, last_name, date_of_birth
+   - Raw <select> for gender selection
+   - Raw <label> elements
+   Recommendation: Replace all with Input, Select, Label components
+
+2. src/Modules/Family/StateDropdownComponent.tsx
+   Lines: 73-97
+   Issues:
+   - Raw <select> for state dropdown
+   - Raw <label> for "State"
+   Recommendation: Use <Select> and <Label> components
+
+3. src/Modules/Family/AddressComponent.tsx
+   Lines: ~100-262
+   Issues:
+   - Raw <input> elements for address fields
+   Recommendation: Use <Input> component for all
+
+4. src/Modules/Family/ContactInformationComponent.tsx
+   Lines: 185-191, 201-206, 213+
+   Issues:
+   - Multiple raw <input type="checkbox">
+   - Raw <label> elements
+   Recommendation: Use <Checkbox> and <Label> components
+
+5. src/Modules/Events/EventCardComponent.tsx
+   Lines: 5, 117-137, 249-265
+   Issues:
+   - Import: react-router-bootstrap LinkContainer (line 5)
+   - Raw <button> with "btn" class (lines 119, 250, 261)
+   - Usage: <LinkContainer> wrapper (lines 116-138)
+   Recommendation: 
+   - Replace LinkContainer with React Router <Link>
+   - Use <Button> component instead of raw <button>
+   - Remove "btn" class
+
+6. src/Modules/Family/templates/BaseComponentTemplate.tsx
+   Lines: 126-143, 175-194, 215-250
+   Issues:
+   - Raw <button> elements in BaseForm template
+   - Raw <input> in BaseInput template
+   - Raw <select> in template
+   Recommendation: Update template to use shadcn components
+
+HIGH PRIORITY FILES
+===================
+
+7. src/Modules/Authentication/SignInFormComponent.tsx
+   Lines: 133-139, 163-169
+   Issues:
+   - Raw <button> for "Forgot Password" (line 133)
+   - Raw <button> for "Sign Up" link (line 163)
+   Recommendation: Use <Button variant="link"> component
+
+8. src/Modules/Authentication/SignUpFormComponent.tsx
+   Lines: 199-205
+   Issues:
+   - Raw <button> for "Sign In" link
+   Recommendation: Use <Button variant="link"> component
+
+9. src/Modules/Authentication/ResetPasswordFormComponent.tsx
+   Lines: ~105
+   Issues:
+   - Raw <button> for navigation
+   Recommendation: Use <Button variant="link"> component
+
+10. src/Modules/Authentication/ConfirmResetPasswordFormComponent.tsx
+    Lines: ~142
+    Issues:
+    - Raw <button> for back navigation
+    Recommendation: Use <Button variant="link"> component
+
+11. src/Modules/Events/EventListComponent.tsx
+    Lines: 82-91
+    Issues:
+    - Raw radio <input> (commented out, lines 82, 84)
+    - Raw <select> with "form-control" Bootstrap class (line 91)
+    - Raw <label> with "btn-toggle" class (lines 83, 85, 90)
+    Recommendation: 
+    - Use <ToggleGroup> or <SegmentedControl> for radio buttons
+    - Use <Select> component for dropdown
+    - Use <Label> for labels
+    - Remove Bootstrap classes (form-control, btn-toggle, form-group)
+
+12. src/Modules/Home/EventNearByComponent.tsx
+    Lines: 42-60, 73-91, 104-122
+    Issues:
+    - Custom accordion implementation with raw <button> elements
+    Recommendation: Replace entire accordion with shadcn <Accordion> component
+
+13. src/Modules/Households/components/HouseholdSignUpWrapper.tsx
+    Lines: 316-321, 322-327
+    Issues:
+    - Raw <button> elements with custom inline Tailwind (lines 316, 322)
+    Recommendation: Use <Button> component instead
+
+14. src/Modules/Households/components/HouseholdCompletionPrompt.tsx
+    Lines: 148-153, 243-248
+    Issues:
+    - Raw <button> close buttons with custom styling
+    Recommendation: Use <Button variant="ghost"> with size="sm"
+
+MEDIUM PRIORITY FILES
+=====================
+
+15. src/Modules/Family/FamilyContainer.tsx
+    Lines: 129-170
+    Issues:
+    - Raw <button type="submit"> with custom styling
+    Recommendation: Use <Button type="submit"> component
+
+16. src/Modules/General/HouseHoldEligibilityComponent.tsx
+    Lines: 54-60
+    Issues:
+    - Raw <button> for "View Guidelines"
+    Recommendation: Use <Button variant="link"> component
+
+17. src/Modules/Events/ResourceListComponent.tsx
+    Lines: 168-172
+    Issues:
+    - LinkContainer usage (react-router-bootstrap)
+    Recommendation: Replace with React Router <Link> component
+
+18. src/Modules/Header/components/UserAccountButton.tsx
+    Lines: 99-105
+    Issues:
+    - Already using shadcn components correctly (DropdownMenu)
+    Status: NO CHANGES NEEDED
+
+19. src/Modules/Header/HeaderComponent.tsx
+    Issues:
+    - Pattern match indicates raw buttons
+    Recommendation: Review and replace with Button component
+
+20. src/Modules/General/GooglePlacesAutocomplete.tsx
+    Issues:
+    - Raw <input> for autocomplete
+    Recommendation: Wrap with <Input> component
+
+21. src/Modules/General/SearchComponent.tsx
+    Issues:
+    - Multiple raw <input> fields
+    Recommendation: Use <Input> component
+
+COMPONENT MAPPING REFERENCE
+===========================
+
+Raw HTML               → shadcn/ui Component
+<button type="button"> → <Button variant="default">
+<button> (link style)  → <Button variant="link">
+<button> (outline)     → <Button variant="outline">
+<button> (ghost)       → <Button variant="ghost">
+<input type="text">    → <Input>
+<input type="checkbox">→ <Checkbox>
+<input type="radio">   → <RadioGroup> or <ToggleGroup>
+<select>              → <Select>
+<label>               → <Label>
+Accordion (custom)    → <Accordion>
+LinkContainer         → React Router <Link>
+
+BOOTSTRAP CLASSES TO REMOVE
+===========================
+
+Pattern: "btn" class
+Files: EventCardComponent.tsx (lines 119, 250, 261)
+Fix: Remove "btn" class, use <Button> component
+
+Pattern: "form-group" and "form-control"
+Files: EventListComponent.tsx (lines 89, 91)
+Fix: Use shadcn form components, remove Bootstrap wrapper
+
+Pattern: "btn-toggle"
+Files: EventListComponent.tsx (lines 83, 85)
+Fix: Use <ToggleGroup> component, custom component, or <SegmentedControl>
+
+REACT-ROUTER-BOOTSTRAP REMOVAL
+===============================
+
+Files using LinkContainer:
+1. src/Modules/Events/EventCardComponent.tsx (line 116)
+2. src/Modules/Events/ResourceListComponent.tsx (line 168)
+
+Migration approach:
+- Replace <LinkContainer to={url}><button>...</button></LinkContainer>
+- With: <Button asChild><Link to={url}>...</Link></Button>
+- Or: Use useNavigate() hook and onClick handler
+
+MIGRATION STRATEGY
+==================
+
+Phase 1: High Priority (Week 1)
+- Family module form inputs (Primary, Address, State, Contact)
+- Authentication form buttons
+- Replace Input, Select, Label, Checkbox components
+
+Phase 2: High Priority (Week 2)
+- Event components (EventCard, EventList)
+- Household components
+- Remove react-router-bootstrap
+
+Phase 3: Medium Priority (Week 3)
+- Remaining components (FamilyContainer, Header, etc.)
+- Update BaseComponentTemplate.tsx (template pattern)
+
+Phase 4: Low Priority (Week 4)
+- Test updates
+- Verification of all functionality
+
+TESTING CHECKLIST
+=================
+
+[] Form validation with react-hook-form
+[] Input/Select component integration
+[] Label associations and accessibility
+[] Custom background colors with className prop
+[] Navigation after LinkContainer removal
+[] No Bootstrap CSS references
+[] Button hover/focus states
+[] Checkbox and radio behavior
+[] Modal/Dialog accessibility
+[] Screen reader compatibility
+
+DEPENDENCIES TO REMOVE
+======================
+
+After migration completion:
+- react-bootstrap (if not used

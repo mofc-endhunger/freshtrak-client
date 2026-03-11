@@ -1,0 +1,220 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║          FreshTrak Client: shadcn/ui Migration Analysis Summary               ║
+║                        Generated: March 11, 2026                              ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+EXECUTIVE SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+This analysis identifies raw HTML elements and Bootstrap components that should be
+replaced with shadcn/ui components to improve code consistency, accessibility, and
+reduce bundle size.
+
+KEY FINDINGS:
+─────────────────────────────────────────────────────────────────────────────────
+✓ Files Analyzed: 80+ source files
+✓ Files Requiring Migration: 20+ files
+✓ Total Raw HTML Instances: 57+
+✓ Components to Migrate: 25+ buttons, 20+ inputs, 5 selects, 4+ labels
+✓ Bootstrap Dependencies to Remove: react-bootstrap, react-router-bootstrap
+✓ Expected Bundle Reduction: 15-20KB
+✓ Migration Effort: 3-4 weeks across 4 phases
+
+INSTANCE BREAKDOWN
+═══════════════════════════════════════════════════════════════════════════════
+
+RAW BUTTON ELEMENTS: 25+ instances
+└─ Authentication Forms: 5 buttons
+   • SignInFormComponent: 2 (forgot password, sign up link)
+   • SignUpFormComponent: 1 (sign in link)
+   • ResetPasswordFormComponent: 1 (back button)
+   • ConfirmResetPasswordFormComponent: 1 (back button)
+
+└─ Event Components: 6 buttons
+   • EventCardComponent: 3 (btn classes, outline, link styles)
+   • EventListComponent: 3 (radio buttons, commented)
+
+└─ Household & General: 10+ buttons
+   • HouseholdSignUpWrapper: 2 (submit, cancel)
+   • HouseholdCompletionPrompt: 2 (close icon buttons)
+   • HouseHoldEligibilityComponent: 1 (view guidelines link)
+   • EventNearByComponent: 3 (accordion buttons)
+   • FamilyContainer: 1 (submit)
+
+RAW INPUT ELEMENTS: 20+ instances
+└─ Family Module: 15+ inputs
+   • PrimaryInfoFormComponent: 8 (text, date inputs)
+   • AddressComponent: 4 (address fields)
+   • ContactInformationComponent: 3 (checkbox inputs)
+   • BaseComponentTemplate: 2 (template elements)
+
+└─ Other Components: 5+ inputs
+   • GooglePlacesAutocomplete: 1
+   • SearchComponent: 3
+   • EventListComponent: 1
+
+RAW SELECT ELEMENTS: 5 instances
+└─ Family Module: 3 selects
+   • StateDropdownComponent: 1
+   • PrimaryInfoFormComponent: 2 (gender, relationship)
+   • BaseComponentTemplate: 1 (template)
+
+└─ Events Module: 1 select
+   • EventListComponent: 1
+
+RAW LABEL ELEMENTS: 4 instances
+└─ Spread across family and event components
+
+BOOTSTRAP CLASS REMOVALS: 3 patterns
+└─ "btn" class: EventCardComponent (3 instances)
+└─ "form-control" class: Multiple files
+└─ "form-group" class: Multiple files
+
+REACT-ROUTER-BOOTSTRAP USAGE: 2 files
+└─ EventCardComponent: LinkContainer wrapper
+└─ ResourceListComponent: LinkContainer wrapper
+
+MIGRATION TIMELINE
+═══════════════════════════════════════════════════════════════════════════════
+
+PHASE 1: CRITICAL (Week 1) - Foundation
+────────────────────────────────────────────────────────────────────────────────
+1. src/Modules/Family/PrimaryInfoFormComponent.tsx
+   • Type: Input/Select/Label (8 instances)
+   • Effort: 6 hours
+   • Impact: CRITICAL - Foundation for form inputs
+
+2. src/Modules/Family/StateDropdownComponent.tsx
+   • Type: Select/Label (1 instance)
+   • Effort: 2 hours
+   • Impact: BLOCKING - Used across modules
+
+3. src/Modules/Family/AddressComponent.tsx
+   • Type: Input/Label (4 instances)
+   • Effort: 4 hours
+   • Impact: HIGH - Critical for household registration
+
+4. src/Modules/Family/ContactInformationComponent.tsx
+   • Type: Checkbox/Label (3 instances)
+   • Effort: 2 hours
+   • Impact: MEDIUM - Family setup
+
+5. src/Modules/Family/templates/BaseComponentTemplate.tsx
+   • Type: Input/Select (2 instances)
+   • Effort: 3 hours
+   • Impact: FOUNDATION - Affects multiple components
+
+PHASE 1 TOTAL: 17 hours
+
+────────────────────────────────────────────────────────────────────────────────
+
+PHASE 2: HIGH PRIORITY (Week 2) - Events & Authentication
+────────────────────────────────────────────────────────────────────────────────
+6. src/Modules/Events/EventCardComponent.tsx
+   • Type: Button/LinkContainer (4 instances)
+   • Effort: 5 hours
+   • Impact: VISIBILITY - Public-facing component
+
+7. src/Modules/Events/EventListComponent.tsx
+   • Type: Select/Label/Radio (4 instances)
+   • Effort: 6 hours
+   • Impact: COMPLEX - Filter functionality
+
+8. src/Modules/Authentication/SignInFormComponent.tsx
+   • Type: Button (2 instances)
+   • Effort: 2 hours
+   • Impact: CRITICAL PATH
+
+9. src/Modules/Authentication/SignUpFormComponent.tsx
+   • Type: Button (1 instance)
+   • Effort: 1 hour
+   • Impact: CRITICAL PATH
+
+10. src/Modules/Home/EventNearByComponent.tsx
+    • Type: Accordion (3 custom buttons)
+    • Effort: 5 hours
+    • Impact: ACCORDION REFACTOR
+
+PHASE 2 TOTAL: 19 hours
+
+────────────────────────────────────────────────────────────────────────────────
+
+PHASE 3: MEDIUM PRIORITY (Week 3) - Households
+────────────────────────────────────────────────────────────────────────────────
+11. src/Modules/Households/components/HouseholdSignUpWrapper.tsx
+    • Type: Button (2 instances)
+    • Effort: 2 hours
+
+12. src/Modules/Households/components/HouseholdCompletionPrompt.tsx
+    • Type: Button (2 icon buttons)
+    • Effort: 2 hours
+
+13. src/Modules/General/HouseHoldEligibilityComponent.tsx
+    • Type: Button (1 instance)
+    • Effort: 1 hour
+
+14. src/Modules/Family/FamilyContainer.tsx
+    • Type: Button (1 instance)
+    • Effort: 1 hour
+
+15. src/Modules/Events/ResourceListComponent.tsx
+    • Type: LinkContainer (1 instance)
+    • Effort: 2 hours
+
+PHASE 3 TOTAL: 8 hours
+
+────────────────────────────────────────────────────────────────────────────────
+
+PHASE 4: LOWER PRIORITY (Week 4) - General Components
+────────────────────────────────────────────────────────────────────────────────
+16. src/Modules/Header/HeaderComponent.tsx - 2 hours
+17. src/Modules/General/GooglePlacesAutocomplete.tsx - 2 hours
+18. src/Modules/General/SearchComponent.tsx - 2 hours
+19. src/Modules/Authentication/ResetPasswordFormComponent.tsx - 1 hour
+20. src/Modules/Authentication/ConfirmResetPasswordFormComponent.tsx - 1 hour
+
+PHASE 4 TOTAL: 8 hours
+
+────────────────────────────────────────────────────────────────────────────────
+
+OVERALL TIMELINE:
+• Phase 1: 17 hours (Week 1)
+• Phase 2: 19 hours (Week 2)
+• Phase 3: 8 hours (Week 3)
+• Phase 4: 8 hours (Week 4)
+• Testing & Bug Fixes: ~10 hours (Throughout)
+
+TOTAL EFFORT: ~52 hours = 1.3 weeks of focused work
+
+COMPONENT MAPPING
+═══════════════════════════════════════════════════════════════════════════════
+
+RAW HTML                          → shadcn/ui Component
+───────────────────────────────────────────────────────────────────────────────
+<button>...</button>              → <Button>...</Button>
+<button> (link style)             → <Button variant="link">...</Button>
+<button> (outline)                → <Button variant="outline">...</Button>
+<button> (minimal)                → <Button variant="ghost">...</Button>
+<button size=icon>...</button>     → <Button variant="ghost" size="icon">
+<input type="text">               → <Input placeholder="...">
+<input type="email">              → <Input type="email">
+<input type="date">               → <Input type="date">
+<input type="checkbox">           → <Checkbox>
+<input type="radio">              → <RadioGroup>
+<select>...</select>              → <Select>...</Select>
+<label>...</label>                → <Label>...</Label>
+Custom accordion buttons          → <Accordion>...</Accordion>
+<LinkContainer to="">             → <Button asChild><Link to="">
+
+FILES AFFECTED BY PRIORITY
+═══════════════════════════════════════════════════════════════════════════════
+
+CRITICAL FILES (8 files):
+1. PrimaryInfoFormComponent.tsx (8 elements)
+2. StateDropdownComponent.tsx (1 element)
+3. AddressComponent.tsx (4 elements)
+4. ContactInformationComponent.tsx (3 elements)
+5. BaseComponentTemplate.tsx (2 elements)
+6. EventCardComponent.tsx (4 elements)
+7. EventListComponent.tsx (4 elements)
+8. SignInFormComponent.tsx (2 eleme

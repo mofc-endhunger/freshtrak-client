@@ -5,6 +5,7 @@ import {
 	ParsedBodyData,
 } from "./types/eligibility.types";
 import localization from "../Localization/LocalizationComponent";
+import { Button } from "../../components/ui/button";
 
 /**
  * HouseHoldEligibilityComponent - Component for displaying household eligibility information
@@ -50,15 +51,13 @@ const HouseHoldEligibilityComponent: React.FC<
 					<span className="font-bold ml-2 text-gray-900">
 						{localization.eligibility_view_requirements_text}
 					</span>
-					<span className="font-bold ml-2">
-						<button
-							type="button"
-							onClick={() => setShowEligibilityModal(true)}
-							className="bg-transparent border-none p-0 text-link underline cursor-pointer text-gray-900 hover:text-link-hover hover:no-underline"
-						>
-							{localization.eligibility_view_guidelines_button}
-						</button>
-					</span>
+					<Button
+						variant="link"
+						onClick={() => setShowEligibilityModal(true)}
+						className="p-0 h-auto ml-2 font-bold text-gray-900"
+					>
+						{localization.eligibility_view_guidelines_button}
+					</Button>
 				</div>
 			</div>
 			<EligibilityModalComponent

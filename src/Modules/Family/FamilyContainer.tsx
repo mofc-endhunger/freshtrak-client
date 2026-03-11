@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { selectEvent } from "../../Store/Events/eventSlice";
+import { Button } from "../../components/ui/button";
 import RegistrationHeaderComponent from "../Registration/RegistrationHeaderComponent";
 import RegistrationTextComponent from "../Registration/RegistrationTextComponent";
 import AddressComponent from "./AddressComponent";
@@ -126,18 +127,9 @@ const FamilyContainer: React.FC<FamilyContainerProps> = ({
 
 								{/* Submit Button Section */}
 								<div className="flex justify-end pt-6 border-t border-gray-200">
-									<button
+									<Button
 										type="submit"
 										disabled={!isValid || isSubmitting}
-										className={`
-                      px-6 py-3 text-base font-medium text-white bg-indigo-600 
-                      border border-transparent rounded-md shadow-sm 
-                      hover:bg-indigo-700 focus:outline-none focus:ring-2 
-                      focus:ring-offset-2 focus:ring-indigo-500 
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      transition-colors duration-200
-                      ${isSubmitting ? "animate-pulse" : ""}
-                    `}
 										data-testid="continue-button"
 									>
 										{isSubmitting ? (
@@ -167,7 +159,7 @@ const FamilyContainer: React.FC<FamilyContainerProps> = ({
 										) : (
 											"Continue"
 										)}
-									</button>
+									</Button>
 								</div>
 							</form>
 						</div>

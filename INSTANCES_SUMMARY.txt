@@ -1,0 +1,208 @@
+═══════════════════════════════════════════════════════════════════════════════
+                   SHADCN/UI MIGRATION - INSTANCES SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+This file lists all raw HTML instances found in the FreshTrak codebase that
+can be replaced with shadcn/ui components.
+
+═══════════════════════════════════════════════════════════════════════════════
+SECTION 1: RAW BUTTON ELEMENTS (25+ instances)
+═══════════════════════════════════════════════════════════════════════════════
+
+Authentication Forms:
+├─ SignInFormComponent.tsx
+│  ├─ Line 133: Forgot Password button → <Button variant="link">
+│  └─ Line 163: Sign Up link button → <Button variant="link">
+├─ SignUpFormComponent.tsx
+│  └─ Line 199: Sign In link button → <Button variant="link">
+├─ ResetPasswordFormComponent.tsx
+│  └─ Line ~105: Back button → <Button variant="ghost">
+└─ ConfirmResetPasswordFormComponent.tsx
+   └─ Line ~142: Back button → <Button variant="ghost">
+
+Event Components:
+├─ EventCardComponent.tsx
+│  ├─ Line 119: Raw button with "btn" class → <Button>
+│  ├─ Line 250: View Details button → <Button variant="outline">
+│  └─ Line 261: Get Directions button → <Button variant="link">
+├─ EventListComponent.tsx
+│  ├─ Line 82: Radio button (commented) → <ToggleGroup>
+│  └─ Line 84: Radio button (commented) → <ToggleGroup>
+└─ EventNearByComponent.tsx
+   ├─ Line 42-60: Accordion button 1 → <Accordion>
+   ├─ Line 73-91: Accordion button 2 → <Accordion>
+   └─ Line 104-122: Accordion button 3 → <Accordion>
+
+Household & General Components:
+├─ HouseholdSignUpWrapper.tsx
+│  ├─ Line 316: Submit button → <Button>
+│  └─ Line 322: Cancel button → <Button variant="outline">
+├─ HouseholdCompletionPrompt.tsx
+│  ├─ Line 148: Close button → <Button variant="ghost" size="icon">
+│  └─ Line 243: Close button → <Button variant="ghost" size="icon">
+├─ HouseHoldEligibilityComponent.tsx
+│  └─ Line 54: View Guidelines button → <Button variant="link">
+└─ FamilyContainer.tsx
+   └─ Line 129: Submit button → <Button type="submit">
+
+═══════════════════════════════════════════════════════════════════════════════
+SECTION 2: RAW INPUT ELEMENTS (20+ instances)
+═══════════════════════════════════════════════════════════════════════════════
+
+Family Module:
+├─ PrimaryInfoFormComponent.tsx
+│  ├─ First Name input → <Input>
+│  ├─ Last Name input → <Input>
+│  ├─ Date of Birth input → <Input type="date">
+│  └─ Additional text inputs → <Input>
+├─ AddressComponent.tsx
+│  ├─ Street Address input → <Input>
+│  ├─ City input → <Input>
+│  ├─ Zip Code input → <Input>
+│  └─ Lot/Suite input → <Input>
+├─ ContactInformationComponent.tsx
+│  ├─ Phone checkbox input → <Checkbox>
+│  ├─ Email checkbox input → <Checkbox>
+│  └─ Text checkbox input → <Checkbox>
+└─ BaseComponentTemplate.tsx
+   ├─ Lines 175-194: BaseInput template → Use <Input>
+   └─ Raw input elements affecting dependent components
+
+General Components:
+├─ GooglePlacesAutocomplete.tsx
+│  └─ Autocomplete input → Wrap with <Input>
+└─ SearchComponent.tsx
+   ├─ Search field 1 → <Input>
+   ├─ Search field 2 → <Input>
+   └─ Search field 3 → <Input>
+
+═══════════════════════════════════════════════════════════════════════════════
+SECTION 3: RAW SELECT ELEMENTS (5 instances)
+═══════════════════════════════════════════════════════════════════════════════
+
+Family Module:
+├─ StateDropdownComponent.tsx
+│  ├─ Lines 80-97: State select → <Select>
+│  └─ Affects multiple modules (high priority)
+├─ PrimaryInfoFormComponent.tsx
+│  ├─ Gender select → <Select>
+│  └─ Relationship select → <Select>
+└─ BaseComponentTemplate.tsx
+   └─ Lines 215-250: Select template → <Select>
+
+Events Module:
+└─ EventListComponent.tsx
+   └─ Line 91: Event filter select → <Select>
+
+═══════════════════════════════════════════════════════════════════════════════
+SECTION 4: RAW LABEL ELEMENTS (4+ instances)
+═══════════════════════════════════════════════════════════════════════════════
+
+Family Module:
+├─ PrimaryInfoFormComponent.tsx
+│  ├─ Lines 70-76: First Name label → <Label>
+│  └─ Additional labels throughout
+├─ StateDropdownComponent.tsx
+│  └─ Lines 73-79: State label → <Label>
+└─ ContactInformationComponent.tsx
+   └─ Line 192: Checkbox label → <Label>
+
+Events Module:
+└─ EventListComponent.tsx
+   ├─ Line 83: Radio label → <Label>
+   ├─ Line 85: Radio label → <Label>
+   └─ Line 90: Select label → <Label>
+
+═══════════════════════════════════════════════════════════════════════════════
+SECTION 5: BOOTSTRAP CLASS PATTERNS (3 patterns)
+═══════════════════════════════════════════════════════════════════════════════
+
+Pattern 1: "btn" class
+├─ EventCardComponent.tsx
+│  ├─ Line 119: btn class
+│  ├─ Line 250: btn-outline class
+│  └─ Line 261: button with custom classes
+└─ Action: Remove "btn" classes, use <Button> component
+
+Pattern 2: "form-control" and "form-group"
+├─ EventListComponent.tsx
+│  ├─ Line 89: form-group
+│  └─ Line 91: form-control
+└─ Action: Use shadcn form components, remove Bootstrap wrappers
+
+Pattern 3: Custom Bootstrap toggle ("btn-toggle")
+├─ EventListComponent.tsx
+│  ├─ Line 83: btn-toggle
+│  └─ Line 85: btn-toggle
+└─ Action: Use <ToggleGroup> or <SegmentedControl> component
+
+═══════════════════════════════════════════════════════════════════════════════
+SECTION 6: REACT-ROUTER-BOOTSTRAP USAGE (2 files)
+═══════════════════════════════════════════════════════════════════════════════
+
+File 1: EventCardComponent.tsx
+├─ Line 5: import { LinkContainer } from "react-router-bootstrap"
+└─ Lines 116-138: <LinkContainer> wrapper around button
+   └─ Migration: Use <Button asChild><Link to="">
+
+File 2: ResourceListComponent.tsx
+├─ Lines 168-172: <LinkContainer> wrapper
+└─ Migration: Use <Button asChild><Link to="">
+
+═══════════════════════════════════════════════════════════════════════════════
+SUMMARY BY FILE (20 files total)
+═══════════════════════════════════════════════════════════════════════════════
+
+PHASE 1 - CRITICAL (17 hours):
+ 1. PrimaryInfoFormComponent.tsx      │ 8 instances  │ 6 hours   │ Foundation
+ 2. StateDropdownComponent.tsx        │ 1 instance   │ 2 hours   │ Blocking
+ 3. AddressComponent.tsx              │ 4 instances  │ 4 hours   │ Critical
+ 4. ContactInformationComponent.tsx   │ 3 instances  │ 2 hours   │ High
+ 5. BaseComponentTemplate.tsx         │ 2 instances  │ 3 hours   │ Foundation
+
+PHASE 2 - HIGH PRIORITY (19 hours):
+ 6. EventCardComponent.tsx            │ 4 instances  │ 5 hours   │ Visibility
+ 7. EventListComponent.tsx            │ 4 instances  │ 6 hours   │ Complex
+ 8. SignInFormComponent.tsx           │ 2 instances  │ 2 hours   │ Critical
+ 9. SignUpFormComponent.tsx           │ 1 instance   │ 1 hour    │ Critical
+10. EventNearByComponent.tsx          │ 3 instances  │ 5 hours   │ Accordion
+
+PHASE 3 - MEDIUM (8 hours):
+11. HouseholdSignUpWrapper.tsx        │ 2 instances  │ 2 hours
+12. HouseholdCompletionPrompt.tsx     │ 2 instances  │ 2 hours
+13. HouseHoldEligibilityComponent.tsx │ 1 instance   │ 1 hour
+14. FamilyContainer.tsx               │ 1 instance   │ 1 hour
+15. ResourceListComponent.tsx         │ 1 instance   │ 2 hours
+
+PHASE 4 - LOWER (8 hours):
+16. HeaderComponent.tsx               │ 2 instances  │ 2 hours
+17. GooglePlacesAutocomplete.tsx      │ 1 instance   │ 2 hours
+18. SearchComponent.tsx               │ 3 instances  │ 2 hours
+19. ResetPasswordFormComponent.tsx    │ 1 instance   │ 1 hour
+20. ConfirmResetPasswordFormComponent │ 1 instance   │ 1 hour
+
+═══════════════════════════════════════════════════════════════════════════════
+
+COMPONENT REPLACEMENT GUIDE:
+═══════════════════════════════════════════════════════════════════════════════
+
+Import shadcn Components:
+───────────────────────────
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Link } from "react-router-dom"

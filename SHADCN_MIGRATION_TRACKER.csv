@@ -1,0 +1,21 @@
+Phase,Priority,File Path,Component Type,Issue,Instance Count,Replacement Component,Estimated Hours,Status
+1,CRITICAL,src/Modules/Family/PrimaryInfoFormComponent.tsx,Input/Select/Label,Multiple raw inputs and selects,8,Input + Select + Label,6,Pending
+1,CRITICAL,src/Modules/Family/StateDropdownComponent.tsx,Select/Label,Raw select dropdown,1,Select + Label,2,Pending
+1,CRITICAL,src/Modules/Family/AddressComponent.tsx,Input/Label,Multiple address inputs,4,Input + Label,4,Pending
+1,CRITICAL,src/Modules/Family/ContactInformationComponent.tsx,Checkbox/Label,Raw checkbox inputs,3,Checkbox + Label,2,Pending
+1,CRITICAL,src/Modules/Family/templates/BaseComponentTemplate.tsx,Input/Select,Template with raw elements,2,Input + Select,3,Pending
+2,HIGH,src/Modules/Events/EventCardComponent.tsx,Button/LinkContainer,3 buttons + LinkContainer,4,Button + Link asChild,5,Pending
+2,HIGH,src/Modules/Events/EventListComponent.tsx,Select/Label/Radio,Select + labels + radio buttons,4,Select + Label + RadioGroup,6,Pending
+2,HIGH,src/Modules/Authentication/SignInFormComponent.tsx,Button,2 navigation link buttons,2,Button variant=link,2,Pending
+2,HIGH,src/Modules/Authentication/SignUpFormComponent.tsx,Button,1 navigation link button,1,Button variant=link,1,Pending
+2,HIGH,src/Modules/Home/EventNearByComponent.tsx,Accordion,3 custom accordion buttons,3,Accordion component,5,Pending
+3,MEDIUM,src/Modules/Households/components/HouseholdSignUpWrapper.tsx,Button,2 form buttons,2,Button,2,Pending
+3,MEDIUM,src/Modules/Households/components/HouseholdCompletionPrompt.tsx,Button,2 close icon buttons,2,Button variant=ghost size=icon,2,Pending
+3,MEDIUM,src/Modules/General/HouseHoldEligibilityComponent.tsx,Button,1 link button,1,Button variant=link,1,Pending
+3,MEDIUM,src/Modules/Family/FamilyContainer.tsx,Button,1 submit button,1,Button type=submit,1,Pending
+3,MEDIUM,src/Modules/Events/ResourceListComponent.tsx,LinkContainer,LinkContainer wrapper,1,Button asChild + Link,2,Pending
+4,LOW,src/Modules/Header/HeaderComponent.tsx,Button,Review buttons,2,Button,2,Pending
+4,LOW,src/Modules/General/GooglePlacesAutocomplete.tsx,Input,Wrap autocomplete input,1,Input wrapper,2,Pending
+4,LOW,src/Modules/General/SearchComponent.tsx,Input,Multiple search inputs,3,Input,2,Pending
+4,LOW,src/Modules/Authentication/ResetPasswordFormComponent.tsx,Button,1 back button,1,Button variant=ghost,1,Pending
+4,LOW,src/Modules/Authentication/ConfirmResetPasswordFormComponent.tsx,Button,1 back button,1,Button variant=ghost,1,Pending

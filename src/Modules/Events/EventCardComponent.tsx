@@ -2,7 +2,7 @@
  * Event Card Component
  */
 import React, { useState } from "react";
-import { LinkContainer } from "react-router-bootstrap";
+import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { MoreVertical } from "lucide-react";
 import { setCurrentEvent } from "../../Store/Events/eventSlice";
@@ -17,6 +17,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu";
+import { Button } from "../../components/ui/button";
 import { sanitizeHtml } from "../../Utils/sanitizeHtml";
 import "../../Assets/scss/main.scss";
 
@@ -127,33 +128,36 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 	};
 
 	const getButton = (buttonName: string, targetUrl: string) => {
-		const buttonClass =
-			variant === "list"
-				? "btn bg-[#392947] text-white py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px] w-full"
-				: "btn bg-[#392947] text-white px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px] w-full";
+		const buttonVariant = variant === "list" ? "secondary" : "highlight";
+		const buttonSize = variant === "list" ? "sm" : "lg";
+		
 		return (
-			<LinkContainer to={targetUrl}>
-				<button
-					type="button"
-					className={buttonClass}
-					onClick={() => {
-						// Store the current search results URL before navigating to event details
-						const currentPath = window.location.pathname;
-						if (currentPath.startsWith("/events/list")) {
-							const currentSearch = window.location.search;
-							const searchResultsUrl =
-								currentPath + currentSearch;
-							sessionStorage.setItem(
-								"searchResultsUrl",
-								searchResultsUrl
-							);
-						}
-						dispatch(setCurrentEvent(props.event));
-					}}
-				>
-					{buttonName}
-				</button>
-			</LinkContainer>
+			<Button
+				asChild
+				variant={buttonVariant}
+				size={buttonSize}
+				className={
+					variant === "list"
+						? "w-full"
+						: "px-9 flex-grow min-h-[50px] w-full"
+				}
+				onClick={() => {
+					// Store the current search results URL before navigating to event details
+					const currentPath = window.location.pathname;
+					if (currentPath.startsWith("/events/list")) {
+						const currentSearch = window.location.search;
+						const searchResultsUrl =
+							currentPath + currentSearch;
+						sessionStorage.setItem(
+							"searchResultsUrl",
+							searchResultsUrl
+						);
+					}
+					dispatch(setCurrentEvent(props.event));
+				}}
+			>
+				<Link to={targetUrl}>{buttonName}</Link>
+			</Button>
 		);
 	};
 
@@ -297,13 +301,13 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 							<div className="flex sm:hidden items-start shrink-0">
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
-										<button
-											type="button"
-											className="p-2 hover:bg-gray-100 rounded-full"
+										<Button
+											variant="ghost"
+											size="icon"
 											aria-label="More actions"
 										>
 											<MoreVertical className="w-5 h-5 text-gray-600" />
-										</button>
+										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent
 										align="end"
@@ -377,8 +381,9 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 							{/* Desktop Actions Section (visible sm and up) */}
 							<div className="hidden sm:flex flex-col gap-1.5 w-[120px] lg:w-[140px] xl:w-[160px] shrink-0">
 								{eventDetails && eventDetails.length > 0 && (
-									<button
-										className="btn bg-gray-200 text-[#392947] py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px]"
+									<Button
+										variant="secondary"
+										size="sm"
 										onClick={(e) => {
 											e.stopPropagation();
 											setShowDetails(!showDetails);
@@ -387,17 +392,18 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 										{!showDetails
 											? localization.button_view_details
 											: localization.button_hide_details}
-									</button>
+									</Button>
 								)}
-								<button
-									className="btn bg-gray-200 text-[#392947] py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px]"
+								<Button
+									variant="secondary"
+									size="sm"
 									onClick={(e) => {
 										e.stopPropagation();
 										handleGetDirections();
 									}}
 								>
 									{localization.button_get_directions}
-								</button>
+								</Button>
 								{ButtonView() && (
 									<div onClick={(e) => e.stopPropagation()}>
 										{ButtonView()}
@@ -516,23 +522,27 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 						{/* Details and Directions buttons row */}
 						<div className="flex flex-col gap-2">
 							{eventDetails && eventDetails.length > 0 && (
-								<button
-									className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
+								<Button
+									variant="secondary"
+									size="lg"
 									onClick={() => {
 										setShowDetails(!showDetails);
 									}}
+									className="w-full"
 								>
 									{!showDetails
 										? localization.button_view_details
 										: localization.button_hide_details}
-								</button>
+								</Button>
 							)}
-							<button
-								className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
+							<Button
+								variant="secondary"
+								size="lg"
 								onClick={handleGetDirections}
+								className="w-full"
 							>
 								{localization.button_get_directions}
-							</button>
+							</Button>
 						</div>
 
 						{/* Reserve button on separate row */}

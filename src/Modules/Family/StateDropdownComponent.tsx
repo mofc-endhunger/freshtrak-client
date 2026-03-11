@@ -92,7 +92,9 @@ const StateDropdownComponent: React.FC<StateDropdownProps> = ({
 				onValueChange={(selectedValue) => {
 					if (onChange) onChange(selectedValue);
 					// Trigger form registration onChange if available
-					const registerResult = register("state", { required: true });
+					const registerResult = register("state", {
+						required: true,
+					});
 					if (registerResult.onChange) {
 						registerResult.onChange({
 							target: { value: selectedValue, name: "state" },
@@ -102,16 +104,20 @@ const StateDropdownComponent: React.FC<StateDropdownProps> = ({
 			>
 				<SelectTrigger
 					id="state"
-					className={errors?.state ? "border-red-500 focus:ring-red-500" : ""}
+					className={
+						errors?.state ? "border-red-500 focus:ring-red-500" : ""
+					}
 				>
 					<SelectValue placeholder="Select State" />
 				</SelectTrigger>
 				<SelectContent>
-					{Object.entries(STATE_LOCALIZATION_MAP).map(([code, label]) => (
-						<SelectItem key={code} value={code}>
-							{label}
-						</SelectItem>
-					))}
+					{Object.entries(STATE_LOCALIZATION_MAP).map(
+						([code, label]) => (
+							<SelectItem key={code} value={code}>
+								{label}
+							</SelectItem>
+						),
+					)}
 				</SelectContent>
 			</Select>
 			{errors?.state && (

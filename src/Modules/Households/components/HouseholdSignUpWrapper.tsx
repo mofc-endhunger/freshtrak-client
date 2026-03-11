@@ -19,6 +19,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "../../../components/ui/alert-dialog";
+import { Button } from "../../../components/ui/button";
 import { StorageService } from "../../../Utils/StorageService";
 
 interface HouseholdSignUpWrapperProps {
@@ -313,18 +314,19 @@ export const HouseholdCompletionPrompt: React.FC<{
 					</div>
 				</div>
 				<div className="flex space-x-2">
-					<button
+					<Button
 						onClick={onSetup}
-						className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+						className="bg-blue-600 text-white hover:bg-blue-700"
 					>
 						{localization.household_setup_now}
-					</button>
-					<button
+					</Button>
+					<Button
 						onClick={handleDismiss}
-						className="text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:text-blue-800 transition-colors"
+						variant="ghost"
+						className="text-blue-600 hover:text-blue-800"
 					>
 						{localization.household_later}
-					</button>
+					</Button>
 				</div>
 			</div>
 		</div>

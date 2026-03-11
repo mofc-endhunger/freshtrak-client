@@ -143,14 +143,16 @@ export const HouseholdCompletionPrompt: React.FC<
 											{promptConfig.dismissText}
 										</Button>
 									</div>
-								</div>
 							</div>
-							<button
-								onClick={handleDismiss}
-								className="flex-shrink-0 text-blue-400 hover:text-blue-600 transition-colors"
-							>
-								<X className="w-5 h-5" />
-							</button>
+						</div>
+						<Button
+							onClick={handleDismiss}
+							variant="ghost"
+							size="icon"
+							className="flex-shrink-0 text-blue-400 hover:text-blue-600"
+						>
+							<X className="w-5 h-5" />
+						</Button>
 						</div>
 					</div>
 				);
@@ -240,12 +242,14 @@ export const HouseholdCompletionPrompt: React.FC<
 									</Button>
 								</div>
 							</div>
-							<button
+							<Button
 								onClick={handleDismiss}
-								className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+								variant="ghost"
+								size="icon"
+								className="flex-shrink-0 text-gray-400 hover:text-gray-600"
 							>
 								<X className="w-4 h-4" />
-							</button>
+							</Button>
 						</div>
 					</div>
 				);

@@ -170,7 +170,6 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					<SelectValue placeholder={localization.option_suffix_none} />
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value="">{localization.option_suffix_none}</SelectItem>
 					<SelectItem value="Jr">{localization.option_suffix_jr}</SelectItem>
 					<SelectItem value="Sr">{localization.option_suffix_sr}</SelectItem>
 					<SelectItem value="II">{localization.option_suffix_ii}</SelectItem>
@@ -243,9 +242,6 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 					<SelectValue placeholder="Select Gender" />
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value="">
-						-
-					</SelectItem>
 					<SelectItem value="male">
 						{localization.option_gender_male}
 					</SelectItem>

@@ -3,6 +3,17 @@
 
 import React from "react";
 import { cn } from "../../../lib/utils";
+import { Label } from "../../../components/ui/label";
+import { Input } from "../../../components/ui/input";
+import { Checkbox } from "../../../components/ui/checkbox";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "../../../components/ui/select";
+import { Button } from "../../../components/ui/button";
 
 // Base component props interface
 export interface BaseComponentProps {
@@ -123,23 +134,22 @@ export const BaseForm: React.FC<BaseFormComponentProps> = ({
 
 			<div className="flex justify-end space-x-3 pt-4">
 				{onCancel && (
-					<button
+					<Button
 						type="button"
+						variant="outline"
 						onClick={onCancel}
 						disabled={isLoading}
-						className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						Cancel
-					</button>
+					</Button>
 				)}
 
-				<button
+				<Button
 					type="submit"
 					disabled={isLoading || isDisabled}
-					className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					{isLoading ? "Loading..." : "Submit"}
-				</button>
+				</Button>
 			</div>
 		</form>
 	);
@@ -163,16 +173,16 @@ export const BaseInput: React.FC<BaseInputComponentProps> = ({
 	return (
 		<div className="space-y-1">
 			{label && (
-				<label
+				<Label
 					htmlFor={name}
 					className="block text-sm font-medium text-gray-700"
 				>
 					{label}
 					{required && <span className="text-red-500 ml-1">*</span>}
-				</label>
+				</Label>
 			)}
 
-			<input
+			<Input
 				id={name}
 				name={name}
 				type="text"
@@ -184,10 +194,8 @@ export const BaseInput: React.FC<BaseInputComponentProps> = ({
 				disabled={disabled}
 				required={required}
 				className={cn(
-					"block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
 					error &&
 						"border-red-300 focus:ring-red-500 focus:border-red-500",
-					disabled && "bg-gray-100 cursor-not-allowed",
 					className
 				)}
 				data-testid={testId}
@@ -228,45 +236,40 @@ export const BaseSelect: React.FC<
 	return (
 		<div className="space-y-1">
 			{label && (
-				<label
+				<Label
 					htmlFor={name}
 					className="block text-sm font-medium text-gray-700"
 				>
 					{label}
 					{required && <span className="text-red-500 ml-1">*</span>}
-				</label>
+				</Label>
 			)}
 
-			<select
-				id={name}
-				name={name}
-				value={value}
-				onChange={e => onChange?.(e.target.value)}
-				onBlur={onBlur}
-				onFocus={onFocus}
+			<Select
+				value={value || ""}
+				onValueChange={(selectedValue) => {
+					onChange?.(selectedValue);
+				}}
 				disabled={disabled}
-				required={required}
-				className={cn(
-					"block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
-					error &&
-						"border-red-300 focus:ring-red-500 focus:border-red-500",
-					disabled && "bg-gray-100 cursor-not-allowed",
-					className
-				)}
-				data-testid={testId}
 			>
-				{placeholder && (
-					<option value="" disabled>
-						{placeholder}
-					</option>
-				)}
-
-				{options.map(option => (
-					<option key={option.value} value={option.value}>
-						{option.label}
-					</option>
-				))}
-			</select>
+				<SelectTrigger
+					id={name}
+					className={cn(
+						error &&
+							"border-red-300 focus:ring-red-500 focus:border-red-500",
+						className
+					)}
+				>
+					<SelectValue placeholder={placeholder} />
+				</SelectTrigger>
+				<SelectContent>
+					{options.map(option => (
+						<SelectItem key={option.value} value={option.value}>
+							{option.label}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
 
 			{error && (
 				<p
@@ -301,28 +304,18 @@ export const BaseCheckbox: React.FC<
 	return (
 		<div className="space-y-1">
 			<div className="flex items-center">
-				<input
+				<Checkbox
 					id={name}
-					name={name}
-					type="checkbox"
 					checked={checked}
-					onChange={e =>
-						onChange?.(e.target.checked ? "true" : "false")
+					onCheckedChange={(state) =>
+						onChange?.(state ? "true" : "false")
 					}
-					onBlur={onBlur}
-					onFocus={onFocus}
 					disabled={disabled}
-					required={required}
-					className={cn(
-						"h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded",
-						disabled && "bg-gray-100 cursor-not-allowed",
-						className
-					)}
 					data-testid={testId}
 				/>
 
 				{label && (
-					<label
+					<Label
 						htmlFor={name}
 						className="ml-2 block text-sm text-gray-900"
 					>
@@ -330,7 +323,7 @@ export const BaseCheckbox: React.FC<
 						{required && (
 							<span className="text-red-500 ml-1">*</span>
 						)}
-					</label>
+					</Label>
 				)}
 			</div>
 
@@ -392,25 +385,25 @@ export const BaseModal: React.FC<
 						className
 					)}
 				>
-					{title && (
-						<div className="px-6 py-4 border-b border-gray-200">
-							<h3 className="text-lg font-medium text-gray-900">
-								{title}
-							</h3>
-						</div>
-					)}
-
-					<div className="px-6 py-4">{children}</div>
-
-					<div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
-						<button
-							type="button"
-							onClick={onClose}
-							className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-						>
-							Close
-						</button>
+				{title && (
+					<div className="px-6 py-4 border-b border-gray-200">
+						<h3 className="text-lg font-medium text-gray-900">
+							{title}
+						</h3>
 					</div>
+				)}
+
+				<div className="px-6 py-4">{children}</div>
+
+				<div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+					<Button
+						type="button"
+						variant="outline"
+						onClick={onClose}
+					>
+						Close
+					</Button>
+				</div>
 				</div>
 			</div>
 		</div>

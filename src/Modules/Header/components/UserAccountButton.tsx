@@ -9,6 +9,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
+import { Button } from "../../../components/ui/button";
 import { Settings, LogOut, Home } from "lucide-react";
 import localization from "../../Localization/LocalizationComponent";
 
@@ -93,13 +94,15 @@ const UserAccountButton: React.FC = () => {
 	return (
 		<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
 			<DropdownMenuTrigger asChild>
-				<button
+				<Button
 					type="button"
-					className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 flex items-center justify-center"
+					variant="ghost"
+					size="icon"
+					className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold text-sm"
 					aria-label={localization.aria_user_account_menu}
 				>
 					{getUserInitials()}
-				</button>
+				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				align="end"

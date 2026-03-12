@@ -246,7 +246,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	// Determine member category based on age
 	const getMemberCategory = (
-		dateOfBirth: string
+		dateOfBirth: string,
 	): "senior" | "adult" | "child" | null => {
 		const age = calculateAge(dateOfBirth);
 		if (age === 0) return null; // Unknown age
@@ -259,7 +259,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	const handleDeleteMember = (memberId: number): void => {
 		// Find the member being deleted
 		const member = currentHouseholdMembers.find(
-			(m: any) => m.id === memberId
+			(m: any) => m.id === memberId,
 		);
 
 		if (member && member.date_of_birth) {
@@ -292,7 +292,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	// Get filtered members (excluding deleted ones)
 	const getFilteredMembers = () => {
 		return currentHouseholdMembers.filter(
-			(member: any) => !deletedMemberIds.includes(member.id)
+			(member: any) => !deletedMemberIds.includes(member.id),
 		);
 	};
 
@@ -375,7 +375,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	const handleFamilyMembersComplete = (
 		members: HouseholdMember[],
-		counts: HouseholdCounts
+		counts: HouseholdCounts,
 	): void => {
 		setState((prev) => ({
 			...prev,
@@ -395,7 +395,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	// Slot change handler for registration mode
 	const handleSlotChange = (
-		e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
+		e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>,
 	): void => {
 		setState((prev) => ({ ...prev, selectedSlotId: e.target.value }));
 	};
@@ -427,7 +427,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	// Form submission handler
 	const handleFormSubmit = async (
-		data: RegistrationFormData
+		data: RegistrationFormData,
 	): Promise<void> => {
 		setState((prev) => ({ ...prev, isSubmitting: true }));
 		try {
@@ -440,14 +440,14 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				data["identification_code"] =
 					prefilledData?.["identification_code"] || "";
 				data["date_of_birth"] = formatDateForServer(
-					data["date_of_birth"]
+					data["date_of_birth"],
 				);
 				data = sanitizeInput(data);
 			} else {
 				// Household setup mode
 				if (data.date_of_birth) {
 					data.date_of_birth = formatDateForServer(
-						data.date_of_birth
+						data.date_of_birth,
 					);
 				}
 
@@ -487,7 +487,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	// Utility functions
 	const sanitizeInput = (
-		data: RegistrationFormData
+		data: RegistrationFormData,
 	): RegistrationFormData => {
 		const keys: (keyof RegistrationFormData)[] = [
 			"first_name",
@@ -518,11 +518,12 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	const getSuffixId = (suffix: string): number => {
 		const suffixMap: { [key: string]: number } = {
-			"Jr.": 1,
-			"Sr.": 2,
+			Jr: 1,
+			Sr: 2,
 			II: 3,
 			III: 4,
 			IV: 5,
+			V: 6,
 		};
 		return suffixMap[suffix] || 0;
 	};
@@ -626,8 +627,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 											isActive
 												? "bg-blue-600 text-white ring-4 ring-blue-200 scale-110"
 												: isCompleted
-												? "bg-blue-600 text-white"
-												: "bg-gray-200 text-gray-500"
+													? "bg-blue-600 text-white"
+													: "bg-gray-200 text-gray-500"
 										}`}
 										role="status"
 										aria-current={
@@ -644,8 +645,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 											isActive
 												? "text-blue-600 font-semibold"
 												: isCompleted
-												? "text-blue-600"
-												: "text-gray-400"
+													? "text-blue-600"
+													: "text-gray-400"
 										}`}
 									>
 										{/* Show abbreviated on mobile, full on desktop */}
@@ -779,7 +780,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 																	<p className="text-sm text-gray-600">
 																		Born:{" "}
 																		{new Date(
-																			member.date_of_birth
+																			member.date_of_birth,
 																		).toLocaleDateString()}
 																	</p>
 																)}
@@ -793,7 +794,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 															size="sm"
 															onClick={() =>
 																handleDeleteMember(
-																	member.id
+																	member.id,
 																)
 															}
 															className="text-red-600 hover:text-red-700 hover:bg-red-50"
@@ -804,7 +805,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 														</Button>
 													)}
 												</div>
-											)
+											),
 										)}
 									</div>
 								</div>
@@ -851,7 +852,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				// Helper to create empty member template
 				const createEmptyMember = (
 					id: number,
-					category: string
+					category: string,
 				): HouseholdMember => ({
 					id,
 					household_id: 0,
@@ -884,7 +885,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				const activeExistingMembers = currentHouseholdMembers.filter(
 					(member: any) =>
 						!deletedMemberIds.includes(member.id) &&
-						member.is_head_of_household !== 1
+						member.is_head_of_household !== 1,
 				);
 
 				// Categorize existing members by age
@@ -898,7 +899,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 						member.date_of_birth !== "1900-01-01"
 					) {
 						const category = getMemberCategory(
-							member.date_of_birth
+							member.date_of_birth,
 						);
 						const householdMember: HouseholdMember = {
 							...member,
@@ -923,15 +924,15 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 				const newSeniorsNeeded = Math.max(
 					0,
-					seniorsCount - existingSeniors.length
+					seniorsCount - existingSeniors.length,
 				);
 				const newAdultsNeeded = Math.max(
 					0,
-					adultsCount - existingAdults.length
+					adultsCount - existingAdults.length,
 				);
 				const newChildrenNeeded = Math.max(
 					0,
-					childrenCount - existingChildren.length
+					childrenCount - existingChildren.length,
 				);
 
 				// Build members array: existing first (prefilled), then new (empty)
@@ -940,31 +941,31 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 				// Add seniors: existing first, then new
 				existingSeniors.forEach((member) =>
-					membersForDetails.push(member)
+					membersForDetails.push(member),
 				);
 				for (let i = 0; i < newSeniorsNeeded; i++) {
 					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "senior")
+						createEmptyMember(tempMemberId--, "senior"),
 					);
 				}
 
 				// Add adults: existing first, then new
 				existingAdults.forEach((member) =>
-					membersForDetails.push(member)
+					membersForDetails.push(member),
 				);
 				for (let i = 0; i < newAdultsNeeded; i++) {
 					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "adult")
+						createEmptyMember(tempMemberId--, "adult"),
 					);
 				}
 
 				// Add children: existing first, then new
 				existingChildren.forEach((member) =>
-					membersForDetails.push(member)
+					membersForDetails.push(member),
 				);
 				for (let i = 0; i < newChildrenNeeded; i++) {
 					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "child")
+						createEmptyMember(tempMemberId--, "child"),
 					);
 				}
 
@@ -1071,7 +1072,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 														const currentValues =
 															getValues();
 														continueHandler(
-															currentValues
+															currentValues,
 														);
 													}}
 													variant="highlight"
@@ -1099,7 +1100,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 														? localization.button_registering
 														: localization.button_creating
 													: submitButtonText ||
-													  modeConfig.submitButtonText}
+														modeConfig.submitButtonText}
 											</Button>
 										)}
 									</div>

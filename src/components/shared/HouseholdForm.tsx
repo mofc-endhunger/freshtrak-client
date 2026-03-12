@@ -520,11 +520,14 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 
 	const getSuffixId = (suffix: string): number => {
 		const suffixMap: { [key: string]: number } = {
+			Jr: 1,
 			"Jr.": 1,
+			Sr: 2,
 			"Sr.": 2,
 			II: 3,
 			III: 4,
 			IV: 5,
+			V: 6,
 		};
 		return suffixMap[suffix] || 0;
 	};
@@ -1072,27 +1075,52 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 										{mode === "householdSetup" && (
 											<CancelButton />
 										)}
-										{!isFinalStep &&
-											state.formStep !==
-												HouseholdFormStep.FAMILY_MEMBER_DETAILS && (
-												<Button
-													type="button"
-													onClick={() => {
-														const currentValues =
-															getValues();
-														continueHandler(
-															currentValues
-														);
-													}}
-													variant="highlight"
-													className="w-full sm:w-auto sm:min-w-48"
-													data-testid="continue-button"
-												>
-													{
-														localization.button_continue
+									{!isFinalStep &&
+										state.formStep !==
+											HouseholdFormStep.FAMILY_MEMBER_DETAILS && (
+											<Button
+												type="button"
+												onClick={async () => {
+													if (
+														state.formStep ===
+														HouseholdFormStep.PRIMARY_INFO
+													) {
+														const valid =
+															await trigger([
+																"first_name",
+																"last_name",
+																"date_of_birth",
+															]);
+														const gender =
+															watch("gender");
+														const lang =
+															watch(
+																"preferred_language"
+															);
+														if (
+															!valid ||
+															!gender ||
+															(mode ===
+																"householdSetup" &&
+																!lang)
+														)
+															return;
 													}
-												</Button>
-											)}
+													const currentValues =
+														getValues();
+													continueHandler(
+														currentValues
+													);
+												}}
+												variant="highlight"
+												className="w-full sm:w-auto sm:min-w-48"
+												data-testid="continue-button"
+											>
+												{
+													localization.button_continue
+												}
+											</Button>
+										)}
 										{isFinalStep && (
 											<Button
 												type="submit"

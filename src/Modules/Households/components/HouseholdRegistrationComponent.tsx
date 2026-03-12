@@ -109,6 +109,19 @@ const HouseholdRegistrationComponent: React.FC<
 						return genderMap[gender] || "";
 					};
 
+				const getSuffixForForm = (suffixId: number | null): string => {
+					if (!suffixId) return "";
+					const suffixMap: Record<number, string> = {
+						1: "Jr",
+						2: "Sr",
+						3: "II",
+						4: "III",
+						5: "IV",
+						6: "V",
+					};
+					return suffixMap[suffixId] || "";
+				};
+
 				// Get counts from API response
 				// These counts represent additional household members (not including head of household)
 				const apiCounts = userData.counts || { seniors: 0, adults: 0, children: 0 };
@@ -125,6 +138,9 @@ const HouseholdRegistrationComponent: React.FC<
 					first_name: primaryMember.first_name || "",
 					last_name: primaryMember.last_name || "",
 					middle_name: primaryMember.middle_name || "",
+					suffix: getSuffixForForm(
+						primaryMember.suffix_id || null
+					),
 					date_of_birth: convertDateFormat(
 						primaryMember.date_of_birth || ""
 					),

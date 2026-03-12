@@ -199,6 +199,21 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							genderId = getGenderId(normalizedGender);
 						}
 
+						// Convert suffix string from form to suffix_id for API
+						const suffixToId: Record<string, number> = {
+							Jr: 1,
+							Sr: 2,
+							II: 3,
+							III: 4,
+							IV: 5,
+							V: 6,
+						};
+						const suffixId = registrationData.suffix
+							? suffixToId[registrationData.suffix] ?? null
+							: updatedMembers[0].suffix_id
+							? Number(updatedMembers[0].suffix_id)
+							: null;
+
 						// Update primary member details
 						updatedMembers[0] = {
 							...updatedMembers[0],
@@ -214,13 +229,13 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							date_of_birth:
 								registrationData.date_of_birth ||
 								updatedMembers[0].date_of_birth,
-							// Update gender_id from registration data if provided, otherwise keep existing
 							gender_id:
 								genderId !== null
 									? genderId
 									: updatedMembers[0].gender_id
 									? Number(updatedMembers[0].gender_id)
 									: null,
+							suffix_id: suffixId,
 						};
 					}
 

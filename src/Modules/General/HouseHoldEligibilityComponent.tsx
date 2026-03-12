@@ -54,7 +54,7 @@ const HouseHoldEligibilityComponent: React.FC<
 					<Button
 						variant="link"
 						onClick={() => setShowEligibilityModal(true)}
-						className="p-0 h-auto ml-2 font-bold text-gray-900"
+						className="p-0 h-auto ml-2 font-bold"
 					>
 						{localization.eligibility_view_guidelines_button}
 					</Button>

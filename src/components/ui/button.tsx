@@ -18,7 +18,7 @@ const buttonVariants = cva(
 				secondary:
 					"bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
 				ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-				link: "text-primary underline-offset-4 hover:underline",
+				link: "text-link underline-offset-4 hover:underline",
 				mofcprimary:
 					"bg-[#392947] uppercase text-white py-[.375rem] px-[.75rem] text-[.85rem] tracking-wider",
 				custom: "bg-default-button text-text-color hover:bg-default-button/90 min-w-[220px]",
@@ -38,7 +38,7 @@ const buttonVariants = cva(
 			variant: "default",
 			size: "default",
 		},
-	}
+	},
 );
 
 function Button(
@@ -52,7 +52,7 @@ function Button(
 		VariantProps<typeof buttonVariants> & {
 			asChild?: boolean;
 		},
-	ref: React.Ref<HTMLButtonElement>
+	ref: React.Ref<HTMLButtonElement>,
 ) {
 	const Comp = asChild ? Slot : "button";
 

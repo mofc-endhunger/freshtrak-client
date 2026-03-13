@@ -7,8 +7,7 @@ interface StateDropdownProps {
 	value?: string;
 }
 
-// Mapping of state codes to localization keys
-const STATE_LOCALIZATION_MAP: Record<string, string> = {
+const getStateOptions = (): Record<string, string> => ({
 	AK: localization.option_state_alaska,
 	AL: localization.option_state_alabama,
 	AR: localization.option_state_arkansas,
@@ -61,7 +60,7 @@ const STATE_LOCALIZATION_MAP: Record<string, string> = {
 	WI: localization.option_state_wisconsin,
 	WV: localization.option_state_west_virginia,
 	WY: localization.option_state_wyoming,
-};
+});
 
 const StateDropdownComponent: React.FC<StateDropdownProps> = ({
 	register,
@@ -89,7 +88,7 @@ const StateDropdownComponent: React.FC<StateDropdownProps> = ({
 				{...register("state", { required: true })}
 			>
 				<option value=""></option>
-				{Object.entries(STATE_LOCALIZATION_MAP).map(([code, label]) => (
+				{Object.entries(getStateOptions()).map(([code, label]) => (
 					<option key={code} value={code}>
 						{label}
 					</option>

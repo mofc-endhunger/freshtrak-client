@@ -73,9 +73,9 @@ const ContactInformationComponent: React.FC<
 					<input
 						type="hidden"
 						{...register("phone", {
-							required: !watch("no_phone_number")
-								? "Phone number is required"
-								: false,
+					required: !watch("no_phone_number")
+							? localization.error_phone_number_required
+							: false,
 						})}
 					/>
 					{errors.phone && (
@@ -83,8 +83,7 @@ const ContactInformationComponent: React.FC<
 							className="text-sm text-red-600"
 							data-testid="phone-error"
 						>
-							This field is required. If you have no phone check
-							"No Phone Available".
+							{localization.error_field_required}
 						</span>
 					)}
 				</div>
@@ -152,29 +151,29 @@ const ContactInformationComponent: React.FC<
 						autoComplete="off"
 						data-testid="email-input"
 						{...register("email", {
-							required: !watch("no_email")
-								? "Email is required"
-								: false,
+					required: !watch("no_email")
+							? localization.error_email_required
+							: false,
 						})}
 					/>
 					<div className="text-sm text-gray-500">
-						No Email?{" "}
+						{localization.label_no_email_question}{" "}
 						<a
 							href="https://support.google.com/mail/answer/56256"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-indigo-600 hover:text-indigo-500 underline"
 						>
-							Get one free from Google.
+							{localization.label_get_free_email}
 						</a>
 					</div>
 					{errors.email && (
-						<span
-							className="text-sm text-red-600"
-							data-testid="email-error"
-						>
-							This field is required
-						</span>
+					<span
+						className="text-sm text-red-600"
+						data-testid="email-error"
+					>
+						{localization.error_field_required}
+					</span>
 					)}
 				</div>
 			)}

@@ -18,9 +18,10 @@ import HouseholdRegistrationComponent from "./components/HouseholdRegistrationCo
 import { AuthGuard } from "./components/AuthGuard";
 import { Button } from "../../components/ui/button";
 import { Settings } from "lucide-react";
-import { getGenderId } from "./utils/householdUtils";
+import { getGenderId, getSuffixId } from "./utils/householdUtils";
 import { storeHouseholdToLocalStorage } from "../../Utils/UserRecordHelper";
 import { StorageService } from "../../Utils/StorageService";
+import { normalizePhoneInput } from "../Family/utils/phoneFormatting";
 import LoadingSpinner from "../General/LoadingSpinner";
 
 interface HouseholdContainerProps {
@@ -182,7 +183,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				city: registrationData.city || null,
 				state: registrationData.state || null,
 				zip_code: registrationData.zip_code || null,
-				phone: registrationData.phone || null,
+				phone: registrationData.phone ? normalizePhoneInput(registrationData.phone) : null,
 				email: registrationData.email || null,
 				// Contact preferences
 				permission_to_text: registrationData.permission_to_text ?? null,
@@ -241,12 +242,18 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							const normalizedGender = normalizeGender(
 								registrationData.gender
 							);
-							genderId = getGenderId(normalizedGender);
-						}
+						genderId = getGenderId(normalizedGender);
+					}
 
-						// Update primary member details
-						updatedMembers[0] = {
-							...updatedMembers[0],
+					const suffixId = registrationData.suffix
+						? getSuffixId(registrationData.suffix) || null
+						: updatedMembers[0].suffix_id
+						? Number(updatedMembers[0].suffix_id)
+						: null;
+
+					// Update primary member details
+					updatedMembers[0] = {
+						...updatedMembers[0],
 							first_name:
 								registrationData.first_name ||
 								updatedMembers[0].first_name,
@@ -259,14 +266,14 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							date_of_birth:
 								registrationData.date_of_birth ||
 								updatedMembers[0].date_of_birth,
-							// Update gender_id from registration data if provided, otherwise keep existing
-							gender_id:
-								genderId !== null
-									? genderId
-									: updatedMembers[0].gender_id
-									? Number(updatedMembers[0].gender_id)
-									: null,
-						};
+						gender_id:
+							genderId !== null
+								? genderId
+								: updatedMembers[0].gender_id
+								? Number(updatedMembers[0].gender_id)
+								: null,
+						suffix_id: suffixId,
+					};
 					}
 
 					// Process family members from setup wizard

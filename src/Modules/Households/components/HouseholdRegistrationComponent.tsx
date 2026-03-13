@@ -17,7 +17,7 @@ import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 // Type imports
 import { RegistrationFormData } from "../../Registration/types/registration.types";
 import { ApiHouseholdMember } from "../types/api.types";
-import { getGenderFromId } from "../utils/householdUtils";
+import { getGenderFromId, getSuffixFromId } from "../utils/householdUtils";
 import localization from "../../Localization/LocalizationComponent";
 
 interface HouseholdRegistrationComponentProps {
@@ -98,25 +98,26 @@ const HouseholdRegistrationComponent: React.FC<
 					): string => {
 						if (!genderId) return "";
 						const gender = getGenderFromId(genderId);
-						// Map from household format to form format
+						if (!gender) return "";
 						const genderMap: Record<string, string> = {
 							male: "male",
 							female: "female",
 							other: "other",
 							prefer_not_to_say: "not_specify",
 						};
-						return genderMap[gender] || "";
-					};
+					return genderMap[gender] || "";
+				};
 
-				// Get counts from API response
+			// Get counts from API response
 				// These counts represent additional household members (not including head of household)
 				const apiCounts = userData.counts || { seniors: 0, adults: 0, children: 0 };
 				
 				setPrefilledData({
-					first_name: primaryMember.first_name || "",
-					last_name: primaryMember.last_name || "",
-					middle_name: primaryMember.middle_name || "",
-					date_of_birth: convertDateFormat(
+				first_name: primaryMember.first_name || "",
+				last_name: primaryMember.last_name || "",
+				middle_name: primaryMember.middle_name || "",
+				suffix: getSuffixFromId(primaryMember.suffix_id),
+				date_of_birth: convertDateFormat(
 						primaryMember.date_of_birth || ""
 					),
 					gender: getGenderForForm(

@@ -106,7 +106,7 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 				</h2>
 				<p className="font-noto-sans text-sm text-gray-500 mt-1">
 					{localization.text_past_events_description ||
-						"Your event history from the last 2 weeks."}
+						"Your event history from the last 30 days."}
 				</p>
 			</div>
 

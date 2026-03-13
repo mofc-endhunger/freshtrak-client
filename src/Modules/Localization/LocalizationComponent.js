@@ -118,7 +118,7 @@ let localization = new LocalizedStrings({
 		title_past_events: "Past Events",
 		text_no_past_events: "No past events found.",
 		text_past_events_description:
-			"Your event history from the last 2 weeks.",
+			"Your event history from the last 30 days.",
 		status_cancelled: "Cancelled",
 		status_confirmed: "Confirmed",
 
@@ -959,7 +959,7 @@ let localization = new LocalizedStrings({
 		title_past_events: "Eventos Pasados",
 		text_no_past_events: "No se encontraron eventos pasados.",
 		text_past_events_description:
-			"Su historial de eventos de las últimas 2 semanas.",
+			"Su historial de eventos de los últimos 30 días.",
 		status_cancelled: "Cancelado",
 		status_confirmed: "Confirmado",
 
@@ -1796,7 +1796,7 @@ let localization = new LocalizedStrings({
 		title_past_events: "Dhacdooyinkii Hore",
 		text_no_past_events: "Lama helin dhacdooyin hore.",
 		text_past_events_description:
-			"Taariikhda dhacdooyinkaaga 2-dii toddobaad ee la soo dhaafay.",
+			"Taariikhda dhacdooyinkaaga 30-kii maalmood ee la soo dhaafay.",
 		status_cancelled: "La Joojiyay",
 		status_confirmed: "La Xaqiijiyay",
 
@@ -2651,7 +2651,7 @@ let localization = new LocalizedStrings({
 		title_past_events: "Прошедшие мероприятия",
 		text_no_past_events: "Прошедшие мероприятия не найдены.",
 		text_past_events_description:
-			"История ваших мероприятий за последние 2 недели.",
+			"История ваших мероприятий за последние 30 дней.",
 		status_cancelled: "Отменено",
 		status_confirmed: "Подтверждено",
 
@@ -3490,7 +3490,7 @@ let localization = new LocalizedStrings({
 		// PAST EVENTS / HISTORY
 		title_past_events: "Geçmiş Etkinlikler",
 		text_no_past_events: "Geçmiş etkinlik bulunamadı.",
-		text_past_events_description: "Son 2 haftadaki etkinlik geçmişiniz.",
+		text_past_events_description: "Son 30 gündeki etkinlik geçmişiniz.",
 		status_cancelled: "İptal Edildi",
 		status_confirmed: "Onaylandı",
 
@@ -4306,7 +4306,7 @@ let localization = new LocalizedStrings({
 		// PAST EVENTS / HISTORY
 		title_past_events: "الأحداث السابقة",
 		text_no_past_events: "لم يتم العثور على أحداث سابقة.",
-		text_past_events_description: "سجل أحداثك من الأسبوعين الماضيين.",
+		text_past_events_description: "سجل أحداثك من آخر 30 يومًا.",
 		status_cancelled: "ملغى",
 		status_confirmed: "مؤكد",
 
@@ -5097,7 +5097,7 @@ let localization = new LocalizedStrings({
 		// PAST EVENTS / HISTORY
 		title_past_events: "过去的活动",
 		text_no_past_events: "未找到过去的活动。",
-		text_past_events_description: "您过去2周的活动历史。",
+		text_past_events_description: "您过去30天的活动历史。",
 		status_cancelled: "已取消",
 		status_confirmed: "已确认",
 
@@ -5872,7 +5872,7 @@ let localization = new LocalizedStrings({
 		title_past_events: "पिछले कार्यक्रम",
 		text_no_past_events: "कोई पिछले कार्यक्रम नहीं मिले।",
 		text_past_events_description:
-			"पिछले 2 सप्ताह का आपका कार्यक्रम इतिहास।",
+			"पिछले 30 दिनों का आपका कार्यक्रम इतिहास।",
 		status_cancelled: "रद्द",
 		status_confirmed: "पुष्टि",
 
@@ -6688,7 +6688,7 @@ let localization = new LocalizedStrings({
 		// PAST EVENTS / HISTORY
 		title_past_events: "विगतका कार्यक्रमहरू",
 		text_no_past_events: "विगतका कार्यक्रमहरू फेला परेनन्।",
-		text_past_events_description: "गत २ हप्ताको तपाईंको कार्यक्रम इतिहास।",
+		text_past_events_description: "गत ३० दिनको तपाईंको कार्यक्रम इतिहास।",
 		status_cancelled: "रद्द",
 		status_confirmed: "पुष्टि",
 

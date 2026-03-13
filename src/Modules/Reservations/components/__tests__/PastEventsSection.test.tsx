@@ -49,7 +49,7 @@ jest.mock("../../../Localization/LocalizationComponent", () => ({
 	__esModule: true,
 	default: {
 		title_past_events: "Past Events",
-		text_past_events_description: "Your event history from the last 2 weeks.",
+		text_past_events_description: "Your event history from the last 30 days.",
 		loading_reservations: "Loading past events...",
 		text_no_past_events: "No past events found.",
 		error_loading_reservations: "Failed to load past events",

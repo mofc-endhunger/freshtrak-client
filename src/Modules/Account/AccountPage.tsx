@@ -35,7 +35,8 @@ import {
 import { StorageService } from "../../Utils/StorageService";
 import { LoadingCard } from "../Households/components/LoadingSpinner";
 import { UsersMeResponse } from "../Households/types/api.types";
-import { calculateAge } from "../Households/utils/householdUtils";
+import { calculateAge, getSuffixFromId } from "../Households/utils/householdUtils";
+import { formatUSPhoneInput } from "../Family/utils/phoneFormatting";
 import localization from "../Localization/LocalizationComponent";
 
 /**
@@ -238,6 +239,8 @@ const AccountPage: React.FC = () => {
 								<h2 className="text-xl font-semibold text-highlight mt-2">
 									{householdData.members[0].first_name}{" "}
 									{householdData.members[0].last_name}
+									{getSuffixFromId(householdData.members[0].suffix_id) &&
+										` ${getSuffixFromId(householdData.members[0].suffix_id)}`}
 								</h2>
 							)}
 						<p className="text-gray-600 mt-2">
@@ -354,6 +357,8 @@ const AccountPage: React.FC = () => {
 																		.members[0]
 																		.last_name
 																}
+																{getSuffixFromId(householdData.members[0].suffix_id) &&
+																	` ${getSuffixFromId(householdData.members[0].suffix_id)}`}
 															</>
 														)}
 												</h3>
@@ -509,9 +514,9 @@ const AccountPage: React.FC = () => {
 																			":"}
 																</p>
 																<p className="text-sm text-gray-600">
-																	{
+																	{formatUSPhoneInput(
 																		householdData.phone
-																	}
+																	)}
 																</p>
 															</div>
 														</div>
@@ -631,8 +636,8 @@ const AccountPage: React.FC = () => {
 																				{member.middle_name &&
 																					` ${member.middle_name}`}
 																				{` ${member.last_name}`}
-																				{member.suffix &&
-																					` ${member.suffix}`}
+																				{getSuffixFromId(member.suffix_id) &&
+																					` ${getSuffixFromId(member.suffix_id)}`}
 																			</h4>
 																			{member.is_head_of_household ===
 																				1 && (
@@ -704,9 +709,9 @@ const AccountPage: React.FC = () => {
 																								":"}
 																					</p>
 																					<p className="text-sm text-gray-600">
-																						{
+																						{formatUSPhoneInput(
 																							member.phone
-																						}
+																						)}
 																					</p>
 																				</div>
 																			</div>

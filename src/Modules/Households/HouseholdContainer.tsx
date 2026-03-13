@@ -18,9 +18,10 @@ import HouseholdRegistrationComponent from "./components/HouseholdRegistrationCo
 import { AuthGuard } from "./components/AuthGuard";
 import { Button } from "../../components/ui/button";
 import { Settings } from "lucide-react";
-import { getGenderId } from "./utils/householdUtils";
+import { getGenderId, getSuffixId } from "./utils/householdUtils";
 import { storeHouseholdToLocalStorage } from "../../Utils/UserRecordHelper";
 import { StorageService } from "../../Utils/StorageService";
+import { normalizePhoneInput } from "../Family/utils/phoneFormatting";
 import LoadingSpinner from "../General/LoadingSpinner";
 
 interface HouseholdContainerProps {
@@ -182,7 +183,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				city: registrationData.city || null,
 				state: registrationData.state || null,
 				zip_code: registrationData.zip_code || null,
-				phone: registrationData.phone || null,
+				phone: registrationData.phone ? normalizePhoneInput(registrationData.phone) : null,
 				email: registrationData.email || null,
 				// Contact preferences
 				permission_to_text: registrationData.permission_to_text ?? null,
@@ -244,17 +245,8 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 						genderId = getGenderId(normalizedGender);
 					}
 
-					// Convert suffix string from form to suffix_id for API
-					const suffixToId: Record<string, number> = {
-						Jr: 1,
-						Sr: 2,
-						II: 3,
-						III: 4,
-						IV: 5,
-						V: 6,
-					};
 					const suffixId = registrationData.suffix
-						? suffixToId[registrationData.suffix] ?? null
+						? getSuffixId(registrationData.suffix) || null
 						: updatedMembers[0].suffix_id
 						? Number(updatedMembers[0].suffix_id)
 						: null;

@@ -15,6 +15,7 @@ import {
   MemberStatusCalculation,
   LanguagePreference,
 } from '../types';
+import localization from '../../Localization/LocalizationComponent';
 
 /**
  * Calculate age from date of birth (timezone-safe)
@@ -175,27 +176,24 @@ export const formatMemberName = (
  */
 export const validateDateOfBirth = (dateOfBirth: string): { isValid: boolean; error?: string } => {
   if (!dateOfBirth) {
-    return { isValid: false, error: 'Date of birth is required' };
+    return { isValid: false, error: localization.error_date_of_birth_required };
   }
 
   const date = new Date(dateOfBirth);
   const today = new Date();
 
-  // Check if date is valid
   if (isNaN(date.getTime())) {
-    return { isValid: false, error: 'Invalid date format' };
+    return { isValid: false, error: localization.error_please_enter_valid_date };
   }
 
-  // Check if date is in the future
   if (date > today) {
-    return { isValid: false, error: 'Date of birth cannot be in the future' };
+    return { isValid: false, error: localization.error_date_of_birth_future };
   }
 
-  // Check if date is too far in the past (reasonable limit: 150 years)
   const minDate = new Date();
   minDate.setFullYear(minDate.getFullYear() - 150);
   if (date < minDate) {
-    return { isValid: false, error: 'Date of birth is too far in the past' };
+    return { isValid: false, error: localization.error_date_of_birth_too_far_past };
   }
 
   return { isValid: true };
@@ -222,7 +220,7 @@ export const validatePhoneNumber = (phone: string): { isValid: boolean; error?: 
     return { isValid: true };
   }
 
-  return { isValid: false, error: 'Please enter a valid 10-digit phone number' };
+  return { isValid: false, error: localization.error_please_enter_valid_phone };
 };
 
 /**
@@ -249,19 +247,20 @@ export const formatPhoneNumber = (phone: string): string => {
  * Format date of birth for display
  */
 export const formatDateOfBirth = (dateOfBirth: string | undefined): string => {
-  if (!dateOfBirth) return 'Not provided';
+  if (!dateOfBirth) return localization.label_not_provided;
 
   try {
     const date = new Date(dateOfBirth);
-    if (isNaN(date.getTime())) return 'Invalid date';
+    if (isNaN(date.getTime())) return localization.label_invalid_date;
 
-    return date.toLocaleDateString('en-US', {
+    const lang = localization.getLanguage() || 'en';
+    return date.toLocaleDateString(lang, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
   } catch (error) {
-    return 'Invalid date';
+    return localization.label_invalid_date;
   }
 };
 
@@ -284,7 +283,7 @@ export const validateEmail = (email: string): { isValid: boolean; error?: string
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return { isValid: false, error: 'Please enter a valid email address' };
+    return { isValid: false, error: localization.error_please_enter_valid_email };
   }
 
   return { isValid: true };
@@ -302,24 +301,23 @@ export const validateAddress = (address: {
   const errors: string[] = [];
 
   if (!address.address_line_1?.trim()) {
-    errors.push('Street address is required');
+    errors.push(localization.error_street_address_required);
   }
 
   if (!address.city?.trim()) {
-    errors.push('City is required');
+    errors.push(localization.error_city_required);
   }
 
   if (!address.state?.trim()) {
-    errors.push('State is required');
+    errors.push(localization.error_state_required);
   }
 
   if (!address.zip_code?.trim()) {
-    errors.push('ZIP code is required');
+    errors.push(localization.error_zip_code_required);
   } else {
-    // Validate ZIP code format (5 digits or 5+4 format)
     const zipRegex = /^\d{5}(-\d{4})?$/;
     if (!zipRegex.test(address.zip_code)) {
-      errors.push('Please enter a valid ZIP code');
+      errors.push(localization.error_please_enter_valid_zip);
     }
   }
 
@@ -333,93 +331,109 @@ export const validateAddress = (address: {
  * Get language display name
  */
 export const getLanguageDisplayName = (language: LanguagePreference): string => {
-  const languageNames: Record<LanguagePreference, string> = {
-    en: 'English',
-    es: 'Spanish',
-    fr: 'French',
-    de: 'German',
-    it: 'Italian',
-    pt: 'Portuguese',
-    zh: 'Chinese',
-    ja: 'Japanese',
-    ko: 'Korean',
-    ar: 'Arabic',
+  const languageKeys: Record<LanguagePreference, string> = {
+    en: localization.option_language_english,
+    es: localization.option_language_spanish,
+    fr: localization.option_language_french,
+    de: localization.option_language_german,
+    it: localization.option_language_italian,
+    pt: localization.option_language_portuguese,
+    zh: localization.option_language_chinese,
+    ja: localization.option_language_japanese,
+    ko: localization.option_language_korean,
+    ar: localization.option_language_arabic,
   };
 
-  return languageNames[language] || language;
+  return languageKeys[language] || language;
 };
 
 /**
  * Get gender display name
  */
 export const getGenderDisplayName = (gender: MemberGender): string => {
-  const genderNames: Record<MemberGender, string> = {
-    male: 'Male',
-    female: 'Female',
-    other: 'Other',
-    prefer_not_to_say: 'Prefer not to say',
+  const genderKeys: Record<MemberGender, string> = {
+    male: localization.option_gender_male,
+    female: localization.option_gender_female,
+    other: localization.option_gender_other,
+    prefer_not_to_say: localization.option_gender_prefer_not_to_say,
   };
 
-  return genderNames[gender] || gender;
+  return genderKeys[gender] || gender;
 };
 
-/**
- * Convert gender_id to MemberGender string
- */
-export const getGenderFromId = (genderId: number): MemberGender => {
-  const genderMap: Record<number, MemberGender> = {
-    1: 'male',
-    2: 'female',
-    3: 'other',
-    4: 'prefer_not_to_say',
-  };
+const GENDER_ID_MAP: [number, MemberGender][] = [
+  [1, 'male'],
+  [2, 'female'],
+  [3, 'other'],
+  [4, 'prefer_not_to_say'],
+];
 
-  return genderMap[genderId] || 'prefer_not_to_say';
+export const getGenderFromId = (genderId: number | string | null | undefined): MemberGender | undefined => {
+  if (genderId == null) return undefined;
+  const id = typeof genderId === 'string' ? parseInt(genderId, 10) : genderId;
+  if (isNaN(id)) return undefined;
+  return GENDER_ID_MAP.find(([i]) => i === id)?.[1];
 };
 
-/**
- * Convert MemberGender string to gender_id
- */
-export const getGenderId = (gender: MemberGender): number => {
-  const genderIdMap: Record<MemberGender, number> = {
-    male: 1,
-    female: 2,
-    other: 3,
-    prefer_not_to_say: 4,
-  };
+export const getGenderId = (gender: MemberGender | string): number =>
+  GENDER_ID_MAP.find(([, g]) => g === gender)?.[0] ?? 0;
 
-  return genderIdMap[gender] || 4;
+const SUFFIX_ID_MAP: [number, string][] = [
+  [1, 'Jr'],
+  [2, 'Sr'],
+  [3, 'II'],
+  [4, 'III'],
+  [5, 'IV'],
+  [6, 'V'],
+];
+
+const SUFFIX_ALIASES: Record<string, string> = {
+  'Jr.': 'Jr',
+  'Sr.': 'Sr',
+};
+
+export const getSuffixFromId = (suffixId: number | string | null | undefined): string => {
+  if (!suffixId) return '';
+  const id = typeof suffixId === 'string' ? parseInt(suffixId, 10) : suffixId;
+  if (isNaN(id)) return '';
+  return SUFFIX_ID_MAP.find(([i]) => i === id)?.[1] ?? '';
+};
+
+export const getSuffixId = (suffix: string | null | undefined): number => {
+  if (!suffix) return 0;
+  const normalized = SUFFIX_ALIASES[suffix] ?? suffix;
+  return SUFFIX_ID_MAP.find(([, s]) => s === normalized)?.[0] ?? 0;
 };
 
 /**
  * Get race display name
  */
 export const getRaceDisplayName = (race: MemberRace): string => {
-  const raceNames: Record<MemberRace, string> = {
-    american_indian: 'American Indian or Alaska Native',
-    asian: 'Asian',
-    black: 'Black or African American',
-    hispanic: 'Hispanic or Latino',
-    native_hawaiian: 'Native Hawaiian or Other Pacific Islander',
-    white: 'White',
-    other: 'Other',
-    prefer_not_to_say: 'Prefer not to say',
+  const raceKeys: Record<MemberRace, string> = {
+    american_indian: localization.option_race_american_indian,
+    asian: localization.option_race_asian,
+    black: localization.option_race_black,
+    hispanic: localization.option_race_hispanic,
+    native_hawaiian: localization.option_race_native_hawaiian,
+    white: localization.option_race_white,
+    other: localization.option_race_other,
+    prefer_not_to_say: localization.option_race_prefer_not_to_say,
   };
 
-  return raceNames[race] || race;
+  return raceKeys[race] || race;
 };
 
 /**
  * Get ethnicity display name
  */
 export const getEthnicityDisplayName = (ethnicity: MemberEthnicity): string => {
-  const ethnicityNames: Record<MemberEthnicity, string> = {
-    hispanic: 'Hispanic or Latino',
-    non_hispanic: 'Not Hispanic or Latino',
-    prefer_not_to_say: 'Prefer not to say',
+  const ethnicityKeys: Record<MemberEthnicity, string> = {
+    hispanic: localization.option_ethnicity_hispanic,
+    non_hispanic: localization.option_ethnicity_non_hispanic,
+    prefer_not_to_say: localization.option_ethnicity_prefer_not_to_say,
   };
 
-  return ethnicityNames[ethnicity] || ethnicity;
+  return ethnicityKeys[ethnicity] || ethnicity;
 };
 
 /**

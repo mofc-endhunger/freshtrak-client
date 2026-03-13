@@ -21,7 +21,7 @@ import { Button } from "../ui/button";
 
 // Utility imports
 import { formatDateForServer } from "../../Utils/DateFormat";
-import { getGenderId } from "../../Modules/Households/utils/householdUtils";
+import { getGenderId, getSuffixId } from "../../Modules/Households/utils/householdUtils";
 import { StorageService } from "../../Utils/StorageService";
 
 // Type imports
@@ -514,18 +514,6 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		modifiedInput = modifiedInput.replace(/\s\s+/g, " ");
 		modifiedInput = modifiedInput.replace(/[^A-Za-z0-9 \-_.@'`]/g, "");
 		return modifiedInput;
-	};
-
-	const getSuffixId = (suffix: string): number => {
-		const suffixMap: { [key: string]: number } = {
-			Jr: 1,
-			Sr: 2,
-			II: 3,
-			III: 4,
-			IV: 5,
-			V: 6,
-		};
-		return suffixMap[suffix] || 0;
 	};
 
 	// Button components

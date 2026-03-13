@@ -17,7 +17,7 @@ import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 // Type imports
 import { RegistrationFormData } from "../../Registration/types/registration.types";
 import { ApiHouseholdMember } from "../types/api.types";
-import { getGenderFromId } from "../utils/householdUtils";
+import { getGenderFromId, getSuffixFromId } from "../utils/householdUtils";
 import localization from "../../Localization/LocalizationComponent";
 
 interface HouseholdRegistrationComponentProps {
@@ -98,7 +98,7 @@ const HouseholdRegistrationComponent: React.FC<
 					): string => {
 						if (!genderId) return "";
 						const gender = getGenderFromId(genderId);
-						// Map from household format to form format
+						if (!gender) return "";
 						const genderMap: Record<string, string> = {
 							male: "male",
 							female: "female",
@@ -106,19 +106,6 @@ const HouseholdRegistrationComponent: React.FC<
 							prefer_not_to_say: "not_specify",
 						};
 					return genderMap[gender] || "";
-				};
-
-				const getSuffixForForm = (suffixId: number | null): string => {
-					if (!suffixId) return "";
-					const suffixMap: Record<number, string> = {
-						1: "Jr",
-						2: "Sr",
-						3: "II",
-						4: "III",
-						5: "IV",
-						6: "V",
-					};
-					return suffixMap[suffixId] || "";
 				};
 
 			// Get counts from API response
@@ -129,9 +116,7 @@ const HouseholdRegistrationComponent: React.FC<
 				first_name: primaryMember.first_name || "",
 				last_name: primaryMember.last_name || "",
 				middle_name: primaryMember.middle_name || "",
-				suffix: getSuffixForForm(
-					primaryMember.suffix_id || null
-				),
+				suffix: getSuffixFromId(primaryMember.suffix_id),
 				date_of_birth: convertDateFormat(
 						primaryMember.date_of_birth || ""
 					),

@@ -66,9 +66,18 @@ jest.mock("../../General/LoadingSpinner", () => {
 
 jest.mock("../../Localization/LocalizationComponent", () => ({
 	__esModule: true,
-	default: {
-		registartion_register: "Register",
-	},
+	default: new Proxy(
+		{
+			formatString: (str: string, ...args: any[]) =>
+				args.reduce(
+					(s: string, arg: any, i: number) =>
+						s.replace(`{${i}}`, String(arg)),
+					str,
+				),
+			getLanguage: () => "en",
+		},
+		{ get: (target: any, prop: string) => target[prop] ?? prop },
+	),
 }));
 
 // Mock the opc-timeline

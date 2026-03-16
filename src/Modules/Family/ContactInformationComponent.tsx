@@ -65,9 +65,9 @@ const ContactInformationComponent: React.FC<
 						placeholder="(xxx) xxx-xxxx"
 						id="phone"
 						value={phone}
-						onChange={(e: string) => {
-							setValue("phone", e);
-						}}
+					onChange={(e: string) => {
+						setValue("phone", e, { shouldValidate: true });
+					}}
 					/>
 					{/* Hidden input for phone validation */}
 					<input

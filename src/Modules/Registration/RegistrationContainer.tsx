@@ -31,6 +31,7 @@ import {
 	getGenderFromId,
 	getSuffixFromId,
 	getSuffixId,
+	getAdditionalMemberCounts,
 } from "../Households/utils/householdUtils";
 import { StorageService } from "../../Utils/StorageService";
 import { normalizePhoneInput } from "../Family/utils/phoneFormatting";
@@ -326,23 +327,18 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						suffix: primaryMember
 							? getSuffixFromId(primaryMember.suffix_id)
 							: user.suffix || "",
-						// Prefill household member counts
-						// Subtract 1 from adults because head of household is counted as an adult
-						adults_in_household:
-							Math.max(
-								0,
-								(householdData.counts?.adults || 0) - 1,
-							) || user.adults_in_household,
-						children_in_household:
-							householdData.counts?.children ||
-							user.children_in_household,
-						// Only trust API seniors count if head of household has valid DOB
-						// Backend defaults DOB to "1900-01-01" which would incorrectly count as 125+ years old (senior)
-						seniors_in_household:
-							primaryMember?.date_of_birth &&
-							primaryMember.date_of_birth !== "1900-01-01"
-								? householdData.counts?.seniors || 0
-								: user.seniors_in_household || 0,
+						// Prefill household member counts (excludes HOH from the correct age bucket)
+						...((): Pick<RegistrationFormData, 'adults_in_household' | 'children_in_household' | 'seniors_in_household'> => {
+							const counts = getAdditionalMemberCounts(
+								householdData.counts || {},
+								primaryMember?.date_of_birth,
+							);
+							return {
+								seniors_in_household: counts.seniors,
+								adults_in_household: counts.adults,
+								children_in_household: counts.children,
+							};
+						})(),
 						// Prefill household name if available
 						identification_code:
 							householdData.identification_code ||

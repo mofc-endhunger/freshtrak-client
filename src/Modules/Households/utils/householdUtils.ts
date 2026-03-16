@@ -147,6 +147,28 @@ export const calculateHouseholdCounts = (members: HouseholdMember[]): HouseholdC
 };
 
 /**
+ * Compute additional-member counts by subtracting the HOH from the correct
+ * age bucket.  The backend counts include the HOH, but the UI shows
+ * "additional members besides yourself", so we need to subtract 1 from
+ * whichever category the HOH belongs to.
+ */
+export const getAdditionalMemberCounts = (
+  apiCounts: { seniors?: number; adults?: number; children?: number },
+  hohDateOfBirth: string | null | undefined,
+): { seniors: number; adults: number; children: number } => {
+  const hohStatus =
+    hohDateOfBirth && hohDateOfBirth !== '1900-01-01'
+      ? getMemberStatus(hohDateOfBirth)
+      : { isChild: false, isAdult: true, isSenior: false };
+
+  return {
+    seniors: Math.max(0, (apiCounts.seniors || 0) - (hohStatus.isSenior ? 1 : 0)),
+    adults: Math.max(0, (apiCounts.adults || 0) - (hohStatus.isAdult ? 1 : 0)),
+    children: Math.max(0, (apiCounts.children || 0) - (hohStatus.isChild ? 1 : 0)),
+  };
+};
+
+/**
  * Generate avatar initials from member name
  */
 export const generateAvatarInitials = (firstName: string, lastName: string): string => {

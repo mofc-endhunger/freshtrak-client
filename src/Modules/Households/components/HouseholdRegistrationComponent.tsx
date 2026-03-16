@@ -17,7 +17,7 @@ import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 // Type imports
 import { RegistrationFormData } from "../../Registration/types/registration.types";
 import { ApiHouseholdMember } from "../types/api.types";
-import { getGenderFromId, getSuffixFromId } from "../utils/householdUtils";
+import { getGenderFromId, getSuffixFromId, getAdditionalMemberCounts } from "../utils/householdUtils";
 import localization from "../../Localization/LocalizationComponent";
 
 interface HouseholdRegistrationComponentProps {
@@ -108,10 +108,12 @@ const HouseholdRegistrationComponent: React.FC<
 					return genderMap[gender] || "";
 				};
 
-			// Get counts from API response
-				// These counts represent additional household members (not including head of household)
-				const apiCounts = userData.counts || { seniors: 0, adults: 0, children: 0 };
-				
+			// Compute additional-member counts (excludes HOH from the correct age bucket)
+				const additionalCounts = getAdditionalMemberCounts(
+					userData.counts || {},
+					primaryMember.date_of_birth,
+				);
+
 				setPrefilledData({
 				first_name: primaryMember.first_name || "",
 				last_name: primaryMember.last_name || "",
@@ -135,17 +137,9 @@ const HouseholdRegistrationComponent: React.FC<
 						userData.permission_to_text ?? false,
 					permission_to_email:
 						userData.permission_to_email ?? false,
-				// Household member counts (additional members, not including head of household)
-				// Subtract 1 from adults count because head of household is counted as an adult
-				// Only trust API seniors count if head of household has valid DOB
-				// Backend defaults DOB to "1900-01-01" which would incorrectly count as 125+ years old (senior)
-				seniors_in_household:
-					primaryMember.date_of_birth &&
-					primaryMember.date_of_birth !== "1900-01-01"
-						? apiCounts.seniors || 0
-						: 0,
-				adults_in_household: Math.max(0, (apiCounts.adults || 0) - 1),
-				children_in_household: apiCounts.children || 0,
+				seniors_in_household: additionalCounts.seniors,
+				adults_in_household: additionalCounts.adults,
+				children_in_household: additionalCounts.children,
 				});
 				} else {
 					// No members found - set empty prefilled data

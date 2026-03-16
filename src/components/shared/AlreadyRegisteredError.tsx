@@ -9,6 +9,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { RENDER_URL } from "../../Utils/Urls";
+import localization from "../../Modules/Localization/LocalizationComponent";
 
 interface AlreadyRegisteredErrorProps {
 	eventName?: string;
@@ -54,26 +55,24 @@ const AlreadyRegisteredError: React.FC<AlreadyRegisteredErrorProps> = ({
 
 					{/* Title */}
 					<h2 className="text-2xl font-bold text-center text-gray-900 mb-4">
-						Already Registered
+						{localization.text_already_registered}
 					</h2>
 
 					{/* Message */}
 					<p className="text-center text-gray-600 mb-6">
 						{eventName ? (
 							<>
-								You have already registered for{" "}
-								<strong>{eventName}</strong>.
+								{localization.formatString(localization.text_already_registered_for_named_event, <strong>{eventName}</strong>)}
 							</>
 						) : (
-							<>You have already registered for this event.</>
+							<>{localization.text_already_registered_for_event}</>
 						)}
 					</p>
 
 					{/* Additional Info */}
 					<div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
 						<p className="text-sm text-blue-800 text-center">
-							If you believe this is a mistake, please contact us
-							for assistance.
+							{localization.text_if_mistake_contact_us}
 						</p>
 					</div>
 
@@ -85,14 +84,14 @@ const AlreadyRegisteredError: React.FC<AlreadyRegisteredErrorProps> = ({
 							onClick={handleBackToHome}
 							className="min-w-48"
 						>
-							Back to Home
+							{localization.button_back_to_home}
 						</Button>
 					</div>
 
 					{/* Contact Info */}
 					<div className="mt-8 pt-6 border-t border-gray-200 text-center">
 						<p className="text-sm text-gray-500">
-							Need help? Contact us at{" "}
+							{localization.text_need_help_contact}{" "}
 							<a
 								href="mailto:support@freshtrak.org"
 								className="text-blue-600 hover:text-blue-800 underline"

@@ -5,7 +5,7 @@
  * into a single, reusable component that handles both registration and household setup flows.
  */
 
-import React, { Fragment, useEffect, useState, useMemo } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 // Component imports
@@ -58,12 +58,11 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 	className = "",
 	"data-testid": testId = "household-form",
 }) => {
-	// Get mode configuration
-	const modeConfig: FormModeConfig = useMemo(() => {
-		return mode === "registration"
+	// Computed on every render so step titles update when the language changes
+	const modeConfig: FormModeConfig =
+		mode === "registration"
 			? getRegistrationModeConfig()
 			: getHouseholdSetupModeConfig();
-	}, [mode]);
 
 	// Form setup
 	const {
@@ -559,14 +558,13 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		const totalSteps = steps.length;
 		const progressPercentage = ((currentStepIndex + 1) / totalSteps) * 100;
 
-		// Helper function to get abbreviated step title for mobile
 		const getAbbreviatedTitle = (title: string): string => {
 			const abbreviations: Record<string, string> = {
-				"Your Details": "Details",
-				"Your Address Details": "Address",
-				"Your Family Details": "Family",
-				"Contact Information": "Contact",
-				"Family Member Details": "Members",
+				[localization.title_your_details]: localization.abbrev_details,
+				[localization.title_your_address_details]: localization.abbrev_address,
+				[localization.title_your_family_details]: localization.abbrev_family,
+				[localization.title_contact_information]: localization.abbrev_contact,
+				[localization.title_family_member_details]: localization.abbrev_members,
 			};
 			return abbreviations[title] || title;
 		};
@@ -576,7 +574,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				{/* Step X of Y indicator */}
 				<div className="text-center mb-4">
 					<span className="text-sm font-medium text-gray-600">
-						Step {currentStepIndex + 1} of {totalSteps}
+						{localization.formatString(localization.text_step_x_of_y, currentStepIndex + 1, totalSteps)}
 					</span>
 				</div>
 
@@ -590,9 +588,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 							aria-valuenow={currentStepIndex + 1}
 							aria-valuemin={1}
 							aria-valuemax={totalSteps}
-							aria-label={`Step ${
-								currentStepIndex + 1
-							} of ${totalSteps}`}
+							aria-label={String(localization.formatString(localization.text_step_x_of_y, currentStepIndex + 1, totalSteps))}
 						/>
 					</div>
 				</div>
@@ -733,7 +729,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 							{currentHouseholdMembers.length > 1 && (
 								<div className="bg-gray-50 p-4 rounded-lg">
 									<h3 className="text-lg font-semibold text-gray-900 mb-4">
-										Current Household Members
+										{localization.label_current_household_members}
 									</h3>
 									<div className="space-y-2">
 										{getFilteredMembers().map(
@@ -757,8 +753,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 																{member.is_head_of_household ===
 																	1 && (
 																	<span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-																		Head of
-																		Household
+																		{localization.text_head_of_household}
 																	</span>
 																)}
 															</p>
@@ -766,7 +761,7 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 																member.date_of_birth !==
 																	"1900-01-01" && (
 																	<p className="text-sm text-gray-600">
-																		Born:{" "}
+																		{localization.label_born}{" "}
 																		{new Date(
 																			member.date_of_birth,
 																		).toLocaleDateString()}

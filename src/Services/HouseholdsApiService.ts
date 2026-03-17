@@ -27,6 +27,7 @@ import {
   mockHousehold,
   mockHouseholdResponse,
 } from '../Testing/mock-households';
+import { normalizePhoneInput } from '../Modules/Family/utils/phoneFormatting';
 import config from '../config';
 
 /**
@@ -361,7 +362,7 @@ export class HouseholdsApiService {
     const apiData: Record<string, unknown> = {
       first_name: data.primary_first_name || '',
       last_name: data.primary_last_name || '',
-      phone: data.phone || null,
+      phone: data.phone ? normalizePhoneInput(data.phone) : null,
       address_line_1: data.address_line_1 || null,
       city: data.city || null,
       state: data.state || null,

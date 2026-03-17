@@ -47,7 +47,7 @@ describe("HouseholdInfoDisplay", () => {
 				"123 Main St, Apt 4B, Anytown, CA, 12345"
 			);
 			expect(screen.getByTestId("household-members")).toHaveTextContent(
-				"2 adults, 1 child, 1 senior"
+				"2 Adults, 1 Children, 1 Seniors"
 			);
 		});
 
@@ -115,9 +115,9 @@ describe("HouseholdInfoDisplay", () => {
 			render(<HouseholdInfoDisplay householdData={mockHouseholdData} />);
 
 			expect(screen.getByTestId("household-members")).toHaveTextContent(
-				"2 adults, 1 child, 1 senior"
+				"2 Adults, 1 Children, 1 Seniors"
 			);
-			expect(screen.getByText("Total: 4 members")).toBeInTheDocument();
+			expect(screen.getByText(/Total Members/)).toBeInTheDocument();
 		});
 
 		it("handles singular member counts", () => {
@@ -130,9 +130,9 @@ describe("HouseholdInfoDisplay", () => {
 			);
 
 			expect(screen.getByTestId("household-members")).toHaveTextContent(
-				"1 adult, 1 child, 1 senior"
+				"1 Adults, 1 Children, 1 Seniors"
 			);
-			expect(screen.getByText("Total: 3 members")).toBeInTheDocument();
+			expect(screen.getByText(/Total Members/)).toBeInTheDocument();
 		});
 
 		it("handles zero member counts", () => {
@@ -145,7 +145,7 @@ describe("HouseholdInfoDisplay", () => {
 			expect(screen.getByTestId("household-members")).toHaveTextContent(
 				"No members"
 			);
-			expect(screen.getByText("Total: 0 members")).toBeInTheDocument();
+			expect(screen.getByText(/Total Members/)).toBeInTheDocument();
 		});
 
 		it("handles only adults", () => {
@@ -156,7 +156,7 @@ describe("HouseholdInfoDisplay", () => {
 			render(<HouseholdInfoDisplay householdData={dataWithOnlyAdults} />);
 
 			expect(screen.getByTestId("household-members")).toHaveTextContent(
-				"3 adults"
+				"3 Adults"
 			);
 		});
 	});

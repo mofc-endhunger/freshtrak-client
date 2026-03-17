@@ -14,13 +14,17 @@ import { RENDER_URL } from "../../Utils/Urls";
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import HouseholdRegistrationComponent from "./components/HouseholdRegistrationComponent";
 import { Button } from "../../components/ui/button";
-import { getGenderId } from "./utils/householdUtils";
-import { getLanguageOptionByCode, getLanguageOptionById } from "../Localization/languageOptions";
+import { getGenderId, getSuffixId } from "./utils/householdUtils";
+import {
+	getLanguageOptionByCode,
+	getLanguageOptionById,
+} from "../Localization/languageOptions";
 import { setLanguage } from "../Localization/localizationUtils";
 import { setCurrentLanguage } from "../../Store/languageSlice";
 import { useDispatch } from "react-redux";
 import { storeHouseholdToLocalStorage } from "../../Utils/UserRecordHelper";
 import { StorageService } from "../../Utils/StorageService";
+import { normalizePhoneInput } from "../Family/utils/phoneFormatting";
 import LoadingSpinner from "../General/LoadingSpinner";
 
 interface HouseholdContainerProps {
@@ -84,7 +88,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 
 						const response =
 							await householdsApiService.createHousehold(
-								initialHouseholdData
+								initialHouseholdData,
 							);
 
 						// Store household data using centralized helper
@@ -95,7 +99,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 					} catch (error: any) {
 						console.error(
 							"Error creating initial household:",
-							error
+							error,
 						);
 						setError(error.message || "Failed to create household");
 					} finally {
@@ -124,11 +128,22 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 
 			// Update only the fields that were changed, keeping the rest from current data
 			// Exclude updated_at, language_id, preferred_language (API expects language_id only, not code)
-			const { updated_at, language_id: _currentLangId, preferred_language: _omitLangCode, ...currentDataWithoutTimestamp } =
-				currentHouseholdData;
-			const langCode = registrationData.preferred_language || currentHouseholdData.preferred_language || "en";
+			const {
+				updated_at,
+				language_id: _currentLangId,
+				preferred_language: _omitLangCode,
+				...currentDataWithoutTimestamp
+			} = currentHouseholdData;
+			const langCode =
+				registrationData.preferred_language ||
+				currentHouseholdData.preferred_language ||
+				"en";
 			const languageOption = getLanguageOptionByCode(langCode);
-			const languageId = languageOption?.id ?? (_currentLangId !== undefined && _currentLangId !== null ? _currentLangId : undefined);
+			const languageId =
+				languageOption?.id ??
+				(_currentLangId !== undefined && _currentLangId !== null
+					? _currentLangId
+					: undefined);
 			const updateData = {
 				...currentDataWithoutTimestamp,
 				address_line_1: registrationData.address_line_1 || null,
@@ -136,7 +151,9 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 				city: registrationData.city || null,
 				state: registrationData.state || null,
 				zip_code: registrationData.zip_code || null,
-				phone: registrationData.phone || null,
+				phone: registrationData.phone
+					? normalizePhoneInput(registrationData.phone)
+					: null,
 				email: registrationData.email || null,
 				...(languageId !== undefined && { language_id: languageId }),
 				// Contact preferences
@@ -176,7 +193,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 						if (registrationData.gender) {
 							// Normalize gender format for getGenderId
 							const normalizeGender = (
-								gender: string
+								gender: string,
 							):
 								| "male"
 								| "female"
@@ -194,10 +211,16 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 								return "prefer_not_to_say";
 							};
 							const normalizedGender = normalizeGender(
-								registrationData.gender
+								registrationData.gender,
 							);
 							genderId = getGenderId(normalizedGender);
 						}
+
+						const suffixId = registrationData.suffix
+							? getSuffixId(registrationData.suffix) || null
+							: updatedMembers[0].suffix_id
+								? Number(updatedMembers[0].suffix_id)
+								: null;
 
 						// Update primary member details
 						updatedMembers[0] = {
@@ -214,13 +237,13 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 							date_of_birth:
 								registrationData.date_of_birth ||
 								updatedMembers[0].date_of_birth,
-							// Update gender_id from registration data if provided, otherwise keep existing
 							gender_id:
 								genderId !== null
 									? genderId
 									: updatedMembers[0].gender_id
-									? Number(updatedMembers[0].gender_id)
-									: null,
+										? Number(updatedMembers[0].gender_id)
+										: null,
+							suffix_id: suffixId,
 						};
 					}
 
@@ -234,7 +257,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 						if (member.id && member.id > 0) {
 							// Find and update the existing member
 							const existingIndex = updatedMembers.findIndex(
-								(m: any) => m.id === member.id
+								(m: any) => m.id === member.id,
 							);
 							if (existingIndex !== -1) {
 								updatedMembers[existingIndex] = {
@@ -255,7 +278,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 
 					// Add only truly new members (no ID or negative ID)
 					const newMembers = familyMembers.filter(
-						(member: any) => !member.id || member.id < 0
+						(member: any) => !member.id || member.id < 0,
 					);
 					const formattedNewMembers = newMembers.map(
 						(member: any) => ({
@@ -274,7 +297,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 								? Number(member.gender_id)
 								: null,
 							suffix_id: member.suffix_id || null,
-						})
+						}),
 					);
 
 					return [...updatedMembers, ...formattedNewMembers];
@@ -289,7 +312,7 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 					const familyMembers = registrationData.family_members || [];
 					// Count only truly new members (no ID or negative ID)
 					const newMembersCount = familyMembers.filter(
-						(member: any) => !member.id || member.id < 0
+						(member: any) => !member.id || member.id < 0,
 					).length;
 					const existingMembersCount = (
 						currentHouseholdData.members || []
@@ -309,11 +332,12 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 
 			await householdsApiService.updateHousehold(
 				currentHouseholdData.added_by,
-				updateData
+				updateData,
 			);
 
 			// Sync site language with the selected preference
-			const savedLangCode = getLanguageOptionById(languageId ?? 0)?.code ?? "en";
+			const savedLangCode =
+				getLanguageOptionById(languageId ?? 0)?.code ?? "en";
 			dispatch(setCurrentLanguage(savedLangCode));
 			setLanguage(savedLangCode);
 

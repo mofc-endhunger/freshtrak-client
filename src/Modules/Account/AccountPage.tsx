@@ -21,6 +21,11 @@ import {
 import { StorageService } from "../../Utils/StorageService";
 import { LoadingCard } from "../Households/components/LoadingSpinner";
 import { UsersMeResponse } from "../Households/types/api.types";
+import {
+	calculateAge,
+	getSuffixFromId,
+} from "../Households/utils/householdUtils";
+import { formatUSPhoneInput } from "../Family/utils/phoneFormatting";
 import localization from "../Localization/LocalizationComponent";
 import {
 	YourReservations,
@@ -46,7 +51,7 @@ const AccountPage: React.FC = () => {
 
 	const [showHouseholdPrompt, setShowHouseholdPrompt] = useState(false);
 	const [householdData, setHouseholdData] = useState<UsersMeResponse | null>(
-		null
+		null,
 	);
 	const [isLoadingHousehold, setIsLoadingHousehold] = useState(false);
 	const [showSkippedSetupPrompt, setShowSkippedSetupPrompt] = useState(false);
@@ -69,7 +74,7 @@ const AccountPage: React.FC = () => {
 				if (userInfo?.id) {
 					StorageService.setItem(
 						"householdId",
-						userInfo.id.toString()
+						userInfo.id.toString(),
 					);
 				}
 
@@ -86,14 +91,14 @@ const AccountPage: React.FC = () => {
 			} catch (error: any) {
 				console.warn(
 					"AccountPage: Error fetching household data:",
-					error
+					error,
 				);
 
 				// Check if this is a "User not found" / 404 error
 				if (isNotFoundError(error)) {
 					const result = await createUserRecordSingleAttempt(
 						householdsApiService,
-						user?.name
+						user?.name,
 					);
 
 					if (result.success) {
@@ -106,7 +111,7 @@ const AccountPage: React.FC = () => {
 							if (userInfo?.id) {
 								StorageService.setItem(
 									"householdId",
-									userInfo.id.toString()
+									userInfo.id.toString(),
 								);
 							}
 
@@ -117,7 +122,7 @@ const AccountPage: React.FC = () => {
 						} catch (retryError) {
 							console.error(
 								"Failed to fetch user data after fallback creation:",
-								retryError
+								retryError,
 							);
 						}
 					}
@@ -203,7 +208,7 @@ const AccountPage: React.FC = () => {
 							<h1 className="font-noto-sans font-bold text-2xl leading-[35px] tracking-normal text-center text-gray-900 mt-4">
 								{householdData?.members &&
 								householdData.members.length > 0
-									? `${householdData.members[0].first_name} ${householdData.members[0].last_name}`
+									? `${householdData.members[0].first_name} ${householdData.members[0].last_name} ${getSuffixFromId(householdData.members[0].suffix_id)}`
 									: user?.name || user?.email}
 							</h1>
 
@@ -214,7 +219,7 @@ const AccountPage: React.FC = () => {
 								householdData.members[0]
 									.is_head_of_household === 1
 									? localization.text_head_of_household ||
-									  "Head of Household"
+										"Head of Household"
 									: "Household Member"}
 							</p>
 						</div>
@@ -279,7 +284,7 @@ const AccountPage: React.FC = () => {
 														<Button
 															onClick={() => {
 																setShowSkippedSetupPrompt(
-																	false
+																	false,
 																);
 																navigateToHouseholdSetup();
 															}}
@@ -291,7 +296,7 @@ const AccountPage: React.FC = () => {
 														<Button
 															onClick={() =>
 																setShowSkippedSetupPrompt(
-																	false
+																	false,
 																)
 															}
 															variant="ghost"

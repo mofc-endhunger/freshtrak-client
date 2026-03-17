@@ -35,6 +35,12 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 	date_of_birth: "Date of Birth",
 	gender: "Gender",
 	register_personal_info: "Personal Information",
+	label_email: "Email",
+	error_phone_number_required: "Phone number is required",
+	error_email_required: "Email is required",
+	error_field_required: "This field is required",
+	label_no_email_question: "No Email?",
+	label_get_free_email: "Get one free from Google.",
 }));
 
 // Mock React Hook Form

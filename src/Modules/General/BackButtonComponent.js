@@ -4,6 +4,7 @@ import back from "../../Assets/img/back.svg";
 import "../../Assets/scss/main.scss";
 import { RENDER_URL } from "../../Utils/Urls";
 import { DEFAULT_DISTANCE } from "../../Utils/Constants";
+import localization from "../Localization/LocalizationComponent";
 
 const BackButtonComponent = () => {
 	const navigate = useNavigate();
@@ -67,10 +68,10 @@ const BackButtonComponent = () => {
 						onClick={backHome}
 					>
 						<span className="back-arrow">
-							<img alt="back button" src={back} />
+							<img alt={localization.button_back} src={back} />
 						</span>
 						<span className="font-weight-bold text-uppercase ml-2">
-							Back
+							{localization.button_back}
 						</span>
 					</button>
 				</div>

@@ -1,6 +1,7 @@
 // Date Validation Utility Functions with TypeScript Types
 
 import moment from 'moment';
+import localization from '../../Localization/LocalizationComponent';
 
 // Types for date validation
 export interface DateValidationResult {
@@ -78,26 +79,24 @@ export const isValidDateOfBirth = (
   if (!isValidDate(dateString, format)) {
     return {
       isValid: false,
-      error: 'Invalid date format. Please use MM / DD / YYYY',
+      error: localization.error_please_enter_valid_date,
     };
   }
 
   const momentDate = moment(dateString, format);
   const now = moment();
 
-  // Check if date is in the future (if not allowed)
   if (!allowFuture && momentDate.isAfter(now)) {
     return {
       isValid: false,
-      error: 'Date of birth cannot be in the future',
+      error: localization.error_date_of_birth_future,
     };
   }
 
-  // Check if date is in the past (if not allowed)
   if (!allowPast && momentDate.isBefore(now)) {
     return {
       isValid: false,
-      error: 'Date must be in the future',
+      error: localization.error_date_of_birth_future,
     };
   }
 
@@ -108,7 +107,7 @@ export const isValidDateOfBirth = (
   if (age < minAge) {
     return {
       isValid: false,
-      error: `Age must be at least ${minAge} years old`,
+      error: localization.error_please_enter_valid_date,
     };
   }
 
@@ -116,7 +115,7 @@ export const isValidDateOfBirth = (
   if (age > maxAge) {
     return {
       isValid: false,
-      error: `Age cannot exceed ${maxAge} years`,
+      error: localization.error_date_of_birth_too_far_past,
     };
   }
 
@@ -124,14 +123,14 @@ export const isValidDateOfBirth = (
   if (minDate && momentDate.isBefore(moment(minDate))) {
     return {
       isValid: false,
-      error: `Date cannot be before ${moment(minDate).format(format)}`,
+      error: localization.error_date_of_birth_too_far_past,
     };
   }
 
   if (maxDate && momentDate.isAfter(moment(maxDate))) {
     return {
       isValid: false,
-      error: `Date cannot be after ${moment(maxDate).format(format)}`,
+      error: localization.error_date_of_birth_future,
     };
   }
 
@@ -250,7 +249,7 @@ export const isValidDateRange = (
   if (!isValidDate(startDate, format) || !isValidDate(endDate, format)) {
     return {
       isValid: false,
-      error: 'Invalid date format',
+      error: localization.error_please_enter_valid_date,
     };
   }
 
@@ -260,7 +259,7 @@ export const isValidDateRange = (
   if (start.isAfter(end)) {
     return {
       isValid: false,
-      error: 'Start date must be before end date',
+      error: localization.error_please_enter_valid_date,
     };
   }
 
@@ -305,7 +304,7 @@ export const isValidEventDate = (eventDate: string, format: string = DATE_CONSTA
   if (!isValidDate(eventDate, format)) {
     return {
       isValid: false,
-      error: 'Invalid event date format',
+      error: localization.error_please_enter_valid_date,
     };
   }
 
@@ -315,7 +314,7 @@ export const isValidEventDate = (eventDate: string, format: string = DATE_CONSTA
   if (eventMoment.isBefore(now, 'day')) {
     return {
       isValid: false,
-      error: 'Event date must be in the future',
+      error: localization.error_date_of_birth_future,
     };
   }
 
@@ -344,7 +343,7 @@ export const isValidTimeRange = (startTime: string, endTime: string): DateValida
   if (!isValidTimeFormat(startTime) || !isValidTimeFormat(endTime)) {
     return {
       isValid: false,
-      error: 'Invalid time format. Use HH:MM AM/PM',
+      error: localization.error_please_enter_valid_date,
     };
   }
 
@@ -354,7 +353,7 @@ export const isValidTimeRange = (startTime: string, endTime: string): DateValida
   if (start.isSameOrAfter(end)) {
     return {
       isValid: false,
-      error: 'Start time must be before end time',
+      error: localization.error_please_enter_valid_date,
     };
   }
 
@@ -461,7 +460,7 @@ export const validateDateWithRules = (
   if (required && (!dateString || dateString.trim() === '')) {
     return {
       isValid: false,
-      error: 'Date is required',
+      error: localization.error_date_of_birth_required,
     };
   }
 
@@ -499,25 +498,22 @@ export const validateDateWithRules = (
  */
 export const validateDobNative = (value: string): string | true => {
   if (!value) {
-    return "Date of birth is required";
+    return localization.error_date_of_birth_required;
   }
 
   const date = moment(value, DATE_CONSTANTS.SERVER_FORMAT, true);
 
-  // Check if date is valid
   if (!date.isValid()) {
-    return "Please enter a valid date";
+    return localization.error_please_enter_valid_date;
   }
 
-  // Check if date is in the future
   if (date.isAfter(moment())) {
-    return "Date of birth cannot be in the future";
+    return localization.error_date_of_birth_future;
   }
 
-  // Check if date is too far in the past (max 123 years)
   const maxAgeDate = moment().subtract(DATE_CONSTANTS.MAX_AGE, "years");
   if (date.isBefore(maxAgeDate)) {
-    return "Please enter a valid date of birth";
+    return localization.error_please_enter_valid_date;
   }
 
   return true;
@@ -534,25 +530,22 @@ export const validateDobNative = (value: string): string | true => {
  */
 export const validateDobText = (value: string): string | true => {
   if (!value) {
-    return "Date of birth is required";
+    return localization.error_date_of_birth_required;
   }
 
   const date = moment(value, DATE_CONSTANTS.DEFAULT_FORMAT, true);
 
-  // Check if date is valid
   if (!date.isValid()) {
-    return "Please enter a valid date";
+    return localization.error_please_enter_valid_date;
   }
 
-  // Check if date is in the future
   if (date.isAfter(moment())) {
-    return "Date of birth cannot be in the future";
+    return localization.error_date_of_birth_future;
   }
 
-  // Check if date is too far in the past (max 123 years)
   const maxAgeDate = moment().subtract(DATE_CONSTANTS.MAX_AGE, "years");
   if (date.isBefore(maxAgeDate)) {
-    return "Please enter a valid date of birth";
+    return localization.error_please_enter_valid_date;
   }
 
   return true;

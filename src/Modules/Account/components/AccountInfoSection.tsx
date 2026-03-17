@@ -11,6 +11,7 @@ import InfoCard from "./InfoCard";
 import { UsersMeResponse } from "../../Households/types/api.types";
 import { calculateAgeFromDOB } from "../utils/memberUtils";
 import localization from "../../Localization/LocalizationComponent";
+import { getSuffixFromId } from "../../Households/utils/householdUtils";
 
 interface AccountInfoSectionProps {
 	householdData: UsersMeResponse | null;
@@ -21,7 +22,7 @@ const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
 }) => {
 	// Find head of household from members
 	const headOfHousehold = householdData?.members?.find(
-		(member: any) => member.is_head_of_household === 1
+		(member: any) => member.is_head_of_household === 1,
 	);
 
 	// Format address
@@ -76,6 +77,7 @@ const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
 			headOfHousehold.first_name,
 			headOfHousehold.middle_name,
 			headOfHousehold.last_name,
+			getSuffixFromId(headOfHousehold.suffix_id),
 		]
 			.filter(Boolean)
 			.join(" ");
@@ -89,12 +91,12 @@ const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
 						month: "short",
 						day: "numeric",
 						year: "numeric",
-				  })
+					})
 				: null;
 
 		// Convert gender_id to readable label (handle both string and number)
 		const getGenderLabel = (
-			genderId: number | string | null
+			genderId: number | string | null,
 		): string | null => {
 			if (!genderId) return null;
 			const id = Number(genderId);

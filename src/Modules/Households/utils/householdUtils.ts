@@ -355,15 +355,15 @@ export const validateAddress = (address: {
 export const getLanguageDisplayName = (language: LanguagePreference): string => {
   const languageKeys: Record<LanguagePreference, string> = {
     en: localization.option_language_english,
-    es: localization.option_language_spanish,
-    fr: localization.option_language_french,
-    de: localization.option_language_german,
-    it: localization.option_language_italian,
-    pt: localization.option_language_portuguese,
-    zh: localization.option_language_chinese,
-    ja: localization.option_language_japanese,
-    ko: localization.option_language_korean,
-    ar: localization.option_language_arabic,
+    spa: localization.option_language_spanish,
+    som: localization.option_language_somali,
+    rus: localization.option_language_russian,
+    tur: localization.option_language_turkish,
+    ara: localization.option_language_arabic,
+    zho: localization.option_language_chinese,
+    hin: localization.option_language_hindi,
+    nep: localization.option_language_nepali,
+    tgl: localization.option_language_tagalog,
   };
 
   return languageKeys[language] || language;

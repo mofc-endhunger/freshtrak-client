@@ -486,8 +486,10 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_email: "Please enter a valid email address",
 		error_please_select_valid_language: "Please select a valid language",
 		error_date_of_birth_future: "Date of birth cannot be in the future",
-		error_date_of_birth_too_far_past: "Date of birth is too far in the past",
-		error_please_enter_valid_phone: "Please enter a valid 10-digit phone number",
+		error_date_of_birth_too_far_past:
+			"Date of birth is too far in the past",
+		error_please_enter_valid_phone:
+			"Please enter a valid 10-digit phone number",
 		error_please_enter_valid_zip: "Please enter a valid ZIP code",
 		label_not_provided: "Not provided",
 		label_invalid_date: "Invalid date",
@@ -622,6 +624,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Korean",
 		option_language_arabic: "Arabic",
 		option_language_hindi: "Hindi",
+		option_language_somali: "Somali",
+		option_language_russian: "Russian",
+		option_language_turkish: "Turkish",
+		option_language_nepali: "Nepali",
+		option_language_tagalog: "Tagalog",
 		option_language_other: "Other",
 		option_suffix_jr: "Jr",
 		option_suffix_sr: "Sr",
@@ -776,12 +783,16 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP is optional for this event",
 		text_rsvp_required_for_event: "RSVP is required for this event",
 		text_already_registered: "Already Registered",
-		text_already_registered_for_event: "You have already registered for this event.",
-		text_already_registered_for_named_event: "You have already registered for {0}.",
-		text_if_mistake_contact_us: "If you believe this is a mistake, please contact us for assistance.",
+		text_already_registered_for_event:
+			"You have already registered for this event.",
+		text_already_registered_for_named_event:
+			"You have already registered for {0}.",
+		text_if_mistake_contact_us:
+			"If you believe this is a mistake, please contact us for assistance.",
 		text_need_help_contact: "Need help? Contact us at",
 		text_step_x_of_y: "Step {0} of {1}",
-		text_sent_confirmation_code: "We've sent a confirmation code to your email address. Please enter it below.",
+		text_sent_confirmation_code:
+			"We've sent a confirmation code to your email address. Please enter it below.",
 		text_confirming: "Confirming...",
 		text_resending: "Resending...",
 		text_page_not_found: "Oops...! Page Not Found",
@@ -793,7 +804,8 @@ let localization = new LocalizedStrings({
 		button_resend_code: "Resend Code",
 		button_back_to_sign_up: "Back to Sign Up",
 		error_valid_email: "Please enter a valid email address",
-		error_confirmation_code_length: "Confirmation code must be at least 6 characters",
+		error_confirmation_code_length:
+			"Confirmation code must be at least 6 characters",
 		abbrev_details: "Details",
 		abbrev_address: "Address",
 		abbrev_family: "Family",
@@ -1375,10 +1387,14 @@ let localization = new LocalizedStrings({
 			"Por favor ingrese una dirección de correo electrónico válida",
 		error_please_select_valid_language:
 			"Por favor seleccione un idioma válido",
-		error_date_of_birth_future: "La fecha de nacimiento no puede ser en el futuro",
-		error_date_of_birth_too_far_past: "La fecha de nacimiento es demasiado lejana en el pasado",
-		error_please_enter_valid_phone: "Por favor ingrese un número de teléfono válido de 10 dígitos",
-		error_please_enter_valid_zip: "Por favor ingrese un código postal válido",
+		error_date_of_birth_future:
+			"La fecha de nacimiento no puede ser en el futuro",
+		error_date_of_birth_too_far_past:
+			"La fecha de nacimiento es demasiado lejana en el pasado",
+		error_please_enter_valid_phone:
+			"Por favor ingrese un número de teléfono válido de 10 dígitos",
+		error_please_enter_valid_zip:
+			"Por favor ingrese un código postal válido",
 		label_not_provided: "No proporcionado",
 		label_invalid_date: "Fecha inválida",
 		error_something_went_wrong: "Algo salió mal",
@@ -1515,6 +1531,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Coreano",
 		option_language_arabic: "Árabe",
 		option_language_hindi: "Hindi",
+		option_language_somali: "Somalí",
+		option_language_russian: "Ruso",
+		option_language_turkish: "Turco",
+		option_language_nepali: "Nepalí",
+		option_language_tagalog: "Tagalo",
 		option_language_other: "Otro",
 		option_suffix_jr: "Jr",
 		option_suffix_sr: "Sr",
@@ -1597,7 +1618,8 @@ let localization = new LocalizedStrings({
 		button_review_update_instead: "Revisar y actualizar en su lugar",
 		button_no_review_update: "No, revisar y actualizar",
 		button_yes_register: "Sí, registrarse",
-		text_no_household_info_available: "No hay información del hogar disponible.",
+		text_no_household_info_available:
+			"No hay información del hogar disponible.",
 		dialog_discard_changes_description:
 			"Tiene cambios sin guardar. ¿Está seguro de que desea descartarlos? Esta acción no se puede deshacer.",
 		dialog_create_account_description:
@@ -1670,12 +1692,16 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP es opcional para este evento",
 		text_rsvp_required_for_event: "RSVP es requerido para este evento",
 		text_already_registered: "Ya Registrado",
-		text_already_registered_for_event: "Ya se ha registrado para este evento.",
-		text_already_registered_for_named_event: "Ya se ha registrado para {0}.",
-		text_if_mistake_contact_us: "Si cree que esto es un error, contáctenos para obtener ayuda.",
+		text_already_registered_for_event:
+			"Ya se ha registrado para este evento.",
+		text_already_registered_for_named_event:
+			"Ya se ha registrado para {0}.",
+		text_if_mistake_contact_us:
+			"Si cree que esto es un error, contáctenos para obtener ayuda.",
 		text_need_help_contact: "¿Necesita ayuda? Contáctenos en",
 		text_step_x_of_y: "Paso {0} de {1}",
-		text_sent_confirmation_code: "Hemos enviado un código de confirmación a su correo electrónico. Ingréselo a continuación.",
+		text_sent_confirmation_code:
+			"Hemos enviado un código de confirmación a su correo electrónico. Ingréselo a continuación.",
 		text_confirming: "Confirmando...",
 		text_resending: "Reenviando...",
 		text_page_not_found: "¡Ups...! Página No Encontrada",
@@ -1683,11 +1709,13 @@ let localization = new LocalizedStrings({
 		label_error_details: "Detalles del Error",
 		label_message_colon: "Mensaje:",
 		label_code_colon: "Código:",
-		placeholder_enter_confirmation_code: "Ingrese el código de confirmación",
+		placeholder_enter_confirmation_code:
+			"Ingrese el código de confirmación",
 		button_resend_code: "Reenviar Código",
 		button_back_to_sign_up: "Volver al Registro",
 		error_valid_email: "Ingrese una dirección de correo electrónico válida",
-		error_confirmation_code_length: "El código de confirmación debe tener al menos 6 caracteres",
+		error_confirmation_code_length:
+			"El código de confirmación debe tener al menos 6 caracteres",
 		abbrev_details: "Detalles",
 		abbrev_address: "Dirección",
 		abbrev_family: "Familia",
@@ -2261,9 +2289,12 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_email:
 			"Fadlan cinwaanka iimaylka saxda ah geli",
 		error_please_select_valid_language: "Fadlan luqad sax ah dooro",
-		error_date_of_birth_future: "Taariikhda dhalashadu ma noqon karto mustaqbalka",
-		error_date_of_birth_too_far_past: "Taariikhda dhalashadu aad ayey u fog tahay",
-		error_please_enter_valid_phone: "Fadlan geli nambar telefon oo sax ah oo 10 lambar ah",
+		error_date_of_birth_future:
+			"Taariikhda dhalashadu ma noqon karto mustaqbalka",
+		error_date_of_birth_too_far_past:
+			"Taariikhda dhalashadu aad ayey u fog tahay",
+		error_please_enter_valid_phone:
+			"Fadlan geli nambar telefon oo sax ah oo 10 lambar ah",
 		error_please_enter_valid_zip: "Fadlan geli koodhka boostada ee sax ah",
 		label_not_provided: "Lama bixin",
 		label_invalid_date: "Taariikh aan sax ahayn",
@@ -2352,7 +2383,6 @@ let localization = new LocalizedStrings({
 		aria_increase_kids: "Tirada carruurta kordhin",
 		aria_continue_as_guest: "Marti ah sii wadi",
 		aria_expand_collapse: "furi/xidh",
-		aria_processing_registration: "Diiwaangelinta waa la hagaajiyaa",
 		aria_close_map: "Khariidada xidh",
 		aria_view_larger_map: "Khariidada weyn ka eeg guji",
 		aria_back_button: "badhanka dib u noqosha",
@@ -2404,6 +2434,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Kuuriyaan",
 		option_language_arabic: "Carabi",
 		option_language_hindi: "Hindi",
+		option_language_somali: "Soomaali",
+		option_language_russian: "Ruush",
+		option_language_turkish: "Turki",
+		option_language_nepali: "Nebaali",
+		option_language_tagalog: "Tagalog",
 		option_language_other: "Kale",
 		option_suffix_jr: "Jr",
 		option_suffix_sr: "Sr",
@@ -2502,10 +2537,6 @@ let localization = new LocalizedStrings({
 		dialog_confirm_account_title: "Akoon Xaqiiji",
 		dialog_reset_password_title: "Erifka Dib u Deji",
 		dialog_confirm_new_password_title: "Erifka Cusub Xaqiiji",
-		error_title_registration_error: "Khalad Diiwaangelin",
-		button_review_update_instead: "Dib u Eeg oo Cusbooneysii",
-		button_no_review_update: "Maya, dib u eeg oo cusbooneysii",
-		button_yes_register: "Haa, diiwaangeli",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "Shuruudaha Isticmaalka FreshTrak",
@@ -2540,8 +2571,6 @@ let localization = new LocalizedStrings({
 			"Ma jiro macluumaadka cinwaanka la heli karo",
 		text_head_of_household: "Madaxa Qoyska",
 		text_freshtrak_user: "Isticmaale FreshTrak",
-		text_no_household_info_available:
-			"Ma jiro macluumaadka qoyska la heli karo.",
 		title_resource_events: "Dhacdooyinka Kheyraadka",
 		title_events_today: "Dhacdooyinka Maanta",
 		title_events_next_7_days: "Dhacdooyinka 7-da maalmood ee soo socda",
@@ -2573,16 +2602,21 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP waa ikhtiyaari ah dhacdadan",
 		text_rsvp_required_for_event: "RSVP waa lagama maarmaan ah dhacdadan",
 		text_already_registered: "Horeyba waa diiwaangashay",
-		text_already_registered_for_event: "Waxaad hore ugu diiwaangashay dhacdadan.",
-		text_already_registered_for_named_event: "Waxaad hore ugu diiwaangashay {0}.",
-		text_if_mistake_contact_us: "Haddii aad rumaysantahay inay tahay qalad, fadlan nala soo xiriir si aan kaaga caawino.",
+		text_already_registered_for_event:
+			"Waxaad hore ugu diiwaangashay dhacdadan.",
+		text_already_registered_for_named_event:
+			"Waxaad hore ugu diiwaangashay {0}.",
+		text_if_mistake_contact_us:
+			"Haddii aad rumaysantahay inay tahay qalad, fadlan nala soo xiriir si aan kaaga caawino.",
 		text_need_help_contact: "Caawimaad u baahan tahay? Nala soo xiriir",
 		text_step_x_of_y: "Tallaabada {0} ee {1}",
-		text_sent_confirmation_code: "Waxaan ku soo dirnay koodh xaqiijin ciwaanka emailkaaga. Fadlan ku geli halkan hoose.",
+		text_sent_confirmation_code:
+			"Waxaan ku soo dirnay koodh xaqiijin ciwaanka emailkaaga. Fadlan ku geli halkan hoose.",
 		text_confirming: "La xaqiijinayaa...",
 		text_resending: "Dib loo dirayaa...",
 		text_page_not_found: "Waa la waayey...! Bogga Lama Helin",
-		text_validation_errors_on_event: "Khaladaad Xaqiijin ah oo laga Helay Dhacdada",
+		text_validation_errors_on_event:
+			"Khaladaad Xaqiijin ah oo laga Helay Dhacdada",
 		label_error_details: "Faahfaahinta Khaladka",
 		label_message_colon: "Fariin:",
 		label_code_colon: "Koodh:",
@@ -2590,7 +2624,8 @@ let localization = new LocalizedStrings({
 		button_resend_code: "Dib u Dir Koodhka",
 		button_back_to_sign_up: "Ku Noqo Isdiiwaangelinta",
 		error_valid_email: "Fadlan geli cinwaan email oo sax ah",
-		error_confirmation_code_length: "Koodhka xaqiijinta waa inuu ugu yaraan noqdaa 6 xaraf",
+		error_confirmation_code_length:
+			"Koodhka xaqiijinta waa inuu ugu yaraan noqdaa 6 xaraf",
 		abbrev_details: "Faahfaahin",
 		abbrev_address: "Cinwaan",
 		abbrev_family: "Qoys",
@@ -2650,7 +2685,8 @@ let localization = new LocalizedStrings({
 		feedback_title: "Faallo Bixi",
 		feedback_description:
 			"Faalladaada waxay taga bankiga cuntada maxalliga ah si loo xaqiijiyo inaad khibrad wanaagsan hesho markaad kheyraadka hesho.",
-		feedback_visit_question: "Sidee booqashadaada {date} ee {location} aheed?",
+		feedback_visit_question:
+			"Sidee booqashadaada {date} ee {location} aheed?",
 		feedback_experience_label: "Wax nooga sheeg khibraddaada.",
 		feedback_placeholder: "Faalladaada wadaag...",
 		feedback_submit: "Faallo Dir",
@@ -3165,9 +3201,12 @@ let localization = new LocalizedStrings({
 		error_please_select_valid_language:
 			"Пожалуйста, выберите действительный язык",
 		error_date_of_birth_future: "Дата рождения не может быть в будущем",
-		error_date_of_birth_too_far_past: "Дата рождения слишком далеко в прошлом",
-		error_please_enter_valid_phone: "Пожалуйста, введите действительный 10-значный номер телефона",
-		error_please_enter_valid_zip: "Пожалуйста, введите действительный почтовый индекс",
+		error_date_of_birth_too_far_past:
+			"Дата рождения слишком далеко в прошлом",
+		error_please_enter_valid_phone:
+			"Пожалуйста, введите действительный 10-значный номер телефона",
+		error_please_enter_valid_zip:
+			"Пожалуйста, введите действительный почтовый индекс",
 		label_not_provided: "Не указано",
 		label_invalid_date: "Недействительная дата",
 		error_something_went_wrong: "Что-то пошло не так",
@@ -3308,6 +3347,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Корейский",
 		option_language_arabic: "Арабский",
 		option_language_hindi: "Хинди",
+		option_language_somali: "Сомалийский",
+		option_language_russian: "Русский",
+		option_language_turkish: "Турецкий",
+		option_language_nepali: "Непальский",
+		option_language_tagalog: "Тагальский",
 		option_language_other: "Другой",
 		option_suffix_jr: "Мл",
 		option_suffix_sr: "Ст",
@@ -3390,7 +3434,8 @@ let localization = new LocalizedStrings({
 		button_review_update_instead: "Проверить и обновить",
 		button_no_review_update: "Нет, проверить и обновить",
 		button_yes_register: "Да, зарегистрироваться",
-		text_no_household_info_available: "Информация о домохозяйстве недоступна.",
+		text_no_household_info_available:
+			"Информация о домохозяйстве недоступна.",
 		dialog_discard_changes_description:
 			"У вас есть несохраненные изменения. Вы уверены, что хотите их отменить? Это действие нельзя отменить.",
 		dialog_create_account_description:
@@ -3465,12 +3510,16 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP необязателен для этого мероприятия",
 		text_rsvp_required_for_event: "RSVP обязателен для этого мероприятия",
 		text_already_registered: "Уже зарегистрирован",
-		text_already_registered_for_event: "Вы уже зарегистрированы на это мероприятие.",
-		text_already_registered_for_named_event: "Вы уже зарегистрированы на {0}.",
-		text_if_mistake_contact_us: "Если вы считаете, что это ошибка, свяжитесь с нами для получения помощи.",
+		text_already_registered_for_event:
+			"Вы уже зарегистрированы на это мероприятие.",
+		text_already_registered_for_named_event:
+			"Вы уже зарегистрированы на {0}.",
+		text_if_mistake_contact_us:
+			"Если вы считаете, что это ошибка, свяжитесь с нами для получения помощи.",
 		text_need_help_contact: "Нужна помощь? Свяжитесь с нами",
 		text_step_x_of_y: "Шаг {0} из {1}",
-		text_sent_confirmation_code: "Мы отправили код подтверждения на ваш email. Пожалуйста, введите его ниже.",
+		text_sent_confirmation_code:
+			"Мы отправили код подтверждения на ваш email. Пожалуйста, введите его ниже.",
 		text_confirming: "Подтверждение...",
 		text_resending: "Повторная отправка...",
 		text_page_not_found: "Упс...! Страница Не Найдена",
@@ -3482,7 +3531,8 @@ let localization = new LocalizedStrings({
 		button_resend_code: "Отправить Код Повторно",
 		button_back_to_sign_up: "Вернуться к Регистрации",
 		error_valid_email: "Пожалуйста, введите корректный email",
-		error_confirmation_code_length: "Код подтверждения должен содержать не менее 6 символов",
+		error_confirmation_code_length:
+			"Код подтверждения должен содержать не менее 6 символов",
 		abbrev_details: "Детали",
 		abbrev_address: "Адрес",
 		abbrev_family: "Семья",
@@ -4042,7 +4092,8 @@ let localization = new LocalizedStrings({
 		error_please_select_valid_language: "Lütfen geçerli bir dil seçin",
 		error_date_of_birth_future: "Doğum tarihi gelecekte olamaz",
 		error_date_of_birth_too_far_past: "Doğum tarihi çok eski",
-		error_please_enter_valid_phone: "Lütfen geçerli bir 10 haneli telefon numarası girin",
+		error_please_enter_valid_phone:
+			"Lütfen geçerli bir 10 haneli telefon numarası girin",
 		error_please_enter_valid_zip: "Lütfen geçerli bir posta kodu girin",
 		label_not_provided: "Belirtilmedi",
 		label_invalid_date: "Geçersiz tarih",
@@ -4177,6 +4228,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Korece",
 		option_language_arabic: "Arapça",
 		option_language_hindi: "Hintçe",
+		option_language_somali: "Somalice",
+		option_language_russian: "Rusça",
+		option_language_turkish: "Türkçe",
+		option_language_nepali: "Nepalce",
+		option_language_tagalog: "Tagalogca",
 		option_language_other: "Diğer",
 		option_suffix_jr: "Jr",
 		option_suffix_sr: "Sr",
@@ -4333,15 +4389,19 @@ let localization = new LocalizedStrings({
 		text_rsvp_required_for_event: "Bu etkinlik için RSVP zorunludur",
 		text_already_registered: "Zaten Kayıtlı",
 		text_already_registered_for_event: "Bu etkinliğe zaten kayıt oldunuz.",
-		text_already_registered_for_named_event: "{0} etkinliğine zaten kayıt oldunuz.",
-		text_if_mistake_contact_us: "Bunun bir hata olduğunu düşünüyorsanız, yardım için bizimle iletişime geçin.",
+		text_already_registered_for_named_event:
+			"{0} etkinliğine zaten kayıt oldunuz.",
+		text_if_mistake_contact_us:
+			"Bunun bir hata olduğunu düşünüyorsanız, yardım için bizimle iletişime geçin.",
 		text_need_help_contact: "Yardıma mı ihtiyacınız var? Bize ulaşın",
 		text_step_x_of_y: "Adım {0} / {1}",
-		text_sent_confirmation_code: "E-posta adresinize bir onay kodu gönderdik. Lütfen aşağıya girin.",
+		text_sent_confirmation_code:
+			"E-posta adresinize bir onay kodu gönderdik. Lütfen aşağıya girin.",
 		text_confirming: "Onaylanıyor...",
 		text_resending: "Yeniden gönderiliyor...",
 		text_page_not_found: "Hay aksi...! Sayfa Bulunamadı",
-		text_validation_errors_on_event: "Etkinlikte Doğrulama Hataları Bulundu",
+		text_validation_errors_on_event:
+			"Etkinlikte Doğrulama Hataları Bulundu",
 		label_error_details: "Hata Detayları",
 		label_message_colon: "Mesaj:",
 		label_code_colon: "Kod:",
@@ -4900,7 +4960,8 @@ let localization = new LocalizedStrings({
 		error_please_select_valid_language: "يرجى اختيار لغة صالحة",
 		error_date_of_birth_future: "لا يمكن أن يكون تاريخ الميلاد في المستقبل",
 		error_date_of_birth_too_far_past: "تاريخ الميلاد بعيد جداً في الماضي",
-		error_please_enter_valid_phone: "يرجى إدخال رقم هاتف صالح مكون من 10 أرقام",
+		error_please_enter_valid_phone:
+			"يرجى إدخال رقم هاتف صالح مكون من 10 أرقام",
 		error_please_enter_valid_zip: "يرجى إدخال رمز بريدي صالح",
 		label_not_provided: "غير متوفر",
 		label_invalid_date: "تاريخ غير صالح",
@@ -5028,6 +5089,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "الكورية",
 		option_language_arabic: "العربية",
 		option_language_hindi: "الهندية",
+		option_language_somali: "الصومالية",
+		option_language_russian: "الروسية",
+		option_language_turkish: "التركية",
+		option_language_nepali: "النيبالية",
+		option_language_tagalog: "التاغالوغية",
 		option_language_other: "آخر",
 		option_suffix_jr: "الأصغر",
 		option_suffix_sr: "الأكبر",
@@ -5183,10 +5249,12 @@ let localization = new LocalizedStrings({
 		text_already_registered: "مسجل بالفعل",
 		text_already_registered_for_event: "لقد سجلت بالفعل في هذا الحدث.",
 		text_already_registered_for_named_event: "لقد سجلت بالفعل في {0}.",
-		text_if_mistake_contact_us: "إذا كنت تعتقد أن هذا خطأ، يرجى الاتصال بنا للحصول على المساعدة.",
+		text_if_mistake_contact_us:
+			"إذا كنت تعتقد أن هذا خطأ، يرجى الاتصال بنا للحصول على المساعدة.",
 		text_need_help_contact: "تحتاج مساعدة؟ اتصل بنا على",
 		text_step_x_of_y: "الخطوة {0} من {1}",
-		text_sent_confirmation_code: "لقد أرسلنا رمز تأكيد إلى بريدك الإلكتروني. يرجى إدخاله أدناه.",
+		text_sent_confirmation_code:
+			"لقد أرسلنا رمز تأكيد إلى بريدك الإلكتروني. يرجى إدخاله أدناه.",
 		text_confirming: "جارٍ التأكيد...",
 		text_resending: "جارٍ إعادة الإرسال...",
 		text_page_not_found: "عذراً...! الصفحة غير موجودة",
@@ -5198,7 +5266,8 @@ let localization = new LocalizedStrings({
 		button_resend_code: "إعادة إرسال الرمز",
 		button_back_to_sign_up: "العودة إلى التسجيل",
 		error_valid_email: "يرجى إدخال عنوان بريد إلكتروني صالح",
-		error_confirmation_code_length: "يجب أن يكون رمز التأكيد 6 أحرف على الأقل",
+		error_confirmation_code_length:
+			"يجب أن يكون رمز التأكيد 6 أحرف على الأقل",
 		abbrev_details: "التفاصيل",
 		abbrev_address: "العنوان",
 		abbrev_family: "العائلة",
@@ -5855,6 +5924,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "韩语",
 		option_language_arabic: "阿拉伯语",
 		option_language_hindi: "印地语",
+		option_language_somali: "索马里语",
+		option_language_russian: "俄语",
+		option_language_turkish: "土耳其语",
+		option_language_nepali: "尼泊尔语",
+		option_language_tagalog: "他加禄语",
 		option_language_other: "其他",
 		option_suffix_jr: "小",
 		option_suffix_sr: "老",
@@ -6005,10 +6079,12 @@ let localization = new LocalizedStrings({
 		text_already_registered: "已注册",
 		text_already_registered_for_event: "您已注册此活动。",
 		text_already_registered_for_named_event: "您已注册{0}。",
-		text_if_mistake_contact_us: "如果您认为这是一个错误，请联系我们寻求帮助。",
+		text_if_mistake_contact_us:
+			"如果您认为这是一个错误，请联系我们寻求帮助。",
 		text_need_help_contact: "需要帮助？请联系我们",
 		text_step_x_of_y: "第{0}步，共{1}步",
-		text_sent_confirmation_code: "我们已向您的电子邮件地址发送了确认码。请在下方输入。",
+		text_sent_confirmation_code:
+			"我们已向您的电子邮件地址发送了确认码。请在下方输入。",
 		text_confirming: "确认中...",
 		text_resending: "重新发送中...",
 		text_page_not_found: "糟糕...！页面未找到",
@@ -6570,7 +6646,8 @@ let localization = new LocalizedStrings({
 		error_please_select_valid_language: "कृपया एक वैध भाषा चुनें",
 		error_date_of_birth_future: "जन्म तिथि भविष्य में नहीं हो सकती",
 		error_date_of_birth_too_far_past: "जन्म तिथि बहुत पुरानी है",
-		error_please_enter_valid_phone: "कृपया एक वैध 10 अंकों का फ़ोन नंबर दर्ज करें",
+		error_please_enter_valid_phone:
+			"कृपया एक वैध 10 अंकों का फ़ोन नंबर दर्ज करें",
 		error_please_enter_valid_zip: "कृपया एक वैध ज़िप कोड दर्ज करें",
 		label_not_provided: "प्रदान नहीं किया गया",
 		label_invalid_date: "अमान्य तिथि",
@@ -6708,6 +6785,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "कोरियाई",
 		option_language_arabic: "अरबी",
 		option_language_hindi: "हिंदी",
+		option_language_somali: "सोमाली",
+		option_language_russian: "रूसी",
+		option_language_turkish: "तुर्की",
+		option_language_nepali: "नेपाली",
+		option_language_tagalog: "तागालोग",
 		option_language_other: "अन्य",
 		option_suffix_jr: "जूनियर",
 		option_suffix_sr: "सीनियर",
@@ -6860,16 +6942,21 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "इस कार्यक्रम के लिए RSVP वैकल्पिक है",
 		text_rsvp_required_for_event: "इस कार्यक्रम के लिए RSVP आवश्यक है",
 		text_already_registered: "पहले से पंजीकृत",
-		text_already_registered_for_event: "आप पहले से इस कार्यक्रम के लिए पंजीकृत हैं।",
-		text_already_registered_for_named_event: "आप पहले से {0} के लिए पंजीकृत हैं।",
-		text_if_mistake_contact_us: "यदि आपको लगता है कि यह गलती है, तो कृपया सहायता के लिए हमसे संपर्क करें।",
+		text_already_registered_for_event:
+			"आप पहले से इस कार्यक्रम के लिए पंजीकृत हैं।",
+		text_already_registered_for_named_event:
+			"आप पहले से {0} के लिए पंजीकृत हैं।",
+		text_if_mistake_contact_us:
+			"यदि आपको लगता है कि यह गलती है, तो कृपया सहायता के लिए हमसे संपर्क करें।",
 		text_need_help_contact: "सहायता चाहिए? हमसे संपर्क करें",
 		text_step_x_of_y: "चरण {0} / {1}",
-		text_sent_confirmation_code: "हमने आपके ईमेल पते पर एक पुष्टिकरण कोड भेजा है। कृपया इसे नीचे दर्ज करें।",
+		text_sent_confirmation_code:
+			"हमने आपके ईमेल पते पर एक पुष्टिकरण कोड भेजा है। कृपया इसे नीचे दर्ज करें।",
 		text_confirming: "पुष्टि हो रही है...",
 		text_resending: "पुनः भेजा जा रहा है...",
 		text_page_not_found: "उफ़...! पृष्ठ नहीं मिला",
-		text_validation_errors_on_event: "कार्यक्रम में सत्यापन त्रुटियाँ मिलीं",
+		text_validation_errors_on_event:
+			"कार्यक्रम में सत्यापन त्रुटियाँ मिलीं",
 		label_error_details: "त्रुटि विवरण",
 		label_message_colon: "संदेश:",
 		label_code_colon: "कोड:",
@@ -6877,7 +6964,8 @@ let localization = new LocalizedStrings({
 		button_resend_code: "कोड पुनः भेजें",
 		button_back_to_sign_up: "साइन अप पर वापस जाएं",
 		error_valid_email: "कृपया एक मान्य ईमेल पता दर्ज करें",
-		error_confirmation_code_length: "पुष्टिकरण कोड कम से कम 6 वर्ण का होना चाहिए",
+		error_confirmation_code_length:
+			"पुष्टिकरण कोड कम से कम 6 वर्ण का होना चाहिए",
 		abbrev_details: "विवरण",
 		abbrev_address: "पता",
 		abbrev_family: "परिवार",
@@ -7443,7 +7531,8 @@ let localization = new LocalizedStrings({
 		error_please_select_valid_language: "कृपया वैध भाषा छान्नुहोस्",
 		error_date_of_birth_future: "जन्म मिति भविष्यमा हुन सक्दैन",
 		error_date_of_birth_too_far_past: "जन्म मिति धेरै पुरानो छ",
-		error_please_enter_valid_phone: "कृपया वैध 10 अंकको फोन नम्बर प्रविष्ट गर्नुहोस्",
+		error_please_enter_valid_phone:
+			"कृपया वैध 10 अंकको फोन नम्बर प्रविष्ट गर्नुहोस्",
 		error_please_enter_valid_zip: "कृपया वैध जिप कोड प्रविष्ट गर्नुहोस्",
 		label_not_provided: "प्रदान गरिएको छैन",
 		label_invalid_date: "अमान्य मिति",
@@ -7580,6 +7669,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "कोरियाली",
 		option_language_arabic: "अरबी",
 		option_language_hindi: "हिन्दी",
+		option_language_somali: "सोमाली",
+		option_language_russian: "रुसी",
+		option_language_turkish: "टर्किश",
+		option_language_nepali: "नेपाली",
+		option_language_tagalog: "तागालोग",
 		option_language_other: "अन्य",
 		option_suffix_jr: "जुनियर",
 		option_suffix_sr: "सिनियर",
@@ -7733,16 +7827,21 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "यस कार्यक्रमको लागि RSVP वैकल्पिक छ",
 		text_rsvp_required_for_event: "यस कार्यक्रमको लागि RSVP आवश्यक छ",
 		text_already_registered: "पहिले नै दर्ता भएको",
-		text_already_registered_for_event: "तपाईं पहिले नै यो कार्यक्रमको लागि दर्ता भइसक्नुभएको छ।",
-		text_already_registered_for_named_event: "तपाईं पहिले नै {0} को लागि दर्ता भइसक्नुभएको छ।",
-		text_if_mistake_contact_us: "यदि तपाईंलाई यो गल्ती हो भन्ने लाग्छ भने, कृपया सहायताको लागि हामीलाई सम्पर्क गर्नुहोस्।",
+		text_already_registered_for_event:
+			"तपाईं पहिले नै यो कार्यक्रमको लागि दर्ता भइसक्नुभएको छ।",
+		text_already_registered_for_named_event:
+			"तपाईं पहिले नै {0} को लागि दर्ता भइसक्नुभएको छ।",
+		text_if_mistake_contact_us:
+			"यदि तपाईंलाई यो गल्ती हो भन्ने लाग्छ भने, कृपया सहायताको लागि हामीलाई सम्पर्क गर्नुहोस्।",
 		text_need_help_contact: "सहायता चाहिन्छ? हामीलाई सम्पर्क गर्नुहोस्",
 		text_step_x_of_y: "चरण {0} / {1}",
-		text_sent_confirmation_code: "हामीले तपाईंको इमेल ठेगानामा पुष्टिकरण कोड पठाएका छौं। कृपया यसलाई तल प्रविष्ट गर्नुहोस्।",
+		text_sent_confirmation_code:
+			"हामीले तपाईंको इमेल ठेगानामा पुष्टिकरण कोड पठाएका छौं। कृपया यसलाई तल प्रविष्ट गर्नुहोस्।",
 		text_confirming: "पुष्टि गर्दै...",
 		text_resending: "पुनः पठाउँदै...",
 		text_page_not_found: "ओहो...! पृष्ठ फेला परेन",
-		text_validation_errors_on_event: "कार्यक्रममा प्रमाणीकरण त्रुटिहरू भेटियो",
+		text_validation_errors_on_event:
+			"कार्यक्रममा प्रमाणीकरण त्रुटिहरू भेटियो",
 		label_error_details: "त्रुटि विवरण",
 		label_message_colon: "सन्देश:",
 		label_code_colon: "कोड:",
@@ -7750,7 +7849,8 @@ let localization = new LocalizedStrings({
 		button_resend_code: "कोड पुनः पठाउनुहोस्",
 		button_back_to_sign_up: "साइन अपमा फर्कनुहोस्",
 		error_valid_email: "कृपया मान्य इमेल ठेगाना प्रविष्ट गर्नुहोस्",
-		error_confirmation_code_length: "पुष्टिकरण कोड कम्तिमा ६ वर्णको हुनुपर्छ",
+		error_confirmation_code_length:
+			"पुष्टिकरण कोड कम्तिमा ६ वर्णको हुनुपर्छ",
 		abbrev_details: "विवरण",
 		abbrev_address: "ठेगाना",
 		abbrev_family: "परिवार",

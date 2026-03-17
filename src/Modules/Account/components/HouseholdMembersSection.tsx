@@ -12,6 +12,7 @@ import MemberCard from "./MemberCard";
 import { UsersMeResponse } from "../../Households/types/api.types";
 import { RENDER_URL } from "../../../Utils/Urls";
 import localization from "../../Localization/LocalizationComponent";
+import { getSuffixFromId } from "../../Households/utils/householdUtils";
 
 interface HouseholdMembersSectionProps {
 	householdData: UsersMeResponse | null;
@@ -25,7 +26,7 @@ const HouseholdMembersSection: React.FC<HouseholdMembersSectionProps> = ({
 	// Filter out head of household - show only other members
 	const otherMembers =
 		householdData?.members?.filter(
-			(member: any) => member.is_head_of_household !== 1
+			(member: any) => member.is_head_of_household !== 1,
 		) || [];
 
 	// Navigate to household setup
@@ -49,7 +50,7 @@ const HouseholdMembersSection: React.FC<HouseholdMembersSectionProps> = ({
 							firstName={member.first_name}
 							lastName={member.last_name}
 							middleName={member.middle_name}
-							suffix={member.suffix}
+							suffix={getSuffixFromId(member.suffix_id)}
 							dateOfBirth={member.date_of_birth}
 							isFreshTrakUser={member.is_freshtrak_user}
 						/>

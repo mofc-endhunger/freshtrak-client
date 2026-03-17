@@ -21,7 +21,10 @@ import { Button } from "../ui/button";
 
 // Utility imports
 import { formatDateForServer } from "../../Utils/DateFormat";
-import { getGenderId, getSuffixId } from "../../Modules/Households/utils/householdUtils";
+import {
+	getGenderId,
+	getSuffixId,
+} from "../../Modules/Households/utils/householdUtils";
 import { StorageService } from "../../Utils/StorageService";
 
 // Type imports
@@ -563,10 +566,14 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 		const getAbbreviatedTitle = (title: string): string => {
 			const abbreviations: Record<string, string> = {
 				[localization.title_your_details]: localization.abbrev_details,
-				[localization.title_your_address_details]: localization.abbrev_address,
-				[localization.title_your_family_details]: localization.abbrev_family,
-				[localization.title_contact_information]: localization.abbrev_contact,
-				[localization.title_family_member_details]: localization.abbrev_members,
+				[localization.title_your_address_details]:
+					localization.abbrev_address,
+				[localization.title_your_family_details]:
+					localization.abbrev_family,
+				[localization.title_contact_information]:
+					localization.abbrev_contact,
+				[localization.title_family_member_details]:
+					localization.abbrev_members,
 			};
 			return abbreviations[title] || title;
 		};
@@ -576,7 +583,11 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 				{/* Step X of Y indicator */}
 				<div className="text-center mb-4">
 					<span className="text-sm font-medium text-gray-600">
-						{localization.formatString(localization.text_step_x_of_y, currentStepIndex + 1, totalSteps)}
+						{localization.formatString(
+							localization.text_step_x_of_y,
+							currentStepIndex + 1,
+							totalSteps,
+						)}
 					</span>
 				</div>
 
@@ -590,7 +601,13 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 							aria-valuenow={currentStepIndex + 1}
 							aria-valuemin={1}
 							aria-valuemax={totalSteps}
-							aria-label={String(localization.formatString(localization.text_step_x_of_y, currentStepIndex + 1, totalSteps))}
+							aria-label={String(
+								localization.formatString(
+									localization.text_step_x_of_y,
+									currentStepIndex + 1,
+									totalSteps,
+								),
+							)}
 						/>
 					</div>
 				</div>
@@ -731,7 +748,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 							{currentHouseholdMembers.length > 1 && (
 								<div className="bg-gray-50 p-4 rounded-lg">
 									<h3 className="text-lg font-semibold text-gray-900 mb-4">
-										{localization.label_current_household_members}
+										{
+											localization.label_current_household_members
+										}
 									</h3>
 									<div className="space-y-2">
 										{getFilteredMembers().map(
@@ -755,7 +774,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 																{member.is_head_of_household ===
 																	1 && (
 																	<span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-																		{localization.text_head_of_household}
+																		{
+																			localization.text_head_of_household
+																		}
 																	</span>
 																)}
 															</p>
@@ -763,7 +784,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 																member.date_of_birth !==
 																	"1900-01-01" && (
 																	<p className="text-sm text-gray-600">
-																		{localization.label_born}{" "}
+																		{
+																			localization.label_born
+																		}{" "}
 																		{new Date(
 																			member.date_of_birth,
 																		).toLocaleDateString()}
@@ -931,34 +954,35 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 					// First time entering Step 4 - build from API data + empty templates
 					let tempMemberId = -1; // Use negative IDs for new members
 
-				// Add seniors: existing first, then new
-				existingSeniors.forEach((member) =>
-					membersForDetails.push(member),
-				);
-				for (let i = 0; i < newSeniorsNeeded; i++) {
-					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "senior"),
+					// Add seniors: existing first, then new
+					existingSeniors.forEach((member) =>
+						membersForDetails.push(member),
 					);
-				}
+					for (let i = 0; i < newSeniorsNeeded; i++) {
+						membersForDetails.push(
+							createEmptyMember(tempMemberId--, "senior"),
+						);
+					}
 
-				// Add adults: existing first, then new
-				existingAdults.forEach((member) =>
-					membersForDetails.push(member),
-				);
-				for (let i = 0; i < newAdultsNeeded; i++) {
-					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "adult"),
+					// Add adults: existing first, then new
+					existingAdults.forEach((member) =>
+						membersForDetails.push(member),
 					);
-				}
+					for (let i = 0; i < newAdultsNeeded; i++) {
+						membersForDetails.push(
+							createEmptyMember(tempMemberId--, "adult"),
+						);
+					}
 
-				// Add children: existing first, then new
-				existingChildren.forEach((member) =>
-					membersForDetails.push(member),
-				);
-				for (let i = 0; i < newChildrenNeeded; i++) {
-					membersForDetails.push(
-						createEmptyMember(tempMemberId--, "child"),
+					// Add children: existing first, then new
+					existingChildren.forEach((member) =>
+						membersForDetails.push(member),
 					);
+					for (let i = 0; i < newChildrenNeeded; i++) {
+						membersForDetails.push(
+							createEmptyMember(tempMemberId--, "child"),
+						);
+					}
 				}
 
 				const originalCounts = {

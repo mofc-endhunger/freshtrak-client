@@ -89,6 +89,15 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 	}, [fetchPastReservations]);
 
 	/**
+	 * Invalidate cache before re-fetching so the backend's updated
+	 * survey status (e.g. completed) is reflected immediately.
+	 */
+	const refreshAfterFeedback = useCallback(async () => {
+		reservationsApiService.invalidateCache();
+		await fetchPastReservations();
+	}, [reservationsApiService, fetchPastReservations]);
+
+	/**
 	 * Handle event card click
 	 */
 	const handleEventClick = (reservation: Reservation) => {
@@ -149,7 +158,7 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 							onClick={
 								onEventClick ? handleEventClick : undefined
 							}
-							onFeedbackSubmitted={fetchPastReservations}
+							onFeedbackSubmitted={refreshAfterFeedback}
 						/>
 					))}
 					</div>

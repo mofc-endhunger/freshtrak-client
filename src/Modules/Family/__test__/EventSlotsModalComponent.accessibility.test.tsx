@@ -395,7 +395,12 @@ describe("EventSlotsModalComponent Accessibility", () => {
 
 			const user = userEvent.setup();
 
-			// Tab to first focusable element (first radio button — no close button rendered)
+			// Dialog auto-focuses the Go Back button on open; first tab advances to Save and Continue
+			await user.tab();
+			const continueButton = screen.getByRole("button", { name: /save and continue/i });
+			expect(continueButton).toHaveFocus();
+
+			// Tab wraps in focus trap to first radio button
 			await user.tab();
 			const firstRadio = screen.getByDisplayValue("slot1");
 			expect(firstRadio).toHaveFocus();

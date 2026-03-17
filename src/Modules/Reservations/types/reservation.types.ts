@@ -109,11 +109,11 @@ export interface ReservationEvent {
 
 /**
  * Timeslot for frontend display
- * Times are formatted for display (e.g., "9:00am")
+ * Times are in normalized HH:mm:ss format; locale formatting is done at the component level.
  */
 export interface ReservationTimeslot {
-	start_time: string; // Formatted: "9:00am"
-	end_time: string; // Formatted: "3:00pm"
+	start_time: string; // "09:00:00" or "N/A"
+	end_time: string; // "15:00:00" or "N/A"
 }
 
 /**

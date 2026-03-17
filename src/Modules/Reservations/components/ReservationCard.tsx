@@ -23,12 +23,15 @@
  * ============================================================================
  */
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import { Reservation, ReservationStatus } from "../types/reservation.types";
 import localization from "../../Localization/LocalizationComponent";
+import { getBcp47Locale } from "../../Localization/languageOptions";
+import { selectLanguage } from "../../../Store/languageSlice";
 import FeedbackContainer from "../../Feedback/FeedbackContainer";
 
 /**
@@ -53,33 +56,43 @@ interface ReservationCardProps {
 }
 
 /**
- * Format date string to readable format
- * Returns "N/A" for null/invalid dates
+ * Format date string to a locale-aware readable format.
+ * Returns "N/A" for null/invalid dates.
  *
- * Note: Date-only strings (YYYY-MM-DD) are parsed as UTC by JavaScript.
+ * Date-only strings (YYYY-MM-DD) are parsed as UTC by JavaScript.
  * We append T12:00:00 to treat them as local time and avoid timezone shifts.
  */
-const formatDate = (dateString: string): string => {
-	// Handle N/A or empty dates
-	if (!dateString || dateString === "N/A") {
-		return "N/A";
-	}
+const formatDate = (dateString: string, locale: string): string => {
+	if (!dateString || dateString === "N/A") return "N/A";
 	try {
-		// If date is in YYYY-MM-DD format, append time to parse as local time
-		// This prevents timezone issues where UTC midnight shifts to previous day
 		const normalizedDate = /^\d{4}-\d{2}-\d{2}$/.test(dateString)
 			? `${dateString}T12:00:00`
 			: dateString;
 		const date = new Date(normalizedDate);
-		// Check for invalid date
-		if (isNaN(date.getTime())) {
-			return "N/A";
-		}
-		return date.toLocaleDateString("en-US", {
+		if (isNaN(date.getTime())) return "N/A";
+		return date.toLocaleDateString(locale, {
 			weekday: "short",
 			month: "short",
 			day: "numeric",
 			year: "numeric",
+		});
+	} catch {
+		return "N/A";
+	}
+};
+
+/**
+ * Format a normalized time string (HH:mm:ss) for display in the given locale.
+ * Returns "N/A" for values that cannot be parsed.
+ */
+const formatTime = (timeString: string, locale: string): string => {
+	if (!timeString || timeString === "N/A") return "N/A";
+	try {
+		const date = new Date(`1970-01-01T${timeString}`);
+		if (isNaN(date.getTime())) return "N/A";
+		return date.toLocaleTimeString(locale, {
+			hour: "numeric",
+			minute: "2-digit",
 		});
 	} catch {
 		return "N/A";
@@ -117,6 +130,8 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 }) => {
 	const { event, date, timeslot, status, survey } = reservation;
 	const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+	const currentLanguage = useSelector(selectLanguage) as string;
+	const locale = useMemo(() => getBcp47Locale(currentLanguage), [currentLanguage]);
 
 	const isPast = variant === "past";
 
@@ -175,8 +190,8 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 							isPast ? "text-gray-500" : "text-gray-600"
 						}`}
 					>
-						{formatDate(date)} · {timeslot.start_time} -{" "}
-						{timeslot.end_time}
+						{formatDate(date, locale)} · {formatTime(timeslot.start_time, locale)} -{" "}
+						{formatTime(timeslot.end_time, locale)}
 					</p>
 
 					{/* Status badge and feedback button - only for past events with available survey */}
@@ -211,7 +226,7 @@ const ReservationCard: React.FC<ReservationCardProps> = ({
 				onClose={handleFeedbackClose}
 				registrationId={reservation.id || 0}
 				locationName={event.name}
-				visitDate={formatDate(date)}
+				visitDate={formatDate(date, locale)}
 				onSubmitComplete={onFeedbackSubmitted}
 			/>
 			)}

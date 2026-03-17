@@ -87,3 +87,25 @@ export function getLanguageCodes(): string[] {
 export function getTranslatedLanguageOptions(): LanguageOption[] {
 	return LANGUAGE_OPTIONS.filter((opt) => TRANSLATED_CODES.has(opt.code));
 }
+
+/**
+ * Maps app language codes that don't match BCP 47 to the correct locale tag
+ * for use with Intl.DateTimeFormat / toLocaleDateString / toLocaleTimeString.
+ * Two-letter ISO 639-1 codes and locale codes (es-MX, etc.) pass through as-is.
+ */
+const CODE_TO_BCP47: Record<string, string> = {
+	spa: "es",
+	som: "so",
+	rus: "ru",
+	tur: "tr",
+	ara: "ar",
+	zho: "zh",
+	hin: "hi",
+	nep: "ne",
+	asl: "en-US",
+	hmn: "hmn",
+};
+
+export function getBcp47Locale(appCode: string): string {
+	return CODE_TO_BCP47[appCode] ?? appCode;
+}

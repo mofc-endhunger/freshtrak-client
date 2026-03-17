@@ -78,8 +78,8 @@ const MOCK_PAST_RESERVATIONS: Reservation[] = [
         },
         date: "2026-01-15",
         timeslot: {
-            start_time: "12:00pm",
-            end_time: "12:59pm",
+            start_time: "12:00:00",
+            end_time: "12:59:00",
         },
         status: "completed",
         household_id: 260,
@@ -97,8 +97,8 @@ const MOCK_PAST_RESERVATIONS: Reservation[] = [
         },
         date: "2026-01-10",
         timeslot: {
-            start_time: "9:00am",
-            end_time: "9:59am",
+            start_time: "09:00:00",
+            end_time: "09:59:00",
         },
         status: "completed",
         household_id: 260,
@@ -116,8 +116,8 @@ const MOCK_PAST_RESERVATIONS: Reservation[] = [
         },
         date: "2026-01-05",
         timeslot: {
-            start_time: "2:00pm",
-            end_time: "2:59pm",
+            start_time: "14:00:00",
+            end_time: "14:59:00",
         },
         status: "completed",
         household_id: 260,
@@ -142,8 +142,8 @@ const MOCK_UPCOMING_RESERVATIONS: Reservation[] = [
         },
         date: "2026-02-10",
         timeslot: {
-            start_time: "1:00pm",
-            end_time: "1:59pm",
+            start_time: "13:00:00",
+            end_time: "13:59:00",
         },
         status: undefined,
         household_id: 260,
@@ -173,39 +173,26 @@ const CACHE_CONFIG = {
 // ============================================================================
 
 /**
- * Transform time string to display format
- * Handles both ISO timestamps and simple time strings:
- * - ISO: "2026-01-17T09:00:00.000Z" → "9:00am"
- * - Simple: "12:00:00" → "12:00pm"
- *
- * @param timeString - ISO 8601 timestamp or simple time string (HH:mm:ss)
- * @returns Formatted time string (e.g., "9:00am")
+ * Normalize a time string to HH:mm:ss format for downstream locale-aware formatting.
+ * Accepts ISO timestamps ("2026-01-17T09:00:00.000Z") or simple times ("12:00:00", "9:00").
+ * Returns "N/A" for values that cannot be parsed.
  */
-function formatTimeFromISO(timeString: string): string {
-    let date: Date;
-
-    // Check if it's a simple time string (HH:mm:ss or HH:mm)
+function normalizeTimeString(timeString: string): string {
     if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(timeString)) {
-        // Prepend a dummy date to make it parseable
-        date = new Date(`1970-01-01T${timeString}`);
-    } else {
-        // Assume ISO format
-        date = new Date(timeString);
+        const parts = timeString.split(":");
+        const hh = parts[0].padStart(2, "0");
+        const mm = parts[1];
+        const ss = parts[2] ?? "00";
+        return `${hh}:${mm}:${ss}`;
     }
 
-    // Check for invalid date
-    if (isNaN(date.getTime())) {
-        return "N/A";
-    }
+    const date = new Date(timeString);
+    if (isNaN(date.getTime())) return "N/A";
 
-    return date
-        .toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-        })
-        .toLowerCase()
-        .replace(" ", ""); // "9:00 am" → "9:00am"
+    const hh = String(date.getHours()).padStart(2, "0");
+    const mm = String(date.getMinutes()).padStart(2, "0");
+    const ss = String(date.getSeconds()).padStart(2, "0");
+    return `${hh}:${mm}:${ss}`;
 }
 
 /**
@@ -213,15 +200,17 @@ function formatTimeFromISO(timeString: string): string {
  * Handles nullable fields gracefully with "N/A" placeholders
  * Note: Status is not set here - it's assigned based on which API method was called
  *
+ * Timeslot times are stored in normalized HH:mm:ss format;
+ * locale-aware display formatting is handled at the component level.
+ *
  * @param apiReservation - Raw API response object
  * @returns Reservation for frontend display (status will be undefined)
  */
 function transformReservation(apiReservation: ReservationApiResponse): Reservation {
-    // Handle nullable timeslot
     const timeslot = apiReservation.timeslot
         ? {
-            start_time: formatTimeFromISO(apiReservation.timeslot.start_time),
-            end_time: formatTimeFromISO(apiReservation.timeslot.end_time),
+            start_time: normalizeTimeString(apiReservation.timeslot.start_time),
+            end_time: normalizeTimeString(apiReservation.timeslot.end_time),
         }
         : {
             start_time: "N/A",

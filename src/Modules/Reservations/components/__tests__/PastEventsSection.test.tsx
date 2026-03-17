@@ -60,7 +60,7 @@ const createMockReservation = (id: number, date: string, name: string): any => (
 	id,
 	event: { id, name },
 	date,
-	timeslot: { start_time: "9:00am", end_time: "3:00pm" },
+	timeslot: { start_time: "09:00:00", end_time: "15:00:00" },
 	status: "completed",
 	household_id: 1,
 	created_at: "2026-01-01T00:00:00Z",

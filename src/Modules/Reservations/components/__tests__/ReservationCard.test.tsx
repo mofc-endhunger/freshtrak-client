@@ -4,6 +4,11 @@ import userEvent from "@testing-library/user-event";
 import ReservationCard from "../ReservationCard";
 import type { Reservation } from "../../types/reservation.types";
 
+jest.mock("react-redux", () => ({
+	useSelector: () => "en",
+	useDispatch: () => jest.fn(),
+}));
+
 jest.mock("../../../Feedback/FeedbackContainer", () => {
 	return function MockFeedbackContainer(props: any) {
 		return props.isOpen ? (
@@ -22,7 +27,7 @@ function createMockReservation(overrides: Partial<Reservation> = {}): Reservatio
 		id: 1,
 		event: { id: 10, name: "Test Event" },
 		date: "2026-01-17",
-		timeslot: { start_time: "9:00am", end_time: "3:00pm" },
+		timeslot: { start_time: "09:00:00", end_time: "15:00:00" },
 		household_id: 100,
 		created_at: "2026-01-01T00:00:00Z",
 		updated_at: "2026-01-01T00:00:00Z",
@@ -37,7 +42,7 @@ describe("ReservationCard", () => {
 		render(<ReservationCard reservation={reservation} variant="upcoming" />);
 
 		expect(screen.getByText("Test Event")).toBeInTheDocument();
-		expect(screen.getByText(/9:00am - 3:00pm/)).toBeInTheDocument();
+		expect(screen.getByText(/9:00\s*AM.*3:00\s*PM/i)).toBeInTheDocument();
 		expect(screen.getByText(/Sat, Jan 17, 2026/)).toBeInTheDocument();
 	});
 
@@ -47,7 +52,7 @@ describe("ReservationCard", () => {
 		render(<ReservationCard reservation={reservation} variant="past" />);
 
 		expect(screen.getByText("Test Event")).toBeInTheDocument();
-		expect(screen.getByText(/9:00am - 3:00pm/)).toBeInTheDocument();
+		expect(screen.getByText(/9:00\s*AM.*3:00\s*PM/i)).toBeInTheDocument();
 		expect(screen.getByText(/Sat, Jan 17, 2026/)).toBeInTheDocument();
 	});
 

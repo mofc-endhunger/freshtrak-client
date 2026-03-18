@@ -1,8 +1,6 @@
 import * as React from "react";
 import { Fragment, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectEvent } from "../../Store/Events/eventSlice";
 import SpinnerComponent from "../General/SpinnerComponent";
 import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
@@ -27,10 +25,11 @@ const RegistrationEventDetailsContainer: React.FC<
 		useState<boolean>(false);
 	// const [ setUserToken] = useState(undefined);
 	const [isSuccessful, setSuccessful] = useState<boolean>(true);
+	//eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [isError, setIsError] = useState<boolean>(false);
+	//eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [pageError, setPageError] = useState<boolean>(false);
 
-	const event = useSelector(selectEvent) as Event;
 	// Don't initialize from Redux cache - always start fresh to avoid stale data
 	const [selectedEvent, setSelectedEvent] = useState<Event>({} as Event);
 
@@ -57,7 +56,7 @@ const RegistrationEventDetailsContainer: React.FC<
 		setIsError(false);
 		setPageError(false);
 		setSuccessful(true);
-		
+
 		// Always fetch fresh event data based on URL parameter
 		if (eventDateId) {
 			getEvent();
@@ -73,7 +72,7 @@ const RegistrationEventDetailsContainer: React.FC<
 				if (referrerUrl.pathname.startsWith("/events/list")) {
 					sessionStorage.setItem(
 						"searchResultsUrl",
-						referrerUrl.pathname + referrerUrl.search
+						referrerUrl.pathname + referrerUrl.search,
 					);
 				}
 			} catch (e) {
@@ -96,7 +95,7 @@ const RegistrationEventDetailsContainer: React.FC<
 	const getEvent = async (): Promise<void> => {
 		try {
 			const resp = await axios.get<EventApiResponse>(
-				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
+				`${BASE_URL}api/event_dates/${eventDateId}/event_details`,
 			);
 			const { data } = resp;
 			if (data?.event !== undefined) {
@@ -130,7 +129,7 @@ const RegistrationEventDetailsContainer: React.FC<
 			setshowAuthenticationModal(false);
 			if (selectedEvent && selectedEvent.id) {
 				navigate(
-					`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`
+					`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`,
 				);
 			} else {
 				setPageError(true);
@@ -150,7 +149,7 @@ const RegistrationEventDetailsContainer: React.FC<
 			// Navigate to registration form
 			if (selectedEvent && selectedEvent.id) {
 				navigate(
-					`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`
+					`${RENDER_URL.REGISTRATION_FORM_URL}/${selectedEvent.id}`,
 				);
 			} else {
 				setPageError(true);

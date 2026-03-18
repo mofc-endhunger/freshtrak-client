@@ -19,6 +19,7 @@ import { HouseholdRegistrationService } from "../../Services/HouseholdRegistrati
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { UsersMeResponse } from "../Households/types/api.types";
 import { useAuth } from "../Authentication/AuthContext";
+import { StorageService } from "../../Utils/StorageService";
 
 import { Event } from "./types/family.types";
 import localization from "../Localization/LocalizationComponent";
@@ -144,7 +145,13 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 
 		// If user is not authenticated (guest user), skip household data fetch
 		if (!isAuthenticated) {
-			// Proceed directly to registration form for guest users
+			navigateToRegistration(slot, null);
+			setIsLoadingHousehold(false);
+			return;
+		}
+
+		// Case managers register on behalf of others; never prefill or confirm their own household
+		if (StorageService.isCaseManager()) {
 			navigateToRegistration(slot, null);
 			setIsLoadingHousehold(false);
 			return;

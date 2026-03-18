@@ -54,6 +54,9 @@ const LoginPage = lazy(() => import("../Modules/Authentication/LoginPage"));
 const CaseManagerLoginPage = lazy(() =>
 	import("../Modules/Authentication/CaseManagerLoginPage")
 );
+const CaseManagerRegistrationsPage = lazy(() =>
+	import("../Modules/CaseManager/CaseManagerRegistrationsPage")
+);
 const HouseholdContainer = lazy(() =>
 	import("../Modules/Households/HouseholdContainer")
 );
@@ -121,6 +124,16 @@ const AppRoutes = () => {
 							element={
 								<ProtectedRoute>
 									<AccountPage />
+								</ProtectedRoute>
+							}
+						/>
+
+						{/* Case Manager Registrations - Protected Route */}
+						<Route
+							path={RENDER_URL.CASE_MANAGER_REGISTRATIONS_URL}
+							element={
+								<ProtectedRoute>
+									<CaseManagerRegistrationsPage />
 								</ProtectedRoute>
 							}
 						/>

@@ -192,8 +192,26 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			if (!isUserAuthenticated) {
 				setShowAuthModal(true);
 			} else if (!user) {
-				// Handle user data for both guest and Cognito users
-				if (userProfile) {
+				if (StorageService.isCaseManager()) {
+					// Case managers register on behalf of others -- start with an empty form
+					setUser(
+						sanitizeUser({
+							first_name: "",
+							last_name: "",
+							email: "",
+							phone_number: "",
+							address: "",
+							city: "",
+							state: "",
+							zip_code: "",
+							adult_count: 1,
+							senior_count: 0,
+							child_count: 0,
+							permission_to_text: false,
+							permission_to_email: false,
+						})
+					);
+				} else if (userProfile) {
 					// Guest user - use existing userProfile
 					try {
 						setUser(sanitizeUser(userProfile as any));
@@ -230,7 +248,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			} else if (
 				user &&
 				location.state?.householdData &&
-				!householdDataProcessedRef.current
+				!householdDataProcessedRef.current &&
+				!StorageService.isCaseManager()
 			) {
 				// Prefill form with household data if available (only once)
 				try {
@@ -862,7 +881,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						registrant: {
 							first_name: updatedUser.first_name,
 							last_name: updatedUser.last_name,
-							phone: updatedUser.phone,
+							suffix: updatedUser.suffix || undefined,
+							gender: updatedUser.gender || undefined,
+							email: updatedUser.email || undefined,
+							date_of_birth: updatedUser.date_of_birth || undefined,
+							phone: updatedUser.phone
+								? updatedUser.phone.replace(/\D/g, "")
+								: undefined,
 							address_line_1: updatedUser.address_line_1,
 							address_line_2: updatedUser.address_line_2,
 							city: updatedUser.city,

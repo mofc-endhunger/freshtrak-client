@@ -244,7 +244,6 @@ export const validatePhoneWithRules = (
     minLength = PHONE_CONSTANTS.US_TOTAL_LENGTH,
     maxLength = PHONE_CONSTANTS.US_TOTAL_LENGTH,
     allowTollFree = true,
-    format = 'US',
   } = rules;
 
   // Check if required

@@ -387,7 +387,7 @@ const EventMapComponent: React.FC<EventMapComponentProps> = ({
 					weight: 2,
 				}).addTo(map);
 
-				map.fitBounds(circle.getBounds(), { padding: [20, 20] });
+				map.fitBounds(circle.getBounds(), { padding: [20, 20], animate: false });
 
 				mapInstanceRef.current = map;
 				setIsMapReady(true);

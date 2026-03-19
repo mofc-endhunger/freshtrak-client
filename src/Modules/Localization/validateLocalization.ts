@@ -288,11 +288,13 @@ export function getLocalizationStats(): {
 }
 
 // Export for use in development/testing
-export default {
+const localizationValidation = {
 	validateLocalization,
 	printValidationResults,
 	getValidationSummary,
 	checkKeyInAllLanguages,
 	getLocalizationStats,
 };
+
+export default localizationValidation;
 

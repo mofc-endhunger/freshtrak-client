@@ -7,7 +7,6 @@ import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
 import { selectUser } from "../../Store/userSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDateDayAndDate } from "../../Utils/DateFormat";
-import { Link } from "react-router-dom";
 import { EventFormat } from "../../Utils/EventHandler";
 import EventCardComponent from "../Events/EventCardComponent";
 import QRCode from "react-qr-code";
@@ -37,7 +36,7 @@ import {
 } from "./types/registration.types";
 
 const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
-	props
+	props,
 ) => {
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -78,7 +77,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
 			const resp = await axios.get<EventApiResponse>(
-				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
+				`${BASE_URL}api/event_dates/${eventDateId}/event_details`,
 			);
 			const { data } = resp;
 			if (data && data.event !== undefined) {
@@ -115,7 +114,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 		if (selectedEvent && Object.keys(selectedEvent).length > 0) {
 			StorageService.removeItem(
 				"freshtrak_session_registered_event_date_id",
-				"session"
+				"session",
 			);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -196,7 +195,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 				eventTime,
 				identification_code,
 				eventDateId,
-				event_slot_id
+				event_slot_id,
 			);
 		} catch (error) {
 			console.error("Error generating confirmation card:", error);
@@ -264,7 +263,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 										value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
 											event_slot_id
 												? "&event_slot_id=" +
-												  event_slot_id
+													event_slot_id
 												: ""
 										}`}
 									/>
@@ -342,41 +341,37 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 										className="mb-5"
 										dangerouslySetInnerHTML={{
 											__html: sanitizeHtml(
-												event.eventDetails
+												event.eventDetails,
 											),
 										}}
 									/>
 								</>
 							)}
 
-						{isCaseManager && location.state?.eventDateId && (
-							<div className="flex justify-center mt-6">
+						<div className="flex flex-col gap-4 w-full items-center justify-center">
+							{isCaseManager && location.state?.eventDateId && (
 								<Button
 									type="button"
-									variant="default"
-									className="min-w-48"
+									className="px-2 uppercase text-white py-6 w-1/2 min-w-1/2 text-wrap"
 									onClick={() =>
 										navigate(
-											`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${location.state.eventDateId}`
+											`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${location.state.eventDateId}`,
 										)
 									}
 								>
 									{localization.cm_register_another}
 								</Button>
-							</div>
-						)}
-
-						<Link to={RENDER_URL.ROOT_URL}>
-							<div className="flex justify-center mt-4">
-								<Button
-									type="submit"
-									variant="highlight"
-									data-testid="continue button"
-								>
-									{localization.button_back_to_home}
-								</Button>
-							</div>
-						</Link>
+							)}
+							<Button
+								type="submit"
+								variant="highlight"
+								className="px-2 uppercase text-white py-6 w-1/2 min-w-1/2 text-wrap"
+								data-testid="continue button"
+								onClick={() => navigate(RENDER_URL.ROOT_URL)}
+							>
+								{localization.button_back_to_home}
+							</Button>
+						</div>
 					</section>
 				</div>
 			)}

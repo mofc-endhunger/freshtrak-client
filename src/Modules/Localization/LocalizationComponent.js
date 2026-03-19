@@ -782,6 +782,16 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"There are currently no available timeslots for this event. This may be due to technical issues or other temporary conditions. Please try again later. If the issue persists, please contact support.",
+
+		// DATA TABLE
+		cm_column_id: "ID",
+		cm_column_event_name: "Event Name",
+		cm_column_date_time: "Date & Time",
+		cm_search_placeholder:
+			"Search by name, event, email or phone...",
+		cm_no_results_found: "No results found.",
+		cm_table_results: "result(s)",
+		cm_table_page: "Page",
 	},
 
 	spa: {
@@ -1563,6 +1573,31 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Actualmente no hay horarios disponibles para este evento. Esto puede deberse a problemas técnicos u otras condiciones temporales. Por favor, intente nuevamente más tarde. Si el problema persiste, póngase en contacto con el soporte.",
+
+		placeholder_state_code: "NY",
+		aria_processing_registration: "Procesando registro",
+		aria_expand_collapse: "expandir/contraer",
+		dialog_confirm_account_title: "Confirmar Cuenta",
+		dialog_reset_password_title: "Restablecer Contraseña",
+		dialog_confirm_new_password_title: "Confirmar Nueva Contraseña",
+		error_title_registration_error: "Error de Registro",
+		button_review_update_instead: "Revisar y Actualizar en su Lugar",
+		button_no_review_update: "No, revisar y actualizar",
+		button_yes_register: "Sí, registrar",
+		text_no_household_info_available:
+			"No hay información del hogar disponible.",
+		title_resource_events: "Eventos de Recursos",
+		title_events_today: "Eventos de Hoy",
+		title_events_next_7_days: "Eventos para los Próximos 7 Días",
+		title_events_next_30_days: "Eventos para los Próximos 30 Días",
+		cm_column_id: "ID",
+		cm_column_event_name: "Nombre del Evento",
+		cm_column_date_time: "Fecha y Hora",
+		cm_search_placeholder:
+			"Buscar por nombre, evento, correo electrónico o teléfono...",
+		cm_no_results_found: "No se encontraron resultados.",
+		cm_table_results: "resultado(s)",
+		cm_table_page: "Página",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -2344,6 +2379,31 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Ma jiro wakhtiyada la heli karo ee hadda loo baahan yahay dhacdadan. Tani waxay sabab u noqon kartaa dhibaatooyinka farsamada ama xaaladaha kale ee ku meel gaarka ah. Fadlan mar kale isku day. Haddii dhibaatadu sii waddo, fadlan la xidhiidh taageerada.",
+
+		placeholder_state_code: "NY",
+		aria_processing_registration: "Diiwaangelinta waa la habeynayaa",
+		aria_expand_collapse: "ballaadhi/isku laab",
+		dialog_confirm_account_title: "Xaqiiji Akoonka",
+		dialog_reset_password_title: "Dib u Dejin Furaha Sirta",
+		dialog_confirm_new_password_title: "Xaqiiji Furaha Sirta Cusub",
+		error_title_registration_error: "Khaladka Diiwaangelinta",
+		button_review_update_instead: "Dib u Eeg & Cusboonaysii Beddelkeeda",
+		button_no_review_update: "Maya, dib u eeg & cusboonaysii",
+		button_yes_register: "Haa, diiwaan geli",
+		text_no_household_info_available:
+			"Macluumaadka qoyska lama heli karo.",
+		title_resource_events: "Dhacdooyinka Agabka",
+		title_events_today: "Dhacdooyinka Maanta",
+		title_events_next_7_days: "Dhacdooyinka 7-da Maalmood ee Soo Socda",
+		title_events_next_30_days: "Dhacdooyinka 30-ka Maalmood ee Soo Socda",
+		cm_column_id: "ID",
+		cm_column_event_name: "Magaca Dhacdada",
+		cm_column_date_time: "Taariikhda & Waqtiga",
+		cm_search_placeholder:
+			"Ku raadi magaca, dhacdada, iimaylka ama taleefanka...",
+		cm_no_results_found: "Natiijooyin lama helin.",
+		cm_table_results: "natiijo(oyin)",
+		cm_table_page: "Bogga",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -3131,6 +3191,31 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"В настоящее время нет доступных временных слотов для этого мероприятия. Это может быть связано с техническими проблемами или другими временными условиями. Пожалуйста, попробуйте позже. Если проблема сохраняется, обратитесь в службу поддержки.",
+
+		placeholder_state_code: "NY",
+		aria_processing_registration: "Обработка регистрации",
+		aria_expand_collapse: "развернуть/свернуть",
+		dialog_confirm_account_title: "Подтвердить Аккаунт",
+		dialog_reset_password_title: "Сбросить Пароль",
+		dialog_confirm_new_password_title: "Подтвердить Новый Пароль",
+		error_title_registration_error: "Ошибка Регистрации",
+		button_review_update_instead: "Проверить и Обновить",
+		button_no_review_update: "Нет, проверить и обновить",
+		button_yes_register: "Да, зарегистрировать",
+		text_no_household_info_available:
+			"Информация о домохозяйстве недоступна.",
+		title_resource_events: "События Ресурсов",
+		title_events_today: "События Сегодня",
+		title_events_next_7_days: "События на Ближайшие 7 Дней",
+		title_events_next_30_days: "События на Ближайшие 30 Дней",
+		cm_column_id: "ID",
+		cm_column_event_name: "Название Мероприятия",
+		cm_column_date_time: "Дата и Время",
+		cm_search_placeholder:
+			"Поиск по имени, мероприятию, email или телефону...",
+		cm_no_results_found: "Результатов не найдено.",
+		cm_table_results: "результат(ов)",
+		cm_table_page: "Страница",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -3894,6 +3979,31 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Bu etkinlik için şu anda müsait zaman dilimi bulunmamaktadır. Bu durum teknik sorunlar veya diğer geçici koşullardan kaynaklanıyor olabilir. Lütfen daha sonra tekrar deneyin. Sorun devam ederse, lütfen destek ekibiyle iletişime geçin.",
+
+		account_loading_message: "Verilerinizi alırken lütfen bekleyin",
+		placeholder_state_code: "NY",
+		aria_processing_registration: "Kayıt işleniyor",
+		aria_expand_collapse: "genişlet/daralt",
+		dialog_confirm_account_title: "Hesabı Onayla",
+		dialog_reset_password_title: "Şifreyi Sıfırla",
+		dialog_confirm_new_password_title: "Yeni Şifreyi Onayla",
+		error_title_registration_error: "Kayıt Hatası",
+		button_review_update_instead: "İncele ve Güncelle",
+		button_no_review_update: "Hayır, incele ve güncelle",
+		button_yes_register: "Evet, kayıt ol",
+		text_no_household_info_available: "Hane bilgisi mevcut değil.",
+		title_resource_events: "Kaynak Etkinlikleri",
+		title_events_today: "Bugünkü Etkinlikler",
+		title_events_next_7_days: "Önümüzdeki 7 Günün Etkinlikleri",
+		title_events_next_30_days: "Önümüzdeki 30 Günün Etkinlikleri",
+		cm_column_id: "ID",
+		cm_column_event_name: "Etkinlik Adı",
+		cm_column_date_time: "Tarih ve Saat",
+		cm_search_placeholder:
+			"Ada, etkinliğe, e-postaya veya telefona göre ara...",
+		cm_no_results_found: "Sonuç bulunamadı.",
+		cm_table_results: "sonuç",
+		cm_table_page: "Sayfa",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -4636,6 +4746,32 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"لا توجد حاليًا فترات زمنية متاحة لهذا الحدث. قد يكون هذا بسبب مشاكل تقنية أو ظروف مؤقتة أخرى. يرجى المحاولة مرة أخرى لاحقًا. إذا استمرت المشكلة، يرجى الاتصال بالدعم.",
+
+		account_loading_message: "يرجى الانتظار أثناء استرداد بياناتك",
+		placeholder_state_code: "NY",
+		aria_processing_registration: "جاري معالجة التسجيل",
+		aria_expand_collapse: "توسيع/طي",
+		dialog_confirm_account_title: "تأكيد الحساب",
+		dialog_reset_password_title: "إعادة تعيين كلمة المرور",
+		dialog_confirm_new_password_title: "تأكيد كلمة المرور الجديدة",
+		error_title_registration_error: "خطأ في التسجيل",
+		button_review_update_instead: "مراجعة وتحديث بدلاً من ذلك",
+		button_no_review_update: "لا، مراجعة وتحديث",
+		button_yes_register: "نعم، سجّل",
+		text_no_household_info_available:
+			"لا تتوفر معلومات عن الأسرة.",
+		title_resource_events: "أحداث الموارد",
+		title_events_today: "أحداث اليوم",
+		title_events_next_7_days: "أحداث الأيام السبعة القادمة",
+		title_events_next_30_days: "أحداث الثلاثين يوماً القادمة",
+		cm_column_id: "ID",
+		cm_column_event_name: "اسم الحدث",
+		cm_column_date_time: "التاريخ والوقت",
+		cm_search_placeholder:
+			"البحث بالاسم أو الحدث أو البريد الإلكتروني أو الهاتف...",
+		cm_no_results_found: "لم يتم العثور على نتائج.",
+		cm_table_results: "نتيجة (نتائج)",
+		cm_table_page: "صفحة",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -5352,6 +5488,30 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"目前此活动没有可用的时间段。这可能是由于技术问题或其他临时条件造成的。请稍后再试。如果问题持续存在，请联系支持。",
+
+		account_loading_message: "请稍候，我们正在获取您的数据",
+		placeholder_state_code: "NY",
+		aria_processing_registration: "正在处理注册",
+		aria_expand_collapse: "展开/收起",
+		dialog_confirm_account_title: "确认账户",
+		dialog_reset_password_title: "重置密码",
+		dialog_confirm_new_password_title: "确认新密码",
+		error_title_registration_error: "注册错误",
+		button_review_update_instead: "改为审查和更新",
+		button_no_review_update: "否，审查和更新",
+		button_yes_register: "是，注册",
+		text_no_household_info_available: "没有可用的家庭信息。",
+		title_resource_events: "资源活动",
+		title_events_today: "今日活动",
+		title_events_next_7_days: "未来7天活动",
+		title_events_next_30_days: "未来30天活动",
+		cm_column_id: "ID",
+		cm_column_event_name: "活动名称",
+		cm_column_date_time: "日期和时间",
+		cm_search_placeholder: "按姓名、活动、电子邮件或电话搜索...",
+		cm_no_results_found: "未找到结果。",
+		cm_table_results: "个结果",
+		cm_table_page: "页",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -6104,15 +6264,42 @@ let localization = new LocalizedStrings({
 		// ELIGIBILITY COMPONENT
 		eligibility_member_size: "परिवार का आकार",
 		eligibility_dialog_description:
-			"घरधुरीको आकारको आधारमा योग्यताको आवश्यकताहरू",
+			"घर के आकार के आधार पर पात्रता आवश्यकताएँ",
 		eligibility_note_prefix: "नोट:",
 		eligibility_view_requirements_text:
-			"हाम्रा कार्यक्रमहरूको लागि योग्यताको आवश्यकताहरू हेर्न यहाँ क्लिक गर्नुहोस्:",
-		eligibility_view_guidelines_button: "योग्यता दिशानिर्देशहरू हेर्नुहोस्",
+			"हमारे कार्यक्रमों के लिए पात्रता आवश्यकताओं को देखने के लिए यहाँ क्लिक करें:",
+		eligibility_view_guidelines_button: "पात्रता दिशानिर्देश देखें",
 
 		// EVENT SLOTS
 		event_slots_no_available_message:
-			"हाल यस कार्यक्रमको लागि उपलब्ध समय स्लटहरू छैनन्। यो प्राविधिक समस्याहरू वा अन्य अस्थायी अवस्थाहरूको कारणले हुन सक्छ। कृपया पछि फेरि प्रयास गर्नुहोस्। यदि समस्या जारी रहन्छ भने, कृपया समर्थनसँग सम्पर्क गर्नुहोस्।",
+			"वर्तमान में इस कार्यक्रम के लिए कोई उपलब्ध समय स्लॉट नहीं है। यह तकनीकी समस्याओं या अन्य अस्थायी स्थितियों के कारण हो सकता है। कृपया बाद में पुनः प्रयास करें। यदि समस्या बनी रहती है, तो कृपया सहायता से संपर्क करें।",
+
+		account_loading_message:
+			"कृपया प्रतीक्षा करें जब हम आपका डेटा प्राप्त कर रहे हैं",
+		placeholder_state_code: "NY",
+		aria_processing_registration: "पंजीकरण प्रक्रिया में है",
+		aria_expand_collapse: "विस्तार/संक्षिप्त करें",
+		dialog_confirm_account_title: "खाता पुष्टि करें",
+		dialog_reset_password_title: "पासवर्ड रीसेट करें",
+		dialog_confirm_new_password_title: "नया पासवर्ड पुष्टि करें",
+		error_title_registration_error: "पंजीकरण त्रुटि",
+		button_review_update_instead: "इसके बजाय समीक्षा और अपडेट करें",
+		button_no_review_update: "नहीं, समीक्षा और अपडेट करें",
+		button_yes_register: "हाँ, पंजीकरण करें",
+		text_no_household_info_available:
+			"कोई घरेलू जानकारी उपलब्ध नहीं है।",
+		title_resource_events: "संसाधन कार्यक्रम",
+		title_events_today: "आज के कार्यक्रम",
+		title_events_next_7_days: "अगले 7 दिनों के कार्यक्रम",
+		title_events_next_30_days: "अगले 30 दिनों के कार्यक्रम",
+		cm_column_id: "ID",
+		cm_column_event_name: "कार्यक्रम का नाम",
+		cm_column_date_time: "दिनांक और समय",
+		cm_search_placeholder:
+			"नाम, कार्यक्रम, ईमेल या फ़ोन से खोजें...",
+		cm_no_results_found: "कोई परिणाम नहीं मिला।",
+		cm_table_results: "परिणाम",
+		cm_table_page: "पृष्ठ",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -6881,6 +7068,34 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"हाल यस कार्यक्रमको लागि उपलब्ध समय स्लटहरू छैनन्। यो प्राविधिक समस्याहरू वा अन्य अस्थायी अवस्थाहरूको कारणले हुन सक्छ। कृपया पछि फेरि प्रयास गर्नुहोस्। यदि समस्या जारी रहन्छ भने, कृपया समर्थनसँग सम्पर्क गर्नुहोस्।",
+
+		account_loading_message:
+			"कृपया पर्खनुहोस् हामी तपाईंको डेटा प्राप्त गर्दैछौं",
+		placeholder_state_code: "NY",
+		aria_processing_registration: "दर्ता प्रक्रिया भइरहेको छ",
+		aria_expand_collapse: "विस्तार/संकुचन गर्नुहोस्",
+		dialog_confirm_account_title: "खाता पुष्टि गर्नुहोस्",
+		dialog_reset_password_title: "पासवर्ड रिसेट गर्नुहोस्",
+		dialog_confirm_new_password_title: "नयाँ पासवर्ड पुष्टि गर्नुहोस्",
+		error_title_registration_error: "दर्ता त्रुटि",
+		button_review_update_instead:
+			"यसको सट्टा समीक्षा र अपडेट गर्नुहोस्",
+		button_no_review_update: "होइन, समीक्षा र अपडेट गर्नुहोस्",
+		button_yes_register: "हो, दर्ता गर्नुहोस्",
+		text_no_household_info_available:
+			"कुनै घरधुरी जानकारी उपलब्ध छैन।",
+		title_resource_events: "स्रोत कार्यक्रमहरू",
+		title_events_today: "आजका कार्यक्रमहरू",
+		title_events_next_7_days: "आगामी ७ दिनका कार्यक्रमहरू",
+		title_events_next_30_days: "आगामी ३० दिनका कार्यक्रमहरू",
+		cm_column_id: "ID",
+		cm_column_event_name: "कार्यक्रमको नाम",
+		cm_column_date_time: "मिति र समय",
+		cm_search_placeholder:
+			"नाम, कार्यक्रम, इमेल वा फोनबाट खोज्नुहोस्...",
+		cm_no_results_found: "कुनै नतिजा भेटिएन।",
+		cm_table_results: "नतिजा(हरू)",
+		cm_table_page: "पृष्ठ",
 	},
 });
 

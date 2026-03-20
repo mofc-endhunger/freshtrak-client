@@ -35,7 +35,7 @@ export const buildMinimalUserData = (name?: string) => {
 		primary_first_name: firstName,
 		primary_last_name: lastName,
 		primary_date_of_birth: "",
-		preferred_language: "en",
+		language_id: 1, // English id in backend language table
 		address_line_1: "",
 		city: "",
 		state: "",

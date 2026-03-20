@@ -12,6 +12,11 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 	no_email: "No Email Available",
 	email_contact_you: "Permission to email you",
 	label_email: "Email",
+	error_phone_number_required: "Phone number is required",
+	error_email_required: "Email is required",
+	error_field_required: "This field is required",
+	label_no_email_question: "No Email?",
+	label_get_free_email: "Get one free from Google.",
 }));
 
 // Mock PhoneInputComponent

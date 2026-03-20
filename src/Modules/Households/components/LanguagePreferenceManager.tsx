@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { Button } from "../../../components/ui/button";
 import {
 	Card,
@@ -27,6 +28,14 @@ import { Globe, Users, User, CheckCircle } from "lucide-react";
 import { HouseholdMember, Household } from "../types/household.types";
 import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 import localization from "../../Localization/LocalizationComponent";
+import { setLanguage } from "../../Localization/localizationUtils";
+import { setCurrentLanguage } from "../../../Store/languageSlice";
+import {
+	getLanguageOptionByCode,
+	getLanguageOptionById,
+	getLanguageCodes,
+	getTranslatedLanguageOptions,
+} from "../../Localization/languageOptions";
 
 interface LanguagePreferenceManagerProps {
 	household: Household;
@@ -42,29 +51,9 @@ interface LanguagePreferenceData {
 	member_language_overrides: Record<number, string>;
 	use_household_language_for_all: boolean;
 	fallback_language: string;
+	/** Backend language table id; sent on PATCH so backend can return in GET /users/me */
+	language_id?: number;
 }
-
-interface LanguageOption {
-	code: string;
-	name: string;
-	nativeName: string;
-	flag: string;
-}
-
-const getSupportedLanguages = (): LanguageOption[] => [
-	{ code: "en", name: localization.option_language_english, nativeName: localization.option_language_english, flag: "🇺🇸" },
-	{ code: "es", name: localization.option_language_spanish, nativeName: localization.option_language_spanish, flag: "🇪🇸" },
-	{ code: "fr", name: localization.option_language_french, nativeName: localization.option_language_french, flag: "🇫🇷" },
-	{ code: "de", name: localization.option_language_german, nativeName: localization.option_language_german, flag: "🇩🇪" },
-	{ code: "it", name: localization.option_language_italian, nativeName: localization.option_language_italian, flag: "🇮🇹" },
-	{ code: "pt", name: localization.option_language_portuguese, nativeName: localization.option_language_portuguese, flag: "🇵🇹" },
-	{ code: "zh", name: localization.option_language_chinese, nativeName: localization.option_language_chinese, flag: "🇨🇳" },
-	{ code: "ja", name: localization.option_language_japanese, nativeName: localization.option_language_japanese, flag: "🇯🇵" },
-	{ code: "ko", name: localization.option_language_korean, nativeName: localization.option_language_korean, flag: "🇰🇷" },
-	{ code: "ar", name: localization.option_language_arabic, nativeName: localization.option_language_arabic, flag: "🇸🇦" },
-	{ code: "hi", name: localization.option_language_hindi, nativeName: localization.option_language_hindi, flag: "🇮🇳" },
-	{ code: "ru", name: "Russian", nativeName: "Русский", flag: "🇷🇺" },
-];
 
 export const LanguagePreferenceManager: React.FC<
 	LanguagePreferenceManagerProps
@@ -76,12 +65,24 @@ export const LanguagePreferenceManager: React.FC<
 	className = "",
 	mode = "edit",
 }) => {
+	const dispatch = useDispatch();
 	const [isEditing, setIsEditing] = useState(mode === "edit");
 	const [isLoading, setIsLoading] = useState(false);
 	const [validation, setValidation] = useState({
 		household: true,
 		members: true,
 	});
+
+	const initialHouseholdLang = (() => {
+		const codes = getLanguageCodes();
+		if (household.preferred_language && codes.includes(household.preferred_language)) {
+			return household.preferred_language;
+		}
+		if (typeof (household as any).language_id === "number") {
+			return getLanguageOptionById((household as any).language_id)?.code ?? "en";
+		}
+		return "en";
+	})();
 
 	const {
 		handleSubmit,
@@ -91,7 +92,7 @@ export const LanguagePreferenceManager: React.FC<
 		reset,
 	} = useForm<LanguagePreferenceData>({
 		defaultValues: {
-			household_preferred_language: household.preferred_language || "en",
+			household_preferred_language: initialHouseholdLang,
 			member_language_overrides: {},
 			use_household_language_for_all: true,
 			fallback_language: "en",
@@ -104,12 +105,10 @@ export const LanguagePreferenceManager: React.FC<
 	useEffect(() => {
 		const overrides: Record<number, string> = {};
 		members.forEach(member => {
-			// In a real implementation, this would come from member data
-			// For now, we'll use household language as default
-			overrides[member.id] = household.preferred_language || "en";
+			overrides[member.id] = initialHouseholdLang;
 		});
 		setValue("member_language_overrides", overrides);
-	}, [members, household.preferred_language, setValue]);
+	}, [members, initialHouseholdLang, setValue]);
 
 	// Validate language preferences
 	useEffect(() => {
@@ -129,8 +128,14 @@ export const LanguagePreferenceManager: React.FC<
 	const onSubmit = async (data: LanguagePreferenceData) => {
 		setIsLoading(true);
 		try {
-			await onUpdate(data);
+			const option = getLanguageOptionByCode(data.household_preferred_language);
+			await onUpdate({ ...data, language_id: option?.id });
 			setIsEditing(false);
+
+			// Sync site language with the saved preference
+			const langCode = option?.code ?? "en";
+			dispatch(setCurrentLanguage(langCode));
+			setLanguage(langCode);
 		} catch (error) {
 			console.error("Error updating language preferences:", error);
 		} finally {
@@ -144,12 +149,8 @@ export const LanguagePreferenceManager: React.FC<
 		onCancel?.();
 	};
 
-	const getLanguageInfo = (code: string): LanguageOption => {
-		const languages = getSupportedLanguages();
-		return (
-			languages.find(lang => lang.code === code) ||
-			languages[0]
-		);
+	const getLanguageInfo = (code: string) => {
+		return getLanguageOptionByCode(code) ?? getTranslatedLanguageOptions()[0];
 	};
 
 	const updateMemberLanguage = (memberId: number, languageCode: string) => {
@@ -184,26 +185,19 @@ export const LanguagePreferenceManager: React.FC<
 					</h4>
 
 					<div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-						<span className="text-2xl">
-							{
-								getLanguageInfo(
-									watchedValues.household_preferred_language
-								).flag
-							}
-						</span>
 						<div>
 							<div className="font-medium text-gray-900">
 								{
 									getLanguageInfo(
 										watchedValues.household_preferred_language
-									).name
+									).text
 								}
 							</div>
 							<div className="text-sm text-gray-600">
 								{
 									getLanguageInfo(
 										watchedValues.household_preferred_language
-									).nativeName
+									).code.toUpperCase()
 								}
 							</div>
 						</div>
@@ -243,17 +237,13 @@ export const LanguagePreferenceManager: React.FC<
 										className="flex items-center justify-between p-3 border rounded-lg"
 									>
 										<div className="flex items-center space-x-3">
-											<span className="text-lg">
-												{langInfo.flag}
-											</span>
 											<div>
 												<div className="font-medium text-gray-900">
 													{member.first_name}{" "}
 													{member.last_name}
 												</div>
 												<div className="text-sm text-gray-600">
-													{langInfo.name} (
-													{langInfo.nativeName})
+													{langInfo.text}
 												</div>
 											</div>
 										</div>
@@ -273,16 +263,10 @@ export const LanguagePreferenceManager: React.FC<
 						{localization.label_fallback_language}
 					</h4>
 					<div className="flex items-center space-x-2">
-						<span className="text-lg">
-							{
-								getLanguageInfo(watchedValues.fallback_language)
-									.flag
-							}
-						</span>
 						<span className="text-sm text-gray-600">
 							{
 								getLanguageInfo(watchedValues.fallback_language)
-									.name
+									.text
 							}
 						</span>
 					</div>
@@ -330,36 +314,26 @@ export const LanguagePreferenceManager: React.FC<
 								value={
 									watchedValues.household_preferred_language
 								}
-								onValueChange={value =>
+								onValueChange={value => {
 									setValue(
 										"household_preferred_language",
 										value,
 										{ shouldDirty: true }
-									)
-								}
+									);
+									setLanguage(value);
+									dispatch(setCurrentLanguage(value));
+								}}
 							>
 								<SelectTrigger>
 									<SelectValue placeholder={localization.placeholder_select_household_language} />
 								</SelectTrigger>
 								<SelectContent>
-									{getSupportedLanguages().map(language => (
+									{getTranslatedLanguageOptions().map(opt => (
 										<SelectItem
-											key={language.code}
-											value={language.code}
+											key={opt.id}
+											value={opt.code}
 										>
-											<div className="flex items-center space-x-2">
-												<span className="text-lg">
-													{language.flag}
-												</span>
-												<div>
-													<div className="font-medium">
-														{language.name}
-													</div>
-													<div className="text-sm text-gray-500">
-														{language.nativeName}
-													</div>
-												</div>
-											</div>
+											{opt.text}
 										</SelectItem>
 									))}
 								</SelectContent>
@@ -430,28 +404,13 @@ export const LanguagePreferenceManager: React.FC<
 													<SelectValue />
 												</SelectTrigger>
 												<SelectContent>
-													{getSupportedLanguages().map(
-														language => (
+													{getTranslatedLanguageOptions().map(
+														opt => (
 															<SelectItem
-																key={
-																	language.code
-																}
-																value={
-																	language.code
-																}
+																key={opt.id}
+																value={opt.code}
 															>
-																<div className="flex items-center space-x-2">
-																	<span className="text-sm">
-																		{
-																			language.flag
-																		}
-																	</span>
-																	<span className="text-sm">
-																		{
-																			language.name
-																		}
-																	</span>
-																</div>
+																{opt.text}
 															</SelectItem>
 														)
 													)}
@@ -481,24 +440,12 @@ export const LanguagePreferenceManager: React.FC<
 								<SelectValue placeholder={localization.placeholder_select_fallback_language} />
 							</SelectTrigger>
 							<SelectContent>
-								{getSupportedLanguages().map(language => (
+								{getTranslatedLanguageOptions().map(opt => (
 									<SelectItem
-										key={language.code}
-										value={language.code}
+										key={opt.id}
+										value={opt.code}
 									>
-										<div className="flex items-center space-x-2">
-											<span className="text-lg">
-												{language.flag}
-											</span>
-											<div>
-												<div className="font-medium">
-													{language.name}
-												</div>
-												<div className="text-sm text-gray-500">
-													{language.nativeName}
-												</div>
-											</div>
-										</div>
+										{opt.text}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -554,11 +501,18 @@ export const useLanguagePreferenceManager = () => {
 				await householdsApiService.getUsersMe();
 
 			// Update household language preference - merge current data with language updates
-			// Exclude updated_at from the request
-			const { updated_at, ...currentDataWithoutTimestamp } =
+			// Exclude updated_at, language_id, preferred_language (API expects language_id only, not code)
+			const { updated_at, language_id: _currentLangId, preferred_language: _omitLangCode, ...currentDataWithoutTimestamp } =
 				currentHouseholdData;
+			const languageId =
+				data.language_id !== undefined && data.language_id !== null
+					? data.language_id
+					: _currentLangId !== undefined && _currentLangId !== null
+						? _currentLangId
+						: undefined;
 			await householdsApiService.updateHousehold(householdId, {
 				...currentDataWithoutTimestamp,
+				...(languageId !== undefined && { language_id: languageId }),
 			});
 
 			// Update individual member language preferences if not using household language
@@ -588,9 +542,7 @@ export const useLanguagePreferenceManager = () => {
 	};
 
 	const getLanguageDisplayInfo = (code: string) => {
-		const languages = getSupportedLanguages();
-		const language = languages.find(lang => lang.code === code);
-		return language || languages[0];
+		return getLanguageOptionByCode(code) ?? getTranslatedLanguageOptions()[0];
 	};
 
 	return {

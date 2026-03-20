@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { RENDER_URL } from "../../Utils/Urls";
+import localization from "../Localization/LocalizationComponent";
 
 import { AlertTriangle, Home, AlertCircle } from "lucide-react";
 import {
@@ -33,12 +34,12 @@ const ErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => {
 						<AlertTriangle className="h-16 w-16 text-red-500" />
 					</div>
 					<h2 className="text-2xl font-bold text-red-600">
-						Oops...! Page Not Found
+						{localization.text_page_not_found}
 					</h2>
 					{error.message && (
 						<div className="text-gray-600 space-y-2">
 							<p>
-								<span className="font-semibold">Message:</span>{" "}
+								<span className="font-semibold">{localization.label_message_colon}</span>{" "}
 								{error.message}
 							</p>
 						</div>
@@ -52,7 +53,7 @@ const ErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => {
 						<AlertCircle className="h-16 w-16 text-orange-500" />
 					</div>
 					<h2 className="text-2xl font-bold text-orange-600">
-						Validation Errors Found on Event
+						{localization.text_validation_errors_on_event}
 					</h2>
 					<div className="space-y-2">
 						{errors.map((error, index) => (
@@ -61,9 +62,9 @@ const ErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => {
 								className="text-gray-600 p-3 bg-orange-50 rounded-lg"
 							>
 								<p className="font-semibold">
-									Code: {error.code}
+									{localization.label_code_colon} {error.code}
 								</p>
-								<p>Message: {error.message}</p>
+								<p>{localization.label_message_colon} {error.message}</p>
 							</div>
 						))}
 					</div>
@@ -78,7 +79,7 @@ const ErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => {
 			<Card className="w-full max-w-md">
 				<CardHeader className="text-center">
 					<CardTitle className="text-xl font-semibold text-gray-800">
-						Error Details
+						{localization.label_error_details}
 					</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
@@ -90,7 +91,7 @@ const ErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => {
 								variant="highlight"
 							>
 								<Home className="h-4 w-4 mr-2" />
-								Back To Home
+								{localization.button_back_to_home}
 							</Button>
 						</Link>
 					</div>

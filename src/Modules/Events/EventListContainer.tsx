@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { useMemo, useEffect } from "react";
 import EventListComponent from "./EventListComponent";
 import { EventHandler } from "../../Utils/EventHandler";
 import {
@@ -20,6 +20,7 @@ interface EventListContainerProps {
 	visibleEventCount?: number;
 	availabilityFilter?: string;
 	reservationsFilter?: boolean;
+	distance?: number;
 	lastItemRef?: (node: HTMLElement | null) => void;
 	loadingMore?: boolean;
 	onHasMoreChange?: (hasMore: boolean) => void;
@@ -31,103 +32,69 @@ const EventListContainer: React.FC<EventListContainerProps> = ({
 	visibleEventCount = 30,
 	availabilityFilter = "next_7_days",
 	reservationsFilter = false,
+	distance = 10,
 	lastItemRef,
 	loadingMore = false,
 	onHasMoreChange,
 }) => {
-	const EventList: React.FC = () => {
-		// ALWAYS process ALL agencies to get ALL events
-		// This ensures filters work correctly and we have complete data
-		const allEvents = EventHandler(agencyData);
-		
-		// Apply availability filter
-		const availabilityFilteredEvents = filterEventsByAvailability(
+	const allEvents = useMemo(() => EventHandler(agencyData), [agencyData]);
+
+	const filteredEvents = useMemo(() => {
+		const availFiltered = filterEventsByAvailability(
 			allEvents,
 			availabilityFilter
 		);
-		
-		// Apply reservations filter
-		const filteredEvents = filterEventsByReservations(
-			availabilityFilteredEvents,
+		return filterEventsByReservations(
+			availFiltered,
 			reservationsFilter
 		) as Record<string, any[]>;
+	}, [allEvents, availabilityFilter, reservationsFilter]);
 
-		// Progressively render events by date
-		// Sort dates chronologically
+	const { visibleEvents, hasMore } = useMemo(() => {
 		const sortedDates = Object.keys(filteredEvents).sort((a, b) => {
-			const dateA = new Date(a.replace(/\//g, '-'));
-			const dateB = new Date(b.replace(/\//g, '-'));
+			const dateA = new Date(a.replace(/\//g, "-"));
+			const dateB = new Date(b.replace(/\//g, "-"));
 			return dateA.getTime() - dateB.getTime();
 		});
 
-		// Count total events and determine which dates to show
-		let eventCount = 0;
-		const visibleDates: string[] = [];
-		
+		const result: Record<string, any[]> = {};
+		let count = 0;
+
 		for (const date of sortedDates) {
 			const eventsForDate = filteredEvents[date];
-			if (eventCount + eventsForDate.length <= visibleEventCount) {
-				// Show all events for this date
-				visibleDates.push(date);
-				eventCount += eventsForDate.length;
+			if (count + eventsForDate.length <= visibleEventCount) {
+				result[date] = eventsForDate;
+				count += eventsForDate.length;
 			} else {
-				// Partially show this date if we have room
-				const remainingSlots = visibleEventCount - eventCount;
-				if (remainingSlots > 0) {
-					visibleDates.push(date);
+				const remaining = visibleEventCount - count;
+				if (remaining > 0) {
+					result[date] = eventsForDate.slice(0, remaining);
 				}
 				break;
 			}
 		}
 
-		// Build the visible events object
-		const visibleEvents: Record<string, any[]> = {};
-		let currentEventCount = 0;
-		
-		for (const date of visibleDates) {
-			const eventsForDate = filteredEvents[date];
-			if (currentEventCount + eventsForDate.length <= visibleEventCount) {
-				// Show all events for this date
-				visibleEvents[date] = eventsForDate;
-				currentEventCount += eventsForDate.length;
-			} else {
-				// Show partial events for this date
-				const remainingSlots = visibleEventCount - currentEventCount;
-				visibleEvents[date] = eventsForDate.slice(0, remainingSlots);
-				break;
-			}
-		}
-
-		// Calculate if there are more events to show
 		const totalEventCount = sortedDates.reduce(
 			(sum, date) => sum + filteredEvents[date].length,
 			0
 		);
-		const hasMore = currentEventCount < totalEventCount;
 
-		// Notify parent component about hasMore state change
-		React.useEffect(() => {
-			if (onHasMoreChange) {
-				onHasMoreChange(hasMore);
-			}
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [hasMore]);
+		return { visibleEvents: result, hasMore: count < totalEventCount };
+	}, [filteredEvents, visibleEventCount]);
 
-		return (
-			<EventListComponent
-				events={visibleEvents}
-				zipCode={zipCode}
-				lastItemRef={lastItemRef}
-				loadingMore={loadingMore}
-				hasMore={hasMore}
-			/>
-		);
-	};
+	useEffect(() => {
+		onHasMoreChange?.(hasMore);
+	}, [hasMore, onHasMoreChange]);
 
 	return (
-		<Fragment>
-			<EventList />
-		</Fragment>
+		<EventListComponent
+			events={visibleEvents}
+			zipCode={zipCode}
+			distance={distance}
+			lastItemRef={lastItemRef}
+			loadingMore={loadingMore}
+			hasMore={hasMore}
+		/>
 	);
 };
 

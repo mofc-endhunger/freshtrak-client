@@ -61,7 +61,7 @@ const HouseholdConfirmationModal: React.FC<HouseholdConfirmationModalProps> = ({
 				</DialogDescription>
 			</VisuallyHidden>
 			<DialogContent
-				className="sm:max-w-md bg-white border border-gray-200"
+				className="sm:max-w-lg bg-white border border-gray-200"
 				showCloseButton={!isLoading}
 				data-testid="household-confirmation-modal"
 			>

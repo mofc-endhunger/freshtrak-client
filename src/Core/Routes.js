@@ -69,7 +69,10 @@ const AppRoutes = () => {
 	React.useEffect(() => {}, []);
 
 	return (
-		<Router basename="/">
+		<Router
+			basename="/"
+			future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+		>
 			<ScrollContainer />
 			<Suspense fallback={<div className="displayNone"> </div>}>
 				<WrapperComponent>
@@ -180,7 +183,9 @@ const AppRoutes = () => {
 						/>
 
 						<Route
-							path={RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL}
+							path={
+								RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL
+							}
 							element={<AlreadyRegisteredPage />}
 						/>
 

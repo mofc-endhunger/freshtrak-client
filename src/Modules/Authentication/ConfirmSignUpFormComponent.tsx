@@ -7,12 +7,13 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useAuth } from "./AuthContext";
 import { ConfirmSignUpFormData } from "./types/authentication.types";
+import localization from "../Localization/LocalizationComponent";
 
-// Validation schema for confirmation form
-const confirmSignUpSchema = z.object({
-	email: z.string().email("Please enter a valid email address"),
-	code: z.string().min(6, "Confirmation code must be at least 6 characters"),
-});
+const getConfirmSignUpSchema = () =>
+	z.object({
+		email: z.string().email(localization.error_valid_email),
+		code: z.string().min(6, localization.error_confirmation_code_length),
+	});
 
 interface ConfirmSignUpFormComponentProps {
 	email?: string;
@@ -49,7 +50,7 @@ const ConfirmSignUpFormComponent: React.FC<ConfirmSignUpFormComponentProps> = ({
 		formState: { errors },
 		reset,
 	} = useForm<ConfirmSignUpFormData>({
-		resolver: zodResolver(confirmSignUpSchema),
+		resolver: zodResolver(getConfirmSignUpSchema()),
 		defaultValues: {
 			email,
 		},
@@ -92,17 +93,16 @@ const ConfirmSignUpFormComponent: React.FC<ConfirmSignUpFormComponentProps> = ({
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 			<div className="text-center mb-4">
 				<p className="text-sm text-gray-600">
-					We've sent a confirmation code to your email address. Please
-					enter it below.
+					{localization.text_sent_confirmation_code}
 				</p>
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor="email">Email</Label>
+				<Label htmlFor="email">{localization.label_email}</Label>
 				<Input
 					id="email"
 					type="email"
-					placeholder="Enter your email"
+					placeholder={localization.placeholder_enter_email_simple}
 					{...register("email")}
 					className={errors.email ? "border-red-500" : ""}
 				/>
@@ -114,11 +114,11 @@ const ConfirmSignUpFormComponent: React.FC<ConfirmSignUpFormComponentProps> = ({
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor="code">Confirmation Code</Label>
+				<Label htmlFor="code">{localization.label_confirmation_code}</Label>
 				<Input
 					id="code"
 					type="text"
-					placeholder="Enter confirmation code"
+					placeholder={localization.placeholder_enter_confirmation_code}
 					{...register("code")}
 					className={errors.code ? "border-red-500" : ""}
 				/>
@@ -138,10 +138,10 @@ const ConfirmSignUpFormComponent: React.FC<ConfirmSignUpFormComponentProps> = ({
 					{isSubmitting || isLoading ? (
 						<div className="flex items-center justify-center space-x-2">
 							<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-							<span>Confirming...</span>
+							<span>{localization.text_confirming}</span>
 						</div>
 					) : (
-						"Confirm Account"
+						localization.button_confirm_account
 					)}
 				</Button>
 
@@ -156,10 +156,10 @@ const ConfirmSignUpFormComponent: React.FC<ConfirmSignUpFormComponentProps> = ({
 						{isResending ? (
 							<div className="flex items-center justify-center space-x-2">
 								<div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
-								<span>Resending...</span>
+								<span>{localization.text_resending}</span>
 							</div>
 						) : (
-							"Resend Code"
+							localization.button_resend_code
 						)}
 					</Button>
 
@@ -170,7 +170,7 @@ const ConfirmSignUpFormComponent: React.FC<ConfirmSignUpFormComponentProps> = ({
 							onClick={onBackToSignUp}
 							className="w-full"
 						>
-							Back to Sign Up
+							{localization.button_back_to_sign_up}
 						</Button>
 					)}
 				</div>

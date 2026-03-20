@@ -1,31 +1,22 @@
 import React from "react";
 import { HouseholdInfoDisplayProps } from "../types/household-registration.types";
+import localization from "../../Localization/LocalizationComponent";
 
-/**
- * HouseholdInfoDisplay Component
- *
- * Displays household information in a clean, readable format for the confirmation modal.
- * Shows address, member counts, contact information, and household name.
- */
 const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
 	householdData,
 	className = "",
 }) => {
-	// Format member counts into readable text
 	const formatMemberCounts = () => {
 		const { adults, children, seniors } = householdData.counts;
 		const counts = [];
 
-		if (adults > 0) counts.push(`${adults} adult${adults > 1 ? "s" : ""}`);
-		if (children > 0)
-			counts.push(`${children} child${children > 1 ? "ren" : ""}`);
-		if (seniors > 0)
-			counts.push(`${seniors} senior${seniors > 1 ? "s" : ""}`);
+		if (adults > 0) counts.push(`${adults} ${localization.label_adults}`);
+		if (children > 0) counts.push(`${children} ${localization.label_children}`);
+		if (seniors > 0) counts.push(`${seniors} ${localization.label_seniors}`);
 
-		return counts.length > 0 ? counts.join(", ") : "No members";
+		return counts.length > 0 ? counts.join(", ") : localization.label_no_members;
 	};
 
-	// Format address
 	const formatAddress = () => {
 		const parts = [
 			householdData.address_line_1,
@@ -35,17 +26,16 @@ const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
 			householdData.zip_code,
 		].filter(Boolean);
 
-		return parts.join(", ") || "No address provided";
+		return parts.join(", ") || localization.label_no_address_provided;
 	};
 
-	// Format contact information
 	const formatContactInfo = () => {
 		const contact = [];
-		if (householdData.phone) contact.push(`Phone: ${householdData.phone}`);
-		if (householdData.email) contact.push(`Email: ${householdData.email}`);
+		if (householdData.phone) contact.push(`${localization.label_phone_colon} ${householdData.phone}`);
+		if (householdData.email) contact.push(`${localization.label_email_colon} ${householdData.email}`);
 		return contact.length > 0
 			? contact.join(" • ")
-			: "No contact information";
+			: localization.label_no_contact_info;
 	};
 
 	return (
@@ -56,10 +46,9 @@ const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
 			aria-labelledby="household-info-heading"
 		>
 			<h2 id="household-info-heading" className="sr-only">
-				Household Information Summary
+				{localization.label_household_members}
 			</h2>
 
-			{/* Household Name */}
 			{householdData.name && (
 				<div className="border-b border-gray-200 pb-3">
 					<h3
@@ -72,13 +61,12 @@ const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
 				</div>
 			)}
 
-			{/* Address Information */}
 			<section className="space-y-2" aria-labelledby="address-heading">
 				<h4
 					id="address-heading"
 					className="text-sm font-medium text-gray-700 uppercase tracking-wide"
 				>
-					Address
+					{localization.label_address}
 				</h4>
 				<p
 					className="text-sm text-gray-600"
@@ -89,13 +77,12 @@ const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
 				</p>
 			</section>
 
-			{/* Member Counts */}
 			<section className="space-y-2" aria-labelledby="members-heading">
 				<h4
 					id="members-heading"
 					className="text-sm font-medium text-gray-700 uppercase tracking-wide"
 				>
-					Household Members
+					{localization.label_household_members}
 				</h4>
 				<p
 					className="text-sm text-gray-600"
@@ -104,22 +91,17 @@ const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
 				>
 					{formatMemberCounts()}
 				</p>
-				<p
-					className="text-xs text-gray-500"
-					aria-label={`Total household members: ${householdData.counts.total}`}
-				>
-					Total: {householdData.counts.total} member
-					{householdData.counts.total !== 1 ? "s" : ""}
+				<p className="text-xs text-gray-500">
+					{localization.label_total_members}: {householdData.counts.total}
 				</p>
 			</section>
 
-			{/* Contact Information */}
 			<section className="space-y-2" aria-labelledby="contact-heading">
 				<h4
 					id="contact-heading"
 					className="text-sm font-medium text-gray-700 uppercase tracking-wide"
 				>
-					Contact Information
+					{localization.label_contact_information}
 				</h4>
 				<p
 					className="text-sm text-gray-600"

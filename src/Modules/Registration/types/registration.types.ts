@@ -43,6 +43,7 @@ export interface RegistrationFormData {
   suffix?: string;
   date_of_birth: string;
   gender: string;
+  preferred_language?: string;
 
   // Address Information
   address_line_1: string;

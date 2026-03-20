@@ -450,9 +450,9 @@ export const MemoizedHouseholdDashboard: React.FC<
 		async (data: any) => {
 			try {
 				if (propHousehold) {
-					const updatedHousehold = {
+					const updatedHousehold: any = {
 						...propHousehold,
-						preferred_language: data.household_preferred_language,
+						...(data.language_id !== undefined && { language_id: data.language_id }),
 					};
 					await onHouseholdUpdate?.(updatedHousehold);
 					setIsEditingLanguagePreferences(false);
@@ -511,7 +511,7 @@ export const MemoizedHouseholdDashboard: React.FC<
 		);
 	}
 
-	// If editing household info, show the HouseholdInfoManager
+	// If editing household info, show the HouseholdInfoManager (defaultEditMode so preferred language dropdown is visible immediately)
 	if (isEditingHouseholdInfo) {
 		return (
 			<HouseholdInfoManager
@@ -519,6 +519,7 @@ export const MemoizedHouseholdDashboard: React.FC<
 				onUpdate={handleUpdateHouseholdInfo}
 				onCancel={handleCancelEditHouseholdInfo}
 				className={className}
+				defaultEditMode
 			/>
 		);
 	}

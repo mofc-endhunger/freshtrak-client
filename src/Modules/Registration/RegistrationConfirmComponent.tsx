@@ -21,7 +21,7 @@ import {
 } from "../../components/ui/dialog";
 import localization from "../Localization/LocalizationComponent";
 import { sanitizeHtml } from "../../Utils/sanitizeHtml";
-import { Printer, Download } from "lucide-react";
+import { Printer, Download, Phone, Home, Mail, Users } from "lucide-react";
 import PrintableConfirmationCard, {
 	generateConfirmationCardPNG,
 } from "./components/PrintableConfirmationCard";
@@ -265,28 +265,42 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 									{suffix}
 								</h3>
 								{address_line_1 && (
-									<p className="text-sm text-gray-600">
-										{address_line_1}
-									</p>
+									<div className="flex items-center space-x-2">
+										<Home className="h-4 w-4" />
+										<p className="text-sm text-gray-600">
+											{address_line_1},
+										</p>
+										<p className="text-sm text-gray-600">
+											{[city, state]
+												.filter(Boolean)
+												.join(", ")}{" "}
+											{zip_code}
+										</p>
+									</div>
 								)}
-								<p className="text-sm text-gray-600">
-									{[city, state].filter(Boolean).join(", ")}{" "}
-									{zip_code}
-								</p>
 								{phone && (
-									<p className="text-sm text-gray-600">
-										{formatPhoneNumber(phone)}
-									</p>
+									<div className="flex items-center space-x-2">
+										<Phone className="h-4 w-4" />
+										<p className="text-sm text-gray-600">
+											{formatPhoneNumber(phone)}
+										</p>
+									</div>
 								)}
-								<p className="text-sm text-gray-600">
-									{user_data?.email || ""}
-								</p>
+								<div className="flex items-center space-x-2">
+									<Mail className="h-4 w-4" />
+									<p className="text-sm text-gray-600">
+										{user_data?.email || ""}
+									</p>
+								</div>
 								{/* registrant family member counts */}
-								<p className="text-sm text-gray-600 font-semibold">
-									{family_member_count || 0}{" "}
-									{localization.family_member_count_plural ||
-										"family members"}
-								</p>
+								<div className="flex items-center space-x-2">
+									<Users className="h-4 w-4" />
+									<p className="text-sm text-gray-600 font-semibold">
+										{family_member_count || 0}{" "}
+										{localization.family_member_count_plural ||
+											"family members"}
+									</p>
+								</div>
 							</CardContent>
 						</Card>
 

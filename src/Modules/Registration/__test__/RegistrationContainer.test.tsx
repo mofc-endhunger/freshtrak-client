@@ -98,6 +98,7 @@ jest.mock("../../../Utils/StorageService", () => {
 		getCognitoUser: jest.fn(),
 		isLoggedInUser: jest.fn(),
 		isGuestUser: jest.fn(),
+		isCaseManager: jest.fn(),
 	};
 	return {
 		StorageService: mockStorageService,
@@ -145,6 +146,7 @@ describe("RegistrationContainer", () => {
 		mockStorageService.getCognitoUser.mockReturnValue(null);
 		mockStorageService.isLoggedInUser.mockReturnValue(false);
 		mockStorageService.isGuestUser.mockReturnValue(false);
+		mockStorageService.isCaseManager.mockReturnValue(false);
 
 		// Mock environment variables
 		process.env.REACT_APP_CLIENT_URL = "http://localhost:3000";

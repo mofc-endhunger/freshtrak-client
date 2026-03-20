@@ -792,6 +792,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "No results found.",
 		cm_table_results: "result(s)",
 		cm_table_page: "Page",
+		cm_registration_complete: "Registration Complete!",
+		cm_save_before_leaving_title: "Save Confirmation?",
+		cm_save_before_leaving_description:
+			"Have you saved or printed the confirmation information? This data will not be available after you leave this page.",
+		family_member_count_plural: "family members",
 	},
 
 	spa: {
@@ -1598,6 +1603,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "No se encontraron resultados.",
 		cm_table_results: "resultado(s)",
 		cm_table_page: "Página",
+		cm_registration_complete: "¡Registro Completado!",
+		cm_save_before_leaving_title: "¿Guardar Confirmación?",
+		cm_save_before_leaving_description:
+			"¿Ha guardado o impreso la información de confirmación? Estos datos no estarán disponibles después de salir de esta página.",
+		family_member_count_plural: "miembros de la familia",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -2404,6 +2414,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "Natiijooyin lama helin.",
 		cm_table_results: "natiijo(oyin)",
 		cm_table_page: "Bogga",
+		cm_registration_complete: "Diiwaangelinta Waa La Dhammeeyey!",
+		cm_save_before_leaving_title: "Keydi Xaqiijinta?",
+		cm_save_before_leaving_description:
+			"Ma keydisay ama daabacday macluumaadka xaqiijinta? Xogtan lama heli doono markaad ka tagto boggan.",
+		family_member_count_plural: "xubnaha qoyska",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -3216,6 +3231,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "Результатов не найдено.",
 		cm_table_results: "результат(ов)",
 		cm_table_page: "Страница",
+		cm_registration_complete: "Регистрация Завершена!",
+		cm_save_before_leaving_title: "Сохранить подтверждение?",
+		cm_save_before_leaving_description:
+			"Вы сохранили или распечатали информацию о подтверждении? Эти данные будут недоступны после того, как вы покинете эту страницу.",
+		family_member_count_plural: "членов семьи",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -4004,6 +4024,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "Sonuç bulunamadı.",
 		cm_table_results: "sonuç",
 		cm_table_page: "Sayfa",
+		cm_registration_complete: "Kayıt Tamamlandı!",
+		cm_save_before_leaving_title: "Onay Kaydedilsin mi?",
+		cm_save_before_leaving_description:
+			"Onay bilgilerini kaydettiniz veya yazdırdınız mı? Bu sayfadan ayrıldıktan sonra bu veriler kullanılamayacaktır.",
+		family_member_count_plural: "aile üyeleri",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -4772,6 +4797,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "لم يتم العثور على نتائج.",
 		cm_table_results: "نتيجة (نتائج)",
 		cm_table_page: "صفحة",
+		cm_registration_complete: "اكتمل التسجيل!",
+		cm_save_before_leaving_title: "حفظ التأكيد؟",
+		cm_save_before_leaving_description:
+			"هل قمت بحفظ أو طباعة معلومات التأكيد؟ لن تكون هذه البيانات متاحة بعد مغادرة هذه الصفحة.",
+		family_member_count_plural: "أفراد الأسرة",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -5512,6 +5542,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "未找到结果。",
 		cm_table_results: "个结果",
 		cm_table_page: "页",
+		cm_registration_complete: "注册完成！",
+		cm_save_before_leaving_title: "保存确认信息？",
+		cm_save_before_leaving_description:
+			"您是否已保存或打印确认信息？离开此页面后将无法获取这些数据。",
+		family_member_count_plural: "家庭成员",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -6300,6 +6335,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "कोई परिणाम नहीं मिला।",
 		cm_table_results: "परिणाम",
 		cm_table_page: "पृष्ठ",
+		cm_registration_complete: "पंजीकरण पूर्ण!",
+		cm_save_before_leaving_title: "पुष्टि सहेजें?",
+		cm_save_before_leaving_description:
+			"क्या आपने पुष्टि जानकारी सहेज ली है या प्रिंट कर लिया है? इस पृष्ठ से जाने के बाद यह डेटा उपलब्ध नहीं होगा।",
+		family_member_count_plural: "परिवार के सदस्य",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -7096,6 +7136,11 @@ let localization = new LocalizedStrings({
 		cm_no_results_found: "कुनै नतिजा भेटिएन।",
 		cm_table_results: "नतिजा(हरू)",
 		cm_table_page: "पृष्ठ",
+		cm_registration_complete: "दर्ता सम्पन्न भयो!",
+		cm_save_before_leaving_title: "पुष्टि बचत गर्नुहोस्?",
+		cm_save_before_leaving_description:
+			"के तपाईंले पुष्टि जानकारी बचत गर्नुभयो वा प्रिन्ट गर्नुभयो? यो पृष्ठ छोडेपछि यो डेटा उपलब्ध हुनेछैन।",
+		family_member_count_plural: "परिवारका सदस्यहरू",
 	},
 });
 

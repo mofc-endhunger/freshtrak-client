@@ -361,27 +361,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				StorageService.setItem("cognitoUser", userData);
 				StorageService.setItem("isLoggedIn", "true");
 
-				// Auto-detect case manager role from JWT cognito:groups claim
-				if (accessToken) {
-					try {
-						const tokenParts = accessToken.split(".");
-						if (tokenParts.length === 3) {
-							const payload = JSON.parse(atob(tokenParts[1]));
-							const groups: string[] =
-								payload?.["cognito:groups"] ?? [];
-							if (groups.includes("case_managers")) {
-								StorageService.setUserRole("case_manager");
-							}
-						}
-					} catch (groupCheckError) {
-						console.warn(
-							"Could not check cognito:groups:",
-							groupCheckError
-						);
-					}
-				}
-
-				// Set userToken for registration system compatibility
+					// Set userToken for registration system compatibility
 				if (accessToken) {
 					StorageService.setUserToken(accessToken);
 				} else {

@@ -47,6 +47,7 @@ interface EventCardComponentProps {
 	agencyLatitude?: number;
 	agencyLongitude?: number;
 	targetUrl?: string;
+	simplified?: boolean;
 }
 
 const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
@@ -82,6 +83,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 		alreadyRegistered,
 		agencyLatitude,
 		agencyLongitude,
+		simplified,
 	} = props;
 
 	// Fallback: use agency coordinates if event coordinates are missing
@@ -174,104 +176,106 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 						</div>
 					</div>
 				</div>
-				<div className="p-4 min-h-[280px] flex flex-col justify-between">
-					<div className="text-sm font-varela flex justify-between mb-2">
-						<div className="date-wrapper">
-							{formatDateDayAndDate(date)}
-						</div>
-						<div className="timing-wrapper">
-							{startTime} - {endTime}
-						</div>
+			<div className={`p-4 ${simplified ? "" : "min-h-[280px]"} flex flex-col justify-between`}>
+				<div className="text-sm font-varela flex justify-between mb-2">
+					<div className="date-wrapper">
+						{formatDateDayAndDate(date)}
 					</div>
-					<div className="text-xs font-varela max-w-[150px] my-2">
-						{eventAddress}
-						<br />
-						{eventCity} {eventState} {eventZip}
-						<br />
-						{phoneNumber}
-						<br />
-					</div>
-					<MiniMapComponent
-						address={eventAddress}
-						city={eventCity}
-						state={eventState}
-						zip={eventZip}
-						onClick={handleMapClick}
-						latitude={latitude}
-						longitude={longitude}
-					/>
-					{exceptionNote && exceptionNote !== "" && (
-						<div className="text-sm font-varela my-2">
-							{localization.label_service_area_limitations}
-							<br />
-							<span
-								className="text-red-600"
-								data-testid="exception-note"
-								dangerouslySetInnerHTML={{
-									__html: sanitizeHtml(exceptionNote),
-								}}
-							/>
-							<br />
-						</div>
-					)}
-					{showDetails && (
-						<div className="">
-							<p>
-								<b> {localization.text_information} </b>
-								<br />
-								<span
-									dangerouslySetInnerHTML={{
-										__html: sanitizeHtml(eventDetails),
-									}}
-								/>
-							</p>
-						</div>
-					)}
-					{!!showRsvpOptional && (
-						<span className="text-red-600 text-sm">
-							{localization.text_rsvp_optional_for_event}
-						</span>
-					)}
-					{!!showRsvpRequired && (
-						<span className="text-red-600 text-sm">
-							{localization.text_rsvp_required_for_event}
-						</span>
-					)}
-					{alreadyRegistered && (
-						<span className="text-red-600 text-sm">
-							{localization.text_already_registered}
-						</span>
-					)}
-					<div className="space-y-3 mt-3">
-						{/* Details and Directions buttons row */}
-						<div className="flex flex-col gap-2">
-							{eventDetails && eventDetails.length > 0 && (
-								<button
-									className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
-									onClick={() => {
-										setShowDetails(!showDetails);
-									}}
-								>
-									{!showDetails
-										? localization.button_view_details
-										: localization.button_hide_details}
-								</button>
-							)}
-							<button
-								className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
-								onClick={handleGetDirections}
-							>
-								{localization.button_get_directions}
-							</button>
-						</div>
-
-						{/* Reserve button on separate row */}
-						{ButtonView() && (
-							<div className="w-full">{ButtonView()}</div>
-						)}
+					<div className="timing-wrapper">
+						{startTime} - {endTime}
 					</div>
 				</div>
+				<div className="text-xs font-varela max-w-[150px] my-2">
+					{eventAddress}
+					<br />
+					{eventCity} {eventState} {eventZip}
+					<br />
+					{phoneNumber}
+					<br />
+				</div>
+				{!simplified && (
+					<>
+						<MiniMapComponent
+							address={eventAddress}
+							city={eventCity}
+							state={eventState}
+							zip={eventZip}
+							onClick={handleMapClick}
+							latitude={latitude}
+							longitude={longitude}
+						/>
+						{exceptionNote && exceptionNote !== "" && (
+							<div className="text-sm font-varela my-2">
+								{localization.label_service_area_limitations}
+								<br />
+								<span
+									className="text-red-600"
+									data-testid="exception-note"
+									dangerouslySetInnerHTML={{
+										__html: sanitizeHtml(exceptionNote),
+									}}
+								/>
+								<br />
+							</div>
+						)}
+						{showDetails && (
+							<div className="">
+								<p>
+									<b> {localization.text_information} </b>
+									<br />
+									<span
+										dangerouslySetInnerHTML={{
+											__html: sanitizeHtml(eventDetails),
+										}}
+									/>
+								</p>
+							</div>
+						)}
+						{!!showRsvpOptional && (
+							<span className="text-red-600 text-sm">
+								{localization.text_rsvp_optional_for_event}
+							</span>
+						)}
+						{!!showRsvpRequired && (
+							<span className="text-red-600 text-sm">
+								{localization.text_rsvp_required_for_event}
+							</span>
+						)}
+						{alreadyRegistered && (
+							<span className="text-red-600 text-sm">
+								{localization.text_already_registered}
+							</span>
+						)}
+						<div className="space-y-3 mt-3">
+							<div className="flex flex-col gap-2">
+								{eventDetails && eventDetails.length > 0 && (
+									<button
+										className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
+										onClick={() => {
+											setShowDetails(!showDetails);
+										}}
+									>
+										{!showDetails
+											? localization.button_view_details
+											: localization.button_hide_details}
+									</button>
+								)}
+								<button
+									className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
+									onClick={handleGetDirections}
+								>
+									{localization.button_get_directions}
+								</button>
+							</div>
+							{ButtonView() && (
+								<div className="w-full">{ButtonView()}</div>
+							)}
+						</div>
+					</>
+				)}
 			</div>
+		</div>
+		{!simplified && (
 			<FullMapModalComponent
 				isOpen={showMapModal}
 				onClose={handleCloseMapModal}
@@ -284,6 +288,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 				latitude={latitude}
 				longitude={longitude}
 			/>
+		)}
 		</section>
 	);
 };

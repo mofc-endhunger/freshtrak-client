@@ -3,7 +3,7 @@
  *
  * Calls the survey client-bundle and submit endpoints.
  *
- *   GET  /api/surveys/client-bundle?registration_id=...&language_id=...
+ *   GET  /api/surveys/client-bundle?registration_id=...&language_id=...&survey_type=feedback
  *   POST /api/surveys/submit
  */
 
@@ -71,7 +71,8 @@ export class FeedbackApiService {
     }
 
     /**
-     * GET /api/surveys/client-bundle?registration_id=...&language_id=...
+     * GET /api/surveys/client-bundle?registration_id=...&language_id=...&survey_type=feedback
+     * survey_type=feedback ensures the backend returns a feedback survey, not an assessment, when multiple survey types exist for the same language.
      */
     async getClientBundle(
         registrationId: number,
@@ -80,7 +81,13 @@ export class FeedbackApiService {
         try {
             const response = await this.axiosInstance.get<ClientBundleResponse>(
                 API_CONFIG.endpoints.clientBundle,
-                { params: { registration_id: registrationId, language_id: languageId } },
+                {
+                    params: {
+                        registration_id: registrationId,
+                        language_id: languageId,
+                        survey_type: "feedback",
+                    },
+                },
             );
             return response.data;
         } catch (error) {

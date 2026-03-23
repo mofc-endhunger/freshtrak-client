@@ -90,6 +90,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "Summary",
 		tab_account: "Account",
+		tab_programs: "Programs",
 		text_profile: "Profile",
 
 		// RESERVATIONS
@@ -892,6 +893,27 @@ let localization = new LocalizedStrings({
 		feedback_error_generic: "An error occurred",
 		feedback_no_questions: "No questions available for this survey.",
 		feedback_required_aria: "required",
+
+		// ASSESSMENT
+		assessment_no_programs: "No programs available yet.",
+		assessment_take_assessment: "Take Assessment",
+		assessment_title: "Enrollment Assessment",
+		assessment_description:
+			"Please complete the following assessment so we can recommend personalized programs for you.",
+		assessment_whats_next: "What's Next?",
+		assessment_confirmation_message:
+			"We will use the information collected today to recommend personalized programs that you qualify for.",
+		assessment_confirmation_supporting:
+			"We will also periodically ask you to fill out other, more detailed, assessments.",
+		assessment_close: "Close",
+		assessment_submitting: "Submitting...",
+		assessment_submit: "Submit",
+		assessment_error_generic: "An error occurred",
+		assessment_no_questions: "No questions available for this assessment.",
+		assessment_already_submitted:
+			"You have already completed this assessment.",
+		assessment_next: "Next",
+		assessment_skip: "Skip",
 	},
 
 	spa: {
@@ -984,6 +1006,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "Resumen",
 		tab_account: "Cuenta",
+		tab_programs: "Programas",
 		text_profile: "Perfil",
 
 		// RESERVATIONS
@@ -1796,6 +1819,27 @@ let localization = new LocalizedStrings({
 		feedback_no_questions:
 			"No hay preguntas disponibles para esta encuesta.",
 		feedback_required_aria: "requerido",
+
+		// ASSESSMENT
+		assessment_no_programs: "No hay programas disponibles aún.",
+		assessment_take_assessment: "Realizar Evaluación",
+		assessment_title: "Evaluación de Inscripción",
+		assessment_description:
+			"Por favor complete la siguiente evaluación para que podamos recomendar programas personalizados para usted.",
+		assessment_whats_next: "¿Qué Sigue?",
+		assessment_confirmation_message:
+			"Usaremos la información recopilada hoy para recomendar programas personalizados para los que usted califica.",
+		assessment_confirmation_supporting:
+			"También le pediremos periódicamente que complete otras evaluaciones más detalladas.",
+		assessment_close: "Cerrar",
+		assessment_submitting: "Enviando...",
+		assessment_submit: "Enviar",
+		assessment_error_generic: "Ocurrió un error",
+		assessment_no_questions:
+			"No hay preguntas disponibles para esta evaluación.",
+		assessment_already_submitted: "Ya completó esta evaluación.",
+		assessment_next: "Siguiente",
+		assessment_skip: "Omitir",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -1887,6 +1931,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "Kooban",
 		tab_account: "Akoon",
+		tab_programs: "Barnaamijyada",
 		text_profile: "Aqoonsiga",
 
 		// RESERVATIONS
@@ -2706,6 +2751,27 @@ let localization = new LocalizedStrings({
 		feedback_error_generic: "Khalad ayaa dhacay",
 		feedback_no_questions: "Su'aalo ma jiraan loogu talagalay sahaninkan.",
 		feedback_required_aria: "loo baahan yahay",
+
+		// ASSESSMENT
+		assessment_no_programs: "Wali ma jiraan barnaamijyo la heli karo.",
+		assessment_take_assessment: "Qaado Qiimaynta",
+		assessment_title: "Qiimaynta Diiwaangelinta",
+		assessment_description:
+			"Fadlan buuxi qiimaynta soo socota si aan kuugu soo jeedino barnaamijyo kuu gaar ah.",
+		assessment_whats_next: "Maxaa Xiga?",
+		assessment_confirmation_message:
+			"Waxaan isticmaali doonaa macluumaadka maanta la ururiyay si aan kuugu soo jeedino barnaamijyo shakhsi ah oo aad u qalanto.",
+		assessment_confirmation_supporting:
+			"Waxaan sidoo kale marmar ku weydiin doonaa inaad buuxiso qiimaynno kale oo faahfaahsan.",
+		assessment_close: "Xir",
+		assessment_submitting: "Diraya...",
+		assessment_submit: "Dir",
+		assessment_error_generic: "Khalad ayaa dhacay",
+		assessment_no_questions:
+			"Ma jiraan su'aalo la heli karo qiimayntan.",
+		assessment_already_submitted: "Waxaad horay u dhameysay qiimayntan.",
+		assessment_next: "Xiga",
+		assessment_skip: "Ka bood",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -2799,6 +2865,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "Сводка",
 		tab_account: "Аккаунт",
+		tab_programs: "Программы",
 		text_profile: "Профиль",
 
 		// RESERVATIONS
@@ -3612,6 +3679,27 @@ let localization = new LocalizedStrings({
 		feedback_error_generic: "Произошла ошибка",
 		feedback_no_questions: "Нет доступных вопросов для этого опроса.",
 		feedback_required_aria: "обязательное поле",
+
+		// ASSESSMENT
+		assessment_no_programs: "Программы пока недоступны.",
+		assessment_take_assessment: "Пройти оценку",
+		assessment_title: "Оценка для зачисления",
+		assessment_description:
+			"Пожалуйста, заполните следующую оценку, чтобы мы могли порекомендовать вам персонализированные программы.",
+		assessment_whats_next: "Что дальше?",
+		assessment_confirmation_message:
+			"Мы используем собранную сегодня информацию, чтобы порекомендовать персонализированные программы, на которые вы можете претендовать.",
+		assessment_confirmation_supporting:
+			"Мы также будем периодически просить вас заполнять другие, более подробные оценки.",
+		assessment_close: "Закрыть",
+		assessment_submitting: "Отправка...",
+		assessment_submit: "Отправить",
+		assessment_error_generic: "Произошла ошибка",
+		assessment_no_questions:
+			"Для этой оценки нет доступных вопросов.",
+		assessment_already_submitted: "Вы уже прошли эту оценку.",
+		assessment_next: "Далее",
+		assessment_skip: "Пропустить",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -3702,6 +3790,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "Özet",
 		tab_account: "Hesap",
+		tab_programs: "Programlar",
 		text_profile: "Profil",
 
 		// RESERVATIONS
@@ -4491,6 +4580,27 @@ let localization = new LocalizedStrings({
 		feedback_error_generic: "Bir hata oluştu",
 		feedback_no_questions: "Bu anket için soru bulunmamaktadır.",
 		feedback_required_aria: "zorunlu",
+
+		// ASSESSMENT
+		assessment_no_programs: "Henüz mevcut program yok.",
+		assessment_take_assessment: "Değerlendirmeyi Yap",
+		assessment_title: "Kayıt Değerlendirmesi",
+		assessment_description:
+			"Lütfen size özel programlar önerebilmemiz için aşağıdaki değerlendirmeyi tamamlayın.",
+		assessment_whats_next: "Sırada Ne Var?",
+		assessment_confirmation_message:
+			"Bugün toplanan bilgileri, hak kazandığınız kişiselleştirilmiş programları önermek için kullanacağız.",
+		assessment_confirmation_supporting:
+			"Ayrıca periyodik olarak diğer, daha ayrıntılı değerlendirmeleri doldurmanızı isteyeceğiz.",
+		assessment_close: "Kapat",
+		assessment_submitting: "Gönderiliyor...",
+		assessment_submit: "Gönder",
+		assessment_error_generic: "Bir hata oluştu",
+		assessment_no_questions:
+			"Bu değerlendirme için soru bulunmamaktadır.",
+		assessment_already_submitted: "Bu değerlendirmeyi zaten tamamladınız.",
+		assessment_next: "İleri",
+		assessment_skip: "Atla",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -4579,6 +4689,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "ملخص",
 		tab_account: "الحساب",
+		tab_programs: "البرامج",
 		text_profile: "الملف الشخصي",
 
 		// RESERVATIONS
@@ -5344,6 +5455,26 @@ let localization = new LocalizedStrings({
 		feedback_error_generic: "حدث خطأ",
 		feedback_no_questions: "لا توجد أسئلة متاحة لهذا الاستبيان.",
 		feedback_required_aria: "مطلوب",
+
+		// ASSESSMENT
+		assessment_no_programs: "لا توجد برامج متاحة حتى الآن.",
+		assessment_take_assessment: "إجراء التقييم",
+		assessment_title: "تقييم التسجيل",
+		assessment_description:
+			"يرجى إكمال التقييم التالي حتى نتمكن من التوصية ببرامج مخصصة لك.",
+		assessment_whats_next: "ما التالي؟",
+		assessment_confirmation_message:
+			"سنستخدم المعلومات التي تم جمعها اليوم للتوصية ببرامج مخصصة تؤهل لها.",
+		assessment_confirmation_supporting:
+			"سنطلب منك أيضاً بشكل دوري ملء تقييمات أخرى أكثر تفصيلاً.",
+		assessment_close: "إغلاق",
+		assessment_submitting: "جارٍ الإرسال...",
+		assessment_submit: "إرسال",
+		assessment_error_generic: "حدث خطأ",
+		assessment_no_questions: "لا توجد أسئلة متاحة لهذا التقييم.",
+		assessment_already_submitted: "لقد أكملت هذا التقييم بالفعل.",
+		assessment_next: "التالي",
+		assessment_skip: "تخطي",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -5429,6 +5560,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "摘要",
 		tab_account: "账户",
+		tab_programs: "项目",
 		text_profile: "个人资料",
 
 		// RESERVATIONS
@@ -6167,6 +6299,26 @@ let localization = new LocalizedStrings({
 		feedback_error_generic: "发生错误",
 		feedback_no_questions: "此调查暂无可用问题。",
 		feedback_required_aria: "必填",
+
+		// ASSESSMENT
+		assessment_no_programs: "暂无可用项目。",
+		assessment_take_assessment: "进行评估",
+		assessment_title: "注册评估",
+		assessment_description:
+			"请完成以下评估，以便我们为您推荐个性化项目。",
+		assessment_whats_next: "接下来是什么？",
+		assessment_confirmation_message:
+			"我们将使用今天收集的信息为您推荐您符合资格的个性化项目。",
+		assessment_confirmation_supporting:
+			"我们还会定期请您填写其他更详细的评估。",
+		assessment_close: "关闭",
+		assessment_submitting: "提交中...",
+		assessment_submit: "提交",
+		assessment_error_generic: "发生错误",
+		assessment_no_questions: "此评估没有可用的问题。",
+		assessment_already_submitted: "您已完成此评估。",
+		assessment_next: "下一步",
+		assessment_skip: "跳过",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -6257,6 +6409,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "सारांश",
 		tab_account: "खाता",
+		tab_programs: "कार्यक्रम",
 		text_profile: "प्रोफ़ाइल",
 
 		// RESERVATIONS
@@ -7045,6 +7198,27 @@ let localization = new LocalizedStrings({
 		feedback_error_generic: "एक त्रुटि हुई",
 		feedback_no_questions: "इस सर्वेक्षण के लिए कोई प्रश्न उपलब्ध नहीं है।",
 		feedback_required_aria: "आवश्यक",
+
+		// ASSESSMENT
+		assessment_no_programs: "अभी तक कोई कार्यक्रम उपलब्ध नहीं है।",
+		assessment_take_assessment: "मूल्यांकन करें",
+		assessment_title: "नामांकन मूल्यांकन",
+		assessment_description:
+			"कृपया निम्नलिखित मूल्यांकन पूरा करें ताकि हम आपके लिए व्यक्तिगत कार्यक्रमों की सिफारिश कर सकें।",
+		assessment_whats_next: "आगे क्या?",
+		assessment_confirmation_message:
+			"हम आज एकत्रित जानकारी का उपयोग आपके लिए उन व्यक्तिगत कार्यक्रमों की सिफारिश करने के लिए करेंगे जिनके लिए आप योग्य हैं।",
+		assessment_confirmation_supporting:
+			"हम समय-समय पर आपसे अन्य, अधिक विस्तृत मूल्यांकन भरने के लिए भी कहेंगे।",
+		assessment_close: "बंद करें",
+		assessment_submitting: "सबमिट हो रहा है...",
+		assessment_submit: "सबमिट करें",
+		assessment_error_generic: "एक त्रुटि हुई",
+		assessment_no_questions:
+			"इस मूल्यांकन के लिए कोई प्रश्न उपलब्ध नहीं है।",
+		assessment_already_submitted: "आपने यह मूल्यांकन पहले ही पूरा कर लिया है।",
+		assessment_next: "अगला",
+		assessment_skip: "छोड़ें",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -7135,6 +7309,7 @@ let localization = new LocalizedStrings({
 		// TABS
 		tab_summary: "सारांश",
 		tab_account: "खाता",
+		tab_programs: "कार्यक्रमहरू",
 		text_profile: "प्रोफाइल",
 
 		// RESERVATIONS
@@ -7929,6 +8104,28 @@ let localization = new LocalizedStrings({
 		feedback_error_generic: "त्रुटि भयो",
 		feedback_no_questions: "यो सर्वेक्षणको लागि कुनै प्रश्न उपलब्ध छैन।",
 		feedback_required_aria: "आवश्यक",
+
+		// ASSESSMENT
+		assessment_no_programs: "अहिलेसम्म कुनै कार्यक्रम उपलब्ध छैन।",
+		assessment_take_assessment: "मूल्याङ्कन गर्नुहोस्",
+		assessment_title: "भर्ना मूल्याङ्कन",
+		assessment_description:
+			"कृपया हामीले तपाईंको लागि व्यक्तिगत कार्यक्रमहरू सिफारिस गर्न सकौं भनी निम्न मूल्याङ्कन पूरा गर्नुहोस्।",
+		assessment_whats_next: "अर्को के छ?",
+		assessment_confirmation_message:
+			"हामी आज सङ्कलन गरिएको जानकारी प्रयोग गरेर तपाईंले योग्यता पाउनुभएका व्यक्तिगत कार्यक्रमहरू सिफारिस गर्नेछौं।",
+		assessment_confirmation_supporting:
+			"हामी समय-समयमा तपाईंलाई अन्य, थप विस्तृत मूल्याङ्कनहरू भर्न पनि अनुरोध गर्नेछौं।",
+		assessment_close: "बन्द गर्नुहोस्",
+		assessment_submitting: "पेश गर्दै...",
+		assessment_submit: "पेश गर्नुहोस्",
+		assessment_error_generic: "त्रुटि भयो",
+		assessment_no_questions:
+			"यो मूल्याङ्कनको लागि कुनै प्रश्न उपलब्ध छैन।",
+		assessment_already_submitted:
+			"तपाईंले यो मूल्याङ्कन पहिले नै पूरा गर्नुभएको छ।",
+		assessment_next: "अर्को",
+		assessment_skip: "छोड्नुहोस्",
 	},
 });
 

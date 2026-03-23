@@ -32,6 +32,7 @@ import {
 	PastEventsSection,
 } from "../Reservations/components";
 import { AccountInfoSection, HouseholdMembersSection } from "./components";
+import { AssessmentContainer } from "../Assessment";
 
 /**
  * AccountPage - User account management page
@@ -55,6 +56,7 @@ const AccountPage: React.FC = () => {
 	);
 	const [isLoadingHousehold, setIsLoadingHousehold] = useState(false);
 	const [showSkippedSetupPrompt, setShowSkippedSetupPrompt] = useState(false);
+	const [isAssessmentOpen, setIsAssessmentOpen] = useState(false);
 
 	// Initialize API service
 	const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
@@ -234,6 +236,9 @@ const AccountPage: React.FC = () => {
 							<TabsTrigger value="account">
 								{localization.tab_account}
 							</TabsTrigger>
+							<TabsTrigger value="programs">
+								{localization.tab_programs}
+							</TabsTrigger>
 						</TabsList>
 
 						{/* Summary Tab Content */}
@@ -332,6 +337,33 @@ const AccountPage: React.FC = () => {
 									/>
 								</div>
 							</LoadingCard>
+						</TabsContent>
+
+						{/* Programs Tab Content */}
+						<TabsContent value="programs" className="mt-6">
+							<div className="flex flex-col items-center justify-center py-16 space-y-6">
+								<p className="text-gray-500 text-center text-lg">
+									{localization.assessment_no_programs ||
+										"No programs available yet."}
+								</p>
+								<Button
+									onClick={() =>
+										setIsAssessmentOpen(true)
+									}
+									className="bg-text-primary hover:bg-text-primary/90 text-white font-semibold px-8 py-3 rounded-md"
+									data-testid="take-assessment-btn"
+								>
+									{localization.assessment_take_assessment ||
+										"Take Assessment"}
+								</Button>
+							</div>
+
+							<AssessmentContainer
+								isOpen={isAssessmentOpen}
+								onClose={() =>
+									setIsAssessmentOpen(false)
+								}
+							/>
 						</TabsContent>
 					</Tabs>
 				</div>

@@ -5,6 +5,8 @@
 
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
 import { HouseholdSignUpWrapper } from "../HouseholdSignUpWrapper";
 import { AuthProvider } from "../../../Authentication/AuthContext";
 
@@ -48,6 +50,20 @@ Object.defineProperty(window, "localStorage", {
 	value: localStorageMock,
 });
 
+const createTestStore = () =>
+	configureStore({
+		reducer: {
+			language: (state = { language: "en" }, action: any) => state,
+			event: (state = { event: {} }, action: any) => state,
+			user: (state = { user: null }, action: any) => state,
+		},
+	});
+
+const renderWithProviders = (ui: React.ReactElement) => {
+	const store = createTestStore();
+	return render(<Provider store={store}>{ui}</Provider>);
+};
+
 describe("HouseholdSignUpWrapper Integration", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
@@ -55,7 +71,7 @@ describe("HouseholdSignUpWrapper Integration", () => {
 	});
 
 	it("renders children when user is not authenticated", () => {
-		render(
+		renderWithProviders(
 			<AuthProvider>
 				<HouseholdSignUpWrapper>
 					<div data-testid="app-content">App Content</div>
@@ -70,7 +86,6 @@ describe("HouseholdSignUpWrapper Integration", () => {
 	});
 
 	it("renders children when user is authenticated but household setup not offered", () => {
-		// Mock authenticated user
 		localStorageMock.getItem.mockImplementation(key => {
 			if (key === "cognitoUser") {
 				return JSON.stringify({
@@ -82,7 +97,7 @@ describe("HouseholdSignUpWrapper Integration", () => {
 			return null;
 		});
 
-		render(
+		renderWithProviders(
 			<AuthProvider>
 				<HouseholdSignUpWrapper>
 					<div data-testid="app-content">App Content</div>
@@ -94,7 +109,6 @@ describe("HouseholdSignUpWrapper Integration", () => {
 	});
 
 	it("shows household setup offer when conditions are met", async () => {
-		// Mock authenticated user with pending household setup
 		localStorageMock.getItem.mockImplementation(key => {
 			if (key === "cognitoUser") {
 				return JSON.stringify({
@@ -115,7 +129,7 @@ describe("HouseholdSignUpWrapper Integration", () => {
 			return null;
 		});
 
-		render(
+		renderWithProviders(
 			<AuthProvider>
 				<HouseholdSignUpWrapper>
 					<div data-testid="app-content">App Content</div>
@@ -123,7 +137,6 @@ describe("HouseholdSignUpWrapper Integration", () => {
 			</AuthProvider>
 		);
 
-		// Wait for the component to process authentication state
 		await waitFor(() => {
 			expect(screen.getByTestId("app-content")).toBeInTheDocument();
 		});
@@ -135,7 +148,6 @@ describe("HouseholdSignUpWrapper Integration", () => {
 		const mockSkipHouseholdSetup = jest.fn();
 		const mockDeferHouseholdSetup = jest.fn();
 
-		// Mock the service with specific functions
 		jest.doMock("../../services/HouseholdSignUpIntegration", () => ({
 			useHouseholdSignUpIntegration: () => ({
 				getSignUpState: () => ({
@@ -153,7 +165,7 @@ describe("HouseholdSignUpWrapper Integration", () => {
 			}),
 		}));
 
-		render(
+		renderWithProviders(
 			<AuthProvider>
 				<HouseholdSignUpWrapper>
 					<div data-testid="app-content">App Content</div>

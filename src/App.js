@@ -10,7 +10,7 @@ import "./amplify-config";
 // import "./Assets/css/style.css";
 
 const App = () => {
-	const language = useSelector((state) => state.language.language);
+	const language = useSelector((state) => state.language);
 
 	// App initialization cleanup - clear expired data on startup
 	useEffect(() => {

@@ -33,6 +33,7 @@ import {
 	getSuffixId,
 	getAdditionalMemberCounts,
 } from "../Households/utils/householdUtils";
+import { getLanguageOptionByCode } from "../Localization/languageOptions";
 import { StorageService } from "../../Utils/StorageService";
 import { normalizePhoneInput } from "../Family/utils/phoneFormatting";
 
@@ -579,8 +580,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		registrationData: RegistrationFormData,
 		currentHousehold: UsersMeResponse,
 	): UpdateHouseholdApiRequest => {
-		// Exclude updated_at from the request (like HouseholdContainer does)
-		const { updated_at, ...currentHouseholdWithoutTimestamp } =
+		// Exclude updated_at, language_id, preferred_language (API expects language_id only, not code)
+		const { updated_at, language_id: _currentLangId, preferred_language: _omitLangCode, ...currentHouseholdWithoutTimestamp } =
 			currentHousehold;
 
 		// Convert registration gender to gender_id if provided
@@ -634,8 +635,14 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			};
 		});
 
+		const langCode = registrationData.preferred_language || currentHousehold.preferred_language || "en";
+		const languageOption = getLanguageOptionByCode(langCode);
+		const languageId =
+			languageOption?.id ??
+			(_currentLangId !== undefined && _currentLangId !== null ? _currentLangId : undefined);
+
 		const payload = {
-			// Preserve existing household structure (excluding updated_at)
+			// Preserve existing household structure (excluding updated_at, language_id)
 			...currentHouseholdWithoutTimestamp,
 
 			// Update fields from registration
@@ -666,6 +673,9 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 			// Update members array with all updates
 			members: updatedMembers,
+
+			// Send language_id only (API expects id, not preferred_language code)
+			...(languageId !== undefined && { language_id: languageId }),
 		};
 
 		return payload;

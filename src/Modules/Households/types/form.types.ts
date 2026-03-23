@@ -92,14 +92,6 @@ export interface FormComponentProps {
   control?: any; // react-hook-form control object
 }
 
-// Household setup wizard props
-export interface HouseholdSetupWizardProps {
-  onComplete: (data: HouseholdSetupFormData) => Promise<void>;
-  onSkip: () => void;
-  isLoading?: boolean;
-  initialData?: Partial<HouseholdSetupFormData>;
-}
-
 // Member form props
 export interface MemberFormProps extends FormComponentProps {
   onSave: (data: MemberFormData) => Promise<void>;

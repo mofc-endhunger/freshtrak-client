@@ -393,20 +393,22 @@ describe("EventSlotsModalComponent Accessibility", () => {
 				expect(radioButtons).toHaveLength(2);
 			});
 
-			// Verify all interactive elements are present and can receive focus
+			const user = userEvent.setup();
+
+			// Dialog auto-focuses the Go Back button on open; first tab advances to Save and Continue
+			await user.tab();
+			const continueButton = screen.getByRole("button", { name: /save and continue/i });
+			expect(continueButton).toHaveFocus();
+
+			// Tab wraps in focus trap to first radio button
+			await user.tab();
 			const firstRadio = screen.getByDisplayValue("slot1");
-			const secondRadio = screen.getByDisplayValue("slot2");
+			expect(firstRadio).toHaveFocus();
+
+			// Tab to Go Back button
+			await user.tab();
 			const backButton = screen.getByText("Go Back");
-			const continueButton = screen.getByText("Save and Continue");
-
-			// Check that elements have valid tabindex or are natively focusable
-			expect(firstRadio).toBeInTheDocument();
-			expect(secondRadio).toBeInTheDocument();
-			expect(backButton).toBeInTheDocument();
-			expect(continueButton).toBeInTheDocument();
-
-			// Continue button should be enabled when slot is selected
-			expect(continueButton).not.toBeDisabled();
+			expect(backButton).toHaveFocus();
 		});
 
 		it("should handle arrow key navigation for radio buttons", async () => {
@@ -519,7 +521,7 @@ describe("EventSlotsModalComponent Accessibility", () => {
 				expect(dialog).toBeInTheDocument();
 				expect(radiogroup).toBeInTheDocument();
 				expect(radioButtons).toHaveLength(2);
-				// Modal has 2 buttons: "Go Back" and "Save and Continue"
+				// 2 buttons: "Go Back" and "Save and Continue" (close button is hidden via showCloseButton={false})
 				expect(buttons).toHaveLength(2);
 			});
 		});

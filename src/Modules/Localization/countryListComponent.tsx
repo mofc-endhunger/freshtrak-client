@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	Select,
 	SelectContent,
@@ -7,35 +7,27 @@ import {
 	SelectValue,
 } from "../../components/ui/select";
 import localization from "./LocalizationComponent";
-
-interface CountryOption {
-	key: string;
-	value: string;
-	text: string;
-}
+import { getTranslatedLanguageOptions } from "./languageOptions";
 
 interface CountryListComponentProps {
 	change: (
 		event: React.ChangeEvent<HTMLSelectElement>,
 		data: { value: string }
 	) => void;
+	/** Current language code from Redux; keeps dropdown in sync when language is set from household setup or on load */
+	currentLanguage?: string;
 }
 
-const countryOptions: CountryOption[] = [
-	{ key: "en", value: "en", text: "English" },
-	{ key: "spa", value: "spa", text: "Español" },
-	{ key: "som", value: "som", text: "Soomaali" },
-	{ key: "rus", value: "rus", text: "Русский" },
-	{ key: "tur", value: "tur", text: "Türkçe" },
-	{ key: "ara", value: "ara", text: "العربية" },
-	{ key: "zho", value: "zho", text: "中文" },
-	{ key: "hin", value: "hin", text: "हिन्दी" },
-	{ key: "nep", value: "nep", text: "नेपाली" },
-	{ key: "tgl", value: "tgl", text: "Tagalog" },
-];
-
 const CountryListComponent: React.FC<CountryListComponentProps> = (props) => {
-	const [selectedValue, setSelectedValue] = useState<string>("");
+	const [selectedValue, setSelectedValue] = useState<string>(
+		props.currentLanguage ?? ""
+	);
+
+	useEffect(() => {
+		if (props.currentLanguage !== undefined && props.currentLanguage !== "") {
+			setSelectedValue(props.currentLanguage);
+		}
+	}, [props.currentLanguage]);
 
 	const handleValueChange = (value: string) => {
 		setSelectedValue(value);
@@ -52,10 +44,10 @@ const CountryListComponent: React.FC<CountryListComponentProps> = (props) => {
 				<SelectValue placeholder={localization.placeholder_select_language} />
 			</SelectTrigger>
 			<SelectContent className="bg-white z-[10000]">
-				{countryOptions.map((option) => (
+				{getTranslatedLanguageOptions().map((option) => (
 					<SelectItem
-						key={option.key}
-						value={option.value}
+						key={option.code}
+						value={option.code}
 						className="text-gray-900"
 					>
 						{option.text}

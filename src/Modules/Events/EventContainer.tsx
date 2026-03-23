@@ -252,6 +252,7 @@ const EventContainer: React.FC = () => {
 							zipCode={zipCode}
 							availabilityFilter={availability}
 							reservationsFilter={reservations}
+							distance={Number(distance) || 10}
 							lastItemRef={lastElementRef}
 							loadingMore={loadingMore}
 							onHasMoreChange={setHasMoreEvents}

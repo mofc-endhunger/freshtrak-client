@@ -29,8 +29,13 @@ import { handleAuthError, getCognitoToken } from "../../Utils/AuthErrorHandler";
 import {
 	getGenderId,
 	getGenderFromId,
+	getSuffixFromId,
+	getSuffixId,
+	getAdditionalMemberCounts,
 } from "../Households/utils/householdUtils";
+import { getLanguageOptionByCode } from "../Localization/languageOptions";
 import { StorageService } from "../../Utils/StorageService";
+import { normalizePhoneInput } from "../Family/utils/phoneFormatting";
 
 // Type imports from registration.types.ts
 import {
@@ -129,7 +134,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		try {
 			setLoading(true);
 			const resp = await axios.get<{ event: Event; errors?: string[] }>(
-				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
+				`${BASE_URL}api/event_dates/${eventDateId}/event_details`,
 			);
 			const { data } = resp;
 			if (data && data.event) {
@@ -161,7 +166,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		setIsError(false);
 		setPageError(false);
 		setErrors([]);
-		
+
 		// Always fetch fresh event data based on URL parameter
 		if (eventDateId) {
 			getEvent();
@@ -278,12 +283,11 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 					// Convert gender_id to form value (lowercase format expected by form)
 					const getGenderForForm = (
-						genderId: number | null
+						genderId: number | null,
 					): string => {
 						if (!genderId) return "";
 						const gender = getGenderFromId(genderId);
-						// Form expects: "male", "female", "other", "not_specify"
-						// Map from household format to form format
+						if (!gender) return "";
 						const genderMap: Record<string, string> = {
 							male: "male",
 							female: "female",
@@ -312,30 +316,30 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						permission_to_email:
 							householdData.permission_to_email ??
 							user.permission_to_email,
-						// Prefill date_of_birth and gender from primary member
+						// Prefill date_of_birth, gender, and suffix from primary member
 						date_of_birth: primaryMember
 							? convertDateFormat(
-									primaryMember.date_of_birth || ""
-							  )
+									primaryMember.date_of_birth || "",
+								)
 							: user.date_of_birth || "",
 						gender: primaryMember
 							? getGenderForForm(primaryMember.gender_id || null)
 							: user.gender || "",
-					// Prefill household member counts
-					// Subtract 1 from adults because head of household is counted as an adult
-					adults_in_household:
-						Math.max(0, (householdData.counts?.adults || 0) - 1) ||
-						user.adults_in_household,
-					children_in_household:
-						householdData.counts?.children ||
-						user.children_in_household,
-					// Only trust API seniors count if head of household has valid DOB
-					// Backend defaults DOB to "1900-01-01" which would incorrectly count as 125+ years old (senior)
-					seniors_in_household:
-						primaryMember?.date_of_birth &&
-						primaryMember.date_of_birth !== "1900-01-01"
-							? householdData.counts?.seniors || 0
-							: user.seniors_in_household || 0,
+						suffix: primaryMember
+							? getSuffixFromId(primaryMember.suffix_id)
+							: user.suffix || "",
+						// Prefill household member counts (excludes HOH from the correct age bucket)
+						...((): Pick<RegistrationFormData, 'adults_in_household' | 'children_in_household' | 'seniors_in_household'> => {
+							const counts = getAdditionalMemberCounts(
+								householdData.counts || {},
+								primaryMember?.date_of_birth,
+							);
+							return {
+								seniors_in_household: counts.seniors,
+								adults_in_household: counts.adults,
+								children_in_household: counts.children,
+							};
+						})(),
 						// Prefill household name if available
 						identification_code:
 							householdData.identification_code ||
@@ -343,14 +347,17 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					};
 					setUser(prefilledUser);
 					// Store household members for count validation
-					if (householdData.members && householdData.members.length > 0) {
+					if (
+						householdData.members &&
+						householdData.members.length > 0
+					) {
 						setHouseholdMembers(householdData.members);
 					}
 					householdDataProcessedRef.current = true; // Mark as processed
 				} catch (error) {
 					console.error(
 						"Error prefilling with household data:",
-						error
+						error,
 					);
 				}
 			}
@@ -430,7 +437,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		];
 
 		return alreadyRegisteredKeywords.some((keyword) =>
-			errorText.includes(keyword)
+			errorText.includes(keyword),
 		);
 	};
 
@@ -499,7 +506,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			if (formatted_msg === "Something Went Wrong") {
 				const firstError = Object.values(msg).find(
 					(value): value is string[] =>
-						Array.isArray(value) && value.length > 0
+						Array.isArray(value) && value.length > 0,
 				);
 				if (firstError && firstError.length > 0) {
 					formatted_msg = formatErrorMessage(firstError[0]);
@@ -554,7 +561,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 	// Helper function to convert registration gender format to household format
 	const normalizeGenderToHouseholdFormat = (
-		gender: string
+		gender: string,
 	): "male" | "female" | "other" | "prefer_not_to_say" => {
 		const normalized = gender.toLowerCase().trim();
 		if (normalized === "male") return "male";
@@ -571,20 +578,25 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	// Helper function to map registration data to household structure
 	const mapRegistrationToHousehold = (
 		registrationData: RegistrationFormData,
-		currentHousehold: UsersMeResponse
+		currentHousehold: UsersMeResponse,
 	): UpdateHouseholdApiRequest => {
-		// Exclude updated_at from the request (like HouseholdContainer does)
-		const { updated_at, ...currentHouseholdWithoutTimestamp } =
+		// Exclude updated_at, language_id, preferred_language (API expects language_id only, not code)
+		const { updated_at, language_id: _currentLangId, preferred_language: _omitLangCode, ...currentHouseholdWithoutTimestamp } =
 			currentHousehold;
 
 		// Convert registration gender to gender_id if provided
 		let genderId: number | null = null;
 		if (registrationData.gender) {
 			const normalizedGender = normalizeGenderToHouseholdFormat(
-				registrationData.gender
+				registrationData.gender,
 			);
 			genderId = getGenderId(normalizedGender);
 		}
+
+		// Convert registration suffix to suffix_id if provided
+		const suffixId: number | null = registrationData.suffix
+			? getSuffixId(registrationData.suffix) || null
+			: null;
 
 		// Update the primary member (members[0]) with all registration data
 		const updatedMembers = currentHousehold.members.map((member, index) => {
@@ -601,16 +613,18 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						null,
 					date_of_birth:
 						registrationData.date_of_birth || member.date_of_birth,
-					// Update gender_id from registration data if provided, otherwise keep existing
 					gender_id:
 						genderId !== null
 							? genderId
 							: member.gender_id
-							? Number(member.gender_id)
-							: null,
-					suffix_id: member.suffix_id
-						? Number(member.suffix_id)
-						: null,
+								? Number(member.gender_id)
+								: null,
+					suffix_id:
+						suffixId !== null
+							? suffixId
+							: member.suffix_id
+								? Number(member.suffix_id)
+								: null,
 				};
 			}
 			// For other members, preserve existing data with proper typing
@@ -621,8 +635,14 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			};
 		});
 
+		const langCode = registrationData.preferred_language || currentHousehold.preferred_language || "en";
+		const languageOption = getLanguageOptionByCode(langCode);
+		const languageId =
+			languageOption?.id ??
+			(_currentLangId !== undefined && _currentLangId !== null ? _currentLangId : undefined);
+
 		const payload = {
-			// Preserve existing household structure (excluding updated_at)
+			// Preserve existing household structure (excluding updated_at, language_id)
 			...currentHouseholdWithoutTimestamp,
 
 			// Update fields from registration
@@ -631,7 +651,9 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			city: registrationData.city || null,
 			state: registrationData.state || null,
 			zip_code: registrationData.zip_code || null,
-			phone: registrationData.phone || null,
+			phone: registrationData.phone
+				? normalizePhoneInput(registrationData.phone)
+				: null,
 			email: registrationData.email || null,
 
 			// Update contact preferences
@@ -651,6 +673,9 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 			// Update members array with all updates
 			members: updatedMembers,
+
+			// Send language_id only (API expects id, not preferred_language code)
+			...(languageId !== undefined && { language_id: languageId }),
 		};
 
 		return payload;
@@ -658,7 +683,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 	// Helper function to handle Cognito user update
 	const updateCognitoUser = async (
-		user: RegistrationFormData
+		user: RegistrationFormData,
 	): Promise<void> => {
 		const cognitoToken = getCognitoToken();
 		if (!cognitoToken) {
@@ -675,7 +700,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			// Ensure we have members data
 			if (!householdData.members || householdData.members.length === 0) {
 				throw new Error(
-					"No household members found. Please contact support."
+					"No household members found. Please contact support.",
 				);
 			}
 
@@ -685,7 +710,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			// Update household using primary member ID
 			await householdsApiService.updateHousehold(
 				parseInt(householdData.members[0].user_id || "0", 10),
-				updateData
+				updateData,
 			);
 		} catch (error: any) {
 			// Handle authentication errors specifically
@@ -707,7 +732,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	// Helper function to handle errors gracefully
 	const handleRegistrationError = (
 		error: any,
-		userType: "guest" | "cognito"
+		userType: "guest" | "cognito",
 	) => {
 		console.error(`${userType} registration error:`, error);
 
@@ -750,7 +775,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 	const register = async (
 		user: RegistrationFormData,
-		event: Event
+		event: Event,
 	): Promise<void> => {
 		setDisabled(!disabled);
 		const event_date_id = parseInt(eventDateId || "0", 10);
@@ -784,15 +809,17 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					}
 				}
 
+				const guestPayload = {
+					...updatedUser,
+					phone: updatedUser.phone
+						? normalizePhoneInput(updatedUser.phone)
+						: "",
+				};
 				const userResp = await axios.patch<
 					ApiResponse<RegistrationFormDataPatch>
-				>(
-					GUEST_USER,
-					updatedUser, // Send user data directly, not wrapped in { user: ... }
-					{
-						headers: { "X-Guest-Token": `${userToken}` },
-					}
-				);
+				>(GUEST_USER, guestPayload, {
+					headers: { "X-Guest-Token": `${userToken}` },
+				});
 				// Use the response data, which should include identification_code
 				// Merge response data with existing user data to maintain all required fields
 				updatedUser = { ...updatedUser, ...(userResp.data.data || {}) };
@@ -823,38 +850,39 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					? { "X-Guest-Token": `${userToken}` }
 					: { Authorization: `Bearer ${getCognitoToken()}` };
 
-		// Build registration payload with counts based on user type
-		const basePayload = eventSlotId
-			? {
-					event_id: selectedEvent.eventId,
-					event_date_id,
-					event_slot_id,
-			  }
-			: { event_id: selectedEvent.eventId, event_date_id };
-
-		// Add counts in appropriate format based on user type
-		// Guest users: flat fields (seniors, adults, children)
-		// Registered users: nested counts object
-		const countsPayload =
-			userType === "guest"
+			// Build registration payload with counts based on user type
+			const basePayload = eventSlotId
 				? {
-						seniors: updatedUser.seniors_in_household || 0,
-						adults: updatedUser.adults_in_household || 0,
-						children: updatedUser.children_in_household || 0,
-				  }
-				: {
-						counts: {
+						event_id: selectedEvent.eventId,
+						event_date_id,
+						event_slot_id,
+					}
+				: { event_id: selectedEvent.eventId, event_date_id };
+
+			// Add counts in appropriate format based on user type
+			// Guest users: flat fields (seniors, adults, children)
+			// Registered users: nested counts object
+			const countsPayload =
+				userType === "guest"
+					? {
 							seniors: updatedUser.seniors_in_household || 0,
 							adults: updatedUser.adults_in_household || 0,
 							children: updatedUser.children_in_household || 0,
-						},
-				  };
+						}
+					: {
+							counts: {
+								seniors: updatedUser.seniors_in_household || 0,
+								adults: updatedUser.adults_in_household || 0,
+								children:
+									updatedUser.children_in_household || 0,
+							},
+						};
 
-		await axios.post<ApiResponse<any>>(
-			CREATE_RESERVATION,
-			{ ...basePayload, ...countsPayload },
-			{ headers }
-		);
+			await axios.post<ApiResponse<any>>(
+				CREATE_RESERVATION,
+				{ ...basePayload, ...countsPayload },
+				{ headers },
+			);
 			TagManager.dataLayer({
 				dataLayer: {
 					event: "reservation",
@@ -867,7 +895,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 				sendRegistrationConfirmationEmail(
 					updatedUser,
 					selectedEvent,
-					location
+					location,
 				);
 			}
 			if (eventDateId) {
@@ -927,7 +955,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							"Network error. Please check your connection and try again.",
 						],
 					},
-					"error"
+					"error",
 				);
 			} else {
 				// Other errors (like axios configuration errors)
@@ -937,7 +965,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							"Something went wrong. Please try again.",
 						],
 					},
-					"error"
+					"error",
 				);
 			}
 

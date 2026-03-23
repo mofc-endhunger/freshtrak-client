@@ -59,6 +59,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"Is it okay to contact you with updates and information about your registration, and updates to our network?",
 		no_email: "No Email Available",
+		label_no_email_question: "No Email?",
+		label_get_free_email: "Get one free from Google.",
 		email_contact_you:
 			"Is it okay to email you with updates and information about your registration, and updates to our network?",
 		register_about_family: "Tell us about your family",
@@ -84,6 +86,60 @@ let localization = new LocalizedStrings({
 			"Sign in or create an account to save time in the future",
 		guest_signin_button: "Sign In / Create Account",
 		account_loading_message: "Please wait while we retrieve your data",
+
+		// TABS
+		tab_summary: "Summary",
+		tab_account: "Account",
+		text_profile: "Profile",
+
+		// RESERVATIONS
+		title_your_reservations: "Your Reservations",
+		text_you_have_event_coming_up: "You have an event coming up.",
+		text_no_upcoming_events: "No upcoming events found.",
+		text_browse_events_to_register: "Browse events to make a reservation.",
+		loading_reservations: "Loading reservations...",
+		error_loading_reservations: "Failed to load reservations",
+		label_check_in_code: "Check-in Code",
+		label_years_old: "years old",
+		alt_qr_code: "QR Code",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Cancel Reservation",
+		title_cancel_reservation: "Cancel Reservation",
+		message_cancel_confirmation:
+			"Are you sure you want to cancel your reservation for this event?",
+		message_cancel_warning:
+			"Your slot may be given to someone else and you may need to re-register.",
+		button_keep_reservation: "Keep Reservation",
+		button_confirm_cancel: "Yes, Cancel",
+		message_cancel_success:
+			"Your reservation has been cancelled successfully.",
+		message_cancel_error: "Unable to cancel reservation. Please try again.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Past Events",
+		text_no_past_events: "No past events found.",
+		text_past_events_description:
+			"Your event history from the last 30 days.",
+		status_cancelled: "Cancelled",
+		status_confirmed: "Confirmed",
+
+		event_type_in_person: "In-Person",
+		event_type_drive_through: "Drive-Through",
+		event_type_delivery: "Delivery",
+		event_type_virtual: "Virtual",
+
+		// ACCOUNT SECTION
+		title_your_information: "Your Information",
+		card_title_information: "Information",
+		card_title_address: "Address",
+		card_title_contact: "Contact",
+		member_category_senior: "Senior",
+		member_category_adult: "Adult",
+		member_category_child: "Child",
+		badge_freshtrak_user: "FreshTrak User",
+		text_no_other_members: "No other household members added.",
+		link_update_household: "Update Household",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Continue",
@@ -183,7 +239,7 @@ let localization = new LocalizedStrings({
 		label_race: "Race",
 		label_ethnicity: "Ethnicity",
 		label_preferred_language: "Preferred Language",
-		label_preferred_language_required: "Preferred Language *",
+		label_preferred_language_required: "Preferred Language",
 		label_household_language: "Household Language",
 		label_fallback_language: "Fallback Language",
 		label_member_language_settings: "Member Language Settings",
@@ -227,12 +283,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "Total Members",
 		label_active_members: "Active Members",
 		label_household_members: "Household Members",
+		label_current_household_members: "Current Household Members",
 		label_confirmation_code: "Confirmation Code",
 		label_license_plate: "License Plate",
 		label_pickup_person: "Pickup Person",
 		label_vehicle_license_plate: "Vehicle License Plate",
 		label_seniors: "Seniors",
 		label_adults: "Adults",
+		label_children: "Children",
+		label_no_members: "No members",
+		label_no_address_provided: "No address provided",
+		label_no_contact_info: "No contact information",
 		label_kids: "Kids",
 		label_optional: "(Optional)",
 		label_required: "*",
@@ -424,6 +485,14 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_date: "Please enter a valid date of birth.",
 		error_please_enter_valid_email: "Please enter a valid email address",
 		error_please_select_valid_language: "Please select a valid language",
+		error_date_of_birth_future: "Date of birth cannot be in the future",
+		error_date_of_birth_too_far_past:
+			"Date of birth is too far in the past",
+		error_please_enter_valid_phone:
+			"Please enter a valid 10-digit phone number",
+		error_please_enter_valid_zip: "Please enter a valid ZIP code",
+		label_not_provided: "Not provided",
+		label_invalid_date: "Invalid date",
 		error_something_went_wrong: "Something went wrong",
 		error_something_went_wrong_try_again:
 			"Something went wrong. Please try again.",
@@ -555,6 +624,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Korean",
 		option_language_arabic: "Arabic",
 		option_language_hindi: "Hindi",
+		option_language_somali: "Somali",
+		option_language_russian: "Russian",
+		option_language_turkish: "Turkish",
+		option_language_nepali: "Nepali",
+		option_language_tagalog: "Tagalog",
 		option_language_other: "Other",
 		option_suffix_jr: "Jr",
 		option_suffix_sr: "Sr",
@@ -709,6 +783,34 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP is optional for this event",
 		text_rsvp_required_for_event: "RSVP is required for this event",
 		text_already_registered: "Already Registered",
+		text_already_registered_for_event:
+			"You have already registered for this event.",
+		text_already_registered_for_named_event:
+			"You have already registered for {0}.",
+		text_if_mistake_contact_us:
+			"If you believe this is a mistake, please contact us for assistance.",
+		text_need_help_contact: "Need help? Contact us at",
+		text_step_x_of_y: "Step {0} of {1}",
+		text_sent_confirmation_code:
+			"We've sent a confirmation code to your email address. Please enter it below.",
+		text_confirming: "Confirming...",
+		text_resending: "Resending...",
+		text_page_not_found: "Oops...! Page Not Found",
+		text_validation_errors_on_event: "Validation Errors Found on Event",
+		label_error_details: "Error Details",
+		label_message_colon: "Message:",
+		label_code_colon: "Code:",
+		placeholder_enter_confirmation_code: "Enter confirmation code",
+		button_resend_code: "Resend Code",
+		button_back_to_sign_up: "Back to Sign Up",
+		error_valid_email: "Please enter a valid email address",
+		error_confirmation_code_length:
+			"Confirmation code must be at least 6 characters",
+		abbrev_details: "Details",
+		abbrev_address: "Address",
+		abbrev_family: "Family",
+		abbrev_contact: "Contact",
+		abbrev_members: "Members",
 		text_optional: "optional",
 		text_required: "required",
 		text_recommended: "Recommended",
@@ -764,6 +866,32 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"There are currently no available timeslots for this event. This may be due to technical issues or other temporary conditions. Please try again later. If the issue persists, please contact support.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Give Feedback",
+		feedback_title: "Give Feedback",
+		feedback_description:
+			"Your feedback goes to your local food bank to assure you have a pleasant experience when getting resources.",
+		feedback_visit_question: "How was your visit on {date} to {location}?",
+		feedback_experience_label: "Tell us about your experience.",
+		feedback_placeholder: "Share your feedback...",
+		feedback_submit: "Submit Feedback",
+		feedback_thank_you_title: "Thank You For Providing Feedback!",
+		feedback_thank_you_message:
+			"With your help, we can improve your experience and better serve our community.",
+		feedback_close: "Close",
+		feedback_tag_kind_volunteers: "Kind Volunteers",
+		feedback_tag_good_service: "Good Service",
+		feedback_tag_clean_space: "Clean Space",
+		feedback_tag_quality_food: "Quality Food",
+		feedback_tag_efficient_shoppers: "Efficient Shoppers",
+		feedback_already_submitted_message:
+			"You have already submitted feedback for this visit.",
+		feedback_comments_label: "Additional Comments",
+		feedback_submitting: "Submitting...",
+		feedback_error_generic: "An error occurred",
+		feedback_no_questions: "No questions available for this survey.",
+		feedback_required_aria: "required",
 	},
 
 	spa: {
@@ -824,6 +952,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"¿Está bien comunicarnos con usted con actualizaciones e información sobre su registro y actualizaciones de nuestra red?",
 		no_email: "No hay correo electrónico disponible",
+		label_no_email_question: "¿No tiene correo electrónico?",
+		label_get_free_email: "Obtenga uno gratis de Google.",
 		email_contact_you:
 			"¿Está bien enviarle un correo electrónico con actualizaciones e información sobre su registro y actualizaciones de nuestra red?",
 		register_about_family: "Háblanos de tu familia",
@@ -850,6 +980,62 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Iniciar Sesión / Crear Cuenta",
 		account_loading_message:
 			"Por favor espere mientras recuperamos sus datos",
+
+		// TABS
+		tab_summary: "Resumen",
+		tab_account: "Cuenta",
+		text_profile: "Perfil",
+
+		// RESERVATIONS
+		title_your_reservations: "Tus Reservaciones",
+		text_you_have_event_coming_up: "Tienes un evento próximo.",
+		text_no_upcoming_events: "No se encontraron eventos próximos.",
+		text_browse_events_to_register:
+			"Explora eventos para hacer una reservación.",
+		loading_reservations: "Cargando reservaciones...",
+		error_loading_reservations: "Error al cargar las reservaciones",
+		label_check_in_code: "Código de Registro",
+		label_years_old: "años",
+		alt_qr_code: "Código QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Cancelar Reservación",
+		title_cancel_reservation: "Cancelar Reservación",
+		message_cancel_confirmation:
+			"¿Está seguro de que desea cancelar su reservación para este evento?",
+		message_cancel_warning:
+			"Su lugar puede ser dado a otra persona y es posible que deba registrarse nuevamente.",
+		button_keep_reservation: "Mantener Reservación",
+		button_confirm_cancel: "Sí, Cancelar",
+		message_cancel_success:
+			"Su reservación ha sido cancelada exitosamente.",
+		message_cancel_error:
+			"No se pudo cancelar la reservación. Por favor intente de nuevo.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Eventos Pasados",
+		text_no_past_events: "No se encontraron eventos pasados.",
+		text_past_events_description:
+			"Su historial de eventos de los últimos 30 días.",
+		status_cancelled: "Cancelado",
+		status_confirmed: "Confirmado",
+
+		event_type_in_person: "En Persona",
+		event_type_drive_through: "Drive-Through",
+		event_type_delivery: "Entrega",
+		event_type_virtual: "Virtual",
+
+		// ACCOUNT SECTION
+		title_your_information: "Tu Información",
+		card_title_information: "Información",
+		card_title_address: "Dirección",
+		card_title_contact: "Contacto",
+		member_category_senior: "Mayor",
+		member_category_adult: "Adulto",
+		member_category_child: "Niño",
+		badge_freshtrak_user: "Usuario FreshTrak",
+		text_no_other_members: "No se han agregado otros miembros del hogar.",
+		link_update_household: "Actualizar Hogar",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Continuar",
@@ -993,12 +1179,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "Total de Miembros",
 		label_active_members: "Miembros Activos",
 		label_household_members: "Miembros del Hogar",
+		label_current_household_members: "Miembros Actuales del Hogar",
 		label_confirmation_code: "Código de Confirmación",
 		label_license_plate: "Matrícula",
 		label_pickup_person: "Persona de Recogida",
 		label_vehicle_license_plate: "Matrícula del Vehículo",
 		label_seniors: "Personas Mayores",
 		label_adults: "Adultos",
+		label_children: "Niños",
+		label_no_members: "Sin miembros",
+		label_no_address_provided: "Dirección no proporcionada",
+		label_no_contact_info: "Sin información de contacto",
 		label_kids: "Niños",
 		label_optional: "(Opcional)",
 		label_required: "*",
@@ -1196,6 +1387,16 @@ let localization = new LocalizedStrings({
 			"Por favor ingrese una dirección de correo electrónico válida",
 		error_please_select_valid_language:
 			"Por favor seleccione un idioma válido",
+		error_date_of_birth_future:
+			"La fecha de nacimiento no puede ser en el futuro",
+		error_date_of_birth_too_far_past:
+			"La fecha de nacimiento es demasiado lejana en el pasado",
+		error_please_enter_valid_phone:
+			"Por favor ingrese un número de teléfono válido de 10 dígitos",
+		error_please_enter_valid_zip:
+			"Por favor ingrese un código postal válido",
+		label_not_provided: "No proporcionado",
+		label_invalid_date: "Fecha inválida",
 		error_something_went_wrong: "Algo salió mal",
 		error_something_went_wrong_try_again:
 			"Algo salió mal. Por favor intente de nuevo.",
@@ -1271,6 +1472,7 @@ let localization = new LocalizedStrings({
 		aria_open_mobile_menu: "Abrir menú móvil",
 		aria_user_account_menu: "Menú de cuenta de usuario",
 		aria_loading_time_slots: "Cargando franjas horarias",
+		aria_processing_registration: "Procesando registro",
 		aria_decrease_seniors: "Disminuir número de personas mayores",
 		aria_increase_seniors: "Aumentar número de personas mayores",
 		aria_decrease_adults: "Disminuir número de adultos",
@@ -1329,6 +1531,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Coreano",
 		option_language_arabic: "Árabe",
 		option_language_hindi: "Hindi",
+		option_language_somali: "Somalí",
+		option_language_russian: "Ruso",
+		option_language_turkish: "Turco",
+		option_language_nepali: "Nepalí",
+		option_language_tagalog: "Tagalo",
 		option_language_other: "Otro",
 		option_suffix_jr: "Jr",
 		option_suffix_sr: "Sr",
@@ -1407,6 +1614,12 @@ let localization = new LocalizedStrings({
 		dialog_discard_changes_title: "¿Descartar Cambios?",
 		dialog_create_account_title: "Crear Cuenta",
 		dialog_authentication_title: "Autenticación",
+		error_title_registration_error: "Error de registro",
+		button_review_update_instead: "Revisar y actualizar en su lugar",
+		button_no_review_update: "No, revisar y actualizar",
+		button_yes_register: "Sí, registrarse",
+		text_no_household_info_available:
+			"No hay información del hogar disponible.",
 		dialog_discard_changes_description:
 			"Tiene cambios sin guardar. ¿Está seguro de que desea descartarlos? Esta acción no se puede deshacer.",
 		dialog_create_account_description:
@@ -1479,6 +1692,35 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP es opcional para este evento",
 		text_rsvp_required_for_event: "RSVP es requerido para este evento",
 		text_already_registered: "Ya Registrado",
+		text_already_registered_for_event:
+			"Ya se ha registrado para este evento.",
+		text_already_registered_for_named_event:
+			"Ya se ha registrado para {0}.",
+		text_if_mistake_contact_us:
+			"Si cree que esto es un error, contáctenos para obtener ayuda.",
+		text_need_help_contact: "¿Necesita ayuda? Contáctenos en",
+		text_step_x_of_y: "Paso {0} de {1}",
+		text_sent_confirmation_code:
+			"Hemos enviado un código de confirmación a su correo electrónico. Ingréselo a continuación.",
+		text_confirming: "Confirmando...",
+		text_resending: "Reenviando...",
+		text_page_not_found: "¡Ups...! Página No Encontrada",
+		text_validation_errors_on_event: "Errores de Validación en el Evento",
+		label_error_details: "Detalles del Error",
+		label_message_colon: "Mensaje:",
+		label_code_colon: "Código:",
+		placeholder_enter_confirmation_code:
+			"Ingrese el código de confirmación",
+		button_resend_code: "Reenviar Código",
+		button_back_to_sign_up: "Volver al Registro",
+		error_valid_email: "Ingrese una dirección de correo electrónico válida",
+		error_confirmation_code_length:
+			"El código de confirmación debe tener al menos 6 caracteres",
+		abbrev_details: "Detalles",
+		abbrev_address: "Dirección",
+		abbrev_family: "Familia",
+		abbrev_contact: "Contacto",
+		abbrev_members: "Miembros",
 		text_optional: "opcional",
 		text_required: "requerido",
 		sr_available_time_slots_registration:
@@ -1527,6 +1769,33 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Actualmente no hay horarios disponibles para este evento. Esto puede deberse a problemas técnicos u otras condiciones temporales. Por favor, intente nuevamente más tarde. Si el problema persiste, póngase en contacto con el soporte.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Dar Opinión",
+		feedback_title: "Dar Opinión",
+		feedback_description:
+			"Su opinión va a su banco de alimentos local para asegurar que tenga una experiencia agradable al obtener recursos.",
+		feedback_visit_question: "¿Cómo fue su visita el {date} a {location}?",
+		feedback_experience_label: "Cuéntenos sobre su experiencia.",
+		feedback_placeholder: "Comparta su opinión...",
+		feedback_submit: "Enviar Opinión",
+		feedback_thank_you_title: "¡Gracias Por Proporcionar Su Opinión!",
+		feedback_thank_you_message:
+			"Con su ayuda, podemos mejorar su experiencia y servir mejor a nuestra comunidad.",
+		feedback_close: "Cerrar",
+		feedback_tag_kind_volunteers: "Voluntarios Amables",
+		feedback_tag_good_service: "Buen Servicio",
+		feedback_tag_clean_space: "Espacio Limpio",
+		feedback_tag_quality_food: "Comida de Calidad",
+		feedback_tag_efficient_shoppers: "Compradores Eficientes",
+		feedback_already_submitted_message:
+			"Ya ha enviado comentarios sobre esta visita.",
+		feedback_comments_label: "Comentarios adicionales",
+		feedback_submitting: "Enviando...",
+		feedback_error_generic: "Ocurrió un error",
+		feedback_no_questions:
+			"No hay preguntas disponibles para esta encuesta.",
+		feedback_required_aria: "requerido",
 	},
 	som: {
 		home_freshtrack: "FreshTrak waxay halkan u joogtaa inay ku caawiso!",
@@ -1587,6 +1856,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"Ma caadi baa inaan kula soo xiriiro cusbooneysiinta iyo macluumaadka ku saabsan diiwaangelintaada, iyo cusbooneysiinta shabakadeena?",
 		no_email: "Email Laheli Mayo",
+		label_no_email_question: "Email ma lihid?",
+		label_get_free_email: "Mid bilaash ah ka hel Google.",
 		email_contact_you:
 			"Ma caadi baa inaan kugu soo dirno cusbooneysiin iyo macluumaad ku saabsan diiwaangelintaada, iyo cusbooneysiinta shabakadeena?",
 		register_about_family: "Reerkaaga wax nooga sheeg",
@@ -1612,6 +1883,61 @@ let localization = new LocalizedStrings({
 			"Gali ama samee akoon si aad waqti u badbaadiso mustaqbalka",
 		guest_signin_button: "Gali / Samee Akoon",
 		account_loading_message: "Fadlan sug inta aan ku soo celinno xogtaada",
+
+		// TABS
+		tab_summary: "Kooban",
+		tab_account: "Akoon",
+		text_profile: "Aqoonsiga",
+
+		// RESERVATIONS
+		title_your_reservations: "Ballanqaadkaaga",
+		text_you_have_event_coming_up: "Waxaad leedahay dhacdo soo socota.",
+		text_no_upcoming_events: "Lama helin dhacdo soo socota.",
+		text_browse_events_to_register: "Raadi dhacdo si aad u ballanqaadato.",
+		loading_reservations: "Ballanqaadyada ayaa la soo dejinayaa...",
+		error_loading_reservations: "Ballanqaadyada soo dejinta way fashilmeen",
+		label_check_in_code: "Koodka Diiwangelinta",
+		label_years_old: "sano jir ah",
+		alt_qr_code: "Koodka QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Jooji Ballanqaadka",
+		title_cancel_reservation: "Jooji Ballanqaadka",
+		message_cancel_confirmation:
+			"Ma hubtaa inaad joojisey ballanqaadkaaga dhacdadan?",
+		message_cancel_warning:
+			"Booska aad haysatay waxaa la siin karaa qof kale waxaadna u baahan kartaa inaad mar kale is diiwaan geliso.",
+		button_keep_reservation: "Hay Ballanqaadka",
+		button_confirm_cancel: "Haa, Jooji",
+		message_cancel_success:
+			"Ballanqaadkaaga si guul leh ayaa loo joojiyay.",
+		message_cancel_error:
+			"Lama joojin karo ballanqaadka. Fadlan isku day mar kale.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Dhacdooyinkii Hore",
+		text_no_past_events: "Lama helin dhacdooyin hore.",
+		text_past_events_description:
+			"Taariikhda dhacdooyinkaaga 30-kii maalmood ee la soo dhaafay.",
+		status_cancelled: "La Joojiyay",
+		status_confirmed: "La Xaqiijiyay",
+
+		event_type_in_person: "Qof ahaan",
+		event_type_drive_through: "Wadista",
+		event_type_delivery: "Gaarsiinta",
+		event_type_virtual: "Farsamaysan",
+
+		// ACCOUNT SECTION
+		title_your_information: "Macluumaadkaaga",
+		card_title_information: "Macluumaad",
+		card_title_address: "Cinwaan",
+		card_title_contact: "Xiriir",
+		member_category_senior: "Waayeel",
+		member_category_adult: "Qof weyn",
+		member_category_child: "Ilmo",
+		badge_freshtrak_user: "Isticmaale FreshTrak",
+		text_no_other_members: "Xubnaha kale ee qoyska lama shixin.",
+		link_update_household: "Cusboonaysii Qoyska",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Sii Wadi",
@@ -1755,12 +2081,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "Wadarta Xubnaha",
 		label_active_members: "Xubnaha Firfircoon",
 		label_household_members: "Xubnaha Qoyska",
+		label_current_household_members: "Xubnaha Hadda ee Qoyska",
 		label_confirmation_code: "Koodhka Xaqiijinta",
 		label_license_plate: "Taarikada Liisanka",
 		label_pickup_person: "Qofka Soo Qaadista",
 		label_vehicle_license_plate: "Taarikada Liisanka Gaadiga",
 		label_seniors: "Waayeelka",
 		label_adults: "Dadka Waaweyn",
+		label_children: "Carruurta",
+		label_no_members: "Xubin la'aan",
+		label_no_address_provided: "Cinwaan lama bixin",
+		label_no_contact_info: "Macluumaadka xiriirka lama bixin",
 		label_kids: "Carruurta",
 		label_optional: "(Ikhtiyaari)",
 		label_required: "*",
@@ -1800,6 +2131,7 @@ let localization = new LocalizedStrings({
 		placeholder_select_race: "Jinsiyada dooro",
 		placeholder_select_ethnicity: "Qabiilka dooro",
 		placeholder_select_suffix: "Suufiyada dooro",
+		placeholder_state_code: "NY",
 		placeholder_select_distance: "Fogaanta dooro",
 		placeholder_select_household_language: "Luqadda qoyska dooro",
 		placeholder_select_fallback_language: "Luqadda gadaal dooro",
@@ -1957,6 +2289,15 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_email:
 			"Fadlan cinwaanka iimaylka saxda ah geli",
 		error_please_select_valid_language: "Fadlan luqad sax ah dooro",
+		error_date_of_birth_future:
+			"Taariikhda dhalashadu ma noqon karto mustaqbalka",
+		error_date_of_birth_too_far_past:
+			"Taariikhda dhalashadu aad ayey u fog tahay",
+		error_please_enter_valid_phone:
+			"Fadlan geli nambar telefon oo sax ah oo 10 lambar ah",
+		error_please_enter_valid_zip: "Fadlan geli koodhka boostada ee sax ah",
+		label_not_provided: "Lama bixin",
+		label_invalid_date: "Taariikh aan sax ahayn",
 		error_something_went_wrong: "Wax baa khalad ahaa",
 		error_something_went_wrong_try_again:
 			"Wax baa khalad ahaa. Fadlan mar kale isku day.",
@@ -2033,6 +2374,7 @@ let localization = new LocalizedStrings({
 		aria_open_mobile_menu: "Liiska mobile fur",
 		aria_user_account_menu: "Liiska akoonka isticmaalaha",
 		aria_loading_time_slots: "Waqtiyada soo dejineysa",
+		aria_processing_registration: "Diiwaangelinta waa la habaabinaayo",
 		aria_decrease_seniors: "Tirada waayeelka yarayn",
 		aria_increase_seniors: "Tirada waayeelka kordhin",
 		aria_decrease_adults: "Tirada dadka waaweyn yarayn",
@@ -2040,6 +2382,7 @@ let localization = new LocalizedStrings({
 		aria_decrease_kids: "Tirada carruurta yarayn",
 		aria_increase_kids: "Tirada carruurta kordhin",
 		aria_continue_as_guest: "Marti ah sii wadi",
+		aria_expand_collapse: "furi/xidh",
 		aria_close_map: "Khariidada xidh",
 		aria_view_larger_map: "Khariidada weyn ka eeg guji",
 		aria_back_button: "badhanka dib u noqosha",
@@ -2091,6 +2434,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Kuuriyaan",
 		option_language_arabic: "Carabi",
 		option_language_hindi: "Hindi",
+		option_language_somali: "Soomaali",
+		option_language_russian: "Ruush",
+		option_language_turkish: "Turki",
+		option_language_nepali: "Nebaali",
+		option_language_tagalog: "Tagalog",
 		option_language_other: "Kale",
 		option_suffix_jr: "Jr",
 		option_suffix_sr: "Sr",
@@ -2169,6 +2517,11 @@ let localization = new LocalizedStrings({
 		dialog_discard_changes_title: "Isbeddellada Tirtir?",
 		dialog_create_account_title: "Akoon Abuur",
 		dialog_authentication_title: "Xaqiijinta",
+		error_title_registration_error: "Khaladka Diiwaangelinta",
+		button_review_update_instead: "Dib u eeg oo cusbooneysii",
+		button_no_review_update: "Maya, dib u eeg oo cusbooneysii",
+		button_yes_register: "Haa, is diiwaan geli",
+		text_no_household_info_available: "Macluumaadka qoyska lama heli karo.",
 		dialog_discard_changes_description:
 			"Waxaad haysataa isbeddelo aan la keydin. Ma hubtaa inaad tirtirto? Ficilkan dib looma celin karo.",
 		dialog_create_account_description:
@@ -2181,6 +2534,9 @@ let localization = new LocalizedStrings({
 		dialog_choose_time_slot_title: "Waqti Dooro",
 		dialog_choose_time_slot_description:
 			"Waqti la heli karo u dooro diiwaangelintaada.",
+		dialog_confirm_account_title: "Akoon Xaqiiji",
+		dialog_reset_password_title: "Erifka Dib u Deji",
+		dialog_confirm_new_password_title: "Erifka Cusub Xaqiiji",
 
 		// STATIC PAGE CONTENT
 		static_terms_title: "Shuruudaha Isticmaalka FreshTrak",
@@ -2215,6 +2571,10 @@ let localization = new LocalizedStrings({
 			"Ma jiro macluumaadka cinwaanka la heli karo",
 		text_head_of_household: "Madaxa Qoyska",
 		text_freshtrak_user: "Isticmaale FreshTrak",
+		title_resource_events: "Dhacdooyinka Kheyraadka",
+		title_events_today: "Dhacdooyinka Maanta",
+		title_events_next_7_days: "Dhacdooyinka 7-da maalmood ee soo socda",
+		title_events_next_30_days: "Dhacdooyinka 30-da maalmood ee soo socda",
 
 		// MAP & LOCATION
 		map_unavailable: "Khariidada ma heli karto",
@@ -2242,6 +2602,35 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP waa ikhtiyaari ah dhacdadan",
 		text_rsvp_required_for_event: "RSVP waa lagama maarmaan ah dhacdadan",
 		text_already_registered: "Horeyba waa diiwaangashay",
+		text_already_registered_for_event:
+			"Waxaad hore ugu diiwaangashay dhacdadan.",
+		text_already_registered_for_named_event:
+			"Waxaad hore ugu diiwaangashay {0}.",
+		text_if_mistake_contact_us:
+			"Haddii aad rumaysantahay inay tahay qalad, fadlan nala soo xiriir si aan kaaga caawino.",
+		text_need_help_contact: "Caawimaad u baahan tahay? Nala soo xiriir",
+		text_step_x_of_y: "Tallaabada {0} ee {1}",
+		text_sent_confirmation_code:
+			"Waxaan ku soo dirnay koodh xaqiijin ciwaanka emailkaaga. Fadlan ku geli halkan hoose.",
+		text_confirming: "La xaqiijinayaa...",
+		text_resending: "Dib loo dirayaa...",
+		text_page_not_found: "Waa la waayey...! Bogga Lama Helin",
+		text_validation_errors_on_event:
+			"Khaladaad Xaqiijin ah oo laga Helay Dhacdada",
+		label_error_details: "Faahfaahinta Khaladka",
+		label_message_colon: "Fariin:",
+		label_code_colon: "Koodh:",
+		placeholder_enter_confirmation_code: "Geli koodhka xaqiijinta",
+		button_resend_code: "Dib u Dir Koodhka",
+		button_back_to_sign_up: "Ku Noqo Isdiiwaangelinta",
+		error_valid_email: "Fadlan geli cinwaan email oo sax ah",
+		error_confirmation_code_length:
+			"Koodhka xaqiijinta waa inuu ugu yaraan noqdaa 6 xaraf",
+		abbrev_details: "Faahfaahin",
+		abbrev_address: "Cinwaan",
+		abbrev_family: "Qoys",
+		abbrev_contact: "Xiriir",
+		abbrev_members: "Xubnaha",
 		text_optional: "ikhtiyaari ah",
 		text_required: "lagama maarmaan ah",
 		sr_available_time_slots_registration:
@@ -2290,6 +2679,33 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Ma jiro wakhtiyada la heli karo ee hadda loo baahan yahay dhacdadan. Tani waxay sabab u noqon kartaa dhibaatooyinka farsamada ama xaaladaha kale ee ku meel gaarka ah. Fadlan mar kale isku day. Haddii dhibaatadu sii waddo, fadlan la xidhiidh taageerada.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Faallo Bixi",
+		feedback_title: "Faallo Bixi",
+		feedback_description:
+			"Faalladaada waxay taga bankiga cuntada maxalliga ah si loo xaqiijiyo inaad khibrad wanaagsan hesho markaad kheyraadka hesho.",
+		feedback_visit_question:
+			"Sidee booqashadaada {date} ee {location} aheed?",
+		feedback_experience_label: "Wax nooga sheeg khibraddaada.",
+		feedback_placeholder: "Faalladaada wadaag...",
+		feedback_submit: "Faallo Dir",
+		feedback_thank_you_title: "Waad Ku Mahadsan Tahay Faallo Bixinta!",
+		feedback_thank_you_message:
+			"Caawintaada, waxaan hagaajin karnaa khibraddaada oo u adeegno si wanaagsan bulshadeena.",
+		feedback_close: "Xidh",
+		feedback_tag_kind_volunteers: "Tabarucayaal Naxariis Leh",
+		feedback_tag_good_service: "Adeeg Wanaagsan",
+		feedback_tag_clean_space: "Meesha Nadiifka Ah",
+		feedback_tag_quality_food: "Cunto Tayo Leh",
+		feedback_tag_efficient_shoppers: "Iibsadayaal Wax Ku Ool Ah",
+		feedback_already_submitted_message:
+			"Horayba waad faallo u direy booqashadaan.",
+		feedback_comments_label: "Faallooyin Dheeraad Ah",
+		feedback_submitting: "La gudbinayaa...",
+		feedback_error_generic: "Khalad ayaa dhacay",
+		feedback_no_questions: "Su'aalo ma jiraan loogu talagalay sahaninkan.",
+		feedback_required_aria: "loo baahan yahay",
 	},
 	rus: {
 		home_freshtrack: "FreshTrak здесь, чтобы помочь!",
@@ -2351,6 +2767,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"Можно ли связываться с вами с обновлениями и информацией о вашей регистрации и обновлениями в нашей сети?",
 		no_email: "Электронная почта недоступна",
+		label_no_email_question: "Нет электронной почты?",
+		label_get_free_email: "Получите бесплатно от Google.",
 		email_contact_you:
 			"Можно ли отправлять вам по электронной почте обновления и информацию о вашей регистрации и обновлениях в нашей сети?",
 		register_about_family: "Информация о вашей семье",
@@ -2377,6 +2795,61 @@ let localization = new LocalizedStrings({
 		guest_signin_button: "Войти / Создать Аккаунт",
 		account_loading_message:
 			"Пожалуйста, подождите, пока мы получим ваши данные",
+
+		// TABS
+		tab_summary: "Сводка",
+		tab_account: "Аккаунт",
+		text_profile: "Профиль",
+
+		// RESERVATIONS
+		title_your_reservations: "Ваши Бронирования",
+		text_you_have_event_coming_up: "У вас есть предстоящее мероприятие.",
+		text_no_upcoming_events: "Предстоящих мероприятий не найдено.",
+		text_browse_events_to_register:
+			"Просмотрите мероприятия для бронирования.",
+		loading_reservations: "Загрузка бронирований...",
+		error_loading_reservations: "Ошибка загрузки бронирований",
+		label_check_in_code: "Код Регистрации",
+		label_years_old: "лет",
+		alt_qr_code: "QR-код",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Отменить бронирование",
+		title_cancel_reservation: "Отменить бронирование",
+		message_cancel_confirmation:
+			"Вы уверены, что хотите отменить бронирование на это мероприятие?",
+		message_cancel_warning:
+			"Ваше место может быть передано другому человеку, и вам может потребоваться зарегистрироваться снова.",
+		button_keep_reservation: "Сохранить бронирование",
+		button_confirm_cancel: "Да, отменить",
+		message_cancel_success: "Ваше бронирование успешно отменено.",
+		message_cancel_error:
+			"Не удалось отменить бронирование. Пожалуйста, попробуйте снова.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Прошедшие мероприятия",
+		text_no_past_events: "Прошедшие мероприятия не найдены.",
+		text_past_events_description:
+			"История ваших мероприятий за последние 30 дней.",
+		status_cancelled: "Отменено",
+		status_confirmed: "Подтверждено",
+
+		event_type_in_person: "Лично",
+		event_type_drive_through: "Автораздача",
+		event_type_delivery: "Доставка",
+		event_type_virtual: "Онлайн",
+
+		// ACCOUNT SECTION
+		title_your_information: "Ваша Информация",
+		card_title_information: "Информация",
+		card_title_address: "Адрес",
+		card_title_contact: "Контакт",
+		member_category_senior: "Пожилой",
+		member_category_adult: "Взрослый",
+		member_category_child: "Ребёнок",
+		badge_freshtrak_user: "Пользователь FreshTrak",
+		text_no_other_members: "Другие члены семьи не добавлены.",
+		link_update_household: "Обновить Домохозяйство",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Продолжить",
@@ -2521,12 +2994,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "Всего членов",
 		label_active_members: "Активные члены",
 		label_household_members: "Члены домохозяйства",
+		label_current_household_members: "Текущие члены домохозяйства",
 		label_confirmation_code: "Код подтверждения",
 		label_license_plate: "Номерной знак",
 		label_pickup_person: "Лицо для получения",
 		label_vehicle_license_plate: "Номерной знак автомобиля",
 		label_seniors: "Пожилые",
 		label_adults: "Взрослые",
+		label_children: "Дети",
+		label_no_members: "Нет участников",
+		label_no_address_provided: "Адрес не указан",
+		label_no_contact_info: "Контактная информация отсутствует",
 		label_kids: "Дети",
 		label_optional: "(Необязательно)",
 		label_required: "*",
@@ -2722,6 +3200,15 @@ let localization = new LocalizedStrings({
 			"Пожалуйста, введите действительный адрес электронной почты",
 		error_please_select_valid_language:
 			"Пожалуйста, выберите действительный язык",
+		error_date_of_birth_future: "Дата рождения не может быть в будущем",
+		error_date_of_birth_too_far_past:
+			"Дата рождения слишком далеко в прошлом",
+		error_please_enter_valid_phone:
+			"Пожалуйста, введите действительный 10-значный номер телефона",
+		error_please_enter_valid_zip:
+			"Пожалуйста, введите действительный почтовый индекс",
+		label_not_provided: "Не указано",
+		label_invalid_date: "Недействительная дата",
 		error_something_went_wrong: "Что-то пошло не так",
 		error_something_went_wrong_try_again:
 			"Что-то пошло не так. Пожалуйста, попробуйте снова.",
@@ -2798,6 +3285,7 @@ let localization = new LocalizedStrings({
 		aria_open_mobile_menu: "Открыть мобильное меню",
 		aria_user_account_menu: "Меню аккаунта пользователя",
 		aria_loading_time_slots: "Загрузка временных слотов",
+		aria_processing_registration: "Обработка регистрации",
 		aria_decrease_seniors: "Уменьшить количество пожилых",
 		aria_increase_seniors: "Увеличить количество пожилых",
 		aria_decrease_adults: "Уменьшить количество взрослых",
@@ -2859,6 +3347,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Корейский",
 		option_language_arabic: "Арабский",
 		option_language_hindi: "Хинди",
+		option_language_somali: "Сомалийский",
+		option_language_russian: "Русский",
+		option_language_turkish: "Турецкий",
+		option_language_nepali: "Непальский",
+		option_language_tagalog: "Тагальский",
 		option_language_other: "Другой",
 		option_suffix_jr: "Мл",
 		option_suffix_sr: "Ст",
@@ -2937,6 +3430,12 @@ let localization = new LocalizedStrings({
 		dialog_discard_changes_title: "Отменить изменения?",
 		dialog_create_account_title: "Создать аккаунт",
 		dialog_authentication_title: "Аутентификация",
+		error_title_registration_error: "Ошибка регистрации",
+		button_review_update_instead: "Проверить и обновить",
+		button_no_review_update: "Нет, проверить и обновить",
+		button_yes_register: "Да, зарегистрироваться",
+		text_no_household_info_available:
+			"Информация о домохозяйстве недоступна.",
 		dialog_discard_changes_description:
 			"У вас есть несохраненные изменения. Вы уверены, что хотите их отменить? Это действие нельзя отменить.",
 		dialog_create_account_description:
@@ -3011,6 +3510,34 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP необязателен для этого мероприятия",
 		text_rsvp_required_for_event: "RSVP обязателен для этого мероприятия",
 		text_already_registered: "Уже зарегистрирован",
+		text_already_registered_for_event:
+			"Вы уже зарегистрированы на это мероприятие.",
+		text_already_registered_for_named_event:
+			"Вы уже зарегистрированы на {0}.",
+		text_if_mistake_contact_us:
+			"Если вы считаете, что это ошибка, свяжитесь с нами для получения помощи.",
+		text_need_help_contact: "Нужна помощь? Свяжитесь с нами",
+		text_step_x_of_y: "Шаг {0} из {1}",
+		text_sent_confirmation_code:
+			"Мы отправили код подтверждения на ваш email. Пожалуйста, введите его ниже.",
+		text_confirming: "Подтверждение...",
+		text_resending: "Повторная отправка...",
+		text_page_not_found: "Упс...! Страница Не Найдена",
+		text_validation_errors_on_event: "Ошибки Валидации Мероприятия",
+		label_error_details: "Детали Ошибки",
+		label_message_colon: "Сообщение:",
+		label_code_colon: "Код:",
+		placeholder_enter_confirmation_code: "Введите код подтверждения",
+		button_resend_code: "Отправить Код Повторно",
+		button_back_to_sign_up: "Вернуться к Регистрации",
+		error_valid_email: "Пожалуйста, введите корректный email",
+		error_confirmation_code_length:
+			"Код подтверждения должен содержать не менее 6 символов",
+		abbrev_details: "Детали",
+		abbrev_address: "Адрес",
+		abbrev_family: "Семья",
+		abbrev_contact: "Контакт",
+		abbrev_members: "Члены",
 		text_optional: "необязательно",
 		text_required: "обязательно",
 		sr_available_time_slots_registration:
@@ -3059,6 +3586,32 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"В настоящее время нет доступных временных слотов для этого мероприятия. Это может быть связано с техническими проблемами или другими временными условиями. Пожалуйста, попробуйте позже. Если проблема сохраняется, обратитесь в службу поддержки.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Оставить отзыв",
+		feedback_title: "Оставить отзыв",
+		feedback_description:
+			"Ваш отзыв отправляется в местный продовольственный банк, чтобы обеспечить вам приятный опыт получения ресурсов.",
+		feedback_visit_question: "Как прошел ваш визит {date} в {location}?",
+		feedback_experience_label: "Расскажите нам о своем опыте.",
+		feedback_placeholder: "Поделитесь своим отзывом...",
+		feedback_submit: "Отправить отзыв",
+		feedback_thank_you_title: "Спасибо за ваш отзыв!",
+		feedback_thank_you_message:
+			"С вашей помощью мы можем улучшить ваш опыт и лучше служить нашему сообществу.",
+		feedback_close: "Закрыть",
+		feedback_tag_kind_volunteers: "Добрые волонтеры",
+		feedback_tag_good_service: "Хорошее обслуживание",
+		feedback_tag_clean_space: "Чистое пространство",
+		feedback_tag_quality_food: "Качественная еда",
+		feedback_tag_efficient_shoppers: "Эффективные покупатели",
+		feedback_already_submitted_message:
+			"Вы уже отправили отзыв об этом визите.",
+		feedback_comments_label: "Дополнительные комментарии",
+		feedback_submitting: "Отправка...",
+		feedback_error_generic: "Произошла ошибка",
+		feedback_no_questions: "Нет доступных вопросов для этого опроса.",
+		feedback_required_aria: "обязательное поле",
 	},
 	tur: {
 		home_freshtrack: "FreshTrak yardım etmek için burada!",
@@ -3119,6 +3672,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"Kaydınızla ilgili güncellemeler ve bilgiler ve ağımızdaki güncellemeler için sizinle iletişime geçebilir miyim?",
 		no_email: "Kullanılabilir E-posta Yok",
+		label_no_email_question: "E-postanız yok mu?",
+		label_get_free_email: "Google'dan ücretsiz bir tane edinin.",
 		email_contact_you:
 			"Kaydınızla ilgili güncellemeler ve bilgiler ve ağımızdaki güncellemeler ile size e-posta gönderebilir miyim?",
 		register_about_family: "Bize ailenden bahset",
@@ -3143,6 +3698,60 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"Gelecekte zaman kazanmak için giriş yapın veya hesap oluşturun",
 		guest_signin_button: "Giriş Yap / Hesap Oluştur",
+
+		// TABS
+		tab_summary: "Özet",
+		tab_account: "Hesap",
+		text_profile: "Profil",
+
+		// RESERVATIONS
+		title_your_reservations: "Rezervasyonlarınız",
+		text_you_have_event_coming_up: "Yaklaşan bir etkinliğiniz var.",
+		text_no_upcoming_events: "Yaklaşan etkinlik bulunamadı.",
+		text_browse_events_to_register:
+			"Rezervasyon yapmak için etkinliklere göz atın.",
+		loading_reservations: "Rezervasyonlar yükleniyor...",
+		error_loading_reservations: "Rezervasyonlar yüklenemedi",
+		label_check_in_code: "Giriş Kodu",
+		label_years_old: "yaşında",
+		alt_qr_code: "QR Kod",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "Rezervasyonu İptal Et",
+		title_cancel_reservation: "Rezervasyonu İptal Et",
+		message_cancel_confirmation:
+			"Bu etkinlik için rezervasyonunuzu iptal etmek istediğinizden emin misiniz?",
+		message_cancel_warning:
+			"Yeriniz başka birine verilebilir ve tekrar kayıt olmanız gerekebilir.",
+		button_keep_reservation: "Rezervasyonu Koru",
+		button_confirm_cancel: "Evet, İptal Et",
+		message_cancel_success: "Rezervasyonunuz başarıyla iptal edildi.",
+		message_cancel_error:
+			"Rezervasyon iptal edilemedi. Lütfen tekrar deneyin.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "Geçmiş Etkinlikler",
+		text_no_past_events: "Geçmiş etkinlik bulunamadı.",
+		text_past_events_description: "Son 30 gündeki etkinlik geçmişiniz.",
+		status_cancelled: "İptal Edildi",
+		status_confirmed: "Onaylandı",
+
+		event_type_in_person: "Yüz Yüze",
+		event_type_drive_through: "Araçtan Alım",
+		event_type_delivery: "Teslimat",
+		event_type_virtual: "Sanal",
+
+		// ACCOUNT SECTION
+		title_your_information: "Bilgileriniz",
+		card_title_information: "Bilgi",
+		card_title_address: "Adres",
+		card_title_contact: "İletişim",
+		member_category_senior: "Yaşlı",
+		member_category_adult: "Yetişkin",
+		member_category_child: "Çocuk",
+		badge_freshtrak_user: "FreshTrak Kullanıcısı",
+		text_no_other_members: "Başka hane üyesi eklenmedi.",
+		link_update_household: "Haneyi Güncelle",
 
 		// BUTTONS & ACTIONS
 		button_continue: "Devam Et",
@@ -3286,12 +3895,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "Toplam Üye",
 		label_active_members: "Aktif Üyeler",
 		label_household_members: "Hane Üyeleri",
+		label_current_household_members: "Mevcut Hane Üyeleri",
 		label_confirmation_code: "Onay Kodu",
 		label_license_plate: "Plaka",
 		label_pickup_person: "Alım Kişisi",
 		label_vehicle_license_plate: "Araç Plakası",
 		label_seniors: "Yaşlılar",
 		label_adults: "Yetişkinler",
+		label_children: "Çocuklar",
+		label_no_members: "Üye yok",
+		label_no_address_provided: "Adres belirtilmedi",
+		label_no_contact_info: "İletişim bilgisi yok",
 		label_kids: "Çocuklar",
 		label_optional: "(İsteğe Bağlı)",
 		label_required: "*",
@@ -3476,6 +4090,13 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_email:
 			"Lütfen geçerli bir e-posta adresi girin",
 		error_please_select_valid_language: "Lütfen geçerli bir dil seçin",
+		error_date_of_birth_future: "Doğum tarihi gelecekte olamaz",
+		error_date_of_birth_too_far_past: "Doğum tarihi çok eski",
+		error_please_enter_valid_phone:
+			"Lütfen geçerli bir 10 haneli telefon numarası girin",
+		error_please_enter_valid_zip: "Lütfen geçerli bir posta kodu girin",
+		label_not_provided: "Belirtilmedi",
+		label_invalid_date: "Geçersiz tarih",
 		error_something_went_wrong: "Bir şeyler yanlış gitti",
 		error_something_went_wrong_try_again:
 			"Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
@@ -3548,6 +4169,7 @@ let localization = new LocalizedStrings({
 		aria_open_mobile_menu: "Mobil menüyü aç",
 		aria_user_account_menu: "Kullanıcı hesap menüsü",
 		aria_loading_time_slots: "Zaman dilimleri yükleniyor",
+		aria_processing_registration: "Kayıt işleniyor",
 		aria_decrease_seniors: "Yaşlı sayısını azalt",
 		aria_increase_seniors: "Yaşlı sayısını artır",
 		aria_decrease_adults: "Yetişkin sayısını azalt",
@@ -3606,6 +4228,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "Korece",
 		option_language_arabic: "Arapça",
 		option_language_hindi: "Hintçe",
+		option_language_somali: "Somalice",
+		option_language_russian: "Rusça",
+		option_language_turkish: "Türkçe",
+		option_language_nepali: "Nepalce",
+		option_language_tagalog: "Tagalogca",
 		option_language_other: "Diğer",
 		option_suffix_jr: "Jr",
 		option_suffix_sr: "Sr",
@@ -3684,6 +4311,11 @@ let localization = new LocalizedStrings({
 		dialog_discard_changes_title: "Değişiklikleri İptal Et?",
 		dialog_create_account_title: "Hesap Oluştur",
 		dialog_authentication_title: "Kimlik Doğrulama",
+		error_title_registration_error: "Kayıt Hatası",
+		button_review_update_instead: "Bunun yerine gözden geçir ve güncelle",
+		button_no_review_update: "Hayır, gözden geçir ve güncelle",
+		button_yes_register: "Evet, kayıt ol",
+		text_no_household_info_available: "Hane bilgisi mevcut değil.",
 		dialog_discard_changes_description:
 			"Kaydedilmemiş değişiklikleriniz var. İptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
 		dialog_create_account_description:
@@ -3756,6 +4388,33 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "Bu etkinlik için RSVP isteğe bağlıdır",
 		text_rsvp_required_for_event: "Bu etkinlik için RSVP zorunludur",
 		text_already_registered: "Zaten Kayıtlı",
+		text_already_registered_for_event: "Bu etkinliğe zaten kayıt oldunuz.",
+		text_already_registered_for_named_event:
+			"{0} etkinliğine zaten kayıt oldunuz.",
+		text_if_mistake_contact_us:
+			"Bunun bir hata olduğunu düşünüyorsanız, yardım için bizimle iletişime geçin.",
+		text_need_help_contact: "Yardıma mı ihtiyacınız var? Bize ulaşın",
+		text_step_x_of_y: "Adım {0} / {1}",
+		text_sent_confirmation_code:
+			"E-posta adresinize bir onay kodu gönderdik. Lütfen aşağıya girin.",
+		text_confirming: "Onaylanıyor...",
+		text_resending: "Yeniden gönderiliyor...",
+		text_page_not_found: "Hay aksi...! Sayfa Bulunamadı",
+		text_validation_errors_on_event:
+			"Etkinlikte Doğrulama Hataları Bulundu",
+		label_error_details: "Hata Detayları",
+		label_message_colon: "Mesaj:",
+		label_code_colon: "Kod:",
+		placeholder_enter_confirmation_code: "Onay kodunu girin",
+		button_resend_code: "Kodu Yeniden Gönder",
+		button_back_to_sign_up: "Kayıt Olma'ya Dön",
+		error_valid_email: "Lütfen geçerli bir e-posta adresi girin",
+		error_confirmation_code_length: "Onay kodu en az 6 karakter olmalıdır",
+		abbrev_details: "Detaylar",
+		abbrev_address: "Adres",
+		abbrev_family: "Aile",
+		abbrev_contact: "İletişim",
+		abbrev_members: "Üyeler",
 		text_optional: "isteğe bağlı",
 		text_required: "zorunlu",
 		sr_available_time_slots_registration:
@@ -3804,6 +4463,34 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"Bu etkinlik için şu anda müsait zaman dilimi bulunmamaktadır. Bu durum teknik sorunlar veya diğer geçici koşullardan kaynaklanıyor olabilir. Lütfen daha sonra tekrar deneyin. Sorun devam ederse, lütfen destek ekibiyle iletişime geçin.",
+
+		// FEEDBACK
+		feedback_give_feedback: "Geri Bildirim Ver",
+		feedback_title: "Geri Bildirim Ver",
+		feedback_description:
+			"Geri bildiriminiz, kaynaklar alırken keyifli bir deneyim yaşamanızı sağlamak için yerel gıda bankanıza gider.",
+		feedback_visit_question:
+			"{date} tarihinde {location}'a ziyaretiniz nasıldı?",
+		feedback_experience_label: "Deneyiminiz hakkında bilgi verin.",
+		feedback_placeholder: "Geri bildiriminizi paylaşın...",
+		feedback_submit: "Geri Bildirim Gönder",
+		feedback_thank_you_title:
+			"Geri Bildirim Sağladığınız İçin Teşekkürler!",
+		feedback_thank_you_message:
+			"Yardımınızla deneyiminizi geliştirebilir ve topluluğumuza daha iyi hizmet verebiliriz.",
+		feedback_close: "Kapat",
+		feedback_tag_kind_volunteers: "Nazik Gönüllüler",
+		feedback_tag_good_service: "İyi Hizmet",
+		feedback_tag_clean_space: "Temiz Alan",
+		feedback_tag_quality_food: "Kaliteli Yiyecek",
+		feedback_tag_efficient_shoppers: "Verimli Alışverişçiler",
+		feedback_already_submitted_message:
+			"Bu ziyaret için zaten geri bildirim gönderdiniz.",
+		feedback_comments_label: "Ek Yorumlar",
+		feedback_submitting: "Gönderiliyor...",
+		feedback_error_generic: "Bir hata oluştu",
+		feedback_no_questions: "Bu anket için soru bulunmamaktadır.",
+		feedback_required_aria: "zorunlu",
 	},
 	ara: {
 		home_freshtrack: "FreshTrak هنا للمساعدة!",
@@ -3862,6 +4549,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"هل من المقبول الاتصال بك للحصول على تحديثات ومعلومات حول تسجيلك وتحديثات لشبكتنا؟",
 		no_email: "لا يوجد بريد إلكتروني متاح",
+		label_no_email_question: "ليس لديك بريد إلكتروني؟",
+		label_get_free_email: "احصل على واحد مجاناً من Google.",
 		email_contact_you:
 			"هل من المقبول مراسلتك عبر البريد الإلكتروني بالتحديثات والمعلومات حول التسجيل والتحديثات الخاصة بشبكتنا؟",
 		register_about_family: "أخبرنا عن عائلتك",
@@ -3886,6 +4575,58 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"سجل الدخول أو أنشئ حسابًا لتوفير الوقت في المستقبل",
 		guest_signin_button: "تسجيل الدخول / إنشاء حساب",
+
+		// TABS
+		tab_summary: "ملخص",
+		tab_account: "الحساب",
+		text_profile: "الملف الشخصي",
+
+		// RESERVATIONS
+		title_your_reservations: "حجوزاتك",
+		text_you_have_event_coming_up: "لديك حدث قادم.",
+		text_no_upcoming_events: "لم يتم العثور على أحداث قادمة.",
+		text_browse_events_to_register: "تصفح الأحداث لإجراء حجز.",
+		loading_reservations: "جاري تحميل الحجوزات...",
+		error_loading_reservations: "فشل تحميل الحجوزات",
+		label_check_in_code: "رمز تسجيل الوصول",
+		label_years_old: "سنة",
+		alt_qr_code: "رمز QR",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "إلغاء الحجز",
+		title_cancel_reservation: "إلغاء الحجز",
+		message_cancel_confirmation:
+			"هل أنت متأكد أنك تريد إلغاء حجزك لهذا الحدث؟",
+		message_cancel_warning:
+			"قد يُعطى مكانك لشخص آخر وقد تحتاج إلى التسجيل مرة أخرى.",
+		button_keep_reservation: "الاحتفاظ بالحجز",
+		button_confirm_cancel: "نعم، إلغاء",
+		message_cancel_success: "تم إلغاء حجزك بنجاح.",
+		message_cancel_error: "تعذر إلغاء الحجز. يرجى المحاولة مرة أخرى.",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "الأحداث السابقة",
+		text_no_past_events: "لم يتم العثور على أحداث سابقة.",
+		text_past_events_description: "سجل أحداثك من آخر 30 يومًا.",
+		status_cancelled: "ملغى",
+		status_confirmed: "مؤكد",
+
+		event_type_in_person: "حضوري",
+		event_type_drive_through: "من السيارة",
+		event_type_delivery: "توصيل",
+		event_type_virtual: "افتراضي",
+
+		// ACCOUNT SECTION
+		title_your_information: "معلوماتك",
+		card_title_information: "المعلومات",
+		card_title_address: "العنوان",
+		card_title_contact: "الاتصال",
+		member_category_senior: "كبير السن",
+		member_category_adult: "بالغ",
+		member_category_child: "طفل",
+		badge_freshtrak_user: "مستخدم FreshTrak",
+		text_no_other_members: "لم تتم إضافة أفراد آخرين للأسرة.",
+		link_update_household: "تحديث الأسرة",
 
 		// BUTTONS & ACTIONS
 		button_continue: "متابعة",
@@ -4029,12 +4770,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "إجمالي الأعضاء",
 		label_active_members: "الأعضاء النشطون",
 		label_household_members: "أعضاء الأسرة",
+		label_current_household_members: "أعضاء الأسرة الحاليون",
 		label_confirmation_code: "رمز التأكيد",
 		label_license_plate: "لوحة الترخيص",
 		label_pickup_person: "شخص الاستلام",
 		label_vehicle_license_plate: "لوحة ترخيص المركبة",
 		label_seniors: "كبار السن",
 		label_adults: "البالغون",
+		label_children: "الأطفال",
+		label_no_members: "لا يوجد أعضاء",
+		label_no_address_provided: "لم يتم تقديم العنوان",
+		label_no_contact_info: "لا توجد معلومات اتصال",
 		label_kids: "الأطفال",
 		label_optional: "(اختياري)",
 		label_required: "*",
@@ -4212,6 +4958,13 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_date: "يرجى إدخال تاريخ ميلاد صالح.",
 		error_please_enter_valid_email: "يرجى إدخال عنوان بريد إلكتروني صالح",
 		error_please_select_valid_language: "يرجى اختيار لغة صالحة",
+		error_date_of_birth_future: "لا يمكن أن يكون تاريخ الميلاد في المستقبل",
+		error_date_of_birth_too_far_past: "تاريخ الميلاد بعيد جداً في الماضي",
+		error_please_enter_valid_phone:
+			"يرجى إدخال رقم هاتف صالح مكون من 10 أرقام",
+		error_please_enter_valid_zip: "يرجى إدخال رمز بريدي صالح",
+		label_not_provided: "غير متوفر",
+		label_invalid_date: "تاريخ غير صالح",
 		error_something_went_wrong: "حدث خطأ ما",
 		error_something_went_wrong_try_again:
 			"حدث خطأ ما. يرجى المحاولة مرة أخرى.",
@@ -4278,6 +5031,7 @@ let localization = new LocalizedStrings({
 		aria_open_mobile_menu: "فتح القائمة المحمولة",
 		aria_user_account_menu: "قائمة حساب المستخدم",
 		aria_loading_time_slots: "جاري تحميل الفترات الزمنية",
+		aria_processing_registration: "جاري معالجة التسجيل",
 		aria_decrease_seniors: "تقليل عدد كبار السن",
 		aria_increase_seniors: "زيادة عدد كبار السن",
 		aria_decrease_adults: "تقليل عدد البالغين",
@@ -4335,6 +5089,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "الكورية",
 		option_language_arabic: "العربية",
 		option_language_hindi: "الهندية",
+		option_language_somali: "الصومالية",
+		option_language_russian: "الروسية",
+		option_language_turkish: "التركية",
+		option_language_nepali: "النيبالية",
+		option_language_tagalog: "التاغالوغية",
 		option_language_other: "آخر",
 		option_suffix_jr: "الأصغر",
 		option_suffix_sr: "الأكبر",
@@ -4413,6 +5172,11 @@ let localization = new LocalizedStrings({
 		dialog_discard_changes_title: "تجاهل التغييرات؟",
 		dialog_create_account_title: "إنشاء حساب",
 		dialog_authentication_title: "المصادقة",
+		error_title_registration_error: "خطأ في التسجيل",
+		button_review_update_instead: "مراجعة وتحديث بدلاً من ذلك",
+		button_no_review_update: "لا، مراجعة وتحديث",
+		button_yes_register: "نعم، سجّل",
+		text_no_household_info_available: "لا تتوفر معلومات الأسرة.",
 		dialog_discard_changes_description:
 			"لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد تجاهلها؟ لا يمكن التراجع عن هذا الإجراء.",
 		dialog_create_account_description:
@@ -4483,6 +5247,32 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "RSVP اختياري لهذا الحدث",
 		text_rsvp_required_for_event: "RSVP مطلوب لهذا الحدث",
 		text_already_registered: "مسجل بالفعل",
+		text_already_registered_for_event: "لقد سجلت بالفعل في هذا الحدث.",
+		text_already_registered_for_named_event: "لقد سجلت بالفعل في {0}.",
+		text_if_mistake_contact_us:
+			"إذا كنت تعتقد أن هذا خطأ، يرجى الاتصال بنا للحصول على المساعدة.",
+		text_need_help_contact: "تحتاج مساعدة؟ اتصل بنا على",
+		text_step_x_of_y: "الخطوة {0} من {1}",
+		text_sent_confirmation_code:
+			"لقد أرسلنا رمز تأكيد إلى بريدك الإلكتروني. يرجى إدخاله أدناه.",
+		text_confirming: "جارٍ التأكيد...",
+		text_resending: "جارٍ إعادة الإرسال...",
+		text_page_not_found: "عذراً...! الصفحة غير موجودة",
+		text_validation_errors_on_event: "تم العثور على أخطاء التحقق في الحدث",
+		label_error_details: "تفاصيل الخطأ",
+		label_message_colon: "الرسالة:",
+		label_code_colon: "الرمز:",
+		placeholder_enter_confirmation_code: "أدخل رمز التأكيد",
+		button_resend_code: "إعادة إرسال الرمز",
+		button_back_to_sign_up: "العودة إلى التسجيل",
+		error_valid_email: "يرجى إدخال عنوان بريد إلكتروني صالح",
+		error_confirmation_code_length:
+			"يجب أن يكون رمز التأكيد 6 أحرف على الأقل",
+		abbrev_details: "التفاصيل",
+		abbrev_address: "العنوان",
+		abbrev_family: "العائلة",
+		abbrev_contact: "الاتصال",
+		abbrev_members: "الأعضاء",
 		text_optional: "اختياري",
 		text_required: "مطلوب",
 		sr_available_time_slots_registration: "الفترات الزمنية المتاحة للتسجيل",
@@ -4528,6 +5318,32 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"لا توجد حاليًا فترات زمنية متاحة لهذا الحدث. قد يكون هذا بسبب مشاكل تقنية أو ظروف مؤقتة أخرى. يرجى المحاولة مرة أخرى لاحقًا. إذا استمرت المشكلة، يرجى الاتصال بالدعم.",
+
+		// FEEDBACK
+		feedback_give_feedback: "قدم ملاحظاتك",
+		feedback_title: "قدم ملاحظاتك",
+		feedback_description:
+			"تذهب ملاحظاتك إلى بنك الطعام المحلي لضمان حصولك على تجربة ممتعة عند الحصول على الموارد.",
+		feedback_visit_question: "كيف كانت زيارتك في {date} إلى {location}؟",
+		feedback_experience_label: "أخبرنا عن تجربتك.",
+		feedback_placeholder: "شارك ملاحظاتك...",
+		feedback_submit: "إرسال الملاحظات",
+		feedback_thank_you_title: "شكرًا لتقديم ملاحظاتك!",
+		feedback_thank_you_message:
+			"بمساعدتك، يمكننا تحسين تجربتك وخدمة مجتمعنا بشكل أفضل.",
+		feedback_close: "إغلاق",
+		feedback_tag_kind_volunteers: "متطوعون لطفاء",
+		feedback_tag_good_service: "خدمة جيدة",
+		feedback_tag_clean_space: "مساحة نظيفة",
+		feedback_tag_quality_food: "طعام عالي الجودة",
+		feedback_tag_efficient_shoppers: "متسوقون فعالون",
+		feedback_already_submitted_message:
+			"لقد قمت بالفعل بإرسال ملاحظاتك حول هذه الزيارة.",
+		feedback_comments_label: "تعليقات إضافية",
+		feedback_submitting: "جاري الإرسال...",
+		feedback_error_generic: "حدث خطأ",
+		feedback_no_questions: "لا توجد أسئلة متاحة لهذا الاستبيان.",
+		feedback_required_aria: "مطلوب",
 	},
 	zho: {
 		home_freshtrack: "FreshTrak在這里為您提供幫助",
@@ -4585,6 +5401,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"是否可以与您联系以获取有关注册的更新和信息以及我们网络的更新",
 		no_email: "没有可用的电子邮件",
+		label_no_email_question: "没有电子邮件？",
+		label_get_free_email: "从Google免费获取一个。",
 		email_contact_you:
 			"可以通过电子邮件向您发送有关注册的更新和信息以及我们网络的更新吗",
 		register_about_family: "告诉我们你的家人",
@@ -4607,6 +5425,57 @@ let localization = new LocalizedStrings({
 		not_to_say: "不想指定",
 		guest_signin_prompt: "登录或创建账户以在未来节省时间",
 		guest_signin_button: "登录 / 创建账户",
+
+		// TABS
+		tab_summary: "摘要",
+		tab_account: "账户",
+		text_profile: "个人资料",
+
+		// RESERVATIONS
+		title_your_reservations: "您的预约",
+		text_you_have_event_coming_up: "您有一个即将到来的活动。",
+		text_no_upcoming_events: "未找到即将到来的活动。",
+		text_browse_events_to_register: "浏览活动以进行预约。",
+		loading_reservations: "正在加载预约...",
+		error_loading_reservations: "加载预约失败",
+		label_check_in_code: "签到码",
+		label_years_old: "岁",
+		alt_qr_code: "二维码",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "取消预约",
+		title_cancel_reservation: "取消预约",
+		message_cancel_confirmation: "您确定要取消此活动的预约吗？",
+		message_cancel_warning:
+			"您的名额可能会被分配给其他人，您可能需要重新注册。",
+		button_keep_reservation: "保留预约",
+		button_confirm_cancel: "是的，取消",
+		message_cancel_success: "您的预约已成功取消。",
+		message_cancel_error: "无法取消预约。请重试。",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "过去的活动",
+		text_no_past_events: "未找到过去的活动。",
+		text_past_events_description: "您过去30天的活动历史。",
+		status_cancelled: "已取消",
+		status_confirmed: "已确认",
+
+		event_type_in_person: "现场",
+		event_type_drive_through: "免下车",
+		event_type_delivery: "配送",
+		event_type_virtual: "线上",
+
+		// ACCOUNT SECTION
+		title_your_information: "您的信息",
+		card_title_information: "信息",
+		card_title_address: "地址",
+		card_title_contact: "联系方式",
+		member_category_senior: "老年人",
+		member_category_adult: "成人",
+		member_category_child: "儿童",
+		badge_freshtrak_user: "FreshTrak用户",
+		text_no_other_members: "未添加其他家庭成员。",
+		link_update_household: "更新家庭",
 
 		// BUTTONS & ACTIONS
 		button_continue: "继续",
@@ -4750,12 +5619,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "总成员数",
 		label_active_members: "活跃成员",
 		label_household_members: "家庭成员",
+		label_current_household_members: "当前家庭成员",
 		label_confirmation_code: "确认码",
 		label_license_plate: "车牌号",
 		label_pickup_person: "取货人",
 		label_vehicle_license_plate: "车辆车牌号",
 		label_seniors: "老年人",
 		label_adults: "成年人",
+		label_children: "儿童",
+		label_no_members: "没有成员",
+		label_no_address_provided: "未提供地址",
+		label_no_contact_info: "没有联系信息",
 		label_kids: "儿童",
 		label_optional: "（可选）",
 		label_required: "*",
@@ -4926,6 +5800,12 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_date: "请输入有效的出生日期。",
 		error_please_enter_valid_email: "请输入有效的电子邮件地址",
 		error_please_select_valid_language: "请选择有效的语言",
+		error_date_of_birth_future: "出生日期不能是未来的日期",
+		error_date_of_birth_too_far_past: "出生日期过于久远",
+		error_please_enter_valid_phone: "请输入有效的10位电话号码",
+		error_please_enter_valid_zip: "请输入有效的邮政编码",
+		label_not_provided: "未提供",
+		label_invalid_date: "无效日期",
 		error_something_went_wrong: "出了些问题",
 		error_something_went_wrong_try_again: "出了些问题。请重试。",
 		error_failed_to_sign_in: "登录失败",
@@ -4986,6 +5866,7 @@ let localization = new LocalizedStrings({
 		aria_open_mobile_menu: "打开移动菜单",
 		aria_user_account_menu: "用户账户菜单",
 		aria_loading_time_slots: "加载时间段",
+		aria_processing_registration: "正在处理注册",
 		aria_decrease_seniors: "减少老年人数",
 		aria_increase_seniors: "增加老年人数",
 		aria_decrease_adults: "减少成年人数",
@@ -5043,6 +5924,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "韩语",
 		option_language_arabic: "阿拉伯语",
 		option_language_hindi: "印地语",
+		option_language_somali: "索马里语",
+		option_language_russian: "俄语",
+		option_language_turkish: "土耳其语",
+		option_language_nepali: "尼泊尔语",
+		option_language_tagalog: "他加禄语",
 		option_language_other: "其他",
 		option_suffix_jr: "小",
 		option_suffix_sr: "老",
@@ -5121,6 +6007,11 @@ let localization = new LocalizedStrings({
 		dialog_discard_changes_title: "丢弃更改？",
 		dialog_create_account_title: "创建账户",
 		dialog_authentication_title: "身份验证",
+		error_title_registration_error: "注册错误",
+		button_review_update_instead: "改为审查和更新",
+		button_no_review_update: "不，审查和更新",
+		button_yes_register: "是的，注册",
+		text_no_household_info_available: "没有可用的家庭信息。",
 		dialog_discard_changes_description:
 			"您有未保存的更改。您确定要丢弃它们吗？此操作无法撤销。",
 		dialog_create_account_description: "登录或创建账户以在未来节省时间",
@@ -5186,6 +6077,31 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "此活动的 RSVP 是可选的",
 		text_rsvp_required_for_event: "此活动的 RSVP 是必需的",
 		text_already_registered: "已注册",
+		text_already_registered_for_event: "您已注册此活动。",
+		text_already_registered_for_named_event: "您已注册{0}。",
+		text_if_mistake_contact_us:
+			"如果您认为这是一个错误，请联系我们寻求帮助。",
+		text_need_help_contact: "需要帮助？请联系我们",
+		text_step_x_of_y: "第{0}步，共{1}步",
+		text_sent_confirmation_code:
+			"我们已向您的电子邮件地址发送了确认码。请在下方输入。",
+		text_confirming: "确认中...",
+		text_resending: "重新发送中...",
+		text_page_not_found: "糟糕...！页面未找到",
+		text_validation_errors_on_event: "活动中发现验证错误",
+		label_error_details: "错误详情",
+		label_message_colon: "消息：",
+		label_code_colon: "代码：",
+		placeholder_enter_confirmation_code: "输入确认码",
+		button_resend_code: "重新发送验证码",
+		button_back_to_sign_up: "返回注册",
+		error_valid_email: "请输入有效的电子邮件地址",
+		error_confirmation_code_length: "确认码必须至少6个字符",
+		abbrev_details: "详情",
+		abbrev_address: "地址",
+		abbrev_family: "家庭",
+		abbrev_contact: "联系",
+		abbrev_members: "成员",
 		text_optional: "可选",
 		text_required: "必需",
 		sr_available_time_slots_registration: "可用于注册的时间段",
@@ -5226,6 +6142,31 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"目前此活动没有可用的时间段。这可能是由于技术问题或其他临时条件造成的。请稍后再试。如果问题持续存在，请联系支持。",
+
+		// FEEDBACK
+		feedback_give_feedback: "提供反馈",
+		feedback_title: "提供反馈",
+		feedback_description:
+			"您的反馈将发送到当地的食品银行，以确保您在获取资源时有愉快的体验。",
+		feedback_visit_question: "您在{date}对{location}的访问如何？",
+		feedback_experience_label: "告诉我们您的体验。",
+		feedback_placeholder: "分享您的反馈...",
+		feedback_submit: "提交反馈",
+		feedback_thank_you_title: "感谢您提供反馈！",
+		feedback_thank_you_message:
+			"在您的帮助下，我们可以改善您的体验并更好地服务我们的社区。",
+		feedback_close: "关闭",
+		feedback_tag_kind_volunteers: "友善的志愿者",
+		feedback_tag_good_service: "良好的服务",
+		feedback_tag_clean_space: "干净的空间",
+		feedback_tag_quality_food: "优质食品",
+		feedback_tag_efficient_shoppers: "高效的购物者",
+		feedback_already_submitted_message: "您已提交过此次访问的反馈。",
+		feedback_comments_label: "其他评论",
+		feedback_submitting: "提交中...",
+		feedback_error_generic: "发生错误",
+		feedback_no_questions: "此调查暂无可用问题。",
+		feedback_required_aria: "必填",
 	},
 	hin: {
 		home_freshtrack: "FreshTrak मदद करने के लिए यहाँ है!",
@@ -5286,6 +6227,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"क्या आपको अपने पंजीकरण के बारे में जानकारी और जानकारी और हमारे नेटवर्क के अपडेट से संपर्क करना ठीक है?",
 		no_email: "कोई ईमेल उपलब्ध नहीं है",
+		label_no_email_question: "ईमेल नहीं है?",
+		label_get_free_email: "Google से एक मुफ़्त प्राप्त करें।",
 		email_contact_you:
 			"क्या आपको अपने पंजीकरण के बारे में जानकारी और जानकारी और हमारे नेटवर्क के अपडेट के साथ ईमेल करना ठीक है?",
 		register_about_family: "अपने परिवार के बारे में हमें बताएं",
@@ -5310,6 +6253,60 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"भविष्य में समय बचाने के लिए साइन इन करें या खाता बनाएं",
 		guest_signin_button: "साइन इन / खाता बनाएं",
+
+		// TABS
+		tab_summary: "सारांश",
+		tab_account: "खाता",
+		text_profile: "प्रोफ़ाइल",
+
+		// RESERVATIONS
+		title_your_reservations: "आपकी आरक्षण",
+		text_you_have_event_coming_up: "आपके पास एक आगामी कार्यक्रम है।",
+		text_no_upcoming_events: "कोई आगामी कार्यक्रम नहीं मिला।",
+		text_browse_events_to_register: "आरक्षण के लिए कार्यक्रम ब्राउज़ करें।",
+		loading_reservations: "आरक्षण लोड हो रहे हैं...",
+		error_loading_reservations: "आरक्षण लोड करने में विफल",
+		label_check_in_code: "चेक-इन कोड",
+		label_years_old: "साल",
+		alt_qr_code: "QR कोड",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "आरक्षण रद्द करें",
+		title_cancel_reservation: "आरक्षण रद्द करें",
+		message_cancel_confirmation:
+			"क्या आप वाकई इस कार्यक्रम के लिए अपना आरक्षण रद्द करना चाहते हैं?",
+		message_cancel_warning:
+			"आपकी जगह किसी और को दी जा सकती है और आपको फिर से पंजीकरण करना पड़ सकता है।",
+		button_keep_reservation: "आरक्षण रखें",
+		button_confirm_cancel: "हाँ, रद्द करें",
+		message_cancel_success: "आपका आरक्षण सफलतापूर्वक रद्द कर दिया गया है।",
+		message_cancel_error:
+			"आरक्षण रद्द करने में असमर्थ। कृपया पुनः प्रयास करें।",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "पिछले कार्यक्रम",
+		text_no_past_events: "कोई पिछले कार्यक्रम नहीं मिले।",
+		text_past_events_description:
+			"पिछले 30 दिनों का आपका कार्यक्रम इतिहास।",
+		status_cancelled: "रद्द",
+		status_confirmed: "पुष्टि",
+
+		event_type_in_person: "व्यक्तिगत",
+		event_type_drive_through: "ड्राइव-थ्रू",
+		event_type_delivery: "डिलीवरी",
+		event_type_virtual: "वर्चुअल",
+
+		// ACCOUNT SECTION
+		title_your_information: "आपकी जानकारी",
+		card_title_information: "जानकारी",
+		card_title_address: "पता",
+		card_title_contact: "संपर्क",
+		member_category_senior: "वरिष्ठ",
+		member_category_adult: "वयस्क",
+		member_category_child: "बच्चा",
+		badge_freshtrak_user: "FreshTrak उपयोगकर्ता",
+		text_no_other_members: "कोई अन्य घरेलू सदस्य नहीं जोड़े गए।",
+		link_update_household: "परिवार अपडेट करें",
 
 		// BUTTONS & ACTIONS
 		button_continue: "जारी रखें",
@@ -5453,12 +6450,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "कुल सदस्य",
 		label_active_members: "सक्रिय सदस्य",
 		label_household_members: "परिवार के सदस्य",
+		label_current_household_members: "वर्तमान परिवार के सदस्य",
 		label_confirmation_code: "पुष्टिकरण कोड",
 		label_license_plate: "लाइसेंस प्लेट",
 		label_pickup_person: "पिकअप व्यक्ति",
 		label_vehicle_license_plate: "वाहन लाइसेंस प्लेट",
 		label_seniors: "वरिष्ठ",
 		label_adults: "वयस्क",
+		label_children: "बच्चे",
+		label_no_members: "कोई सदस्य नहीं",
+		label_no_address_provided: "पता प्रदान नहीं किया गया",
+		label_no_contact_info: "कोई संपर्क जानकारी नहीं",
 		label_kids: "बच्चे",
 		label_optional: "(वैकल्पिक)",
 		label_required: "*",
@@ -5642,6 +6644,13 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_date: "कृपया एक वैध जन्म तिथि दर्ज करें।",
 		error_please_enter_valid_email: "कृपया एक वैध ईमेल पता दर्ज करें",
 		error_please_select_valid_language: "कृपया एक वैध भाषा चुनें",
+		error_date_of_birth_future: "जन्म तिथि भविष्य में नहीं हो सकती",
+		error_date_of_birth_too_far_past: "जन्म तिथि बहुत पुरानी है",
+		error_please_enter_valid_phone:
+			"कृपया एक वैध 10 अंकों का फ़ोन नंबर दर्ज करें",
+		error_please_enter_valid_zip: "कृपया एक वैध ज़िप कोड दर्ज करें",
+		label_not_provided: "प्रदान नहीं किया गया",
+		label_invalid_date: "अमान्य तिथि",
 		error_something_went_wrong: "कुछ गलत हो गया",
 		error_something_went_wrong_try_again:
 			"कुछ गलत हो गया। कृपया पुन: प्रयास करें।",
@@ -5717,6 +6726,7 @@ let localization = new LocalizedStrings({
 		aria_open_mobile_menu: "मोबाइल मेनू खोलें",
 		aria_user_account_menu: "उपयोगकर्ता खाता मेनू",
 		aria_loading_time_slots: "समय स्लॉट लोड हो रहे हैं",
+		aria_processing_registration: "पंजीकरण संसाधित हो रहा है",
 		aria_decrease_seniors: "वरिष्ठ संख्या कम करें",
 		aria_increase_seniors: "वरिष्ठ संख्या बढ़ाएं",
 		aria_decrease_adults: "वयस्क संख्या कम करें",
@@ -5775,6 +6785,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "कोरियाई",
 		option_language_arabic: "अरबी",
 		option_language_hindi: "हिंदी",
+		option_language_somali: "सोमाली",
+		option_language_russian: "रूसी",
+		option_language_turkish: "तुर्की",
+		option_language_nepali: "नेपाली",
+		option_language_tagalog: "तागालोग",
 		option_language_other: "अन्य",
 		option_suffix_jr: "जूनियर",
 		option_suffix_sr: "सीनियर",
@@ -5853,6 +6868,11 @@ let localization = new LocalizedStrings({
 		dialog_discard_changes_title: "परिवर्तन त्यागें?",
 		dialog_create_account_title: "खाता बनाएं",
 		dialog_authentication_title: "प्रमाणीकरण",
+		error_title_registration_error: "पंजीकरण त्रुटि",
+		button_review_update_instead: "इसके बजाय समीक्षा और अपडेट करें",
+		button_no_review_update: "नहीं, समीक्षा और अपडेट करें",
+		button_yes_register: "हाँ, पंजीकरण करें",
+		text_no_household_info_available: "कोई घरेलू जानकारी उपलब्ध नहीं है।",
 		dialog_discard_changes_description:
 			"आपके पास बचाए नहीं गए परिवर्तन हैं। क्या आप वाकई उन्हें त्यागना चाहते हैं? इस कार्रवाई को पूर्ववत नहीं किया जा सकता।",
 		dialog_create_account_description:
@@ -5922,6 +6942,35 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "इस कार्यक्रम के लिए RSVP वैकल्पिक है",
 		text_rsvp_required_for_event: "इस कार्यक्रम के लिए RSVP आवश्यक है",
 		text_already_registered: "पहले से पंजीकृत",
+		text_already_registered_for_event:
+			"आप पहले से इस कार्यक्रम के लिए पंजीकृत हैं।",
+		text_already_registered_for_named_event:
+			"आप पहले से {0} के लिए पंजीकृत हैं।",
+		text_if_mistake_contact_us:
+			"यदि आपको लगता है कि यह गलती है, तो कृपया सहायता के लिए हमसे संपर्क करें।",
+		text_need_help_contact: "सहायता चाहिए? हमसे संपर्क करें",
+		text_step_x_of_y: "चरण {0} / {1}",
+		text_sent_confirmation_code:
+			"हमने आपके ईमेल पते पर एक पुष्टिकरण कोड भेजा है। कृपया इसे नीचे दर्ज करें।",
+		text_confirming: "पुष्टि हो रही है...",
+		text_resending: "पुनः भेजा जा रहा है...",
+		text_page_not_found: "उफ़...! पृष्ठ नहीं मिला",
+		text_validation_errors_on_event:
+			"कार्यक्रम में सत्यापन त्रुटियाँ मिलीं",
+		label_error_details: "त्रुटि विवरण",
+		label_message_colon: "संदेश:",
+		label_code_colon: "कोड:",
+		placeholder_enter_confirmation_code: "पुष्टिकरण कोड दर्ज करें",
+		button_resend_code: "कोड पुनः भेजें",
+		button_back_to_sign_up: "साइन अप पर वापस जाएं",
+		error_valid_email: "कृपया एक मान्य ईमेल पता दर्ज करें",
+		error_confirmation_code_length:
+			"पुष्टिकरण कोड कम से कम 6 वर्ण का होना चाहिए",
+		abbrev_details: "विवरण",
+		abbrev_address: "पता",
+		abbrev_family: "परिवार",
+		abbrev_contact: "संपर्क",
+		abbrev_members: "सदस्य",
 		text_optional: "वैकल्पिक",
 		text_required: "आवश्यक",
 		sr_available_time_slots_registration: "पंजीकरण के लिए उपलब्ध समय स्लॉट",
@@ -5969,6 +7018,33 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"हाल यस कार्यक्रमको लागि उपलब्ध समय स्लटहरू छैनन्। यो प्राविधिक समस्याहरू वा अन्य अस्थायी अवस्थाहरूको कारणले हुन सक्छ। कृपया पछि फेरि प्रयास गर्नुहोस्। यदि समस्या जारी रहन्छ भने, कृपया समर्थनसँग सम्पर्क गर्नुहोस्।",
+
+		// FEEDBACK
+		feedback_give_feedback: "प्रतिक्रिया दें",
+		feedback_title: "प्रतिक्रिया दें",
+		feedback_description:
+			"आपकी प्रतिक्रिया आपके स्थानीय फ़ूड बैंक को जाती है ताकि संसाधन प्राप्त करते समय आपका अनुभव सुखद हो।",
+		feedback_visit_question:
+			"{date} को {location} पर आपकी यात्रा कैसी रही?",
+		feedback_experience_label: "अपने अनुभव के बारे में बताएं।",
+		feedback_placeholder: "अपनी प्रतिक्रिया साझा करें...",
+		feedback_submit: "प्रतिक्रिया जमा करें",
+		feedback_thank_you_title: "प्रतिक्रिया देने के लिए धन्यवाद!",
+		feedback_thank_you_message:
+			"आपकी मदद से, हम आपके अनुभव को बेहतर बना सकते हैं और अपने समुदाय की बेहतर सेवा कर सकते हैं।",
+		feedback_close: "बंद करें",
+		feedback_tag_kind_volunteers: "दयालु स्वयंसेवक",
+		feedback_tag_good_service: "अच्छी सेवा",
+		feedback_tag_clean_space: "साफ जगह",
+		feedback_tag_quality_food: "गुणवत्तापूर्ण भोजन",
+		feedback_tag_efficient_shoppers: "कुशल खरीदार",
+		feedback_already_submitted_message:
+			"आपने पहले ही इस विज़िट के लिए प्रतिक्रिया जमा कर दी है।",
+		feedback_comments_label: "अतिरिक्त टिप्पणियाँ",
+		feedback_submitting: "जमा हो रहा है...",
+		feedback_error_generic: "एक त्रुटि हुई",
+		feedback_no_questions: "इस सर्वेक्षण के लिए कोई प्रश्न उपलब्ध नहीं है।",
+		feedback_required_aria: "आवश्यक",
 	},
 	nep: {
 		home_freshtrack: "फ्रेशट्र्याक मद्दत गर्न यहाँ छ!",
@@ -6029,6 +7105,8 @@ let localization = new LocalizedStrings({
 		phone_contact_you:
 			"के तपाइँसँग तपाइँको रेजिष्ट्रेसनको बारेमा अद्यावधिक र जानकारी, र हाम्रो नेटवर्कमा अद्यावधिक जानकारीका साथ सम्पर्क गर्न ठीक छ?",
 		no_email: "कुनै ईमेल उपलब्ध छैन",
+		label_no_email_question: "इमेल छैन?",
+		label_get_free_email: "Google बाट एउटा निःशुल्क प्राप्त गर्नुहोस्।",
 		email_contact_you:
 			"के तपाइँलाई तपाइँको पंजीकरणको बारेमा अद्यावधिक र जानकारी, र हाम्रो नेटवर्कमा अद्यावधिकको साथ ईमेल गर्न ठीक छ?",
 		register_about_family: "तपाईंको परिवारको बारेमा हामीलाई भन्नुहोस्",
@@ -6053,6 +7131,59 @@ let localization = new LocalizedStrings({
 		guest_signin_prompt:
 			"भविष्यमा समय बचाउन साइन इन गर्नुहोस् वा खाता बनाउनुहोस्",
 		guest_signin_button: "साइन इन / खाता बनाउनुहोस्",
+
+		// TABS
+		tab_summary: "सारांश",
+		tab_account: "खाता",
+		text_profile: "प्रोफाइल",
+
+		// RESERVATIONS
+		title_your_reservations: "तपाईंको आरक्षण",
+		text_you_have_event_coming_up: "तपाईंसँग आगामी कार्यक्रम छ।",
+		text_no_upcoming_events: "कुनै आगामी कार्यक्रम भेटिएन।",
+		text_browse_events_to_register: "आरक्षण गर्न कार्यक्रमहरू हेर्नुहोस्।",
+		loading_reservations: "आरक्षणहरू लोड हुँदैछ...",
+		error_loading_reservations: "आरक्षणहरू लोड गर्न असफल",
+		label_check_in_code: "चेक-इन कोड",
+		label_years_old: "वर्ष",
+		alt_qr_code: "QR कोड",
+
+		// CANCEL RESERVATION
+		button_cancel_reservation: "आरक्षण रद्द गर्नुहोस्",
+		title_cancel_reservation: "आरक्षण रद्द गर्नुहोस्",
+		message_cancel_confirmation:
+			"के तपाईं यो कार्यक्रमको लागि आफ्नो आरक्षण रद्द गर्न चाहनुहुन्छ?",
+		message_cancel_warning:
+			"तपाईंको स्थान अरू कसैलाई दिन सकिन्छ र तपाईंले फेरि दर्ता गर्नुपर्ने हुन सक्छ।",
+		button_keep_reservation: "आरक्षण राख्नुहोस्",
+		button_confirm_cancel: "हो, रद्द गर्नुहोस्",
+		message_cancel_success: "तपाईंको आरक्षण सफलतापूर्वक रद्द गरियो।",
+		message_cancel_error:
+			"आरक्षण रद्द गर्न असमर्थ। कृपया फेरि प्रयास गर्नुहोस्।",
+
+		// PAST EVENTS / HISTORY
+		title_past_events: "विगतका कार्यक्रमहरू",
+		text_no_past_events: "विगतका कार्यक्रमहरू फेला परेनन्।",
+		text_past_events_description: "गत ३० दिनको तपाईंको कार्यक्रम इतिहास।",
+		status_cancelled: "रद्द",
+		status_confirmed: "पुष्टि",
+
+		event_type_in_person: "व्यक्तिगत",
+		event_type_drive_through: "ड्राइव-थ्रू",
+		event_type_delivery: "डेलिभरी",
+		event_type_virtual: "भर्चुअल",
+
+		// ACCOUNT SECTION
+		title_your_information: "तपाईंको जानकारी",
+		card_title_information: "जानकारी",
+		card_title_address: "ठेगाना",
+		card_title_contact: "सम्पर्क",
+		member_category_senior: "वरिष्ठ",
+		member_category_adult: "वयस्क",
+		member_category_child: "बालक",
+		badge_freshtrak_user: "FreshTrak प्रयोगकर्ता",
+		text_no_other_members: "अन्य घरपरिवारका सदस्यहरू थपिएका छैनन्।",
+		link_update_household: "घरपरिवार अपडेट गर्नुहोस्",
 
 		// BUTTONS & ACTIONS
 		button_continue: "जारी राख्नुहोस्",
@@ -6196,12 +7327,17 @@ let localization = new LocalizedStrings({
 		label_total_members: "कुल सदस्यहरू",
 		label_active_members: "सक्रिय सदस्यहरू",
 		label_household_members: "घरधुरी सदस्यहरू",
+		label_current_household_members: "हालका घरधुरी सदस्यहरू",
 		label_confirmation_code: "पुष्टिकरण कोड",
 		label_license_plate: "नम्बर प्लेट",
 		label_pickup_person: "उठाउने व्यक्ति",
 		label_vehicle_license_plate: "सवारी साधन नम्बर प्लेट",
 		label_seniors: "वरिष्ठहरू",
 		label_adults: "वयस्कहरू",
+		label_children: "बच्चाहरू",
+		label_no_members: "कुनै सदस्य छैन",
+		label_no_address_provided: "ठेगाना प्रदान गरिएको छैन",
+		label_no_contact_info: "कुनै सम्पर्क जानकारी छैन",
 		label_kids: "बच्चाहरू",
 		label_optional: "(वैकल्पिक)",
 		label_required: "*",
@@ -6393,6 +7529,13 @@ let localization = new LocalizedStrings({
 		error_please_enter_valid_email:
 			"कृपया वैध इमेल ठेगाना प्रविष्ट गर्नुहोस्",
 		error_please_select_valid_language: "कृपया वैध भाषा छान्नुहोस्",
+		error_date_of_birth_future: "जन्म मिति भविष्यमा हुन सक्दैन",
+		error_date_of_birth_too_far_past: "जन्म मिति धेरै पुरानो छ",
+		error_please_enter_valid_phone:
+			"कृपया वैध 10 अंकको फोन नम्बर प्रविष्ट गर्नुहोस्",
+		error_please_enter_valid_zip: "कृपया वैध जिप कोड प्रविष्ट गर्नुहोस्",
+		label_not_provided: "प्रदान गरिएको छैन",
+		label_invalid_date: "अमान्य मिति",
 		error_something_went_wrong: "केहि गलत भयो",
 		error_something_went_wrong_try_again:
 			"केहि गलत भयो। कृपया फेरि प्रयास गर्नुहोस्।",
@@ -6467,6 +7610,7 @@ let localization = new LocalizedStrings({
 		aria_open_mobile_menu: "मोबाइल मेनू खोल्नुहोस्",
 		aria_user_account_menu: "प्रयोगकर्ता खाता मेनू",
 		aria_loading_time_slots: "समय स्लटहरू लोड हुँदैछन्",
+		aria_processing_registration: "दर्ता प्रशोधन हुँदैछ",
 		aria_decrease_seniors: "वरिष्ठ संख्या कम गर्नुहोस्",
 		aria_increase_seniors: "वरिष्ठ संख्या बढाउनुहोस्",
 		aria_decrease_adults: "वयस्क संख्या कम गर्नुहोस्",
@@ -6525,6 +7669,11 @@ let localization = new LocalizedStrings({
 		option_language_korean: "कोरियाली",
 		option_language_arabic: "अरबी",
 		option_language_hindi: "हिन्दी",
+		option_language_somali: "सोमाली",
+		option_language_russian: "रुसी",
+		option_language_turkish: "टर्किश",
+		option_language_nepali: "नेपाली",
+		option_language_tagalog: "तागालोग",
 		option_language_other: "अन्य",
 		option_suffix_jr: "जुनियर",
 		option_suffix_sr: "सिनियर",
@@ -6603,6 +7752,11 @@ let localization = new LocalizedStrings({
 		dialog_discard_changes_title: "परिवर्तनहरू त्याग्नुहोस्?",
 		dialog_create_account_title: "खाता बनाउनुहोस्",
 		dialog_authentication_title: "प्रमाणीकरण",
+		error_title_registration_error: "दर्ता त्रुटि",
+		button_review_update_instead: "यसको सट्टा समीक्षा र अपडेट गर्नुहोस्",
+		button_no_review_update: "होइन, समीक्षा र अपडेट गर्नुहोस्",
+		button_yes_register: "हो, दर्ता गर्नुहोस्",
+		text_no_household_info_available: "घरधुरीको जानकारी उपलब्ध छैन।",
 		dialog_discard_changes_description:
 			"तपाईंसँग बचत नभएका परिवर्तनहरू छन्। के तपाईं वास्तवमै तिनीहरूलाई त्याग्न चाहनुहुन्छ? यो कार्य पूर्ववत गर्न सकिँदैन।",
 		dialog_create_account_description:
@@ -6673,6 +7827,35 @@ let localization = new LocalizedStrings({
 		text_rsvp_optional_for_event: "यस कार्यक्रमको लागि RSVP वैकल्पिक छ",
 		text_rsvp_required_for_event: "यस कार्यक्रमको लागि RSVP आवश्यक छ",
 		text_already_registered: "पहिले नै दर्ता भएको",
+		text_already_registered_for_event:
+			"तपाईं पहिले नै यो कार्यक्रमको लागि दर्ता भइसक्नुभएको छ।",
+		text_already_registered_for_named_event:
+			"तपाईं पहिले नै {0} को लागि दर्ता भइसक्नुभएको छ।",
+		text_if_mistake_contact_us:
+			"यदि तपाईंलाई यो गल्ती हो भन्ने लाग्छ भने, कृपया सहायताको लागि हामीलाई सम्पर्क गर्नुहोस्।",
+		text_need_help_contact: "सहायता चाहिन्छ? हामीलाई सम्पर्क गर्नुहोस्",
+		text_step_x_of_y: "चरण {0} / {1}",
+		text_sent_confirmation_code:
+			"हामीले तपाईंको इमेल ठेगानामा पुष्टिकरण कोड पठाएका छौं। कृपया यसलाई तल प्रविष्ट गर्नुहोस्।",
+		text_confirming: "पुष्टि गर्दै...",
+		text_resending: "पुनः पठाउँदै...",
+		text_page_not_found: "ओहो...! पृष्ठ फेला परेन",
+		text_validation_errors_on_event:
+			"कार्यक्रममा प्रमाणीकरण त्रुटिहरू भेटियो",
+		label_error_details: "त्रुटि विवरण",
+		label_message_colon: "सन्देश:",
+		label_code_colon: "कोड:",
+		placeholder_enter_confirmation_code: "पुष्टिकरण कोड प्रविष्ट गर्नुहोस्",
+		button_resend_code: "कोड पुनः पठाउनुहोस्",
+		button_back_to_sign_up: "साइन अपमा फर्कनुहोस्",
+		error_valid_email: "कृपया मान्य इमेल ठेगाना प्रविष्ट गर्नुहोस्",
+		error_confirmation_code_length:
+			"पुष्टिकरण कोड कम्तिमा ६ वर्णको हुनुपर्छ",
+		abbrev_details: "विवरण",
+		abbrev_address: "ठेगाना",
+		abbrev_family: "परिवार",
+		abbrev_contact: "सम्पर्क",
+		abbrev_members: "सदस्यहरू",
 		text_optional: "वैकल्पिक",
 		text_required: "आवश्यक",
 		sr_available_time_slots_registration: "दर्ताको लागि उपलब्ध समय स्लटहरू",
@@ -6719,6 +7902,33 @@ let localization = new LocalizedStrings({
 		// EVENT SLOTS
 		event_slots_no_available_message:
 			"हाल यस कार्यक्रमको लागि उपलब्ध समय स्लटहरू छैनन्। यो प्राविधिक समस्याहरू वा अन्य अस्थायी अवस्थाहरूको कारणले हुन सक्छ। कृपया पछि फेरि प्रयास गर्नुहोस्। यदि समस्या जारी रहन्छ भने, कृपया समर्थनसँग सम्पर्क गर्नुहोस्।",
+
+		// FEEDBACK
+		feedback_give_feedback: "प्रतिक्रिया दिनुहोस्",
+		feedback_title: "प्रतिक्रिया दिनुहोस्",
+		feedback_description:
+			"तपाईंको प्रतिक्रिया तपाईंको स्थानीय खाना बैंकमा जान्छ ताकि संसाधनहरू प्राप्त गर्दा तपाईंको अनुभव सुखद होस्।",
+		feedback_visit_question:
+			"{date} मा {location} मा तपाईंको भ्रमण कस्तो रह्यो?",
+		feedback_experience_label: "तपाईंको अनुभवको बारेमा हामीलाई बताउनुहोस्।",
+		feedback_placeholder: "तपाईंको प्रतिक्रिया साझा गर्नुहोस्...",
+		feedback_submit: "प्रतिक्रिया पेश गर्नुहोस्",
+		feedback_thank_you_title: "प्रतिक्रिया दिनुभएकोमा धन्यवाद!",
+		feedback_thank_you_message:
+			"तपाईंको मद्दतले, हामी तपाईंको अनुभव सुधार्न र हाम्रो समुदायलाई राम्रोसँग सेवा गर्न सक्छौं।",
+		feedback_close: "बन्द गर्नुहोस्",
+		feedback_tag_kind_volunteers: "दयालु स्वयंसेवकहरू",
+		feedback_tag_good_service: "राम्रो सेवा",
+		feedback_tag_clean_space: "सफा ठाउँ",
+		feedback_tag_quality_food: "गुणस्तरीय खाना",
+		feedback_tag_efficient_shoppers: "प्रभावकारी किनमेल गर्नेहरू",
+		feedback_already_submitted_message:
+			"तपाईंले यो भ्रमणको लागि पहिले नै प्रतिक्रिया पेश गर्नुभएको छ।",
+		feedback_comments_label: "थप टिप्पणीहरू",
+		feedback_submitting: "पेश गर्दैछ...",
+		feedback_error_generic: "त्रुटि भयो",
+		feedback_no_questions: "यो सर्वेक्षणको लागि कुनै प्रश्न उपलब्ध छैन।",
+		feedback_required_aria: "आवश्यक",
 	},
 });
 

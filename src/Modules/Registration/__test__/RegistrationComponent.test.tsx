@@ -66,9 +66,18 @@ jest.mock("../../General/LoadingSpinner", () => {
 
 jest.mock("../../Localization/LocalizationComponent", () => ({
 	__esModule: true,
-	default: {
-		registartion_register: "Register",
-	},
+	default: new Proxy(
+		{
+			formatString: (str: string, ...args: any[]) =>
+				args.reduce(
+					(s: string, arg: any, i: number) =>
+						s.replace(`{${i}}`, String(arg)),
+					str,
+				),
+			getLanguage: () => "en",
+		},
+		{ get: (target: any, prop: string) => target[prop] ?? prop },
+	),
 }));
 
 // Mock the opc-timeline
@@ -76,7 +85,7 @@ jest.mock("@one-platform/opc-timeline", () => {});
 
 // Mock utilities
 jest.mock("../../../Utils/DateFormat", () => ({
-	formatDateForServer: jest.fn(date => date),
+	formatDateForServer: jest.fn((date) => date),
 }));
 
 // Create mock store
@@ -144,7 +153,9 @@ const renderWithProviders = (component: React.ReactElement) => {
 	const store = createMockStore();
 	return render(
 		<Provider store={store}>
-			<BrowserRouter>{component}</BrowserRouter>
+			<BrowserRouter future={{ v7_startTransition: true }}>
+				{component}
+			</BrowserRouter>
 		</Provider>
 	);
 };

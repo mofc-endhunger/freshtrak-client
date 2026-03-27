@@ -17,7 +17,15 @@ import { HouseholdsApiService } from "../../../Services/HouseholdsApiService";
 // Type imports
 import { RegistrationFormData } from "../../Registration/types/registration.types";
 import { ApiHouseholdMember } from "../types/api.types";
-import { getGenderFromId, getSuffixFromId, getAdditionalMemberCounts } from "../utils/householdUtils";
+import {
+	getGenderFromId,
+	getSuffixFromId,
+	getAdditionalMemberCounts,
+} from "../utils/householdUtils";
+import {
+	getLanguageCodes,
+	getLanguageOptionById,
+} from "../../Localization/languageOptions";
 import localization from "../../Localization/LocalizationComponent";
 
 interface HouseholdRegistrationComponentProps {
@@ -94,7 +102,7 @@ const HouseholdRegistrationComponent: React.FC<
 
 					// Convert gender_id to form value (lowercase format expected by form)
 					const getGenderForForm = (
-						genderId: number | null
+						genderId: number | null,
 					): string => {
 						if (!genderId) return "";
 						const gender = getGenderFromId(genderId);
@@ -105,42 +113,52 @@ const HouseholdRegistrationComponent: React.FC<
 							other: "other",
 							prefer_not_to_say: "not_specify",
 						};
-					return genderMap[gender] || "";
-				};
+						return genderMap[gender] || "";
+					};
 
-			// Compute additional-member counts (excludes HOH from the correct age bucket)
-				const additionalCounts = getAdditionalMemberCounts(
-					userData.counts || {},
-					primaryMember.date_of_birth,
-				);
+					// Compute additional-member counts (excludes HOH from the correct age bucket)
+					const additionalCounts = getAdditionalMemberCounts(
+						userData.counts || {},
+						primaryMember.date_of_birth,
+					);
 
-				setPrefilledData({
-				first_name: primaryMember.first_name || "",
-				last_name: primaryMember.last_name || "",
-				middle_name: primaryMember.middle_name || "",
-				suffix: getSuffixFromId(primaryMember.suffix_id),
-				date_of_birth: convertDateFormat(
-						primaryMember.date_of_birth || ""
-					),
-					gender: getGenderForForm(
-						primaryMember.gender_id || null
-					),
-					phone: userData.phone || "",
-					email: userData.email || "",
-					address_line_1: userData.address_line_1 || "",
-					address_line_2: userData.address_line_2 || "",
-					city: userData.city || "",
-					state: userData.state || "",
-					zip_code: userData.zip_code || "",
-					// Contact preferences
-					permission_to_text:
-						userData.permission_to_text ?? false,
-					permission_to_email:
-						userData.permission_to_email ?? false,
-				seniors_in_household: additionalCounts.seniors,
-				adults_in_household: additionalCounts.adults,
-				children_in_household: additionalCounts.children,
-				});
+					const preferredLang =
+						(userData.preferred_language &&
+						getLanguageCodes().includes(userData.preferred_language)
+							? userData.preferred_language
+							: null) ??
+						(typeof userData.language_id === "number"
+							? getLanguageOptionById(userData.language_id)?.code
+							: undefined) ??
+						"en";
+					setPrefilledData({
+						first_name: primaryMember.first_name || "",
+						last_name: primaryMember.last_name || "",
+						middle_name: primaryMember.middle_name || "",
+						suffix: getSuffixFromId(primaryMember.suffix_id),
+						date_of_birth: convertDateFormat(
+							primaryMember.date_of_birth || "",
+						),
+						gender: getGenderForForm(
+							primaryMember.gender_id || null,
+						),
+						preferred_language: preferredLang,
+						phone: userData.phone || "",
+						email: userData.email || "",
+						address_line_1: userData.address_line_1 || "",
+						address_line_2: userData.address_line_2 || "",
+						city: userData.city || "",
+						state: userData.state || "",
+						zip_code: userData.zip_code || "",
+						// Contact preferences
+						permission_to_text:
+							userData.permission_to_text ?? false,
+						permission_to_email:
+							userData.permission_to_email ?? false,
+						seniors_in_household: additionalCounts.seniors,
+						adults_in_household: additionalCounts.adults,
+						children_in_household: additionalCounts.children,
+					});
 				} else {
 					// No members found - set empty prefilled data
 					console.error("No members found in user data");

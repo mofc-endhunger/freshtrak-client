@@ -47,6 +47,8 @@ export interface UsersMeResponse {
   // Contact preferences
   permission_to_text: boolean | null;
   permission_to_email: boolean | null;
+  preferred_language?: string | null;
+  language_id?: number | null;
 }
 
 // API member structure (matches actual API response)

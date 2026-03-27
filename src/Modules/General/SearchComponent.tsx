@@ -17,6 +17,12 @@ interface AddressComponent {
 
 interface Place {
 	address_components: AddressComponent[];
+	geometry?: {
+		location: {
+			lat: () => number;
+			lng: () => number;
+		};
+	};
 }
 
 interface ServiceCategory {
@@ -91,12 +97,14 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
 						: ""
 				);
 
-				// Note: Coordinates are not available with the new API
-				// You may need to implement a separate geocoding service
-				// to get coordinates if needed
-				// For now, we'll set empty coordinates
-				setLat("");
-				setLong("");
+				// Extract coordinates if available from the place geometry
+				if (place.geometry?.location) {
+					setLat(place.geometry.location.lat().toString());
+					setLong(place.geometry.location.lng().toString());
+				} else {
+					setLat("");
+					setLong("");
+				}
 			}
 		};
 

@@ -342,6 +342,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak User",
 		placeholder_all: "All",
 		placeholder_select_pickup_person: "Select pickup person",
+		placeholder_your_answer: "Your answer",
+		placeholder_select_scale: "Select 1–10",
+		placeholder_select_an_option: "Select an option",
 
 		// HEADERS & TITLES
 		title_event_registration: "Event Registration",
@@ -1239,6 +1242,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "Usuario de FreshTrak",
 		placeholder_all: "Todos",
 		placeholder_select_pickup_person: "Seleccionar persona de recogida",
+		placeholder_your_answer: "Su respuesta",
+		placeholder_select_scale: "Seleccionar 1–10",
+		placeholder_select_an_option: "Seleccionar una opción",
 
 		// HEADERS & TITLES
 		title_event_registration: "Registro de Evento",
@@ -2141,6 +2147,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "Isticmaalaha FreshTrak",
 		placeholder_all: "Dhammaan",
 		placeholder_select_pickup_person: "Qofka soo qaadista dooro",
+		placeholder_your_answer: "Jawaabtaada",
+		placeholder_select_scale: "Dooro 1–10",
+		placeholder_select_an_option: "Dooro ikhtiyaar",
 
 		// HEADERS & TITLES
 		title_event_registration: "Isdiiwaangelinta Dhacdada",
@@ -3053,6 +3062,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "Пользователь FreshTrak",
 		placeholder_all: "Все",
 		placeholder_select_pickup_person: "Выберите лицо для получения",
+		placeholder_your_answer: "Ваш ответ",
+		placeholder_select_scale: "Выберите 1–10",
+		placeholder_select_an_option: "Выберите вариант",
 
 		// HEADERS & TITLES
 		title_event_registration: "Регистрация на мероприятие",
@@ -3953,6 +3965,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak Kullanıcısı",
 		placeholder_all: "Tümü",
 		placeholder_select_pickup_person: "Alım kişisini seçin",
+		placeholder_your_answer: "Cevabınız",
+		placeholder_select_scale: "1–10 seçin",
+		placeholder_select_an_option: "Bir seçenek seçin",
 
 		// HEADERS & TITLES
 		title_event_registration: "Etkinlik Kaydı",
@@ -4827,6 +4842,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "مستخدم FreshTrak",
 		placeholder_all: "الكل",
 		placeholder_select_pickup_person: "اختر شخص الاستلام",
+		placeholder_your_answer: "إجابتك",
+		placeholder_select_scale: "اختر 1–10",
+		placeholder_select_an_option: "اختر خيارًا",
 
 		// HEADERS & TITLES
 		title_event_registration: "تسجيل الحدث",
@@ -5676,6 +5694,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak 用户",
 		placeholder_all: "全部",
 		placeholder_select_pickup_person: "选择取货人",
+		placeholder_your_answer: "您的回答",
+		placeholder_select_scale: "选择 1–10",
+		placeholder_select_an_option: "选择一个选项",
 
 		// HEADERS & TITLES
 		title_event_registration: "活动注册",
@@ -6508,6 +6529,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak उपयोगकर्ता",
 		placeholder_all: "सभी",
 		placeholder_select_pickup_person: "पिकअप व्यक्ति चुनें",
+		placeholder_your_answer: "आपका उत्तर",
+		placeholder_select_scale: "1–10 चुनें",
+		placeholder_select_an_option: "एक विकल्प चुनें",
 
 		// HEADERS & TITLES
 		title_event_registration: "इवेंट पंजीकरण",
@@ -7388,6 +7412,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak प्रयोगकर्ता",
 		placeholder_all: "सबै",
 		placeholder_select_pickup_person: "उठाउने व्यक्ति छान्नुहोस्",
+		placeholder_your_answer: "तपाईंको जवाफ",
+		placeholder_select_scale: "1–10 छान्नुहोस्",
+		placeholder_select_an_option: "एउटा विकल्प छान्नुहोस्",
 
 		// HEADERS & TITLES
 		title_event_registration: "घटना दर्ता",

@@ -22,9 +22,11 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 	register_how_to_contact: "How to Contact You",
 	phone_number: "Phone Number",
 	no_phone: "No Phone Available",
-	phone_contact_you: "Permission to text you",
+	phone_contact_you:
+		"I agree to receive SMS text message confirmations for my food pantry visit. Message & data rates may apply. Reply STOP to opt out.",
 	no_email: "No Email Available",
-	email_contact_you: "Permission to email you",
+	email_contact_you:
+		"I agree to receive email confirmations and updates about my food pantry visit.",
 	register_where_you_live: "Where do you live?",
 	street_address: "Street Address",
 	lot_suite: "Lot/Suite",

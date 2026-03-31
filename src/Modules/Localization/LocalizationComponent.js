@@ -57,12 +57,12 @@ let localization = new LocalizedStrings({
 		phone_number: "Phone Number (Mobile Preferred)",
 		no_phone: "No Phone Available",
 		phone_contact_you:
-			"Is it okay to contact you with updates and information about your registration, and updates to our network?",
+			"I agree to receive SMS text message confirmations for my food pantry visit. Message & data rates may apply. Reply STOP to opt out.",
 		no_email: "No Email Available",
 		label_no_email_question: "No Email?",
 		label_get_free_email: "Get one free from Google.",
 		email_contact_you:
-			"Is it okay to email you with updates and information about your registration, and updates to our network?",
+			"I agree to receive email confirmations and updates about my food pantry visit.",
 		register_about_family: "Tell us about your family",
 		family_count:
 			"How many additional family members are in each age group? (Do not include yourself)",
@@ -342,6 +342,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak User",
 		placeholder_all: "All",
 		placeholder_select_pickup_person: "Select pickup person",
+		placeholder_your_answer: "Your answer",
+		placeholder_select_scale: "Select 1–10",
+		placeholder_select_an_option: "Select an option",
 
 		// HEADERS & TITLES
 		title_event_registration: "Event Registration",
@@ -986,12 +989,12 @@ let localization = new LocalizedStrings({
 		phone_number: "Número de teléfono (móvil preferido)",
 		no_phone: "No hay teléfono disponible",
 		phone_contact_you:
-			"¿Está bien comunicarnos con usted con actualizaciones e información sobre su registro y actualizaciones de nuestra red?",
+			"Acepto recibir confirmaciones por mensaje de texto SMS para mi visita al banco de alimentos. Se pueden aplicar tarifas de mensajes y datos. Responda STOP para cancelar.",
 		no_email: "No hay correo electrónico disponible",
 		label_no_email_question: "¿No tiene correo electrónico?",
 		label_get_free_email: "Obtenga uno gratis de Google.",
 		email_contact_you:
-			"¿Está bien enviarle un correo electrónico con actualizaciones e información sobre su registro y actualizaciones de nuestra red?",
+			"Acepto recibir confirmaciones y actualizaciones por correo electrónico sobre mi visita al banco de alimentos.",
 		register_about_family: "Háblanos de tu familia",
 		family_count:
 			"¿Cuántos miembros adicionales de la familia hay en cada grupo de edad? (No te incluyas a ti mismo)",
@@ -1275,6 +1278,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "Usuario de FreshTrak",
 		placeholder_all: "Todos",
 		placeholder_select_pickup_person: "Seleccionar persona de recogida",
+		placeholder_your_answer: "Su respuesta",
+		placeholder_select_scale: "Seleccionar 1–10",
+		placeholder_select_an_option: "Seleccionar una opción",
 
 		// HEADERS & TITLES
 		title_event_registration: "Registro de Evento",
@@ -1934,12 +1940,12 @@ let localization = new LocalizedStrings({
 		phone_number: "Lambarka taleefanka (Mobile doorbiday)",
 		no_phone: "Taleefan lamaheli karo",
 		phone_contact_you:
-			"Ma caadi baa inaan kula soo xiriiro cusbooneysiinta iyo macluumaadka ku saabsan diiwaangelintaada, iyo cusbooneysiinta shabakadeena?",
+			"Waxaan ogolahay inaan helo xaqiijinta fariin qoraal SMS ah ee booqashadayda kaydka cuntada. Khidmadaha fariimaha iyo xogta ayaa laga yaabaa inay khuseyso. Ku jawaab STOP si aad u joojiso.",
 		no_email: "Email Laheli Mayo",
 		label_no_email_question: "Email ma lihid?",
 		label_get_free_email: "Mid bilaash ah ka hel Google.",
 		email_contact_you:
-			"Ma caadi baa inaan kugu soo dirno cusbooneysiin iyo macluumaad ku saabsan diiwaangelintaada, iyo cusbooneysiinta shabakadeena?",
+			"Waxaan ogolahay inaan helo xaqiijinta iyo cusbooneysiinta iimayl ah ee ku saabsan booqashadayda kaydka cuntada.",
 		register_about_family: "Reerkaaga wax nooga sheeg",
 		family_count:
 			"Immisa xubnood oo qoys ah ayaa ku jira da 'kasta? (Ha ku darin naftaada)",
@@ -2221,6 +2227,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "Isticmaalaha FreshTrak",
 		placeholder_all: "Dhammaan",
 		placeholder_select_pickup_person: "Qofka soo qaadista dooro",
+		placeholder_your_answer: "Jawaabtaada",
+		placeholder_select_scale: "Dooro 1–10",
+		placeholder_select_an_option: "Dooro ikhtiyaar",
 
 		// HEADERS & TITLES
 		title_event_registration: "Isdiiwaangelinta Dhacdada",
@@ -2882,12 +2891,12 @@ let localization = new LocalizedStrings({
 		phone_number: "Номер телефона (предпочтительно мобильный)",
 		no_phone: "Телефон недоступен",
 		phone_contact_you:
-			"Можно ли связываться с вами с обновлениями и информацией о вашей регистрации и обновлениями в нашей сети?",
+			"Я соглашаюсь получать SMS-подтверждения о моём посещении продовольственного банка. Могут применяться тарифы за сообщения и передачу данных. Отправьте STOP для отмены.",
 		no_email: "Электронная почта недоступна",
 		label_no_email_question: "Нет электронной почты?",
 		label_get_free_email: "Получите бесплатно от Google.",
 		email_contact_you:
-			"Можно ли отправлять вам по электронной почте обновления и информацию о вашей регистрации и обновлениях в нашей сети?",
+			"Я соглашаюсь получать подтверждения и обновления по электронной почте о моём посещении продовольственного банка.",
 		register_about_family: "Информация о вашей семье",
 		family_count:
 			"Сколько дополнительных членов семьи в каждой возрастной группе? (Не включайте себя)",
@@ -3170,6 +3179,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "Пользователь FreshTrak",
 		placeholder_all: "Все",
 		placeholder_select_pickup_person: "Выберите лицо для получения",
+		placeholder_your_answer: "Ваш ответ",
+		placeholder_select_scale: "Выберите 1–10",
+		placeholder_select_an_option: "Выберите вариант",
 
 		// HEADERS & TITLES
 		title_event_registration: "Регистрация на мероприятие",
@@ -3833,12 +3845,12 @@ let localization = new LocalizedStrings({
 		phone_number: "Telefon Numarası (Mobil Tercihli)",
 		no_phone: "Telefon Yok",
 		phone_contact_you:
-			"Kaydınızla ilgili güncellemeler ve bilgiler ve ağımızdaki güncellemeler için sizinle iletişime geçebilir miyim?",
+			"Gıda bankası ziyaretim için SMS metin mesajı onayları almayı kabul ediyorum. Mesaj ve veri ücretleri uygulanabilir. Vazgeçmek için STOP yanıtlayın.",
 		no_email: "Kullanılabilir E-posta Yok",
 		label_no_email_question: "E-postanız yok mu?",
 		label_get_free_email: "Google'dan ücretsiz bir tane edinin.",
 		email_contact_you:
-			"Kaydınızla ilgili güncellemeler ve bilgiler ve ağımızdaki güncellemeler ile size e-posta gönderebilir miyim?",
+			"Gıda bankası ziyaretim hakkında e-posta onayları ve güncellemeler almayı kabul ediyorum.",
 		register_about_family: "Bize ailenden bahset",
 		family_count:
 			"Her yaş grubunda kaç aile üyesi daha var? (Kendinizi dahil etmeyin)",
@@ -4116,6 +4128,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak Kullanıcısı",
 		placeholder_all: "Tümü",
 		placeholder_select_pickup_person: "Alım kişisini seçin",
+		placeholder_your_answer: "Cevabınız",
+		placeholder_select_scale: "1–10 seçin",
+		placeholder_select_an_option: "Bir seçenek seçin",
 
 		// HEADERS & TITLES
 		title_event_registration: "Etkinlik Kaydı",
@@ -4757,12 +4772,12 @@ let localization = new LocalizedStrings({
 		phone_number: "رقم الهاتف (يفضل الجوال)",
 		no_phone: "لا يوجد هاتف متاح",
 		phone_contact_you:
-			"هل من المقبول الاتصال بك للحصول على تحديثات ومعلومات حول تسجيلك وتحديثات لشبكتنا؟",
+			"أوافق على تلقي رسائل تأكيد نصية SMS لزيارتي لبنك الطعام. قد تُطبق رسوم الرسائل والبيانات. أرسل STOP لإلغاء الاشتراك.",
 		no_email: "لا يوجد بريد إلكتروني متاح",
 		label_no_email_question: "ليس لديك بريد إلكتروني؟",
 		label_get_free_email: "احصل على واحد مجاناً من Google.",
 		email_contact_you:
-			"هل من المقبول مراسلتك عبر البريد الإلكتروني بالتحديثات والمعلومات حول التسجيل والتحديثات الخاصة بشبكتنا؟",
+			"أوافق على تلقي تأكيدات وتحديثات عبر البريد الإلكتروني حول زيارتي لبنك الطعام.",
 		register_about_family: "أخبرنا عن عائلتك",
 		family_count:
 			"كم عدد أفراد الأسرة الإضافيين في كل فئة عمرية؟ (لا تشمل نفسك)",
@@ -5037,6 +5052,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "مستخدم FreshTrak",
 		placeholder_all: "الكل",
 		placeholder_select_pickup_person: "اختر شخص الاستلام",
+		placeholder_your_answer: "إجابتك",
+		placeholder_select_scale: "اختر 1–10",
+		placeholder_select_an_option: "اختر خيارًا",
 
 		// HEADERS & TITLES
 		title_event_registration: "تسجيل الحدث",
@@ -5656,12 +5674,12 @@ let localization = new LocalizedStrings({
 		phone_number: "电话号码（首选移动电话）",
 		no_phone: "没有可用的电话",
 		phone_contact_you:
-			"是否可以与您联系以获取有关注册的更新和信息以及我们网络的更新",
+			"我同意接收有关食物银行访问的短信确认。可能会收取短信和数据费用。回复 STOP 取消订阅。",
 		no_email: "没有可用的电子邮件",
 		label_no_email_question: "没有电子邮件？",
 		label_get_free_email: "从Google免费获取一个。",
 		email_contact_you:
-			"可以通过电子邮件向您发送有关注册的更新和信息以及我们网络的更新吗",
+			"我同意接收有关食物银行访问的电子邮件确认和更新。",
 		register_about_family: "告诉我们你的家人",
 		family_count: "每个年龄段还有多少家庭成员？ （不要包括自己)",
 		seniors: "老年人",
@@ -5933,6 +5951,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak 用户",
 		placeholder_all: "全部",
 		placeholder_select_pickup_person: "选择取货人",
+		placeholder_your_answer: "您的回答",
+		placeholder_select_scale: "选择 1–10",
+		placeholder_select_an_option: "选择一个选项",
 
 		// HEADERS & TITLES
 		title_event_registration: "活动注册",
@@ -6524,12 +6545,12 @@ let localization = new LocalizedStrings({
 		phone_number: "फ़ोन नंबर (मोबाइल पसंदीदा)",
 		no_phone: "कोई फोन उपलब्ध नहीं है",
 		phone_contact_you:
-			"क्या आपको अपने पंजीकरण के बारे में जानकारी और जानकारी और हमारे नेटवर्क के अपडेट से संपर्क करना ठीक है?",
+			"मैं अपनी खाद्य बैंक यात्रा के लिए SMS पाठ संदेश पुष्टिकरण प्राप्त करने के लिए सहमत हूँ। संदेश और डेटा शुल्क लागू हो सकते हैं। सदस्यता रद्द करने के लिए STOP उत्तर दें।",
 		no_email: "कोई ईमेल उपलब्ध नहीं है",
 		label_no_email_question: "ईमेल नहीं है?",
 		label_get_free_email: "Google से एक मुफ़्त प्राप्त करें।",
 		email_contact_you:
-			"क्या आपको अपने पंजीकरण के बारे में जानकारी और जानकारी और हमारे नेटवर्क के अपडेट के साथ ईमेल करना ठीक है?",
+			"मैं अपनी खाद्य बैंक यात्रा के बारे में ईमेल पुष्टिकरण और अपडेट प्राप्त करने के लिए सहमत हूँ।",
 		register_about_family: "अपने परिवार के बारे में हमें बताएं",
 		family_count:
 			"प्रत्येक आयु वर्ग में कितने अतिरिक्त परिवार के सदस्य हैं? (खुद को शामिल न करें)",
@@ -6807,6 +6828,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak उपयोगकर्ता",
 		placeholder_all: "सभी",
 		placeholder_select_pickup_person: "पिकअप व्यक्ति चुनें",
+		placeholder_your_answer: "आपका उत्तर",
+		placeholder_select_scale: "1–10 चुनें",
+		placeholder_select_an_option: "एक विकल्प चुनें",
 
 		// HEADERS & TITLES
 		title_event_registration: "इवेंट पंजीकरण",
@@ -7449,12 +7473,12 @@ let localization = new LocalizedStrings({
 		phone_number: "फोन नम्बर (मोबाइल मनपर्दो)",
 		no_phone: "कुनै फोन उपलब्ध छैन",
 		phone_contact_you:
-			"के तपाइँसँग तपाइँको रेजिष्ट्रेसनको बारेमा अद्यावधिक र जानकारी, र हाम्रो नेटवर्कमा अद्यावधिक जानकारीका साथ सम्पर्क गर्न ठीक छ?",
+			"म मेरो खाद्य बैंक भ्रमणको लागि SMS पाठ सन्देश पुष्टिकरणहरू प्राप्त गर्न सहमत छु। सन्देश र डाटा शुल्क लागू हुन सक्छ। सदस्यता रद्द गर्न STOP जवाफ दिनुहोस्।",
 		no_email: "कुनै ईमेल उपलब्ध छैन",
 		label_no_email_question: "इमेल छैन?",
 		label_get_free_email: "Google बाट एउटा निःशुल्क प्राप्त गर्नुहोस्।",
 		email_contact_you:
-			"के तपाइँलाई तपाइँको पंजीकरणको बारेमा अद्यावधिक र जानकारी, र हाम्रो नेटवर्कमा अद्यावधिकको साथ ईमेल गर्न ठीक छ?",
+			"म मेरो खाद्य बैंक भ्रमणको बारेमा ईमेल पुष्टिकरण र अपडेटहरू प्राप्त गर्न सहमत छु।",
 		register_about_family: "तपाईंको परिवारको बारेमा हामीलाई भन्नुहोस्",
 		family_count:
 			"प्रत्येक उमेर समूहमा कति अतिरिक्त परिवार सदस्यहरू छन्? (आफूलाई समावेश नगर्नुहोस्)",
@@ -7734,6 +7758,9 @@ let localization = new LocalizedStrings({
 		placeholder_freshtrak_user: "FreshTrak प्रयोगकर्ता",
 		placeholder_all: "सबै",
 		placeholder_select_pickup_person: "उठाउने व्यक्ति छान्नुहोस्",
+		placeholder_your_answer: "तपाईंको जवाफ",
+		placeholder_select_scale: "1–10 छान्नुहोस्",
+		placeholder_select_an_option: "एउटा विकल्प छान्नुहोस्",
 
 		// HEADERS & TITLES
 		title_event_registration: "घटना दर्ता",

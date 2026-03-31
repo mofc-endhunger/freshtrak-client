@@ -22,6 +22,7 @@ import {
 	SelectValue,
 } from "../../../components/ui/select";
 import { cn } from "../../../lib/utils";
+import { getLocalizedString } from "../../Localization/localizationUtils";
 import type { QuestionRendererProps, SurveyQuestionOption } from "../types";
 
 const STAR_OR_SCALE_5 = new Set([
@@ -85,7 +86,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 				<Textarea
 					value={answerStr}
 					onChange={(e) => handleChange(e.target.value)}
-					placeholder="Your answer"
+					placeholder={getLocalizedString("placeholder_your_answer")}
 					className="min-h-[80px] resize-none"
 				/>
 			</div>
@@ -115,7 +116,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 				{promptLabel}
 				<Select value={answerStr || ""} onValueChange={(v) => handleChange(v ?? "")}>
 					<SelectTrigger className="w-full max-w-[8rem]">
-						<SelectValue placeholder="Select 1–10" />
+						<SelectValue placeholder={getLocalizedString("placeholder_select_scale")} />
 					</SelectTrigger>
 					<SelectContent className="z-[10002] bg-white max-w-[min(20rem,100vw)]">
 						{Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
@@ -240,7 +241,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 					<SelectTrigger
 						className="w-full min-w-0 overflow-hidden [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:text-left"
 					>
-						<SelectValue placeholder="Select an option" />
+						<SelectValue placeholder={getLocalizedString("placeholder_select_an_option")} />
 					</SelectTrigger>
 					<SelectContent className="z-[10002] bg-white max-w-[min(20rem,100vw)]">
 						{sortedOptions.map((opt) => (
@@ -266,7 +267,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({
 				type="text"
 				value={answerStr}
 				onChange={(e) => handleChange(e.target.value)}
-				placeholder="Your answer"
+				placeholder={getLocalizedString("placeholder_your_answer")}
 			/>
 		</div>
 	);

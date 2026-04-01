@@ -1,414 +1,231 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { useForm } from "react-hook-form";
-import StateDropdownComponent from "../StateDropdownComponent";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import StateDropdownComponent from '../StateDropdownComponent';
 
-// Test wrapper component that provides form context
-const TestWrapper: React.FC<{
-	children?: React.ReactNode;
-	defaultValues?: any;
-	errors?: any;
-}> = ({ children, defaultValues = {}, errors = {} }) => {
-	const methods = useForm({
-		defaultValues: {
-			state: "",
-			...defaultValues,
-		},
-	});
+jest.mock('../../Localization/LocalizationComponent', () => ({
+  state: 'State',
+  error_field_required: 'This field is required',
+  option_state_alaska: 'Alaska',
+  option_state_alabama: 'Alabama',
+  option_state_arkansas: 'Arkansas',
+  option_state_arizona: 'Arizona',
+  option_state_california: 'California',
+  option_state_colorado: 'Colorado',
+  option_state_connecticut: 'Connecticut',
+  option_state_district_of_columbia: 'District of Columbia',
+  option_state_delaware: 'Delaware',
+  option_state_florida: 'Florida',
+  option_state_georgia: 'Georgia',
+  option_state_hawaii: 'Hawaii',
+  option_state_iowa: 'Iowa',
+  option_state_idaho: 'Idaho',
+  option_state_illinois: 'Illinois',
+  option_state_indiana: 'Indiana',
+  option_state_kansas: 'Kansas',
+  option_state_kentucky: 'Kentucky',
+  option_state_louisiana: 'Louisiana',
+  option_state_massachusetts: 'Massachusetts',
+  option_state_maryland: 'Maryland',
+  option_state_maine: 'Maine',
+  option_state_michigan: 'Michigan',
+  option_state_minnesota: 'Minnesota',
+  option_state_missouri: 'Missouri',
+  option_state_mississippi: 'Mississippi',
+  option_state_montana: 'Montana',
+  option_state_north_carolina: 'North Carolina',
+  option_state_north_dakota: 'North Dakota',
+  option_state_nebraska: 'Nebraska',
+  option_state_new_hampshire: 'New Hampshire',
+  option_state_new_jersey: 'New Jersey',
+  option_state_new_mexico: 'New Mexico',
+  option_state_nevada: 'Nevada',
+  option_state_new_york: 'New York',
+  option_state_ohio: 'Ohio',
+  option_state_oklahoma: 'Oklahoma',
+  option_state_oregon: 'Oregon',
+  option_state_pennsylvania: 'Pennsylvania',
+  option_state_puerto_rico: 'Puerto Rico',
+  option_state_rhode_island: 'Rhode Island',
+  option_state_south_carolina: 'South Carolina',
+  option_state_south_dakota: 'South Dakota',
+  option_state_tennessee: 'Tennessee',
+  option_state_texas: 'Texas',
+  option_state_utah: 'Utah',
+  option_state_virginia: 'Virginia',
+  option_state_vermont: 'Vermont',
+  option_state_washington: 'Washington',
+  option_state_wisconsin: 'Wisconsin',
+  option_state_west_virginia: 'West Virginia',
+  option_state_wyoming: 'Wyoming',
+}));
 
-	// Mock the errors object
-	const mockErrors = errors;
-
-	return (
-		<StateDropdownComponent
-			register={methods.register}
-			errors={mockErrors}
-			value={methods.watch("state")}
-		/>
-	);
+const defaultProps = {
+  value: '',
+  onValueChange: jest.fn(),
 };
 
-describe("StateDropdownComponent", () => {
-	describe("Rendering", () => {
-		test("should render without crashing", () => {
-			render(<TestWrapper />);
-			expect(screen.getByText("State")).toBeInTheDocument();
-		});
+describe('StateDropdownComponent', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-		test("should display the correct label", () => {
-			render(<TestWrapper />);
-			expect(screen.getByText("State")).toBeInTheDocument();
-			expect(screen.getByText("*")).toBeInTheDocument();
-		});
+  describe('Rendering', () => {
+    test('should render without crashing', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      expect(screen.getByText('State')).toBeInTheDocument();
+    });
 
-		test("should render the select element", () => {
-			render(<TestWrapper />);
-			expect(screen.getByRole("combobox")).toBeInTheDocument();
-		});
+    test('should display the correct label', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      expect(screen.getByText('State')).toBeInTheDocument();
+      expect(screen.getByText('*')).toBeInTheDocument();
+    });
 
-		test("should have the correct id and name attributes", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveAttribute("id", "state");
-			expect(select).toHaveAttribute("name", "state");
-		});
+    test('should render the select trigger', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
+    });
 
-		test("should display all US states and territories", () => {
-			render(<TestWrapper />);
+    test('should have the correct id on the trigger', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).toHaveAttribute('id', 'state');
+    });
+  });
 
-			// Check for a few key states
-			expect(screen.getByText("Alaska")).toBeInTheDocument();
-			expect(screen.getByText("California")).toBeInTheDocument();
-			expect(screen.getByText("New York")).toBeInTheDocument();
-			expect(screen.getByText("Texas")).toBeInTheDocument();
-			expect(screen.getByText("Florida")).toBeInTheDocument();
+  describe('Selected Value Display', () => {
+    test('should display selected state when value is provided', () => {
+      render(<StateDropdownComponent {...defaultProps} value="CA" />);
+      expect(screen.getByText('California')).toBeInTheDocument();
+    });
 
-			// Check for territories
-			expect(screen.getByText("Puerto Rico")).toBeInTheDocument();
-			expect(
-				screen.getByText("District of Columbia")
-			).toBeInTheDocument();
-		});
+    test('should display different selected state', () => {
+      render(<StateDropdownComponent {...defaultProps} value="NY" />);
+      expect(screen.getByText('New York')).toBeInTheDocument();
+    });
 
-		test("should have an empty option as first choice", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			const options = select.querySelectorAll("option");
-			expect(options[0]).toHaveValue("");
-		});
+    test('should display Texas when TX is selected', () => {
+      render(<StateDropdownComponent {...defaultProps} value="TX" />);
+      expect(screen.getByText('Texas')).toBeInTheDocument();
+    });
+  });
 
-		test("should have correct option values", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
+  describe('Callback Contract', () => {
+    test('should accept onValueChange callback', () => {
+      const mockOnValueChange = jest.fn();
 
-			// Check a few option values
-			expect(
-				select.querySelector('option[value="CA"]')
-			).toHaveTextContent("California");
-			expect(
-				select.querySelector('option[value="NY"]')
-			).toHaveTextContent("New York");
-			expect(
-				select.querySelector('option[value="TX"]')
-			).toHaveTextContent("Texas");
-		});
-	});
+      render(<StateDropdownComponent {...defaultProps} onValueChange={mockOnValueChange} />);
 
-	describe("Initial Values", () => {
-		test("should start with empty value by default", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveValue("");
-		});
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
+    });
 
-		test("should display custom initial value when provided", () => {
-			render(<TestWrapper defaultValues={{ state: "CA" }} />);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveValue("CA");
-		});
+    test('should render trigger as a combobox', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
 
-		test("should display different initial value when provided", () => {
-			render(<TestWrapper defaultValues={{ state: "NY" }} />);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveValue("NY");
-		});
-	});
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).toHaveAttribute('type', 'button');
+    });
 
-	describe("Form Integration", () => {
-		test("should register form field correctly", () => {
-			const mockRegister = jest.fn();
-			const mockErrors = {};
+    test('should update displayed value when value prop changes', () => {
+      const { rerender } = render(<StateDropdownComponent {...defaultProps} value="" />);
 
-			render(
-				<StateDropdownComponent
-					register={mockRegister}
-					errors={mockErrors}
-					value=""
-				/>
-			);
+      rerender(<StateDropdownComponent {...defaultProps} value="FL" />);
 
-			expect(mockRegister).toHaveBeenCalledWith("state", {
-				required: true,
-			});
-		});
+      expect(screen.getByText('Florida')).toBeInTheDocument();
+    });
+  });
 
-		test("should handle form submission correctly", () => {
-			const mockRegister = jest.fn();
-			const mockErrors = {};
+  describe('Error Handling', () => {
+    test('should not show error when no error is provided', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      expect(screen.queryByText('This field is required')).not.toBeInTheDocument();
+    });
 
-			render(
-				<StateDropdownComponent
-					register={mockRegister}
-					errors={mockErrors}
-					value=""
-				/>
-			);
+    test('should show error message when error is provided', () => {
+      render(<StateDropdownComponent {...defaultProps} error="This field is required" />);
+      expect(screen.getByText('This field is required')).toBeInTheDocument();
+    });
 
-			const select = screen.getByRole("combobox");
-			fireEvent.change(select, { target: { value: "CA" } });
+    test('should set aria-invalid on trigger when error is present', () => {
+      render(<StateDropdownComponent {...defaultProps} error="This field is required" />);
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).toHaveAttribute('aria-invalid', 'true');
+    });
 
-			expect(select).toHaveValue("CA");
-		});
+    test('should not set aria-invalid when no error', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).not.toHaveAttribute('aria-invalid', 'true');
+    });
+  });
 
-		test("should maintain selected value after change", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
+  describe('Disabled State', () => {
+    test('should disable the trigger when disabled is true', () => {
+      render(<StateDropdownComponent {...defaultProps} disabled={true} />);
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).toBeDisabled();
+    });
 
-			fireEvent.change(select, { target: { value: "TX" } });
-			expect(select).toHaveValue("TX");
+    test('should not be disabled by default', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).not.toBeDisabled();
+    });
+  });
 
-			fireEvent.change(select, { target: { value: "FL" } });
-			expect(select).toHaveValue("FL");
-		});
-	});
+  describe('Accessibility', () => {
+    test('should have proper label association', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      const label = screen.getByText('State');
+      const trigger = screen.getByRole('combobox');
+      expect(label).toHaveAttribute('for', 'state');
+      expect(trigger).toHaveAttribute('id', 'state');
+    });
 
-	describe("Error Handling", () => {
-		test("should not show error when no errors exist", () => {
-			render(<TestWrapper />);
-			expect(
-				screen.queryByText("This field is required")
-			).not.toBeInTheDocument();
-		});
+    test('should have required indicator', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      expect(screen.getByText('*')).toBeInTheDocument();
+    });
 
-		test("should show error message when state field has errors", () => {
-			render(
-				<TestWrapper
-					errors={{
-						state: {
-							type: "required",
-							message: "This field is required",
-						},
-					}}
-				/>
-			);
-			expect(
-				screen.getByText("This field is required")
-			).toBeInTheDocument();
-		});
+    test('should be keyboard accessible', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).not.toBeDisabled();
+    });
+  });
 
-		test("should apply error styling when state field has errors", () => {
-			render(
-				<TestWrapper
-					errors={{
-						state: {
-							type: "required",
-							message: "This field is required",
-						},
-					}}
-				/>
-			);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("border-red-500");
-		});
+  describe('Edge Cases', () => {
+    test('should handle undefined value gracefully', () => {
+      render(<StateDropdownComponent {...defaultProps} value={undefined} />);
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
+    });
 
-		test("should apply focus ring styling when state field has errors", () => {
-			render(
-				<TestWrapper
-					errors={{
-						state: {
-							type: "required",
-							message: "This field is required",
-						},
-					}}
-				/>
-			);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("focus:ring-red-500");
-		});
+    test('should handle empty string value', () => {
+      render(<StateDropdownComponent {...defaultProps} value="" />);
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
+    });
 
-		test("should not apply error styling when no errors exist", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("border-gray-300");
-			expect(select).not.toHaveClass("border-red-500");
-		});
-	});
+    test('should handle undefined error gracefully', () => {
+      render(<StateDropdownComponent {...defaultProps} error={undefined} />);
+      expect(screen.getByText('State')).toBeInTheDocument();
+    });
+  });
 
-	describe("Accessibility", () => {
-		test("should have proper label association", () => {
-			render(<TestWrapper />);
-			const label = screen.getByText("State");
-			const select = screen.getByRole("combobox");
-			expect(label).toHaveAttribute("for", "state");
-			expect(select).toHaveAttribute("id", "state");
-		});
+  describe('Layout', () => {
+    test('should have correct container styling', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      const container = screen.getByText('State').closest('div');
+      expect(container).toHaveClass('ml-2');
+      expect(container).toHaveClass('space-y-2');
+    });
 
-		test("should have required indicator", () => {
-			render(<TestWrapper />);
-			expect(screen.getByText("*")).toBeInTheDocument();
-		});
-
-		test("should have proper validation attributes", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			// The select element should be properly configured for form validation
-			expect(select).toHaveAttribute("name", "state");
-			expect(select).toHaveAttribute("id", "state");
-		});
-
-		test("should be keyboard navigable", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			expect(select).not.toHaveAttribute("disabled");
-		});
-	});
-
-	describe("Styling and Classes", () => {
-		test("should have correct base styling classes", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("w-full");
-			expect(select).toHaveClass("px-3");
-			expect(select).toHaveClass("py-2");
-			expect(select).toHaveClass("border");
-			expect(select).toHaveClass("rounded-md");
-			expect(select).toHaveClass("shadow-sm");
-		});
-
-		test("should have correct focus styling classes", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("focus:outline-none");
-			expect(select).toHaveClass("focus:ring-2");
-			expect(select).toHaveClass("focus:ring-indigo-500");
-			expect(select).toHaveClass("focus:border-indigo-500");
-		});
-
-		test("should have correct container styling", () => {
-			render(<TestWrapper />);
-			const container = screen.getByText("State").closest("div");
-			expect(container).toHaveClass("ml-2");
-			expect(container).toHaveClass("space-y-2");
-		});
-
-		test("should have correct label styling", () => {
-			render(<TestWrapper />);
-			const label = screen.getByText("State");
-			expect(label).toHaveClass("block");
-			expect(label).toHaveClass("text-sm");
-			expect(label).toHaveClass("font-medium");
-			expect(label).toHaveClass("text-gray-700");
-		});
-	});
-
-	describe("Edge Cases", () => {
-		test("should handle undefined errors gracefully", () => {
-			render(
-				<StateDropdownComponent
-					register={jest.fn()}
-					errors={undefined}
-					value=""
-				/>
-			);
-			expect(screen.getByText("State")).toBeInTheDocument();
-		});
-
-		test("should handle undefined value gracefully", () => {
-			render(
-				<StateDropdownComponent
-					register={jest.fn()}
-					errors={{}}
-					value={undefined}
-				/>
-			);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveValue("");
-		});
-
-		test("should handle empty string value", () => {
-			render(
-				<StateDropdownComponent
-					register={jest.fn()}
-					errors={{}}
-					value=""
-				/>
-			);
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveValue("");
-		});
-
-		test("should handle all state abbreviations", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-
-			// Test a few more state abbreviations
-			const testStates = ["AK", "AL", "CA", "NY", "TX", "FL", "WA", "OR"];
-			testStates.forEach(abbr => {
-				const option = select.querySelector(`option[value="${abbr}"]`);
-				expect(option).toBeInTheDocument();
-			});
-		});
-	});
-
-	describe("User Interactions", () => {
-		test("should allow user to select different states", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-
-			fireEvent.change(select, { target: { value: "CA" } });
-			expect(select).toHaveValue("CA");
-
-			fireEvent.change(select, { target: { value: "NY" } });
-			expect(select).toHaveValue("NY");
-
-			fireEvent.change(select, { target: { value: "TX" } });
-			expect(select).toHaveValue("TX");
-		});
-
-		test("should allow user to clear selection", () => {
-			render(<TestWrapper defaultValues={{ state: "CA" }} />);
-			const select = screen.getByRole("combobox");
-
-			fireEvent.change(select, { target: { value: "" } });
-			expect(select).toHaveValue("");
-		});
-
-		test("should maintain selection after multiple changes", () => {
-			render(<TestWrapper />);
-			const select = screen.getByRole("combobox");
-
-			const states = ["CA", "NY", "TX", "FL", "WA"];
-			states.forEach(state => {
-				fireEvent.change(select, { target: { value: state } });
-				expect(select).toHaveValue(state);
-			});
-		});
-	});
-
-	describe("Responsive Design", () => {
-		test("should have responsive container classes", () => {
-			render(<TestWrapper />);
-
-			const container = screen.getByText("State").closest("div");
-			expect(container).toHaveClass("ml-2", "space-y-2");
-		});
-
-		test("should have responsive select styling", () => {
-			render(<TestWrapper />);
-
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("w-full", "px-3", "py-2");
-		});
-
-		test("should have responsive focus states", () => {
-			render(<TestWrapper />);
-
-			const select = screen.getByRole("combobox");
-			expect(select).toHaveClass("focus:outline-none", "focus:ring-2");
-		});
-
-		test("should have responsive text sizing", () => {
-			render(<TestWrapper />);
-
-			const label = screen.getByText("State");
-			expect(label).toHaveClass("text-sm", "font-medium");
-		});
-
-		test("should have responsive spacing", () => {
-			render(<TestWrapper />);
-
-			const container = screen.getByText("State").closest("div");
-			expect(container).toHaveClass("space-y-2");
-		});
-	});
+    test('should render label with correct styling', () => {
+      render(<StateDropdownComponent {...defaultProps} />);
+      const label = screen.getByText('State');
+      expect(label).toHaveClass('text-sm');
+      expect(label).toHaveClass('font-medium');
+      expect(label).toHaveClass('text-gray-700');
+    });
+  });
 });

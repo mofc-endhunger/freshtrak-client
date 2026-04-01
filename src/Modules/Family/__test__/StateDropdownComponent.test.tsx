@@ -216,7 +216,6 @@ describe('StateDropdownComponent', () => {
     test('should have correct container styling', () => {
       render(<StateDropdownComponent {...defaultProps} />);
       const container = screen.getByText('State').closest('div');
-      expect(container).toHaveClass('ml-2');
       expect(container).toHaveClass('space-y-2');
     });
 

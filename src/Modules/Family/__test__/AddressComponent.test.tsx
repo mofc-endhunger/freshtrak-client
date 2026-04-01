@@ -215,6 +215,7 @@ describe('AddressComponent', () => {
           type: 'required',
           message: 'This field is required',
         },
+        city: { type: 'required', message: 'This field is required' },
       };
 
       renderComponent({ errors });
@@ -225,6 +226,9 @@ describe('AddressComponent', () => {
         'focus:ring-red-500',
         'focus:border-red-500',
       );
+
+      const cityInput = screen.getByTestId('city-input');
+      expect(cityInput).toHaveAttribute('aria-invalid', 'true');
     });
 
     test('should not show error messages when no errors', () => {
@@ -361,7 +365,7 @@ describe('AddressComponent', () => {
       renderComponent();
       const cityInput = screen.getByTestId('city-input');
 
-      expect(cityInput).toHaveClass('w-full', 'px-3', 'py-2');
+      expect(cityInput).toHaveClass('w-full', 'px-3');
     });
   });
 

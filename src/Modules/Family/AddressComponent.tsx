@@ -1,36 +1,21 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { UseFormRegister, UseFormWatch, UseFormSetValue, FieldErrors } from 'react-hook-form';
 import StateDropdownComponent from './StateDropdownComponent';
 import localization from '../Localization/LocalizationComponent';
 import GooglePlacesAutocomplete from '../General/GooglePlacesAutocomplete';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
 
-// Component props interface
+import type { RegistrationFormData } from '../Registration/types/registration.types';
+import type { GooglePlace, GooglePlaceComponent, GooglePlaceAddress } from './types/family.types';
+
 interface AddressComponentProps {
-  register: UseFormRegister<any>;
-  watch: UseFormWatch<any>;
-  setValue: UseFormSetValue<any>;
-  errors: FieldErrors<any>;
+  register: UseFormRegister<RegistrationFormData>;
+  watch: UseFormWatch<RegistrationFormData>;
+  setValue: UseFormSetValue<RegistrationFormData>;
+  errors: FieldErrors<RegistrationFormData>;
   className?: string;
   'data-testid'?: string;
-}
-
-// Google Places address component interface
-interface GoogleAddressComponent {
-  long_name: string;
-  short_name: string;
-  types: string[];
-}
-
-// Destructured address interface
-interface DestructuredAddress {
-  neighborhood?: string;
-  street_number?: string;
-  route?: string;
-  locality?: string;
-  administrative_area_level_1?: string;
-  administrative_area_level_1_short?: string;
-  country?: string;
-  postal_code?: string;
 }
 
 const AddressComponent: React.FC<AddressComponentProps> = ({
@@ -46,31 +31,26 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
   const shortStateName = watch('state') || '';
   const zip = watch('zip_code') || '';
 
-  useEffect(() => {
-    register('state', { required: true });
-  }, [register]);
-
-  const handleSelect = async (value: string, place: any) => {
-    // Remove errors when selecting a new address
-    if (errors.city) delete errors.city;
-    if (errors.zip_code) delete errors.zip_code;
-
+  const handleSelect = async (value: string, place: GooglePlace) => {
     if (place && place.address_components) {
       const destructuredAddress = getDestructured(place.address_components);
       setValue(
         'address_line_1',
-        destructuredAddress['street_number'] !== undefined
-          ? `${destructuredAddress['street_number']} ${destructuredAddress['route']}`
+        destructuredAddress.street_number !== undefined
+          ? `${destructuredAddress.street_number} ${destructuredAddress.route ?? ''}`
           : '',
+        { shouldValidate: true },
       );
-      setValue('city', destructuredAddress['locality']);
-      setValue('state', destructuredAddress['administrative_area_level_1_short']);
-      setValue('zip_code', destructuredAddress['postal_code']);
+      setValue('city', destructuredAddress.locality ?? '', { shouldValidate: true });
+      setValue('state', destructuredAddress.administrative_area_level_1_short ?? '', {
+        shouldValidate: true,
+      });
+      setValue('zip_code', destructuredAddress.postal_code ?? '', { shouldValidate: true });
     }
   };
 
-  const getDestructured = (address_components: GoogleAddressComponent[]): DestructuredAddress => {
-    const destructured: DestructuredAddress = {};
+  const getDestructured = (address_components: GooglePlaceComponent[]): GooglePlaceAddress => {
+    const destructured: GooglePlaceAddress = {};
 
     address_components.forEach((component) => {
       switch (component['types'][0]) {
@@ -113,17 +93,15 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 
       {/* Street Address Field */}
       <div className="space-y-2">
-        <label htmlFor="address_line_1" className="block text-sm font-medium text-gray-700">
+        <Label htmlFor="address_line_1" className="text-sm font-medium text-gray-700">
           {localization.street_address}
-          <span className="text-red-500 ml-1">*</span>
-        </label>
+          <span className="text-red-500 ">*</span>
+        </Label>
         <GooglePlacesAutocomplete
           value={addressLine1}
           onSelect={handleSelect}
           className={`
-						w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-						placeholder-gray-400 focus:outline-none focus:ring-2
-						focus:ring-indigo-500 focus:border-indigo-500
+						"h-[42px] w-full bg-white border-gray-300 rounded-md shadow-sm focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary
 						${errors.address_line_1 ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}
 					`}
           id="address_line_1"
@@ -141,14 +119,12 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 
       {/* Address Line 2 Field */}
       <div className="space-y-2">
-        <label htmlFor="address_line_2" className="block text-sm font-medium text-gray-700">
+        <Label htmlFor="address_line_2" className="text-sm font-medium text-gray-700">
           {localization.lot_suite}
-        </label>
-        <input
+        </Label>
+        <Input
           type="text"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-								placeholder-gray-400 focus:outline-none focus:ring-2
-								focus:ring-indigo-500 focus:border-indigo-500"
+          className="h-[42px] w-full bg-white border-gray-300 rounded-md shadow-sm focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
           id="address_line_2"
           data-testid="address-line-2-input"
           {...register('address_line_2')}
@@ -159,20 +135,16 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* City Field */}
         <div className="space-y-2">
-          <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+          <Label htmlFor="city" className="text-sm font-medium text-gray-700">
             {localization.city}
-            <span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
+            <span className="text-red-500 ">*</span>
+          </Label>
+          <Input
             type="text"
-            className={`
-							w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-							placeholder-gray-400 focus:outline-none focus:ring-2
-							focus:ring-indigo-500 focus:border-indigo-500
-							${errors.city ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}
-						`}
+            className={`h-[42px] w-full bg-white border-gray-300 rounded-md shadow-sm focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary ${errors.city ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
             id="city"
             defaultValue={cityName}
+            aria-invalid={!!errors.city}
             data-testid="city-input"
             {...register('city', { required: true })}
           />
@@ -184,7 +156,8 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
         </div>
 
         {/* State Dropdown */}
-        <div className="space-y-2">
+        <div>
+          <input type="hidden" {...register('state', { required: true })} />
           <StateDropdownComponent
             value={shortStateName}
             onValueChange={(val) =>
@@ -199,20 +172,16 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 
         {/* Zip Code Field */}
         <div className="space-y-2">
-          <label htmlFor="zip_code" className="block text-sm font-medium text-gray-700">
+          <Label htmlFor="zip_code" className="text-sm font-medium text-gray-700">
             {localization.zip_code}
-            <span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
+            <span className="text-red-500 ">*</span>
+          </Label>
+          <Input
             type="text"
-            className={`
-							w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm
-							placeholder-gray-400 focus:outline-none focus:ring-2
-							focus:ring-indigo-500 focus:border-indigo-500
-							${errors.zip_code ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}
-						`}
+            className={`h-[42px] bg-white border-gray-300 rounded-md shadow-sm focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary ${errors.zip_code ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
             defaultValue={zip}
             id="zip_code"
+            aria-invalid={!!errors.zip_code}
             data-testid="zip-code-input"
             {...register('zip_code', { required: true })}
           />

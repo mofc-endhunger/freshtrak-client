@@ -1,8 +1,4 @@
-import {
-  EventHandler,
-  EventObjectBuilder,
-  AgencyHandler,
-} from '../EventHandler';
+import { EventHandler, EventObjectBuilder, AgencyHandler } from '../EventHandler';
 import {
   mockAgencyBuilder,
   mockEventsBuilder,
@@ -49,6 +45,8 @@ test('should return an array of events', () => {
       eventDetails: event1.event_details,
       seniorAge: form1.display_age_senior,
       adultAge: form1.display_age_adult,
+      agencyImages: [],
+      eventImages: [],
     },
   ];
   const testData = [
@@ -97,6 +95,8 @@ test('should return an array of events with multiple agencies and one with no ev
       eventDetails: event1.event_details,
       seniorAge: form1.display_age_senior,
       adultAge: form1.display_age_adult,
+      agencyImages: [],
+      eventImages: [],
     },
   ];
   const testData = [
@@ -149,6 +149,8 @@ test('should return an array of events with multiple agencies and multiple event
       eventDetails: event1.event_details,
       seniorAge: form1.display_age_senior,
       adultAge: form1.display_age_adult,
+      agencyImages: [],
+      eventImages: [],
     },
     {
       id: eventDate2.id,
@@ -171,6 +173,8 @@ test('should return an array of events with multiple agencies and multiple event
       eventDetails: event2.event_details,
       seniorAge: form2.display_age_senior,
       adultAge: form2.display_age_adult,
+      agencyImages: [],
+      eventImages: [],
     },
   ];
   const testData = [
@@ -234,6 +238,8 @@ test('should sort events into dates', () => {
         eventDetails: event1.event_details,
         seniorAge: form1.display_age_senior,
         adultAge: form1.display_age_adult,
+        agencyImages: [],
+        eventImages: [],
       },
       {
         id: eventDate2.id,
@@ -256,6 +262,8 @@ test('should sort events into dates', () => {
         eventDetails: event2.event_details,
         seniorAge: form2.display_age_senior,
         adultAge: form2.display_age_adult,
+        agencyImages: [],
+        eventImages: [],
       },
     ],
   };
@@ -284,8 +292,8 @@ test('should sort events into dates', () => {
             },
           ],
         },
-      ])
-    )
+      ]),
+    ),
   ).toEqual(expected);
 });
 
@@ -344,12 +352,7 @@ test(`should return a final object sorted by events_date's date and distance`, (
     ],
   };
 
-  const testData = [
-    shouldBeForth,
-    shouldBeThird,
-    shouldBeSecond,
-    shouldBeFirst,
-  ];
+  const testData = [shouldBeForth, shouldBeThird, shouldBeSecond, shouldBeFirst];
   const expected = {
     [shouldBeFirst.events[0].event_dates[0].date]: [
       {
@@ -373,6 +376,8 @@ test(`should return a final object sorted by events_date's date and distance`, (
         estimated_distance: shouldBeFirst.estimated_distance,
         seniorAge: mockForms.display_age_senior,
         adultAge: mockForms.display_age_adult,
+        agencyImages: [],
+        eventImages: [],
       },
     ],
     [shouldBeSecond.events[0].event_dates[0].date]: [
@@ -397,6 +402,8 @@ test(`should return a final object sorted by events_date's date and distance`, (
         estimated_distance: shouldBeSecond.estimated_distance,
         seniorAge: mockForms.display_age_senior,
         adultAge: mockForms.display_age_adult,
+        agencyImages: [],
+        eventImages: [],
       },
       {
         agencyName: 'should be third',
@@ -419,6 +426,8 @@ test(`should return a final object sorted by events_date's date and distance`, (
         estimated_distance: shouldBeThird.estimated_distance,
         seniorAge: mockForms.display_age_senior,
         adultAge: mockForms.display_age_adult,
+        agencyImages: [],
+        eventImages: [],
       },
       {
         agencyName: 'should be forth',
@@ -441,8 +450,41 @@ test(`should return a final object sorted by events_date's date and distance`, (
         estimated_distance: shouldBeForth.estimated_distance,
         seniorAge: mockForms.display_age_senior,
         adultAge: mockForms.display_age_adult,
+        agencyImages: [],
+        eventImages: [],
       },
     ],
   };
   expect(EventHandler(testData)).toEqual(expected);
+});
+
+test('should thread agency and event images through AgencyHandler', () => {
+  const agencyImages = [{ id: 1, type: 'Logo', caption: 'Agency Logo', src: '/logo.png' }];
+  const eventImages = [{ id: 2, type: 'Instructions', caption: 'Check-in', src: '/checkin.png' }];
+  const agency = mockAgencyBuilder();
+  const event = mockEventsBuilder();
+  const eventDate = mockEventDatesBuilder();
+  const form = mockFormsBuilder();
+  const serviceCategory = mockServiceCategoryBuilder();
+
+  const testData = [
+    {
+      ...agency,
+      images: agencyImages,
+      events: [
+        {
+          ...event,
+          event_dates: [{ ...eventDate }],
+          forms: [{ ...form }],
+          service_category: { ...serviceCategory },
+          images: eventImages,
+        },
+      ],
+    },
+  ];
+
+  const result = AgencyHandler(testData);
+  expect(result).toHaveLength(1);
+  expect(result[0].agencyImages).toEqual(agencyImages);
+  expect(result[0].eventImages).toEqual(eventImages);
 });

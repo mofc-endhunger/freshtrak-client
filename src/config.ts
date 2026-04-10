@@ -15,6 +15,7 @@ interface EnvConfig {
   GA_ID?: string;
   PANTRY_FINDER_API: string;
   REGISTRATION_API: string;
+  IMAGES_BASE_URL: string;
   GOOGLE_API_KEY: string;
   GOOGLE_GEOLOCATION_KEY: string;
   USER_POOL_ID: string;
@@ -51,6 +52,7 @@ export const config: EnvConfig = {
   GA_ID: getConfig('GA_ID') || undefined,
   PANTRY_FINDER_API: getConfig('PANTRY_FINDER_API'),
   REGISTRATION_API: getConfig('REGISTRATION_API'),
+  IMAGES_BASE_URL: getConfig('IMAGES_BASE_URL') || 'https://images.pantrytrak.com',
   GOOGLE_API_KEY: getConfig('GOOGLE_API_KEY'),
   GOOGLE_GEOLOCATION_KEY: getConfig('GOOGLE_GEOLOCATION_KEY'),
   USER_POOL_ID: getConfig('USER_POOL_ID'),

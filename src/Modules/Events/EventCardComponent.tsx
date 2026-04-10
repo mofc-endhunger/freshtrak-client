@@ -323,6 +323,13 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
                       {!!acceptReservations && !registrationView && !alreadyRegistered && (
                         <DropdownMenuItem
                           onClick={() => {
+                            const currentPath = window.location.pathname;
+                            if (currentPath.startsWith('/events/list')) {
+                              sessionStorage.setItem(
+                                'searchResultsUrl',
+                                currentPath + window.location.search,
+                              );
+                            }
                             dispatch(setCurrentEvent(props.event));
                             window.location.href =
                               props.targetUrl !== undefined
@@ -336,6 +343,13 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
                       {!!showRsvp && !registrationView && !alreadyRegistered && (
                         <DropdownMenuItem
                           onClick={() => {
+                            const currentPath = window.location.pathname;
+                            if (currentPath.startsWith('/events/list')) {
+                              sessionStorage.setItem(
+                                'searchResultsUrl',
+                                currentPath + window.location.search,
+                              );
+                            }
                             dispatch(setCurrentEvent(props.event));
                             window.location.href =
                               props.targetUrl !== undefined

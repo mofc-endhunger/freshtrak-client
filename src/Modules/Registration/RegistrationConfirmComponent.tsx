@@ -391,15 +391,6 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (props)
                 </div>
               )}
             </div>
-            {((event as any).agencyImages?.length > 0 ||
-              (event as any).eventImages?.length > 0) && (
-              <div className="mt-3 mb-3">
-                <ImageThumbnailStrip
-                  agencyImages={(event as any).agencyImages}
-                  eventImages={(event as any).eventImages}
-                />
-              </div>
-            )}
             <div className="mt-5">
               <h2>
                 {localization.header_your_confirmation_number}{' '}

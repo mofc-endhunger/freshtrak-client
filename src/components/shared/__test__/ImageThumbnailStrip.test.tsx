@@ -53,7 +53,7 @@ describe('ImageThumbnailStrip', () => {
     expect(images[0]).toHaveAttribute('alt', 'Check-in guide');
   });
 
-  it('shows +N more text when total exceeds maxVisible', () => {
+  it("always shows 'View Photos' text regardless of image count", () => {
     render(
       <ImageThumbnailStrip
         agencyImages={mockAgencyImages}
@@ -61,10 +61,10 @@ describe('ImageThumbnailStrip', () => {
         maxVisible={2}
       />,
     );
-    expect(screen.getByText('+1 more')).toBeInTheDocument();
+    expect(screen.getByText('View Photos')).toBeInTheDocument();
   });
 
-  it("shows 'View Photos' text when within maxVisible", () => {
+  it("shows 'View Photos' text with a single image", () => {
     render(<ImageThumbnailStrip agencyImages={[mockAgencyImages[0]]} maxVisible={3} />);
     expect(screen.getByText('View Photos')).toBeInTheDocument();
   });

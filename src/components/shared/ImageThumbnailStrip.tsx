@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Camera } from 'lucide-react';
-import { Button } from '../ui/button';
 import ImageGalleryDialog from './ImageGalleryDialog';
 import { resolveImageUrl } from '../../Utils/imageUrl';
 import localization from '../../Modules/Localization/LocalizationComponent';
@@ -44,8 +43,8 @@ const ImageThumbnailStrip: React.FC<ImageThumbnailStripProps> = ({
       agencyImages={agencyImages}
       eventImages={eventImages}
       trigger={
-        <Button
-          variant="ghost"
+        <button
+          type="button"
           className="flex h-auto items-center gap-2 p-2 hover:bg-gray-50 border border-gray-200 rounded-md"
           data-testid="image-thumbnail-strip"
         >
@@ -65,11 +64,9 @@ const ImageThumbnailStrip: React.FC<ImageThumbnailStripProps> = ({
           </div>
           <span className="flex items-center gap-1 text-xs text-muted-foreground">
             <Camera className="h-3 w-3" />
-            {remaining > 0
-              ? localization.formatString(localization.label_more_photos, remaining)
-              : localization.button_view_photos}
+            {localization.button_view_photos}
           </span>
-        </Button>
+        </button>
       }
     />
   );

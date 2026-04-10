@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { enrichEventWithMockImages } from './devImageEnrichment';
 
 export const EventHandler = (agencies) =>
   EventDateSorterByDate(EventObjectBuilder(AgencyHandler(agencies)));
@@ -56,7 +57,7 @@ export const eventDateMapper = (
         end_time,
         date,
       } = dateOfEvent;
-      return {
+      return enrichEventWithMockImages({
         id,
         eventId: event_id,
         acceptReservations: accept_reservations,
@@ -82,7 +83,7 @@ export const eventDateMapper = (
         agencyLongitude,
         agencyImages: agencyImages || [],
         eventImages: eventImages || [],
-      };
+      });
     });
   } else {
     return [];
@@ -119,7 +120,7 @@ export const EventFormat = (event, eventDateId) => {
     date,
   } = eventDate;
 
-  return {
+  return enrichEventWithMockImages({
     id: eventDateId,
     eventId,
     acceptReservations,
@@ -143,7 +144,7 @@ export const EventFormat = (event, eventDateId) => {
     adultAge: forms.length > 0 ? forms[0].display_age_adult : 18,
     agencyImages: agencyImages || [],
     eventImages: eventImages || [],
-  };
+  });
 };
 
 export const HomeEventFormat = (event, eventDateId) => {
@@ -175,7 +176,7 @@ export const HomeEventFormat = (event, eventDateId) => {
       date,
     } = eventDate;
 
-    return {
+    return enrichEventWithMockImages({
       id: eventDateId,
       eventId,
       acceptReservations,
@@ -199,7 +200,7 @@ export const HomeEventFormat = (event, eventDateId) => {
       adultAge: forms.length > 0 ? forms[0].display_age_adult : 18,
       agencyImages: agencyImages || [],
       eventImages: eventImages || [],
-    };
+    });
   } else {
     return null;
   }

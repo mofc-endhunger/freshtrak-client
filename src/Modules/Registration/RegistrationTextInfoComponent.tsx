@@ -9,7 +9,6 @@ import localization from '../Localization/LocalizationComponent';
 import { Event } from './types/registration.types';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
-import ImageThumbnailStrip from '../../components/shared/ImageThumbnailStrip';
 
 interface RegistrationTextInfoComponentProps {
   event: Event;
@@ -40,15 +39,6 @@ const RegistrationTextInfoComponent: React.FC<RegistrationTextInfoComponentProps
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {((event as any).agencyImages?.length > 0 || (event as any).eventImages?.length > 0) && (
-        <div className="mt-3">
-          <ImageThumbnailStrip
-            agencyImages={(event as any).agencyImages}
-            eventImages={(event as any).eventImages}
-          />
-        </div>
       )}
 
       <div className="flex mt-4">

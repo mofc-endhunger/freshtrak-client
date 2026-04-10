@@ -94,7 +94,7 @@ const ImageGalleryDialog: React.FC<ImageGalleryDialogProps> = ({
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-lg bg-white">
+      <DialogContent className="sm:max-w-lg bg-white" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>{localization.button_view_photos}</DialogTitle>
         </DialogHeader>

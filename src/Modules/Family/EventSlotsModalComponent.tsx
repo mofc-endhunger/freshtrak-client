@@ -19,6 +19,7 @@ import { HouseholdRegistrationService } from "../../Services/HouseholdRegistrati
 import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { UsersMeResponse } from "../Households/types/api.types";
 import { useAuth } from "../Authentication/AuthContext";
+import { getAdditionalMemberCounts } from "../Households/utils/householdUtils";
 
 import { Event } from "./types/family.types";
 import localization from "../Localization/LocalizationComponent";
@@ -230,13 +231,13 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		setHouseholdError(null);
 
 		try {
-			// Register directly with household data (include counts - API requires it for registered users)
+			// Send additional-member counts (HOH excluded) to the reservation endpoint.
+			const hohDob = householdData?.members?.find(
+				(m) => m.is_head_of_household === 1,
+			)?.date_of_birth ?? householdData?.members?.[0]?.date_of_birth;
+
 			const counts = householdData?.counts
-				? {
-						seniors: householdData.counts.seniors ?? 0,
-						adults: householdData.counts.adults ?? 0,
-						children: householdData.counts.children ?? 0,
-				  }
+				? getAdditionalMemberCounts(householdData.counts, hohDob)
 				: { seniors: 0, adults: 0, children: 0 };
 
 			const result =

@@ -212,7 +212,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 					? convertDateFormat(date_of_birth)
 					: "",
 				gender,
-				preferred_language: preferred_language || "en",
+				...(mode === "householdSetup" && {
+					preferred_language: preferred_language || "en",
+				}),
 				address_line_1,
 				address_line_2,
 				city,
@@ -443,10 +445,15 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
 			if (mode === "registration") {
 				data["identification_code"] =
 					prefilledData?.["identification_code"] || "";
-				data["date_of_birth"] = formatDateForServer(
-					data["date_of_birth"],
-				);
-				data = sanitizeInput(data);
+				const formattedDob = formatDateForServer(data["date_of_birth"]);
+				if (formattedDob) {
+					data["date_of_birth"] = formattedDob;
+				} else {
+					const { date_of_birth: _omitDob, ...rest } = data;
+					data = rest as RegistrationFormData;
+				}
+				const { preferred_language: _omitLang, ...withoutLang } = data;
+				data = sanitizeInput(withoutLang as RegistrationFormData);
 			} else {
 				// Household setup mode
 				if (data.date_of_birth) {

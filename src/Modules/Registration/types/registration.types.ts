@@ -84,6 +84,16 @@ export interface RegistrationFormData {
 }
 
 /**
+ * Image attached to an agency or event
+ */
+export interface AgencyImage {
+  id: number;
+  type: string;
+  caption: string;
+  src: string;
+}
+
+/**
  * Event interface
  * Represents event data structure
  */
@@ -95,7 +105,8 @@ export interface Event {
   endTime: string;
   acceptWalkin: boolean;
   eventDetails?: string;
-  // Additional event properties as needed
+  agencyImages?: AgencyImage[];
+  eventImages?: AgencyImage[];
   [key: string]: any;
 }
 
@@ -143,6 +154,7 @@ export interface EventApiResponse {
     endTime: string;
     acceptWalkin: boolean;
     eventDetails?: string;
+    images?: AgencyImage[];
     [key: string]: any;
   };
 }
@@ -345,19 +357,64 @@ export enum FormStep {
  * Gender options
  */
 export const GENDER_OPTIONS = ['Male', 'Female', 'Other', 'Prefer not to say'] as const;
-export type Gender = typeof GENDER_OPTIONS[number];
+export type Gender = (typeof GENDER_OPTIONS)[number];
 
 /**
  * State options (US states)
  */
 export const STATE_OPTIONS = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+  'AL',
+  'AK',
+  'AZ',
+  'AR',
+  'CA',
+  'CO',
+  'CT',
+  'DE',
+  'FL',
+  'GA',
+  'HI',
+  'ID',
+  'IL',
+  'IN',
+  'IA',
+  'KS',
+  'KY',
+  'LA',
+  'ME',
+  'MD',
+  'MA',
+  'MI',
+  'MN',
+  'MS',
+  'MO',
+  'MT',
+  'NE',
+  'NV',
+  'NH',
+  'NJ',
+  'NM',
+  'NY',
+  'NC',
+  'ND',
+  'OH',
+  'OK',
+  'OR',
+  'PA',
+  'RI',
+  'SC',
+  'SD',
+  'TN',
+  'TX',
+  'UT',
+  'VT',
+  'VA',
+  'WA',
+  'WV',
+  'WI',
+  'WY',
 ] as const;
-export type State = typeof STATE_OPTIONS[number];
+export type State = (typeof STATE_OPTIONS)[number];
 
 // ============================================================================
 // DEFAULT VALUES
@@ -399,4 +456,4 @@ export const DEFAULT_EVENT: Event = {
   endTime: '',
   acceptWalkin: false,
   eventDetails: '',
-}; 
+};

@@ -8,9 +8,11 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 	register_how_to_contact: "How to Contact You",
 	phone_number: "Phone Number",
 	no_phone: "No Phone Available",
-	phone_contact_you: "Permission to text you",
+	phone_contact_you:
+		"I agree to receive SMS text message confirmations for my food pantry visit. Message & data rates may apply. Reply STOP to opt out.",
 	no_email: "No Email Available",
-	email_contact_you: "Permission to email you",
+	email_contact_you:
+		"I agree to receive email confirmations and updates about my food pantry visit.",
 	label_email: "Email",
 	error_phone_number_required: "Phone number is required",
 	error_email_required: "Email is required",
@@ -215,7 +217,9 @@ describe("ContactInformationComponent", () => {
 			renderComponent();
 
 			expect(
-				screen.getByText("Permission to text you")
+				screen.getByText(
+					"I agree to receive SMS text message confirmations for my food pantry visit. Message & data rates may apply. Reply STOP to opt out."
+				)
 			).toBeInTheDocument();
 			expect(screen.getByTestId("phone permission")).toBeInTheDocument();
 		});
@@ -311,7 +315,9 @@ describe("ContactInformationComponent", () => {
 			renderComponent();
 
 			expect(
-				screen.getByText("Permission to email you")
+				screen.getByText(
+					"I agree to receive email confirmations and updates about my food pantry visit."
+				)
 			).toBeInTheDocument();
 			expect(screen.getByTestId("email permission")).toBeInTheDocument();
 		});

@@ -20,13 +20,14 @@ import { HouseholdsApiService } from "../../Services/HouseholdsApiService";
 import { UsersMeResponse } from "../Households/types/api.types";
 import { useAuth } from "../Authentication/AuthContext";
 import { StorageService } from "../../Utils/StorageService";
+import { getAdditionalMemberCounts } from "../Households/utils/householdUtils";
 
 import { Event } from "./types/family.types";
 import localization from "../Localization/LocalizationComponent";
 
 // Transform household data to user data format expected by confirmation page
 const transformHouseholdDataToUserData = (
-	householdData: UsersMeResponse | null
+	householdData: UsersMeResponse | null,
 ) => {
 	if (!householdData) {
 		return {
@@ -45,7 +46,7 @@ const transformHouseholdDataToUserData = (
 	// Extract head of household from members array
 	const headOfHousehold =
 		householdData.members?.find(
-			(member) => member.is_head_of_household === 1
+			(member) => member.is_head_of_household === 1,
 		) || householdData.members?.[0];
 
 	// Parse household name to get first and last name
@@ -72,7 +73,7 @@ export interface EventSlotsModalProps {
 	targetUrl?: string;
 	selectedSlotId?: string;
 	onSlotChange: (
-		event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+		event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => void;
 }
 
@@ -104,7 +105,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	// Household confirmation modal state
 	const [showHouseholdModal, setShowHouseholdModal] = useState(false);
 	const [householdData, setHouseholdData] = useState<UsersMeResponse | null>(
-		null
+		null,
 	);
 	const [isLoadingHousehold, setIsLoadingHousehold] = useState(false);
 	const [householdError, setHouseholdError] = useState<string | null>(null);
@@ -165,11 +166,11 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 			// Check if user has completed household setup by verifying DOB is not placeholder
 			// When household is auto-created on signup, DOB defaults to "1900-01-01"
 			const headOfHousehold = household?.members?.find(
-				(member) => member.is_head_of_household === 1
+				(member) => member.is_head_of_household === 1,
 			);
 			const hasCompletedSetup = Boolean(
 				headOfHousehold?.date_of_birth &&
-					headOfHousehold.date_of_birth !== "1900-01-01"
+				headOfHousehold.date_of_birth !== "1900-01-01",
 			);
 
 			if (hasCompletedSetup) {
@@ -191,7 +192,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	// Navigate to registration form
 	const navigateToRegistration = (
 		slot: EventSlot,
-		householdData: UsersMeResponse | null
+		householdData: UsersMeResponse | null,
 	) => {
 		navigate(
 			`${targetUrl || RENDER_URL.REGISTRATION_FORM_URL}/${eventDateId}/${
@@ -203,14 +204,14 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 					event_date: eventDate,
 					householdData: householdData, // Pass household data for prefilling
 				},
-			}
+			},
 		);
 		setShow(false);
 	};
 
 	// Check if error message indicates "already registered"
 	const isAlreadyRegisteredError = (
-		errorMessage: string | null | undefined
+		errorMessage: string | null | undefined,
 	): boolean => {
 		if (!errorMessage) {
 			return false;
@@ -225,7 +226,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		];
 
 		return alreadyRegisteredKeywords.some((keyword) =>
-			errorText.includes(keyword)
+			errorText.includes(keyword),
 		);
 	};
 
@@ -237,13 +238,14 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		setHouseholdError(null);
 
 		try {
-			// Register directly with household data (include counts - API requires it for registered users)
+			// Send additional-member counts (HOH excluded) to the reservation endpoint.
+			const hohDob =
+				householdData?.members?.find(
+					(m) => m.is_head_of_household === 1,
+				)?.date_of_birth ?? householdData?.members?.[0]?.date_of_birth;
+
 			const counts = householdData?.counts
-				? {
-						seniors: householdData.counts.seniors ?? 0,
-						adults: householdData.counts.adults ?? 0,
-						children: householdData.counts.children ?? 0,
-				  }
+				? getAdditionalMemberCounts(householdData.counts, hohDob)
 				: { seniors: 0, adults: 0, children: 0 };
 
 			const result =
@@ -253,7 +255,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 						eventDateId: eventDateId || "",
 						eventSlotId: selectedSlot.event_slot_id,
 					},
-					counts
+					counts,
 				);
 
 			if (result.success) {
@@ -300,7 +302,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				isAlreadyRegisteredError(errorMessage) ||
 				(error?.response?.data &&
 					isAlreadyRegisteredError(
-						JSON.stringify(error.response.data)
+						JSON.stringify(error.response.data),
 					))
 			) {
 				// Redirect to already registered page
@@ -347,7 +349,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		try {
 			const { EVENT_DATES_URL } = API_URL;
 			const resp = await axios.get(
-				EVENT_DATES_URL + "/" + eventDateId + "/event_hours"
+				EVENT_DATES_URL + "/" + eventDateId + "/event_hours",
 			);
 			const { data } = resp;
 			if (
@@ -367,7 +369,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 
 	// Calculate available slots once for reuse
 	const availableSlots = eventHour.flatMap((item) =>
-		item.event_slots.filter((e) => e.open_slots > 0)
+		item.event_slots.filter((e) => e.open_slots > 0),
 	);
 	const hasAvailableSlots = availableSlots.length > 0;
 
@@ -468,10 +470,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 																}
 																checked={
 																	String(
-																		selectedSlotId
+																		selectedSlotId,
 																	) ===
 																	String(
-																		e.event_slot_id
+																		e.event_slot_id,
 																	)
 																}
 																onChange={
@@ -503,7 +505,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 															</span>
 														</div>
 													);
-												})
+												}),
 										)}
 									</fieldset>
 								);

@@ -696,7 +696,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			permission_to_text: registrationData.permission_to_text ?? null,
 			permission_to_email: registrationData.permission_to_email ?? null,
 
-			// Update counts from registration
 			counts: {
 				seniors: registrationData.seniors_in_household || 0,
 				adults: registrationData.adults_in_household || 0,
@@ -847,8 +846,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					}
 				}
 
+				const { preferred_language: _omitLang, ...cleanUser } =
+					updatedUser;
 				const guestPayload = {
-					...updatedUser,
+					...cleanUser,
 					phone: updatedUser.phone
 						? normalizePhoneInput(updatedUser.phone)
 						: "",

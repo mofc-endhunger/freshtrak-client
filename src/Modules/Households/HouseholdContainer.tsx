@@ -303,29 +303,22 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({
 					return [...updatedMembers, ...formattedNewMembers];
 				})(),
 				counts: (() => {
-					// Use provided counts if available, otherwise calculate from step 3 data
 					if (registrationData.household_counts) {
 						return registrationData.household_counts;
 					}
 
-					// Calculate counts from step 3 data as fallback
-					const familyMembers = registrationData.family_members || [];
-					// Count only truly new members (no ID or negative ID)
-					const newMembersCount = familyMembers.filter(
-						(member: any) => !member.id || member.id < 0,
-					).length;
-					const existingMembersCount = (
-						currentHouseholdData.members || []
-					).length;
+					const seniors =
+						Number(registrationData.seniors_in_household) || 0;
+					const adults =
+						Number(registrationData.adults_in_household) || 0;
+					const children =
+						Number(registrationData.children_in_household) || 0;
 
 					return {
-						seniors:
-							Number(registrationData.seniors_in_household) || 0,
-						adults:
-							Number(registrationData.adults_in_household) || 0,
-						children:
-							Number(registrationData.children_in_household) || 0,
-						total: existingMembersCount + newMembersCount,
+						seniors,
+						adults,
+						children,
+						total: seniors + adults + children,
 					};
 				})(),
 			};

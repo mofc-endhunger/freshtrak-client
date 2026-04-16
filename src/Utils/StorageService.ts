@@ -404,6 +404,41 @@ export class StorageService {
     }
 
     // ============================================================================
+    // User Role Methods
+    // ============================================================================
+
+    /**
+     * Set the current user's role (e.g. 'case_manager').
+     * Called after successful case manager login once group membership is verified.
+     */
+    static setUserRole(role: string): void {
+        this.setItem('freshtrak_user_role', role);
+    }
+
+    /**
+     * Get the current user's role.
+     * @returns Role string (e.g. 'case_manager') or null if not set.
+     */
+    static getUserRole(): string | null {
+        return this.getItem<string>('freshtrak_user_role');
+    }
+
+    /**
+     * Check if the current user is a case manager.
+     * @returns true if the stored role is 'case_manager'.
+     */
+    static isCaseManager(): boolean {
+        return this.getUserRole() === 'case_manager';
+    }
+
+    /**
+     * Clear the stored user role.
+     */
+    static clearUserRole(): void {
+        this.removeItem('freshtrak_user_role');
+    }
+
+    // ============================================================================
     // Token Management Methods
     // ============================================================================
 
@@ -582,6 +617,7 @@ export class StorageService {
 
         // Clear common auth data
         this.removeItem('freshtrak_user_current');
+        this.removeItem('freshtrak_user_role');
     }
 
     /**
@@ -593,6 +629,7 @@ export class StorageService {
         this.removeItem('freshtrak_user_token');
         this.removeItem('freshtrak_user_current');
         this.removeItem('freshtrak_user_logged_in');
+        this.removeItem('freshtrak_user_role');
     }
 
     /**

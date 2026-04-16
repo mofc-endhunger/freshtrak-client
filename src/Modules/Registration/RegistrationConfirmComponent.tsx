@@ -7,7 +7,6 @@ import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
 import { selectUser } from "../../Store/userSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { formatDateDayAndDate } from "../../Utils/DateFormat";
-import { Link } from "react-router-dom";
 import { EventFormat } from "../../Utils/EventHandler";
 import EventCardComponent from "../Events/EventCardComponent";
 import QRCode from "react-qr-code";
@@ -22,12 +21,11 @@ import {
 } from "../../components/ui/dialog";
 import localization from "../Localization/LocalizationComponent";
 import { sanitizeHtml } from "../../Utils/sanitizeHtml";
-import { Printer, Download } from "lucide-react";
+import { Printer, Download, Phone, Home, Mail, Users } from "lucide-react";
 import PrintableConfirmationCard, {
 	generateConfirmationCardPNG,
 } from "./components/PrintableConfirmationCard";
 import { StorageService } from "../../Utils/StorageService";
-
 // Type imports from registration.types.ts
 import {
 	RegistrationConfirmProps,
@@ -35,14 +33,16 @@ import {
 	Event,
 	EventApiResponse,
 } from "./types/registration.types";
+import { Separator } from "../../components/ui/separator";
 
 const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
-	props
+	props,
 ) => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const currentUser = useSelector(selectUser) as RegistrationFormData | null;
 	const user_data = location.state?.user || currentUser || {};
+	const isCaseManager: boolean = location.state?.isCaseManager === true;
 
 	const dispatch = useDispatch();
 	const event = useSelector(selectEvent) as Event;
@@ -54,6 +54,8 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
 	const [showGuestSigninModal, setShowGuestSigninModal] =
+		useState<boolean>(false);
+	const [showRegisterAnotherDialog, setShowRegisterAnotherDialog] =
 		useState<boolean>(false);
 	const eventDateId = StorageService.getRegisteredEventDateID();
 
@@ -77,7 +79,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
 			const resp = await axios.get<EventApiResponse>(
-				`${BASE_URL}api/event_dates/${eventDateId}/event_details`
+				`${BASE_URL}api/event_dates/${eventDateId}/event_details`,
 			);
 			const { data } = resp;
 			if (data && data.event !== undefined) {
@@ -114,15 +116,16 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 		if (selectedEvent && Object.keys(selectedEvent).length > 0) {
 			StorageService.removeItem(
 				"freshtrak_session_registered_event_date_id",
-				"session"
+				"session",
 			);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedEvent]);
 
-	// Show guest signin modal for guest users only
+	// Show guest signin modal for guest users only (not for case managers)
 	useEffect(() => {
-		// Only show modal if user is a guest user (not a Cognito user)
+		if (isCaseManager) return;
+
 		const isGuest = StorageService.isGuestUser();
 		const isCognito = StorageService.isLoggedInUser();
 
@@ -156,7 +159,14 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 		state = "",
 		phone = "",
 		identification_code = "",
+		adults_in_household = 0,
+		children_in_household = 0,
+		seniors_in_household = 0,
 	} = user_data || {};
+
+	// calculate total family member count
+	const family_member_count =
+		adults_in_household + children_in_household + seniors_in_household;
 
 	// Get event address details
 	const eventAddress = (event as any)?.eventAddress || "";
@@ -194,7 +204,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 				eventTime,
 				identification_code,
 				eventDateId,
-				event_slot_id
+				event_slot_id,
 			);
 		} catch (error) {
 			console.error("Error generating confirmation card:", error);
@@ -223,7 +233,191 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 					eventSlotId={event_slot_id}
 				/>
 			)}
-			{event && (
+			{event && isCaseManager && (
+				<div className="mt-20 max-w-6xl mx-auto px-4 pb-24">
+					<h1 className="text-3xl font-bold text-center mt-5 mb-8">
+						{localization.cm_registration_complete ||
+							"Registration Complete!"}
+					</h1>
+
+					{/* Top grid: Event Info | QR + Save/Print */}
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+						<Card>
+							<CardContent className="py-6">
+								<h2 className="text-xl font-bold text-gray-900 mb-1">
+									{event.agencyName}
+								</h2>
+								<p className="text-lg text-gray-700 mb-3">
+									{(event as any).eventName || ""}
+								</p>
+								<p className="text-sm text-gray-600">
+									{eventDateFormatted}
+								</p>
+								<p className="text-sm text-gray-600 mb-3">
+									{eventTime}
+								</p>
+								<p className="text-sm text-gray-500">
+									{agencyAddress}
+								</p>
+								<Separator className="my-4 bg-gray-200" />
+								<h3 className="text-lg font-bold text-gray-900 mb-1">
+									{first_name} {middle_name} {last_name}{" "}
+									{suffix}
+								</h3>
+								{address_line_1 && (
+									<div className="flex items-center space-x-2">
+										<Home className="h-4 w-4" />
+										<p className="text-sm text-gray-600">
+											{address_line_1},
+										</p>
+										<p className="text-sm text-gray-600">
+											{[city, state]
+												.filter(Boolean)
+												.join(", ")}{" "}
+											{zip_code}
+										</p>
+									</div>
+								)}
+								{phone && (
+									<div className="flex items-center space-x-2">
+										<Phone className="h-4 w-4" />
+										<p className="text-sm text-gray-600">
+											{formatPhoneNumber(phone)}
+										</p>
+									</div>
+								)}
+								<div className="flex items-center space-x-2">
+									<Mail className="h-4 w-4" />
+									<p className="text-sm text-gray-600">
+										{user_data?.email || ""}
+									</p>
+								</div>
+								{/* registrant family member counts */}
+								<div className="flex items-center space-x-2">
+									<Users className="h-4 w-4" />
+									<p className="text-sm text-gray-600 font-semibold">
+										{family_member_count || 0}{" "}
+										{localization.family_member_count_plural ||
+											"family members"}
+									</p>
+								</div>
+							</CardContent>
+						</Card>
+
+						<Card>
+							<CardContent className="py-6 relative">
+								<div className="absolute top-2 right-2 flex gap-2">
+									<Button
+										onClick={handlePrint}
+										variant="outline"
+										size="icon"
+										className="bg-white hover:bg-gray-50"
+										title={localization.button_print}
+										aria-label={
+											localization.aria_print_confirmation
+										}
+									>
+										<Printer className="h-4 w-4" />
+									</Button>
+									<Button
+										onClick={handleSave}
+										variant="outline"
+										size="icon"
+										className="bg-white hover:bg-gray-50"
+										title={localization.button_save}
+										aria-label={
+											localization.aria_save_confirmation
+										}
+									>
+										<Download className="h-4 w-4" />
+									</Button>
+								</div>
+								{identification_code && (
+									<p className="text-xl font-bold text-gray-900 mb-4">
+										{identification_code.toUpperCase()}
+									</p>
+								)}
+								<div className="flex justify-center p-4 bg-white">
+									<QRCode
+										value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
+											event_slot_id
+												? "&event_slot_id=" +
+													event_slot_id
+												: ""
+										}`}
+									/>
+								</div>
+							</CardContent>
+						</Card>
+					</div>
+
+					{/* Buttons */}
+					<div className="flex flex-col gap-4 w-full items-center justify-center">
+						{location.state?.eventDateId && (
+							<Button
+								type="button"
+								className="px-2 uppercase text-white py-6 w-1/2 min-w-1/2 text-wrap"
+								onClick={() =>
+									setShowRegisterAnotherDialog(true)
+								}
+							>
+								{localization.cm_register_another}
+							</Button>
+						)}
+						<Button
+							type="submit"
+							variant="highlight"
+							className="px-2 uppercase text-white py-6 w-1/2 min-w-1/2 text-wrap"
+							data-testid="continue button"
+							onClick={() => navigate(RENDER_URL.ROOT_URL)}
+						>
+							{localization.button_back_to_home}
+						</Button>
+					</div>
+
+					{/* Save confirmation prompt before registering another */}
+					<Dialog
+						open={showRegisterAnotherDialog}
+						onOpenChange={setShowRegisterAnotherDialog}
+					>
+						<DialogContent className="sm:max-w-md bg-white border border-gray-200 text-gray-900">
+							<DialogHeader>
+								<DialogTitle className="text-center text-gray-900">
+									{localization.cm_save_before_leaving_title ||
+										"Save Confirmation?"}
+								</DialogTitle>
+								<DialogDescription className="text-center text-gray-600">
+									{localization.cm_save_before_leaving_description ||
+										"Have you saved or printed the confirmation information? This data will not be available after you leave this page."}
+								</DialogDescription>
+							</DialogHeader>
+							<div className="flex gap-3 mt-4 justify-end">
+								<Button
+									variant="outline"
+									onClick={() =>
+										setShowRegisterAnotherDialog(false)
+									}
+								>
+									{localization.button_cancel}
+								</Button>
+								<Button
+									onClick={() => {
+										setShowRegisterAnotherDialog(false);
+										navigate(
+											`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${location.state.eventDateId}`,
+										);
+									}}
+								>
+									{localization.button_continue}
+								</Button>
+							</div>
+						</DialogContent>
+					</Dialog>
+				</div>
+			)}
+
+			{/* Regular user view (unchanged) */}
+			{event && !isCaseManager && (
 				<div className="mt-20 max-w-6xl mx-auto px-4">
 					<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 register-confirmation">
 						<h1 className="big-title med-title mt-5 mb-5 mobile-mb">
@@ -262,12 +456,11 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 										value={`https://secure.pantrytrak.com/mobile/qr_code_processing.php?code=${identification_code.toUpperCase()}&event_date_id=${eventDateId}${
 											event_slot_id
 												? "&event_slot_id=" +
-												  event_slot_id
+													event_slot_id
 												: ""
 										}`}
 									/>
 								</div>
-								{/* Action buttons in top right corner */}
 								<div className="absolute top-0 right-0 flex gap-2 p-2">
 									<Button
 										onClick={handlePrint}
@@ -340,24 +533,24 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 										className="mb-5"
 										dangerouslySetInnerHTML={{
 											__html: sanitizeHtml(
-												event.eventDetails
+												event.eventDetails,
 											),
 										}}
 									/>
 								</>
 							)}
 
-						<Link to={RENDER_URL.ROOT_URL}>
-							<div className="flex justify-center mt-4">
-								<Button
-									type="submit"
-									variant="highlight"
-									data-testid="continue button"
-								>
-									{localization.button_back_to_home}
-								</Button>
-							</div>
-						</Link>
+						<div className="flex flex-col gap-4 w-full items-center justify-center">
+							<Button
+								type="submit"
+								variant="highlight"
+								className="px-2 uppercase text-white py-6 w-1/2 min-w-1/2 text-wrap"
+								data-testid="continue button"
+								onClick={() => navigate(RENDER_URL.ROOT_URL)}
+							>
+								{localization.button_back_to_home}
+							</Button>
+						</div>
 					</section>
 				</div>
 			)}

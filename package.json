@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "homepage": "https://freshtrak.com",
   "dependencies": {
@@ -19,6 +19,7 @@
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@reduxjs/toolkit": "^1.9.7",
+    "@tanstack/react-table": "^8.21.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
@@ -39,6 +40,7 @@
     "popper.js": "^1.16.1",
     "qrcode": "^1.5.4",
     "qrcode.react": "^3.1.0",
+    "radix-ui": "^1.4.3",
     "rc-slider": "^11.1.8",
     "react": "^18.2.0",
     "react-bootstrap": "^2.8.0",

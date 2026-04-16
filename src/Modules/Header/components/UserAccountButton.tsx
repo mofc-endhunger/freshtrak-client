@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Authentication/AuthContext";
 import { RENDER_URL } from "../../../Utils/Urls";
+import { StorageService } from "../../../Utils/StorageService";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -9,7 +10,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
-import { Settings, LogOut, Home } from "lucide-react";
+import { Settings, LogOut, Home, ClipboardList, Users } from "lucide-react";
 import localization from "../../Localization/LocalizationComponent";
 
 /**
@@ -86,21 +87,28 @@ const UserAccountButton: React.FC = () => {
 		navigate(RENDER_URL.ROOT_URL);
 	};
 
+	const isCaseManager = StorageService.isCaseManager();
+
 	if (!user) {
 		return null;
 	}
 
 	return (
 		<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-			<DropdownMenuTrigger asChild>
-				<button
-					type="button"
-					className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 flex items-center justify-center"
-					aria-label={localization.aria_user_account_menu}
-				>
-					{getUserInitials()}
-				</button>
-			</DropdownMenuTrigger>
+			<div className="relative">
+				<DropdownMenuTrigger asChild>
+					<button
+						type="button"
+						className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 flex items-center justify-center"
+						aria-label={localization.aria_user_account_menu}
+					>
+						{getUserInitials()}
+					</button>
+				</DropdownMenuTrigger>
+				{isCaseManager && (
+					<ClipboardList className="absolute -top-2 -right-2 h-5 w-5 text-white bg-color-red rounded-full p-0.5 pointer-events-none" />
+				)}
+			</div>
 			<DropdownMenuContent
 				align="end"
 				side="bottom"
@@ -125,6 +133,11 @@ const UserAccountButton: React.FC = () => {
 							<p className="text-xs text-gray-500 truncate">
 								{user.email}
 							</p>
+							{isCaseManager && (
+								<span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 rounded">
+									{localization.cm_badge}
+								</span>
+							)}
 						</div>
 					</div>
 				</div>
@@ -138,13 +151,31 @@ const UserAccountButton: React.FC = () => {
 					<span>{localization.menu_home}</span>
 				</DropdownMenuItem>
 
-				<DropdownMenuItem
-					onClick={handleAccountClick}
-					className="cursor-pointer hover:bg-gray-50"
-				>
-					<Settings className="mr-2 h-4 w-4" />
-					<span>{localization.text_profile}</span>
-				</DropdownMenuItem>
+				{isCaseManager && (
+					<DropdownMenuItem
+						onClick={() => {
+							setIsOpen(false);
+							navigate(RENDER_URL.CASE_MANAGER_REGISTRATIONS_URL);
+						}}
+						className="cursor-pointer hover:bg-gray-50"
+					>
+						<Users className="mr-2 h-4 w-4" />
+						<span>
+							{localization.cm_my_registrations ||
+								"My Registrations"}
+						</span>
+					</DropdownMenuItem>
+				)}
+
+				{!isCaseManager && (
+					<DropdownMenuItem
+						onClick={handleAccountClick}
+						className="cursor-pointer hover:bg-gray-50"
+					>
+						<Settings className="mr-2 h-4 w-4" />
+						<span>{localization.title_account_settings}</span>
+					</DropdownMenuItem>
+				)}
 
 				<DropdownMenuSeparator />
 

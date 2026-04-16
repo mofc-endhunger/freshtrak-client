@@ -403,6 +403,17 @@ const LoginPage: React.FC = () => {
 						← {localization.button_back_to_home || "Back to Home"}
 					</Button>
 				</div>
+
+				{/* Case Manager Link */}
+				<div className="text-center mt-2">
+					<Button
+						variant="link"
+						onClick={() => navigate(RENDER_URL.CASE_MANAGER_LOGIN_URL)}
+						className="text-xs text-gray-400 hover:text-gray-600 h-auto p-0"
+					>
+						{localization.cm_login_link}
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

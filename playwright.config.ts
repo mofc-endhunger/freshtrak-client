@@ -46,7 +46,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm start',
+    command: process.env.CI ? 'npx react-scripts start' : 'npm start',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

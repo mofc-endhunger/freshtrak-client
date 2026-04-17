@@ -1,264 +1,263 @@
-import React from "react";
-import { render, screen, waitFor, act } from "@testing-library/react";
-import { Provider } from "react-redux";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
-import { configureStore } from "@reduxjs/toolkit";
-import RegistrationContainer from "../RegistrationContainer";
-import eventSlice from "../../../Store/Events/eventSlice";
-import userSlice from "../../../Store/userSlice";
+import React from 'react';
+import { render, screen, waitFor, act } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { configureStore } from '@reduxjs/toolkit';
+import RegistrationContainer from '../RegistrationContainer';
+import eventSlice from '../../../Store/Events/eventSlice';
+import userSlice from '../../../Store/userSlice';
 
 // Mock axios
-jest.mock("axios");
-const mockAxios = require("axios");
+jest.mock('axios');
+const mockAxios = require('axios');
 
 // Mock the dependencies
-jest.mock("react-gtm-module", () => ({
-	dataLayer: jest.fn(),
+jest.mock('react-gtm-module', () => ({
+  dataLayer: jest.fn(),
 }));
 
-jest.mock("../../../Utils/EventHandler", () => ({
-	EventFormat: jest.fn(event => event),
+jest.mock('../../../Utils/EventHandler', () => ({
+  EventFormat: jest.fn((event) => event),
 }));
 
-jest.mock("../../../Services/ApiService", () => ({
-	sendRegistrationConfirmationEmail: jest.fn(),
+jest.mock('../../../Services/ApiService', () => ({
+  sendRegistrationConfirmationEmail: jest.fn(),
 }));
 
-jest.mock("../../../Services/HouseholdsApiService", () => ({
-	HouseholdsApiService: jest.fn().mockImplementation(() => ({
-		getUsersMe: jest.fn().mockResolvedValue({
-			members: [{
-				user_id: "1",
-				first_name: "John",
-				last_name: "Doe",
-			}],
-			address_line_1: "123 Main St",
-			city: "Test City",
-			state: "CA",
-			zip_code: "12345",
-			phone: "1234567890",
-			email: "john@example.com",
-			counts: {
-				seniors: 0,
-				adults: 1,
-				children: 0,
-				total: 1,
-			},
-		}),
-		updateHousehold: jest.fn().mockResolvedValue({}),
-	})),
+jest.mock('../../../Services/HouseholdsApiService', () => ({
+  HouseholdsApiService: jest.fn().mockImplementation(() => ({
+    getUsersMe: jest.fn().mockResolvedValue({
+      members: [
+        {
+          user_id: '1',
+          first_name: 'John',
+          last_name: 'Doe',
+        },
+      ],
+      address_line_1: '123 Main St',
+      city: 'Test City',
+      state: 'CA',
+      zip_code: '12345',
+      phone: '1234567890',
+      email: 'john@example.com',
+      counts: {
+        seniors: 0,
+        adults: 1,
+        children: 0,
+        total: 1,
+      },
+    }),
+    updateHousehold: jest.fn().mockResolvedValue({}),
+  })),
 }));
 
-jest.mock("../RegistrationComponent", () => {
-	return function MockRegistrationComponent() {
-		return (
-			<div data-testid="registration-component">
-				Registration Component
-			</div>
-		);
-	};
+jest.mock('../RegistrationComponent', () => {
+  return function MockRegistrationComponent() {
+    return <div data-testid="registration-component">Registration Component</div>;
+  };
 });
 
-jest.mock("../../General/SpinnerComponent", () => {
-	return function MockSpinnerComponent() {
-		return <div data-testid="spinner">Loading...</div>;
-	};
+jest.mock('../../General/SpinnerComponent', () => {
+  return function MockSpinnerComponent() {
+    return <div data-testid="spinner">Loading...</div>;
+  };
 });
 
-jest.mock("../../General/ErrorComponent", () => {
-	return function MockErrorComponent({ error }: { error: string[] }) {
-		return (
-			<div data-testid="error-component">Error: {error.join(", ")}</div>
-		);
-	};
+jest.mock('../../General/ErrorComponent', () => {
+  return function MockErrorComponent({ error }: { error: string[] }) {
+    return <div data-testid="error-component">Error: {error.join(', ')}</div>;
+  };
 });
 
-jest.mock("../../Authentication/AuthenticationModal", () => {
-	return function MockAuthModal({
-		show,
-		onLogin,
-	}: {
-		show: boolean;
-		onLogin: () => void;
-	}) {
-		return show ? <div data-testid="auth-modal">Auth Modal</div> : null;
-	};
+jest.mock('../../Authentication/AuthenticationModal', () => {
+  return function MockAuthModal({ show, onLogin }: { show: boolean; onLogin: () => void }) {
+    return show ? <div data-testid="auth-modal">Auth Modal</div> : null;
+  };
 });
 
-jest.mock("../../Notifications/NotifyToastComponent", () => ({
-	NotifyToast: () => <div data-testid="notify-toast">Toast</div>,
-	showToast: jest.fn(),
+jest.mock('../../Notifications/NotifyToastComponent', () => ({
+  NotifyToast: () => <div data-testid="notify-toast">Toast</div>,
+  showToast: jest.fn(),
 }));
 
 // Mock StorageService
-jest.mock("../../../Utils/StorageService", () => {
-	const mockStorageService = {
-		getUserToken: jest.fn(),
-		getGuestUser: jest.fn(),
-		getCognitoUser: jest.fn(),
-		isLoggedInUser: jest.fn(),
-		isGuestUser: jest.fn(),
-		isCaseManager: jest.fn(),
-	};
-	return {
-		StorageService: mockStorageService,
-	};
+jest.mock('../../../Utils/StorageService', () => {
+  const mockStorageService = {
+    getUserToken: jest.fn(),
+    getGuestUser: jest.fn(),
+    getCognitoUser: jest.fn(),
+    isLoggedInUser: jest.fn(),
+    isGuestUser: jest.fn(),
+    isCaseManager: jest.fn(),
+  };
+  return {
+    StorageService: mockStorageService,
+  };
 });
 
 // Get the mocked StorageService after mock is created
-const { StorageService: mockStorageService } = require("../../../Utils/StorageService");
+const { StorageService: mockStorageService } = require('../../../Utils/StorageService');
 
 // Create a mock store
 const createMockStore = () => {
-	return configureStore({
-		reducer: {
-			event: eventSlice,
-			user: userSlice,
-		},
-		preloadedState: {
-			event: {
-				event: {
-					id: "1",
-					agencyName: "Test Agency",
-					date: "2024-01-01",
-					startTime: "09:00",
-					endTime: "10:00",
-					acceptWalkin: true,
-				},
-			},
-			user: {
-				user: null,
-			},
-		},
-	});
+  return configureStore({
+    reducer: {
+      event: eventSlice,
+      user: userSlice,
+    },
+    preloadedState: {
+      event: {
+        event: {
+          id: '1',
+          agencyName: 'Test Agency',
+          date: '2024-01-01',
+          startTime: '09:00',
+          endTime: '10:00',
+          acceptWalkin: true,
+        },
+      },
+      user: {
+        user: null,
+      },
+    },
+  });
 };
 
-describe("RegistrationContainer", () => {
-	let store: ReturnType<typeof createMockStore>;
+describe('RegistrationContainer', () => {
+  let store: ReturnType<typeof createMockStore>;
 
-	beforeEach(() => {
-		store = createMockStore();
-		jest.clearAllMocks();
+  beforeEach(() => {
+    store = createMockStore();
+    jest.clearAllMocks();
 
-		// Reset StorageService mocks
-		mockStorageService.getUserToken.mockReturnValue(null);
-		mockStorageService.getGuestUser.mockReturnValue(null);
-		mockStorageService.getCognitoUser.mockReturnValue(null);
-		mockStorageService.isLoggedInUser.mockReturnValue(false);
-		mockStorageService.isGuestUser.mockReturnValue(false);
-		mockStorageService.isCaseManager.mockReturnValue(false);
+    // Reset StorageService mocks
+    mockStorageService.getUserToken.mockReturnValue(null);
+    mockStorageService.getGuestUser.mockReturnValue(null);
+    mockStorageService.getCognitoUser.mockReturnValue(null);
+    mockStorageService.isLoggedInUser.mockReturnValue(false);
+    mockStorageService.isGuestUser.mockReturnValue(false);
+    mockStorageService.isCaseManager.mockReturnValue(false);
 
-		// Mock environment variables
-		process.env.REACT_APP_CLIENT_URL = "http://localhost:3000";
+    // Mock environment variables
+    process.env.REACT_APP_CLIENT_URL = 'http://localhost:3000';
 
-		// Mock axios.get to return a mock event by default
-		mockAxios.get.mockResolvedValue({
-			data: {
-				event: {
-					id: "1",
-					agencyName: "Test Agency",
-					date: "2024-01-01",
-					startTime: "09:00",
-					endTime: "10:00",
-					acceptWalkin: true,
-				},
-			},
-		});
-	});
+    // Mock axios.get to return a mock event by default
+    mockAxios.get.mockResolvedValue({
+      data: {
+        event: {
+          id: '1',
+          agencyName: 'Test Agency',
+          date: '2024-01-01',
+          startTime: '09:00',
+          endTime: '10:00',
+          acceptWalkin: true,
+        },
+      },
+    });
+  });
 
-	const renderWithProviders = (component: React.ReactElement, route = "/register/form/1") => {
-		return render(
-			<Provider store={store}>
-				<MemoryRouter initialEntries={[route]}>
-					<Routes>
-						<Route path="/register/form/:eventDateId" element={component} />
-					</Routes>
-				</MemoryRouter>
-			</Provider>
-		);
-	};
+  const renderWithProviders = (component: React.ReactElement, route = '/register/form/1') => {
+    return render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[route]}>
+          <Routes>
+            <Route path="/register/form/:eventDateId" element={component} />
+          </Routes>
+        </MemoryRouter>
+      </Provider>,
+    );
+  };
 
-	test("renders without crashing", () => {
-		// Mock that user is not authenticated (no token)
-		mockStorageService.getUserToken.mockReturnValue(null);
-		mockStorageService.getGuestUser.mockReturnValue(null);
-		mockStorageService.isLoggedInUser.mockReturnValue(false);
-		mockStorageService.isGuestUser.mockReturnValue(false);
+  test('renders without crashing', () => {
+    // Mock that user is not authenticated (no token)
+    mockStorageService.getUserToken.mockReturnValue(null);
+    mockStorageService.getGuestUser.mockReturnValue(null);
+    mockStorageService.isLoggedInUser.mockReturnValue(false);
+    mockStorageService.isGuestUser.mockReturnValue(false);
 
-		const { container } = renderWithProviders(<RegistrationContainer />);
-		expect(container).toBeInTheDocument();
-	});
+    const { container } = renderWithProviders(<RegistrationContainer />);
+    expect(container).toBeInTheDocument();
+  });
 
-	test("shows auth modal when user is not authenticated", async () => {
-		mockStorageService.getUserToken.mockReturnValue(null);
-		mockStorageService.getGuestUser.mockReturnValue(null);
-		mockStorageService.isLoggedInUser.mockReturnValue(false);
-		mockStorageService.isGuestUser.mockReturnValue(false);
+  test('shows auth modal when user is not authenticated', async () => {
+    mockStorageService.getUserToken.mockReturnValue(null);
+    mockStorageService.getGuestUser.mockReturnValue(null);
+    mockStorageService.isLoggedInUser.mockReturnValue(false);
+    mockStorageService.isGuestUser.mockReturnValue(false);
 
-		renderWithProviders(<RegistrationContainer />);
+    renderWithProviders(<RegistrationContainer />);
 
-		// Wait for the auth modal to appear (component checks auth after event loads)
-		await waitFor(() => {
-			expect(screen.getByTestId("auth-modal")).toBeInTheDocument();
-		}, { timeout: 3000 });
-	});
+    // Wait for the auth modal to appear (component checks auth after event loads)
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('auth-modal')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+  });
 
-	test("shows auth modal when user is authenticated but no profile", async () => {
-		// Mock that user has token but no profile
-		mockStorageService.getUserToken.mockReturnValue("mock-token");
-		mockStorageService.getGuestUser.mockReturnValue(null);
-		mockStorageService.isLoggedInUser.mockReturnValue(false);
-		mockStorageService.isGuestUser.mockReturnValue(false);
+  test('shows auth modal when user is authenticated but no profile', async () => {
+    // Mock that user has token but no profile
+    mockStorageService.getUserToken.mockReturnValue('mock-token');
+    mockStorageService.getGuestUser.mockReturnValue(null);
+    mockStorageService.isLoggedInUser.mockReturnValue(false);
+    mockStorageService.isGuestUser.mockReturnValue(false);
 
-		renderWithProviders(<RegistrationContainer />);
+    renderWithProviders(<RegistrationContainer />);
 
-		// Component shows spinner when token exists but no user profile
-		// (because !user triggers spinner at line 928)
-		await waitFor(() => {
-			expect(screen.getByTestId("spinner")).toBeInTheDocument();
-		}, { timeout: 1000 });
-	});
+    // Component shows spinner when token exists but no user profile
+    // (because !user triggers spinner at line 928)
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('spinner')).toBeInTheDocument();
+      },
+      { timeout: 1000 },
+    );
+  });
 
-	test("always fetches fresh event data based on URL eventDateId", async () => {
-		// This test verifies the fix for the caching bug where stale event data
-		// from localStorage (redux-persist) was shown instead of fetching fresh data
-		
-		// Mock axios to return event data
-		const mockEvent = {
-			id: "123",
-			agencyName: "Test Agency",
-			date: "2024-01-01",
-			startTime: "09:00",
-			endTime: "10:00",
-			acceptWalkin: true,
-		};
-		mockAxios.get.mockResolvedValue({
-			data: { event: mockEvent },
-		});
+  test('always fetches fresh event data based on URL eventDateId', async () => {
+    // This test verifies the fix for the caching bug where stale event data
+    // from localStorage (redux-persist) was shown instead of fetching fresh data
 
-		// Mock StorageService (user not authenticated - will show auth modal)
-		mockStorageService.getUserToken.mockReturnValue(null);
-		mockStorageService.getGuestUser.mockReturnValue(null);
-		mockStorageService.isLoggedInUser.mockReturnValue(false);
-		mockStorageService.isGuestUser.mockReturnValue(false);
+    // Mock axios to return event data
+    const mockEvent = {
+      id: '123',
+      agencyName: 'Test Agency',
+      date: '2024-01-01',
+      startTime: '09:00',
+      endTime: '10:00',
+      acceptWalkin: true,
+    };
+    mockAxios.get.mockResolvedValue({
+      data: { event: mockEvent },
+    });
 
-		// Render with a specific eventDateId in the URL
-		render(
-			<Provider store={store}>
-				<MemoryRouter initialEntries={["/register/form/123"]}>
-					<Routes>
-						<Route path="/register/form/:eventDateId" element={<RegistrationContainer />} />
-					</Routes>
-				</MemoryRouter>
-			</Provider>
-		);
+    // Mock StorageService (user not authenticated - will show auth modal)
+    mockStorageService.getUserToken.mockReturnValue(null);
+    mockStorageService.getGuestUser.mockReturnValue(null);
+    mockStorageService.isLoggedInUser.mockReturnValue(false);
+    mockStorageService.isGuestUser.mockReturnValue(false);
 
-		// Wait for the axios call to be made
-		await waitFor(() => {
-			// Verify axios.get was called with the URL containing the eventDateId from the URL
-			expect(mockAxios.get).toHaveBeenCalledWith(
-				expect.stringContaining("/api/event_dates/123/event_details")
-			);
-		}, { timeout: 3000 });
-	});
+    // Render with a specific eventDateId in the URL
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/register/form/123']}>
+          <Routes>
+            <Route path="/register/form/:eventDateId" element={<RegistrationContainer />} />
+          </Routes>
+        </MemoryRouter>
+      </Provider>,
+    );
+
+    // Wait for the axios call to be made
+    await waitFor(
+      () => {
+        // Verify axios.get was called with the URL containing the eventDateId from the URL
+        expect(mockAxios.get).toHaveBeenCalledWith(
+          expect.stringContaining('api/event_dates/123/event_details'),
+        );
+      },
+      { timeout: 3000 },
+    );
+  });
 });

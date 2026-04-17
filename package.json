@@ -88,7 +88,10 @@
     "lint:fix": "eslint src/ --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,scss,md}\"",
-    "test:ci": "react-scripts test --watchAll=false",
+    "test:ci": "react-scripts test --watchAll=false --coverage=true",
+    "test:e2e": "env-cmd -f .env playwright test",
+    "test:e2e:ui": "env-cmd -f .env playwright test --ui",
+    "test:e2e:headed": "env-cmd -f .env playwright test --headed",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -118,6 +121,7 @@
     "@babel/preset-react": "^7.27.1",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
     "@types/jest-axe": "^3.5.9",

@@ -146,6 +146,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
         <button
           type="button"
           className={buttonClass}
+          data-testid="event-reserve-button"
           onClick={() => {
             // Store the current search results URL before navigating to event details
             const currentPath = window.location.pathname;
@@ -183,7 +184,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
   // List view layout - horizontal card (compact for map view)
   if (variant === 'list') {
     return (
-      <section tabIndex={0} className="w-full py-1">
+      <section tabIndex={0} className="w-full py-1" data-testid="event-card">
         <div className="flex flex-row items-stretch">
           {/* Map Pin container - always rendered for alignment, content only shown if event has map coordinates */}
           <div className="flex items-center justify-center w-10 sm:w-12 shrink-0">
@@ -371,6 +372,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
                     (eventImages && eventImages.length > 0)) && (
                     <button
                       className="btn bg-gray-200 text-[#392947] py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px]"
+                      data-testid="event-details-toggle"
                       onClick={(e) => {
                         e.stopPropagation();
                         setShowDetails(!showDetails);
@@ -383,6 +385,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
                   )}
                   <button
                     className="btn bg-gray-200 text-[#392947] py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px]"
+                    data-testid="event-directions-link"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleGetDirections();
@@ -414,7 +417,11 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
 
   // Tile view layout - original vertical card
   return (
-    <section className={registrationView ? '' : 'lg:col-span-1 xl:col-span-1'} tabIndex={0}>
+    <section
+      className={registrationView ? '' : 'lg:col-span-1 xl:col-span-1'}
+      tabIndex={0}
+      data-testid="event-card"
+    >
       <div className="bg-white rounded-lg shadow-md">
         <div className="bg-text-primary text-white p-4 rounded-t-lg">
           <div className="text-lg font-bold pb-2 truncate">{agencyName}</div>
@@ -502,6 +509,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
                     (eventImages && eventImages.length > 0)) && (
                     <button
                       className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
+                      data-testid="event-details-toggle"
                       onClick={() => {
                         setShowDetails(!showDetails);
                       }}
@@ -513,6 +521,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
                   )}
                   <button
                     className="btn bg-gray-200 text-[#392947] px-9 py-3 rounded-lg text-sm font-bold uppercase tracking-wider flex-grow min-h-[50px]"
+                    data-testid="event-directions-link"
                     onClick={handleGetDirections}
                   >
                     {localization.button_get_directions}

@@ -132,6 +132,7 @@
     "@types/redux-persist": "^4.3.1",
     "autoprefixer": "^10.4.21",
     "babel-jest": "^30.0.4",
+    "dotenv": "^17.4.2",
     "env-cmd": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",

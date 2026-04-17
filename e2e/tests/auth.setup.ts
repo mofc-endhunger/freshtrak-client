@@ -19,13 +19,17 @@ setup('authenticate test user', async ({ page }) => {
       await expect(page).toHaveURL(ROUTES.home, { timeout: 45_000 });
       break;
     } catch {
-      const errorVisible = await page.getByTestId(SEL.authErrorMessage).isVisible();
+      const errorEl = page.getByTestId(SEL.authErrorMessage);
+      const errorVisible = await errorEl.isVisible();
+      const errorText = errorVisible ? await errorEl.textContent() : null;
       const currentUrl = page.url();
 
       if (attempt === MAX_LOGIN_ATTEMPTS) {
+        await page.screenshot({ path: 'test-results/auth-setup-final-failure.png' });
         throw new Error(
           `Login failed after ${MAX_LOGIN_ATTEMPTS} attempts. ` +
             `URL: ${currentUrl}, Error visible: ${errorVisible}. ` +
+            `Error message: "${errorText ?? 'N/A'}". ` +
             `Cognito may be throttling or unreachable.`,
         );
       }

@@ -73,17 +73,16 @@ describe('Registration API Integration Tests', () => {
         },
         {
           headers: {
-            'Authorization': `Bearer ${mockToken}`,
+            Authorization: `Bearer ${mockToken}`,
             'Content-Type': 'application/json',
           },
           timeout: 5000,
-        }
+        },
       );
     });
 
     test('should handle timeout gracefully when API takes longer than 5 seconds', async () => {
       const mockToken = 'mock-cognito-token';
-
 
       // Mock axios to simulate timeout
       mockedAxios.post.mockRejectedValue({
@@ -129,14 +128,13 @@ describe('Registration API Integration Tests', () => {
         expect.any(Object),
         expect.objectContaining({
           headers: expect.objectContaining({
-            'Authorization': `Bearer ${mockToken}`,
+            Authorization: `Bearer ${mockToken}`,
           }),
-        })
+        }),
       );
     });
 
     test('should handle missing authentication token', async () => {
-
       mockedAxios.post.mockRejectedValue({
         response: {
           status: 401,
@@ -161,7 +159,6 @@ describe('Registration API Integration Tests', () => {
 
     test('should handle expired authentication token', async () => {
       const expiredToken = 'expired-token';
-
 
       mockedAxios.post.mockRejectedValue({
         response: {
@@ -190,7 +187,6 @@ describe('Registration API Integration Tests', () => {
     test('should handle 409 conflict error (timeslot unavailable)', async () => {
       const mockToken = 'valid-token';
 
-
       mockedAxios.post.mockRejectedValue({
         response: {
           status: 409,
@@ -216,7 +212,6 @@ describe('Registration API Integration Tests', () => {
 
     test('should handle 422 validation error (invalid household data)', async () => {
       const mockToken = 'valid-token';
-
 
       mockedAxios.post.mockRejectedValue({
         response: {
@@ -247,7 +242,6 @@ describe('Registration API Integration Tests', () => {
     test('should handle 500 server error', async () => {
       const mockToken = 'valid-token';
 
-
       mockedAxios.post.mockRejectedValue({
         response: {
           status: 500,
@@ -273,7 +267,6 @@ describe('Registration API Integration Tests', () => {
     test('should handle network error', async () => {
       const mockToken = 'valid-token';
 
-
       mockedAxios.post.mockRejectedValue({
         message: 'Network Error',
         code: 'NETWORK_ERROR',
@@ -294,7 +287,6 @@ describe('Registration API Integration Tests', () => {
 
     test('should handle unknown error', async () => {
       const mockToken = 'valid-token';
-
 
       mockedAxios.post.mockRejectedValue({
         message: 'Something went wrong',
@@ -343,17 +335,16 @@ describe('Registration API Integration Tests', () => {
         },
         expect.objectContaining({
           headers: {
-            'Authorization': `Bearer ${mockToken}`,
+            Authorization: `Bearer ${mockToken}`,
             'Content-Type': 'application/json',
           },
           timeout: 5000,
-        })
+        }),
       );
     });
 
     test('should handle missing required fields in payload', async () => {
       const mockToken = 'valid-token';
-
 
       mockedAxios.post.mockRejectedValue({
         response: {
@@ -476,13 +467,13 @@ describe('Registration API Integration Tests', () => {
           eventId: `event-${index}`,
           eventDateId: `date-${index}`,
           eventSlotId: `slot-${index}`,
-        })
+        }),
       );
 
       const results = await Promise.all(promises);
 
       expect(results).toHaveLength(5);
-      results.forEach(result => {
+      results.forEach((result) => {
         expect(result.success).toBe(true);
       });
       expect(mockedAxios.post).toHaveBeenCalledTimes(5);
@@ -506,7 +497,7 @@ describe('Registration API Integration Tests', () => {
           eventId: `event-${index}`,
           eventDateId: `date-${index}`,
           eventSlotId: `slot-${index}`,
-        })
+        }),
       );
 
       await Promise.all(promises);

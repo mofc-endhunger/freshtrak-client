@@ -13,16 +13,20 @@ function loadPersistedLanguage() {
 export const languageSlice = createSlice({
   name: 'language',
   initialState: {
-    language: loadPersistedLanguage()
+    language: loadPersistedLanguage(),
   },
   reducers: {
     setCurrentLanguage(state, action) {
       state.language = action.payload;
-      try { localStorage.setItem(STORAGE_KEY, action.payload); } catch { /* noop */ }
+      try {
+        localStorage.setItem(STORAGE_KEY, action.payload);
+      } catch {
+        /* noop */
+      }
     },
-  }
+  },
 });
 
 export const { setCurrentLanguage } = languageSlice.actions;
-export const selectLanguage = state => state.language.language;
+export const selectLanguage = (state) => state.language.language;
 export default languageSlice.reducer;

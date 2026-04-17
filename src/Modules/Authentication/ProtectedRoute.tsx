@@ -4,11 +4,11 @@
  * Automatically redirects to /login when access token is invalidated
  */
 
-import React from "react";
-import { AuthGuard } from "../Households/components/AuthGuard";
+import React from 'react';
+import { AuthGuard } from '../Households/components/AuthGuard';
 
 interface ProtectedRouteProps {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 /**
@@ -16,7 +16,7 @@ interface ProtectedRouteProps {
  * Wraps routes that require authentication
  */
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-	return <AuthGuard>{children}</AuthGuard>;
+  return <AuthGuard>{children}</AuthGuard>;
 };
 
 export default ProtectedRoute;

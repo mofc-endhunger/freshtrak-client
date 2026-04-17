@@ -1,6 +1,6 @@
 /**
  * Household Utility Functions
- * 
+ *
  * Utility functions for household data manipulation, validation, and calculations.
  */
 
@@ -21,7 +21,7 @@ import localization from '../../Localization/LocalizationComponent';
  * Calculate age from date of birth (timezone-safe)
  */
 export const calculateAge = (dateOfBirth: string | undefined): AgeCalculation => {
-  if (!dateOfBirth || dateOfBirth === "1900-01-01") {
+  if (!dateOfBirth || dateOfBirth === '1900-01-01') {
     return {
       years: 0,
       months: 0,
@@ -76,7 +76,7 @@ export const calculateAge = (dateOfBirth: string | undefined): AgeCalculation =>
       totalDays,
     };
   } catch (error) {
-    console.warn("Age calculation failed:", error);
+    console.warn('Age calculation failed:', error);
     return {
       years: 0,
       months: 0,
@@ -123,13 +123,13 @@ export const getMemberStatus = (dateOfBirth: string | undefined): MemberStatusCa
  * Calculate household counts from members
  */
 export const calculateHouseholdCounts = (members: HouseholdMember[]): HouseholdCounts => {
-  const activeMembers = members.filter(member => member.is_active);
+  const activeMembers = members.filter((member) => member.is_active);
 
   let children = 0;
   let adults = 0;
   let seniors = 0;
 
-  activeMembers.forEach(member => {
+  activeMembers.forEach((member) => {
     if (member.date_of_birth) {
       const status = getMemberStatus(member.date_of_birth);
       if (status.isChild) children++;
@@ -184,7 +184,7 @@ export const formatMemberName = (
   firstName: string,
   lastName: string,
   middleName?: string,
-  suffix?: string
+  suffix?: string,
 ): string => {
   let name = firstName;
   if (middleName) name += ` ${middleName}`;
@@ -390,7 +390,9 @@ const GENDER_ID_MAP: [number, MemberGender][] = [
   [4, 'prefer_not_to_say'],
 ];
 
-export const getGenderFromId = (genderId: number | string | null | undefined): MemberGender | undefined => {
+export const getGenderFromId = (
+  genderId: number | string | null | undefined,
+): MemberGender | undefined => {
   if (genderId == null) return undefined;
   const id = typeof genderId === 'string' ? parseInt(genderId, 10) : genderId;
   if (isNaN(id)) return undefined;
@@ -483,13 +485,13 @@ export const sortMembers = (members: HouseholdMember[]): HouseholdMember[] => {
  */
 export const filterMembersByStatus = (
   members: HouseholdMember[],
-  status: 'active' | 'inactive' | 'all'
+  status: 'active' | 'inactive' | 'all',
 ): HouseholdMember[] => {
   switch (status) {
     case 'active':
-      return members.filter(member => member.is_active);
+      return members.filter((member) => member.is_active);
     case 'inactive':
-      return members.filter(member => !member.is_active);
+      return members.filter((member) => !member.is_active);
     case 'all':
     default:
       return members;
@@ -499,11 +501,14 @@ export const filterMembersByStatus = (
 /**
  * Search members by name
  */
-export const searchMembers = (members: HouseholdMember[], searchTerm: string): HouseholdMember[] => {
+export const searchMembers = (
+  members: HouseholdMember[],
+  searchTerm: string,
+): HouseholdMember[] => {
   if (!searchTerm.trim()) return members;
 
   const term = searchTerm.toLowerCase();
-  return members.filter(member => {
+  return members.filter((member) => {
     const fullName = `${member.first_name} ${member.last_name}`.toLowerCase();
     return fullName.includes(term);
   });
@@ -516,9 +521,11 @@ export const isHouseholdSetupComplete = (household: any): boolean => {
   if (!household) return false;
 
   // Check required fields
-  const hasAddress = household.address_line_1 && household.city && household.state && household.zip_code;
+  const hasAddress =
+    household.address_line_1 && household.city && household.state && household.zip_code;
   const hasLanguage = household.preferred_language;
-  const hasPrimaryMember = household.members && household.members.some((member: any) => member.is_primary);
+  const hasPrimaryMember =
+    household.members && household.members.some((member: any) => member.is_primary);
 
   return hasAddress && hasLanguage && hasPrimaryMember;
 };

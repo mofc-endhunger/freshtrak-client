@@ -54,7 +54,11 @@ export const PHONE_PATTERNS = {
 export const normalizePhoneInput = (input: string | number): string => {
   try {
     if (typeof input !== 'string' && typeof input !== 'number') {
-      console.error('[phoneFormatting] normalizePhoneInput received invalid value:', input, typeof input);
+      console.error(
+        '[phoneFormatting] normalizePhoneInput received invalid value:',
+        input,
+        typeof input,
+      );
       return '';
     }
 
@@ -150,7 +154,7 @@ export const parsePhoneNumber = (phoneNumber: string): PhoneNumberParts | null =
  */
 export const formatPhoneNumber = (
   phoneNumber: string,
-  options: PhoneFormatOptions = {}
+  options: PhoneFormatOptions = {},
 ): string => {
   const {
     format = PHONE_CONSTANTS.DEFAULT_FORMAT,
@@ -193,7 +197,7 @@ export const formatPhoneNumber = (
  */
 export const validateAndFormatPhoneInput = (
   input: string,
-  options: PhoneFormatOptions = {}
+  options: PhoneFormatOptions = {},
 ): PhoneValidationResult => {
   const formattedInput = formatUSPhoneInput(input);
 
@@ -237,7 +241,7 @@ export const validatePhoneWithRules = (
     maxLength?: number;
     allowTollFree?: boolean;
     format?: 'US' | 'INTERNATIONAL' | 'E164' | 'NATIONAL';
-  } = {}
+  } = {},
 ): PhoneValidationResult => {
   const {
     required = true,
@@ -293,10 +297,7 @@ export const validatePhoneWithRules = (
 /**
  * Formats phone number for display with masking
  */
-export const maskPhoneNumber = (
-  phoneNumber: string,
-  maskChar: string = '*'
-): string => {
+export const maskPhoneNumber = (phoneNumber: string, maskChar: string = '*'): string => {
   if (!phoneNumber) return '';
 
   const parts = parsePhoneNumber(phoneNumber);
@@ -334,16 +335,15 @@ export const isValidExtension = (extension: string): boolean => {
   if (!extension) return true; // Extensions are optional
 
   const extensionDigits = extension.replace(/\D/g, '');
-  return extensionDigits.length > 0 && extensionDigits.length <= PHONE_CONSTANTS.MAX_EXTENSION_LENGTH;
+  return (
+    extensionDigits.length > 0 && extensionDigits.length <= PHONE_CONSTANTS.MAX_EXTENSION_LENGTH
+  );
 };
 
 /**
  * Formats phone number with extension
  */
-export const formatPhoneWithExtension = (
-  phoneNumber: string,
-  extension?: string
-): string => {
+export const formatPhoneWithExtension = (phoneNumber: string, extension?: string): string => {
   const formatted = formatPhoneNumber(phoneNumber);
 
   if (!extension) return formatted;

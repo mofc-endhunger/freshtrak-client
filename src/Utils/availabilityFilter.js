@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from 'moment';
 
 /**
  * Filters events by availability time periods
@@ -9,70 +9,63 @@ import moment from "moment";
  * TODO: This is client-side filtering. When API supports availability filtering,
  * this should be moved to server-side filtering for better performance.
  */
-export const filterEventsByAvailability = (
-	eventsByDate,
-	availabilityFilter
-) => {
-	if (!eventsByDate || availabilityFilter === "All") {
-		return eventsByDate;
-	}
+export const filterEventsByAvailability = (eventsByDate, availabilityFilter) => {
+  if (!eventsByDate || availabilityFilter === 'All') {
+    return eventsByDate;
+  }
 
-	const today = moment().startOf("day");
-	const tomorrow = moment().add(1, "day").startOf("day");
-	const next7Days = moment().add(7, "days").endOf("day");
-	// Next 2 weeks = today through 14 days from today (not end-of-week)
-	const endOfNext2Weeks = moment().add(14, "days").endOf("day");
-	const endOfMonth = moment().endOf("month");
-	const endOfNextMonth = moment().add(1, "month").endOf("month");
+  const today = moment().startOf('day');
+  const tomorrow = moment().add(1, 'day').startOf('day');
+  const next7Days = moment().add(7, 'days').endOf('day');
+  // Next 2 weeks = today through 14 days from today (not end-of-week)
+  const endOfNext2Weeks = moment().add(14, 'days').endOf('day');
+  const endOfMonth = moment().endOf('month');
+  const endOfNextMonth = moment().add(1, 'month').endOf('month');
 
-	const filteredEvents = {};
+  const filteredEvents = {};
 
-	Object.keys(eventsByDate).forEach(dateKey => {
-		// EventHandler uses YYYY/MM/DD format for date keys
-		const eventDate = moment(dateKey, "YYYY/MM/DD");
+  Object.keys(eventsByDate).forEach((dateKey) => {
+    // EventHandler uses YYYY/MM/DD format for date keys
+    const eventDate = moment(dateKey, 'YYYY/MM/DD');
 
-		let shouldInclude = false;
+    let shouldInclude = false;
 
-		switch (availabilityFilter) {
-			case "today":
-				shouldInclude = eventDate.isSame(today, "day");
-				break;
-			case "tomorrow":
-				shouldInclude = eventDate.isSame(tomorrow, "day");
-				break;
-		case "next_7_days":
-			shouldInclude =
-				eventDate.isSameOrAfter(today, "day") &&
-				eventDate.isSameOrBefore(next7Days, "day");
-			break;
-			case "next_2_weeks":
-				// Include today through 14 days from today (matches "Next 7 Days" behavior)
-				shouldInclude =
-					eventDate.isSameOrAfter(today, "day") &&
-					eventDate.isSameOrBefore(endOfNext2Weeks, "day");
-				break;
-			case "this_month":
-				// Include today through end of current month
-				shouldInclude =
-					eventDate.isSameOrAfter(today, "day") &&
-					eventDate.isSameOrBefore(endOfMonth, "day");
-				break;
-			case "next_month":
-				// First day of next month through end of next month
-				shouldInclude =
-					eventDate.isAfter(endOfMonth, "day") &&
-					eventDate.isSameOrBefore(endOfNextMonth, "day");
-				break;
-			default:
-				shouldInclude = true;
-		}
+    switch (availabilityFilter) {
+      case 'today':
+        shouldInclude = eventDate.isSame(today, 'day');
+        break;
+      case 'tomorrow':
+        shouldInclude = eventDate.isSame(tomorrow, 'day');
+        break;
+      case 'next_7_days':
+        shouldInclude =
+          eventDate.isSameOrAfter(today, 'day') && eventDate.isSameOrBefore(next7Days, 'day');
+        break;
+      case 'next_2_weeks':
+        // Include today through 14 days from today (matches "Next 7 Days" behavior)
+        shouldInclude =
+          eventDate.isSameOrAfter(today, 'day') && eventDate.isSameOrBefore(endOfNext2Weeks, 'day');
+        break;
+      case 'this_month':
+        // Include today through end of current month
+        shouldInclude =
+          eventDate.isSameOrAfter(today, 'day') && eventDate.isSameOrBefore(endOfMonth, 'day');
+        break;
+      case 'next_month':
+        // First day of next month through end of next month
+        shouldInclude =
+          eventDate.isAfter(endOfMonth, 'day') && eventDate.isSameOrBefore(endOfNextMonth, 'day');
+        break;
+      default:
+        shouldInclude = true;
+    }
 
-		if (shouldInclude) {
-			filteredEvents[dateKey] = eventsByDate[dateKey];
-		}
-	});
+    if (shouldInclude) {
+      filteredEvents[dateKey] = eventsByDate[dateKey];
+    }
+  });
 
-	return filteredEvents;
+  return filteredEvents;
 };
 
 /**
@@ -81,28 +74,23 @@ export const filterEventsByAvailability = (
  * @param {boolean} reservationsFilter - The reservations filter to apply (true to show only events that accept reservations, false to show all)
  * @returns {Object} Filtered events grouped by date
  */
-export const filterEventsByReservations = (
-	eventsByDate,
-	reservationsFilter
-) => {
-	if (!eventsByDate || !reservationsFilter) {
-		return eventsByDate;
-	}
+export const filterEventsByReservations = (eventsByDate, reservationsFilter) => {
+  if (!eventsByDate || !reservationsFilter) {
+    return eventsByDate;
+  }
 
-	const filteredEvents = {};
+  const filteredEvents = {};
 
-	Object.keys(eventsByDate).forEach(dateKey => {
-		const events = eventsByDate[dateKey];
-		const filteredEventsForDate = events.filter(
-			event => event.acceptReservations === 1
-		);
+  Object.keys(eventsByDate).forEach((dateKey) => {
+    const events = eventsByDate[dateKey];
+    const filteredEventsForDate = events.filter((event) => event.acceptReservations === 1);
 
-		if (filteredEventsForDate.length > 0) {
-			filteredEvents[dateKey] = filteredEventsForDate;
-		}
-	});
+    if (filteredEventsForDate.length > 0) {
+      filteredEvents[dateKey] = filteredEventsForDate;
+    }
+  });
 
-	return filteredEvents;
+  return filteredEvents;
 };
 
 /**
@@ -110,11 +98,11 @@ export const filterEventsByReservations = (
  * @returns {Array} Array of availability filter options
  */
 export const getAvailabilityOptions = () => [
-	{ value: "All", label: "All" },
-	{ value: "today", label: "Today" },
-	{ value: "tomorrow", label: "Tomorrow" },
-	{ value: "next_7_days", label: "Next 7 Days" },
-	{ value: "next_2_weeks", label: "Next 2 Weeks" },
-	{ value: "this_month", label: "This Month" },
-	{ value: "next_month", label: "Next Month" },
+  { value: 'All', label: 'All' },
+  { value: 'today', label: 'Today' },
+  { value: 'tomorrow', label: 'Tomorrow' },
+  { value: 'next_7_days', label: 'Next 7 Days' },
+  { value: 'next_2_weeks', label: 'Next 2 Weeks' },
+  { value: 'this_month', label: 'This Month' },
+  { value: 'next_month', label: 'Next Month' },
 ];

@@ -32,7 +32,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
         },
       };
 
-
       // First two calls fail with network error, third succeeds
       mockedAxios.post
         .mockRejectedValueOnce({
@@ -63,7 +62,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
         },
       };
 
-
       // First call times out, second succeeds
       mockedAxios.post
         .mockRejectedValueOnce({
@@ -89,7 +87,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
           message: 'Registration successful',
         },
       };
-
 
       // First call fails with 500 error, second succeeds
       mockedAxios.post
@@ -152,7 +149,9 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('This timeslot is no longer available. Please select another time.');
+      expect(result.error).toBe(
+        'This timeslot is no longer available. Please select another time.',
+      );
       expect(mockedAxios.post).toHaveBeenCalledTimes(1); // No retry
     });
 
@@ -201,8 +200,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
 
   describe('Error Handling Tests', () => {
     test('should handle mixed retryable and non-retryable errors', async () => {
-
-
       // First call fails with retryable error, second with non-retryable
       mockedAxios.post
         .mockRejectedValueOnce({
@@ -230,8 +227,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
     });
 
     test('should handle unknown error types', async () => {
-
-
       mockedAxios.post.mockRejectedValue({
         message: 'Unknown error',
         someUnknownProperty: 'value',
@@ -257,7 +252,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
           message: 'Registration successful',
         },
       };
-
 
       // First call fails, second succeeds
       mockedAxios.post
@@ -290,7 +284,6 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
         },
       };
 
-
       // Each operation fails once then succeeds
       mockedAxios.post
         .mockRejectedValueOnce({
@@ -320,7 +313,7 @@ describe('HouseholdRegistrationService Retry Logic Tests', () => {
       const results = await Promise.all(promises);
 
       expect(results).toHaveLength(2);
-      results.forEach(result => {
+      results.forEach((result) => {
         expect(result.success).toBe(true);
       });
       expect(mockedAxios.post).toHaveBeenCalledTimes(4); // 2 operations × 2 calls each

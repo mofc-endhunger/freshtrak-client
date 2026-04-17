@@ -1,7 +1,7 @@
-import React from "react";
-import DashBoardDataComponent from "./DashBoardDataComponent";
-import DashBoardFoodBankComponent from "./DashBoardFoodBankComponent";
-import { DashBoardContainerProps } from "./types/dashboard.types";
+import React from 'react';
+import DashBoardDataComponent from './DashBoardDataComponent';
+import DashBoardFoodBankComponent from './DashBoardFoodBankComponent';
+import { DashBoardContainerProps } from './types/dashboard.types';
 
 /**
  * DashBoardContainer - Main container component that orchestrates the dashboard layout
@@ -19,16 +19,16 @@ import { DashBoardContainerProps } from "./types/dashboard.types";
  * ```
  */
 const DashBoardContainer: React.FC<DashBoardContainerProps> = () => {
-	return (
-		<React.Fragment>
-			<section>
-				<DashBoardDataComponent />
-			</section>
-			<section className="bg-gray-100">
-				<DashBoardFoodBankComponent />
-			</section>
-		</React.Fragment>
-	);
+  return (
+    <React.Fragment>
+      <section>
+        <DashBoardDataComponent />
+      </section>
+      <section className="bg-gray-100">
+        <DashBoardFoodBankComponent />
+      </section>
+    </React.Fragment>
+  );
 };
 
 export default DashBoardContainer;

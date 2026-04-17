@@ -1,10 +1,10 @@
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect } from 'react';
 
 interface UseInfiniteScrollOptions {
-	onLoadMore: () => void;
-	hasMore: boolean;
-	isLoading: boolean;
-	rootMargin?: string;
+  onLoadMore: () => void;
+  hasMore: boolean;
+  isLoading: boolean;
+  rootMargin?: string;
 }
 
 /**
@@ -16,46 +16,46 @@ interface UseInfiniteScrollOptions {
  * @returns Object containing lastElementRef to attach to the last item
  */
 export const useInfiniteScroll = ({
-	onLoadMore,
-	hasMore,
-	isLoading,
-	rootMargin = "100px",
+  onLoadMore,
+  hasMore,
+  isLoading,
+  rootMargin = '100px',
 }: UseInfiniteScrollOptions) => {
-	const observerRef = useRef<IntersectionObserver | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-	const lastElementRef = useCallback(
-		(node: HTMLElement | null) => {
-			if (isLoading) return;
+  const lastElementRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (isLoading) return;
 
-			if (observerRef.current) {
-				observerRef.current.disconnect();
-			}
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
 
-			observerRef.current = new IntersectionObserver(
-				entries => {
-					if (entries[0].isIntersecting && hasMore && !isLoading) {
-						onLoadMore();
-					}
-				},
-				{ rootMargin }
-			);
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore && !isLoading) {
+            onLoadMore();
+          }
+        },
+        { rootMargin },
+      );
 
-			if (node) {
-				observerRef.current.observe(node);
-			}
-		},
-		[hasMore, isLoading, onLoadMore, rootMargin]
-	);
+      if (node) {
+        observerRef.current.observe(node);
+      }
+    },
+    [hasMore, isLoading, onLoadMore, rootMargin],
+  );
 
-	useEffect(() => {
-		return () => {
-			if (observerRef.current) {
-				observerRef.current.disconnect();
-			}
-		};
-	}, []);
+  useEffect(() => {
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
 
-	return { lastElementRef };
+  return { lastElementRef };
 };
 
 export default useInfiniteScroll;

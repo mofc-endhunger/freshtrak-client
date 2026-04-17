@@ -58,7 +58,7 @@ export const ERROR_MESSAGES: Record<HouseholdApiError, ErrorMessage> = {
   },
   AUTHORIZATION_ERROR: {
     title: 'Access Denied',
-    message: 'You don\'t have permission to perform this action.',
+    message: "You don't have permission to perform this action.",
     severity: 'high',
     action: 'Contact support if you believe this is an error.',
     retryable: false,
@@ -86,7 +86,7 @@ export const ERROR_MESSAGES: Record<HouseholdApiError, ErrorMessage> = {
   },
   SERVER_ERROR: {
     title: 'Server Error',
-    message: 'Something went wrong on our end. We\'re working to fix it.',
+    message: "Something went wrong on our end. We're working to fix it.",
     severity: 'high',
     action: 'Please try again in a few minutes.',
     retryable: true,
@@ -119,7 +119,7 @@ export const ERROR_MESSAGES: Record<HouseholdApiError, ErrorMessage> = {
  */
 export const createErrorContext = (
   operation: string,
-  additionalData?: Partial<ErrorContext>
+  additionalData?: Partial<ErrorContext>,
 ): ErrorContext => ({
   operation,
   timestamp: new Date().toISOString(),
@@ -131,7 +131,7 @@ export const createErrorContext = (
  */
 export const getUserFriendlyErrorMessage = (
   error: HouseholdApiError,
-  context?: ErrorContext
+  context?: ErrorContext,
 ): ErrorMessage => {
   const baseMessage = ERROR_MESSAGES[error];
 
@@ -151,7 +151,7 @@ export const getUserFriendlyErrorMessage = (
  */
 export const calculateRetryDelay = (
   attempt: number,
-  config: RetryConfig = DEFAULT_RETRY_CONFIG
+  config: RetryConfig = DEFAULT_RETRY_CONFIG,
 ): number => {
   const delay = config.baseDelay * Math.pow(config.backoffMultiplier, attempt - 1);
   return Math.min(delay, config.maxDelay);
@@ -163,7 +163,7 @@ export const calculateRetryDelay = (
 export const retryWithBackoff = async <T>(
   operation: () => Promise<T>,
   config: RetryConfig = DEFAULT_RETRY_CONFIG,
-  context?: ErrorContext
+  context?: ErrorContext,
 ): Promise<T> => {
   let lastError: Error | undefined;
 
@@ -181,18 +181,18 @@ export const retryWithBackoff = async <T>(
       // Check if error is retryable based on status code
       const axiosError = error as any;
       const status = axiosError?.response?.status;
-      
+
       // Don't retry on 4xx errors (except 429 rate limit)
       // Only retry on 5xx errors or network errors
       const isRetryable = !status || status >= 500 || status === 429;
-      
+
       if (!isRetryable) {
         throw error;
       }
 
       // Wait before retrying
       const delay = calculateRetryDelay(attempt, config);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 
@@ -223,7 +223,7 @@ export const handleOfflineError = (): ErrorMessage => ({
 export const logError = (
   error: Error,
   context: ErrorContext,
-  additionalData?: Record<string, any>
+  additionalData?: Record<string, any>,
 ): void => {
   const errorLog = {
     error: {
@@ -251,7 +251,7 @@ export const logError = (
  */
 export const formatErrorForDisplay = (
   error: Error | HouseholdApiError,
-  context?: ErrorContext
+  context?: ErrorContext,
 ): ErrorMessage => {
   let errorType: HouseholdApiError;
 

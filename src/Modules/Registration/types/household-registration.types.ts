@@ -40,17 +40,13 @@ export interface HouseholdInfoDisplayProps {
 
 // Household registration service interface
 export interface HouseholdRegistrationService {
-  registerWithHousehold(
-    timeslotData: {
-      eventId: string;
-      eventDateId: string;
-      eventSlotId: string;
-    }
-  ): Promise<RegistrationResponse>;
+  registerWithHousehold(timeslotData: {
+    eventId: string;
+    eventDateId: string;
+    eventSlotId: string;
+  }): Promise<RegistrationResponse>;
 
-  checkHouseholdCompleteness(
-    householdData: UsersMeResponse
-  ): boolean;
+  checkHouseholdCompleteness(householdData: UsersMeResponse): boolean;
 }
 
 // Error handling types

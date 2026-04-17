@@ -1,126 +1,120 @@
-import { useState, useEffect } from "react";
-import localization from "../Modules/Localization/LocalizationComponent";
+import { useState, useEffect } from 'react';
+import localization from '../Modules/Localization/LocalizationComponent';
 
 const UseForm = (props, validations, callback, errorToComponent = false) => {
-    const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({});
 
-    const formValidation = (value, validator, limit) => {
-        let valueLength;
-        if(typeof value === 'number'){
-            valueLength = value;
-        }else{
-            valueLength = value.length;
+  const formValidation = (value, validator, limit) => {
+    let valueLength;
+    if (typeof value === 'number') {
+      valueLength = value;
+    } else {
+      valueLength = value.length;
+    }
+    switch (validator) {
+      case 'required':
+        return valueLength > 0 ? '' : localization.error_field_required;
+      case 'min':
+        return valueLength >= limit
+          ? ''
+          : localization.error_zip_code_min_length
+              ?.replace('ZIP code', 'This value')
+              .replace('5', limit.toString()) ||
+              `This value needs to be at least ${limit} characters`;
+      case 'max':
+        return valueLength <= limit ? '' : `This value cannot be more than ${limit} characters`;
+      case 'is_address':
+        const validAddress = new RegExp('^[-().,#\/a-zA-Z0-9 ]*$');
+        let errors_address = validAddress.test(value);
+        return errors_address
+          ? ''
+          : localization.error_street_address_required || 'Enter a valid address';
+      default:
+        return '';
+    }
+  };
+
+  const handleErrors = (e) => {
+    if (typeof e.target === 'undefined') {
+      let data = e;
+      let count = 0;
+      for (let key in data) {
+        // get index and check for last index and set true
+        let keyExists = key in validations;
+        if (keyExists) {
+          count++;
+          if (count === Object.keys(validations).length) {
+            let loopFinish = processValidations(data[key], validations[key], key, true);
+            return loopFinish;
+          } else {
+            processValidations(data[key], validations[key], key);
+          }
         }
-        switch (validator) {
-            case "required":
-                return valueLength > 0 ? "" : localization.error_field_required;
-            case "min":
-                return valueLength >= limit
-                    ? ""
-                    : localization.error_zip_code_min_length?.replace('ZIP code', 'This value').replace('5', limit.toString()) || `This value needs to be at least ${limit} characters`;
-            case "max":
-                return valueLength <= limit
-                    ? ""
-                    : `This value cannot be more than ${limit} characters`;
-            case "is_address":
-                const validAddress = new RegExp("^[-().,#\/a-zA-Z0-9 ]*$");
-                let errors_address = validAddress.test(value);
-                return errors_address
-                    ? ""
-                    : localization.error_street_address_required || "Enter a valid address";
-            default:
-                return "";
-        }
-    };
+      }
+    } else {
+      let { name, value } = e.target;
+      let nameExists = name in validations;
+      if (nameExists) {
+        processValidations(value, validations[name], name);
+      }
+    }
+  };
 
-    const handleErrors = (e) => {
-        if (typeof e.target === "undefined") {
-            let data = e;
-            let count = 0;
-            for(let key in data){
-                // get index and check for last index and set true
-                let keyExists = key in validations;
-                if(keyExists){
-                    count++;
-                    if(count === Object.keys(validations).length){
-                        let loopFinish = processValidations(data[key], validations[key], key, true);
-                        return loopFinish
-                    }else{
-                        processValidations(data[key], validations[key], key);
-                    }
+  const processValidations = (value, validate, name, lastLoop) => {
+    let validationRes;
+    let validator;
+    let limit;
+    let count = 0;
 
-                }
-            }
-        }else{
-            let {name, value} = e.target;
-            let nameExists = name in validations;
-            if(nameExists){
-                processValidations(value, validations[name], name);
-            }
-        }
+    for (let i = 0; i < validate.length; i++) {
+      count++;
+      let splitKey = validate[i].split(':');
+      if (typeof splitKey[1] !== 'undefined') {
+        validator = splitKey[0];
+        limit = splitKey[1];
+      } else {
+        validator = validate[i];
+      }
 
-    };
+      if (typeof validator === 'string') {
+        validationRes = formValidation(value, validator, limit);
+      }
+      if (validationRes) break;
+    }
 
+    setErrors((errors) => ({
+      ...errors,
+      [name]: validationRes,
+    }));
 
-    const processValidations = (value, validate, name, lastLoop) => {
-        let validationRes;
-        let validator;
-        let limit;
-        let count = 0;
+    if (count >= 1 && lastLoop) {
+      if (validationRes) {
+        return true;
+      }
+      return false;
+    }
+  };
 
-        for (let i = 0; i < validate.length; i++) {
-            count++;
-            let splitKey = validate[i].split(':');
-            if(typeof splitKey[1] !== 'undefined'){
-                validator = splitKey[0];
-                limit = splitKey[1];
-            }else{
-                validator = validate[i];
-            }
+  useEffect(() => {
+    for (let keys in errors) {
+      if (errors[keys] === null || errors[keys] === '') {
+        delete errors[keys];
+      }
+    }
 
-            if (typeof validator === "string") {
-                validationRes = formValidation(value, validator, limit);
-            }
-            if (validationRes) break;
-        }
+    if (Object.keys(errors).length === 0) {
+      callback();
+    }
 
-        setErrors(errors => ({
-            ...errors,
-            [name]: validationRes
-        }));
+    if (!errorToComponent) {
+      props.onFormErrors(errors);
+    }
+  }, [errors]);
 
-        if(count >= 1 && lastLoop){
-            if(validationRes){
-                return true;
-            }
-            return false;
-        }
-    };
-
-    useEffect(() => {
-        for(let keys in errors){
-            if(errors[keys] === null || errors[keys] === ""){
-                delete errors[keys]
-            }
-        }
-
-        if(Object.keys(errors).length === 0){
-            callback();
-        }
-
-        if(!errorToComponent){
-            props.onFormErrors(errors);
-        }
-
-
-    }, [errors]);
-
-
-
-    return {
-        handleErrors,
-        errors
-    };
+  return {
+    handleErrors,
+    errors,
+  };
 };
 
 export default UseForm;

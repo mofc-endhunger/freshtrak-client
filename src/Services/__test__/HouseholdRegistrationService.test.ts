@@ -72,11 +72,11 @@ describe('HouseholdRegistrationService', () => {
         },
         {
           headers: {
-            'Authorization': 'Bearer mock-token',
+            Authorization: 'Bearer mock-token',
             'Content-Type': 'application/json',
           },
           timeout: 5000,
-        }
+        },
       );
     });
 
@@ -127,7 +127,9 @@ describe('HouseholdRegistrationService', () => {
       const result = await service.registerWithHousehold(mockTimeslotData);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('This timeslot is no longer available. Please select another time.');
+      expect(result.error).toBe(
+        'This timeslot is no longer available. Please select another time.',
+      );
     });
 
     it('handles validation errors (422)', async () => {

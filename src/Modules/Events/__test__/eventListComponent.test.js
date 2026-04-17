@@ -3,14 +3,13 @@ import EventListComponent from '../EventListComponent';
 import { preformattedEventData, renderWithRouter } from '../../../Testing';
 
 // Suppress the moment warning. This is a consequence of using test-data-bot
-// and does not show in reality 
+// and does not show in reality
 const originalWarn = console.warn.bind(console.warn);
 beforeAll(() => {
-  console.warn = (msg) => 
-    !msg.toString().includes('Deprecation warning') && originalWarn(msg)
+  console.warn = (msg) => !msg.toString().includes('Deprecation warning') && originalWarn(msg);
 });
 afterAll(() => {
-  console.warn = originalWarn
+  console.warn = originalWarn;
 });
 
 test('should render that there are no events scheduled if an empty object is passed to it', () => {
@@ -20,9 +19,7 @@ test('should render that there are no events scheduled if an empty object is pas
 
 test('should display the data if data is passed to it', () => {
   const testData = { [preformattedEventData.date]: [preformattedEventData] };
-  const { getByText } = renderWithRouter(
-    <EventListComponent events={testData} zipCode={43123} />
-  );
+  const { getByText } = renderWithRouter(<EventListComponent events={testData} zipCode={43123} />);
   getByText(preformattedEventData.agencyName);
   getByText(/Resource Events Serving Residents of Zip Code 43123/i);
 });

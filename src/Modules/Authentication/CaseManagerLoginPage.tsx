@@ -57,8 +57,9 @@ const CaseManagerLoginPage: React.FC = () => {
 		try {
 			await signIn(data.email, data.password);
 
-			const session = await fetchAuthSession();
-			const accessToken = session.tokens?.accessToken?.toString();
+		const session = await fetchAuthSession();
+		// Use the ID token: it contains the email claim and cognito:groups, unlike the access token
+		const accessToken = session.tokens?.idToken?.toString();
 
 			if (!accessToken) {
 				await signOut();

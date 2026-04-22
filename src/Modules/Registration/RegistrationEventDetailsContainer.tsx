@@ -2,7 +2,7 @@ import * as React from "react";
 import { Fragment, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SpinnerComponent from "../General/SpinnerComponent";
-import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
+import { API_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import RegistrationTextInfoComponent from "../Registration/RegistrationTextInfoComponent";
 import AuthenticationModalComponent from "../Authentication/AuthenticationModal";
@@ -95,7 +95,7 @@ const RegistrationEventDetailsContainer: React.FC<
 	const getEvent = async (): Promise<void> => {
 		try {
 			const resp = await axios.get<EventApiResponse>(
-				`${BASE_URL}api/event_dates/${eventDateId}/event_details`,
+				API_URL.EVENT_DATE_DETAILS(eventDateId),
 			);
 			const { data } = resp;
 			if (data?.event !== undefined) {

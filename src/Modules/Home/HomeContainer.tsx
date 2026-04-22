@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 /**
  * HomeContainer - Main container component for the Home module
@@ -55,9 +55,19 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 	);
 	const [loading, setLoading] = useState<boolean>(false);
 	const dispatch = useDispatch();
+	const isMountedRef = useRef(true);
+
+	const safeSetState = (setter: () => void) => {
+		if (isMountedRef.current) {
+			setter();
+		}
+	};
 
 	useEffect(() => {
 		getUsersReservations();
+		return () => {
+			isMountedRef.current = false;
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -89,7 +99,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 			!Array.isArray(userRegData) ||
 			userRegData.length === 0
 		) {
-			setReservedEvents([]);
+			safeSetState(() => setReservedEvents([]));
 			return;
 		}
 		const userRegEvents: Promise<any>[] = [];
@@ -99,7 +109,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 				axios.get(`${EVENT_URL}?event_date_id=${userReg.event_date_id}`)
 			);
 		});
-		const regEvents = await axios.all(userRegEvents);
+		const regEvents = await Promise.all(userRegEvents);
 		const events: ReservedEvent[] = [];
 		if (regEvents && Array.isArray(regEvents)) {
 			regEvents.forEach((event: any, index: number) => {
@@ -125,7 +135,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 				}
 			});
 		}
-		setReservedEvents(events);
+		safeSetState(() => setReservedEvents(events));
 	};
 
 	useEffect(() => {
@@ -137,7 +147,7 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 
 	const getEvents = async (zip: string): Promise<void> => {
 		if (zip) {
-			setLoading(true);
+			safeSetState(() => setLoading(true));
 			try {
 				const resp: { data: EventsListApiResponse } = await axios.get(
 					API_URL.EVENTS_LIST,
@@ -149,12 +159,14 @@ const HomeContainer: React.FC<HomeContainerProps> = () => {
 				const {
 					data: { agencies },
 				} = resp;
-				setAgencyData(agencies);
-				setAgencyResponse(true);
-				setLoading(false);
+				safeSetState(() => {
+					setAgencyData(agencies);
+					setAgencyResponse(true);
+					setLoading(false);
+				});
 			} catch (err) {
 				console.error(err);
-				setLoading(false);
+				safeSetState(() => setLoading(false));
 			}
 		}
 	};

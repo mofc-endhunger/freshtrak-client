@@ -66,13 +66,16 @@ const ResourceListComponent: React.FC<ResourceListComponentProps> = ({
 	};
 
 	React.useEffect(() => {
-		if (dataToChild) {
-			const { foodbanks } = dataToChild;
-			let foodBankArray: FoodbankData[] = foodbanks.map((foodbank) => {
-				return { foodbank };
-			});
+		if (dataToChild && Array.isArray(dataToChild.foodbanks)) {
+			const foodBankArray: FoodbankData[] = dataToChild.foodbanks.map(
+				(foodbank) => {
+					return { foodbank };
+				}
+			);
 			setFoodBankArray(foodBankArray);
+			return;
 		}
+		setFoodBankArray([]);
 	}, [dataToChild]);
 
 	return (
@@ -131,7 +134,10 @@ const ResourceListComponent: React.FC<ResourceListComponentProps> = ({
 							</div>
 						</div>
 						<ul className="space-y-2 mt-4">
-							{foodbank_texts.map((value, index) => {
+							{(Array.isArray(foodbank_texts)
+								? foodbank_texts
+								: []
+							).map((value, index) => {
 								return (
 									<li
 										className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef } from "react";
+import React, { useState, useEffect, forwardRef, useRef } from "react";
 import localization from "../Localization/LocalizationComponent";
 
 interface GooglePlacesAutocompleteProps {
@@ -153,33 +153,50 @@ const GooglePlacesAutocomplete = forwardRef<
 	const [loading, setLoading] = useState<boolean>(false);
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 	const [isApiAvailable, setIsApiAvailable] = useState<boolean>(false);
+	const isMountedRef = useRef(true);
+	const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const safeSetState = (setter: () => void) => {
+		if (isMountedRef.current) {
+			setter();
+		}
+	};
 
 	useEffect(() => {
+		isMountedRef.current = true;
 		// Check if new Google Places API is available
 		const checkApiAvailability = () => {
 			if (window.google?.maps?.places?.AutocompleteSuggestion) {
-				setIsApiAvailable(true);
+				safeSetState(() => setIsApiAvailable(true));
 				return true;
 			}
 			return false;
 		};
 
-		// Try to check immediately
-		if (checkApiAvailability()) return;
-
-		// If not available immediately, wait and try again
-		const timer = setTimeout(checkApiAvailability, 1000);
-		return () => clearTimeout(timer);
+		// Try to check immediately; only schedule retry when unavailable.
+		const apiAvailable = checkApiAvailability();
+		const timer = apiAvailable ? null : setTimeout(checkApiAvailability, 1000);
+		return () => {
+			isMountedRef.current = false;
+			if (timer) {
+				clearTimeout(timer);
+			}
+			if (blurTimeoutRef.current) {
+				clearTimeout(blurTimeoutRef.current);
+			}
+		};
 	}, []);
 
 	const getPlacePredictions = async (input: string) => {
 		if (!input.trim()) {
-			setSuggestions([]);
-			setLoading(false);
+			safeSetState(() => {
+				setSuggestions([]);
+				setLoading(false);
+			});
 			return;
 		}
 
-		setLoading(true);
+		safeSetState(() => setLoading(true));
 		try {
 			// Use the new AutocompleteSuggestion API
 			if (isApiAvailable) {
@@ -217,16 +234,16 @@ const GooglePlacesAutocomplete = forwardRef<
 					})
 				);
 
-				setSuggestions(mappedSuggestions);
+				safeSetState(() => setSuggestions(mappedSuggestions));
 			} else {
 				// API not available - users can manually type their address
-				setSuggestions([]);
+				safeSetState(() => setSuggestions([]));
 			}
 		} catch (error) {
 			console.error("Error fetching place predictions:", error);
-			setSuggestions([]);
+			safeSetState(() => setSuggestions([]));
 		} finally {
-			setLoading(false);
+			safeSetState(() => setLoading(false));
 		}
 	};
 
@@ -240,15 +257,17 @@ const GooglePlacesAutocomplete = forwardRef<
 
 		if (inputValue.length > 2) {
 			getPlacePredictions(inputValue);
-			setShowSuggestions(true);
+			safeSetState(() => setShowSuggestions(true));
 		} else {
-			setSuggestions([]);
-			setShowSuggestions(false);
+			safeSetState(() => {
+				setSuggestions([]);
+				setShowSuggestions(false);
+			});
 		}
 	};
 
 	const handleSuggestionClick = async (suggestion: GooglePlace) => {
-		setShowSuggestions(false);
+		safeSetState(() => setShowSuggestions(false));
 
 		// Create a proper event object for onChange
 		const event = {
@@ -326,8 +345,11 @@ const GooglePlacesAutocomplete = forwardRef<
 
 	const handleInputBlur = () => {
 		// Delay hiding suggestions to allow for clicks
-		setTimeout(() => {
-			setShowSuggestions(false);
+		if (blurTimeoutRef.current) {
+			clearTimeout(blurTimeoutRef.current);
+		}
+		blurTimeoutRef.current = setTimeout(() => {
+			safeSetState(() => setShowSuggestions(false));
 		}, 200);
 	};
 

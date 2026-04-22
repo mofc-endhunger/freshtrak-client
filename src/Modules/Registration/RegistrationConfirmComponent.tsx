@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Fragment, useEffect, useState, useCallback } from "react";
+import { Fragment, useEffect, useState, useCallback, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RENDER_URL, BASE_URL } from "../../Utils/Urls";
+import { RENDER_URL, API_URL } from "../../Utils/Urls";
 import axios from "axios";
 import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
 import { selectUser } from "../../Store/userSlice";
@@ -57,7 +57,15 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 		useState<boolean>(false);
 	const [showRegisterAnotherDialog, setShowRegisterAnotherDialog] =
 		useState<boolean>(false);
+	const isMountedRef = useRef(true);
+	const guestSigninTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const eventDateId = StorageService.getRegisteredEventDateID();
+
+	const safeSetState = (setter: () => void) => {
+		if (isMountedRef.current) {
+			setter();
+		}
+	};
 
 	const isLoggedIn = StorageService.getItem<string>("isLoggedIn");
 	if (!isLoggedIn || isLoggedIn !== "true") {
@@ -79,21 +87,21 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
 			const resp = await axios.get<EventApiResponse>(
-				`${BASE_URL}api/event_dates/${eventDateId}/event_details`,
+				API_URL.EVENT_DATE_DETAILS(eventDateId),
 			);
 			const { data } = resp;
 			if (data && data.event !== undefined) {
 				const eventData = EventFormat(data.event, eventDateId);
 				dispatch(setCurrentEvent(eventData));
-				setSelectedEvent(eventData);
+				safeSetState(() => setSelectedEvent(eventData));
 			} else {
-				setPageError(true);
+				safeSetState(() => setPageError(true));
 			}
 		} catch (e: unknown) {
 			console.error(e);
-			setIsError(true);
+			safeSetState(() => setIsError(true));
 			if (e && typeof e === "object" && "response" in e) {
-				setPageError(true);
+				safeSetState(() => setPageError(true));
 			}
 		}
 	}, [eventDateId, dispatch]);
@@ -124,22 +132,29 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 
 	// Show guest signin modal for guest users only (not for case managers)
 	useEffect(() => {
-		if (isCaseManager) return;
+		isMountedRef.current = true;
+		if (!isCaseManager) {
+			const isGuest = StorageService.isGuestUser();
+			const isCognito = StorageService.isLoggedInUser();
 
-		const isGuest = StorageService.isGuestUser();
-		const isCognito = StorageService.isLoggedInUser();
-
-		if (isGuest && !isCognito) {
-			setTimeout(() => {
-				setShowGuestSigninModal(true);
-			}, 3000);
+			if (isGuest && !isCognito) {
+				guestSigninTimerRef.current = setTimeout(() => {
+					safeSetState(() => setShowGuestSigninModal(true));
+				}, 3000);
+			}
 		}
+		return () => {
+			isMountedRef.current = false;
+			if (guestSigninTimerRef.current) {
+				clearTimeout(guestSigninTimerRef.current);
+			}
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [isCaseManager]);
 
 	function fetchBusinesses(): void {
 		const token = localStorage.getItem("userToken");
-		setUserToken(token || undefined);
+		safeSetState(() => setUserToken(token || undefined));
 		if (!isError && !pageError) {
 			if (Object.keys(selectedEvent).length === 0) {
 				getEvent();

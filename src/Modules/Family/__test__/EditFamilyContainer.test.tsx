@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
@@ -116,14 +116,26 @@ const renderEditFamilyContainer = () => {
 	);
 };
 
+const finishInitialLoading = async () => {
+	await act(async () => {
+		jest.runAllTimers();
+	});
+
+	await waitFor(() => {
+		expect(screen.queryByTestId("spinner-component")).not.toBeInTheDocument();
+	});
+};
+
 describe("EditFamilyContainer", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		jest.useFakeTimers();
 	});
 
-	afterEach(() => {
-		jest.runAllTimers();
+	afterEach(async () => {
+		await act(async () => {
+			jest.runOnlyPendingTimers();
+		});
 		jest.useRealTimers();
 	});
 
@@ -158,16 +170,7 @@ describe("EditFamilyContainer", () => {
 	describe("Form Rendering After Loading", () => {
 		it("renders form components after loading", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			// Wait for loading to complete
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			expect(screen.getByTestId("address-component")).toBeInTheDocument();
 			expect(
@@ -180,15 +183,7 @@ describe("EditFamilyContainer", () => {
 
 		it("renders email input field", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const emailInput = screen.getByLabelText("Email Address");
 			expect(emailInput).toBeInTheDocument();
@@ -197,15 +192,7 @@ describe("EditFamilyContainer", () => {
 
 		it("renders update button", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const updateButton = screen.getByTestId("continue button");
 			expect(updateButton).toBeInTheDocument();
@@ -214,15 +201,7 @@ describe("EditFamilyContainer", () => {
 
 		it("renders Google email link", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const emailLink = screen.getByText("Get one free from Google.");
 			expect(emailLink).toBeInTheDocument();
@@ -239,15 +218,7 @@ describe("EditFamilyContainer", () => {
 		it("calls onSubmit when form is submitted", async () => {
 			const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const form = screen
 				.getByTestId("address-component")
@@ -260,15 +231,7 @@ describe("EditFamilyContainer", () => {
 
 		it("resets form with mock data after loading", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			expect(mockReset).toHaveBeenCalledWith({
 				address_line_1: "123 Main St",
@@ -288,15 +251,7 @@ describe("EditFamilyContainer", () => {
 
 		it("handles null household counts gracefully", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			// The component should call reset with the mock data, which includes the original household counts
 			// The null handling is done in the component's reset logic, not in the test mock
@@ -320,30 +275,14 @@ describe("EditFamilyContainer", () => {
 	describe("Component Integration", () => {
 		it("passes correct props to AddressComponent", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			expect(screen.getByTestId("address-component")).toBeInTheDocument();
 		});
 
 		it("passes correct props to PrimaryInfoFormComponent", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			expect(
 				screen.getByTestId("primary-info-component")
@@ -352,15 +291,7 @@ describe("EditFamilyContainer", () => {
 
 		it("passes correct props to MemberCountFormComponent", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			expect(
 				screen.getByTestId("member-count-component")
@@ -371,15 +302,7 @@ describe("EditFamilyContainer", () => {
 	describe("Responsive Design", () => {
 		it("applies responsive container classes", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			// Look for the container div that has the max-w-4xl mx-auto classes
 			const container = screen
@@ -390,15 +313,7 @@ describe("EditFamilyContainer", () => {
 
 		it("applies responsive padding classes", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			// Look for the form container div that has the p-6 md:p-8 classes
 			// This is the div that contains the form element
@@ -410,15 +325,7 @@ describe("EditFamilyContainer", () => {
 
 		it("applies responsive button width classes", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const updateButton = screen.getByTestId("continue button");
 			expect(updateButton).toHaveClass("w-full", "md:w-auto");
@@ -426,15 +333,7 @@ describe("EditFamilyContainer", () => {
 
 		it("applies responsive text sizing", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const heading = screen.getByText("Edit Family Information");
 			expect(heading).toHaveClass("text-3xl");
@@ -442,15 +341,7 @@ describe("EditFamilyContainer", () => {
 
 		it("applies responsive spacing", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const form = screen
 				.getByTestId("address-component")
@@ -462,15 +353,7 @@ describe("EditFamilyContainer", () => {
 	describe("Accessibility", () => {
 		it("has proper form labels", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const emailLabel = screen.getByText("Email Address");
 			expect(emailLabel).toBeInTheDocument();
@@ -479,15 +362,7 @@ describe("EditFamilyContainer", () => {
 
 		it("has proper button test ID", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const updateButton = screen.getByTestId("continue button");
 			expect(updateButton).toBeInTheDocument();
@@ -495,15 +370,7 @@ describe("EditFamilyContainer", () => {
 
 		it("has proper form structure", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const form = screen
 				.getByTestId("address-component")
@@ -515,15 +382,7 @@ describe("EditFamilyContainer", () => {
 	describe("Error Handling", () => {
 		it("handles form submission errors gracefully", async () => {
 			renderEditFamilyContainer();
-
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			const form = screen
 				.getByTestId("address-component")
@@ -540,15 +399,7 @@ describe("EditFamilyContainer", () => {
 			// Initially shows loading
 			expect(screen.getByTestId("spinner-component")).toBeInTheDocument();
 
-			// Run timers to complete loading
-			jest.runAllTimers();
-
-			// After timeout, shows form
-			await waitFor(() => {
-				expect(
-					screen.queryByTestId("spinner-component")
-				).not.toBeInTheDocument();
-			});
+			await finishInitialLoading();
 
 			expect(screen.getByTestId("address-component")).toBeInTheDocument();
 		});

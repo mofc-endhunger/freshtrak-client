@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 
 /**
  * LocalFoodBankComponent - Component for displaying local food bank information
@@ -35,13 +35,25 @@ const LocalFoodBankComponent: React.FC<LocalFoodBankComponentProps> = props => {
 		FoodBank | "no_foodbanks_found" | Record<string, never>
 	>({});
 	const dispatch = useDispatch();
+	const isMountedRef = useRef(true);
+
+	const safeSetState = (setter: () => void) => {
+		if (isMountedRef.current) {
+			setter();
+		}
+	};
 
 	useEffect(() => {
+		isMountedRef.current = true;
 		const zipCode = props.zipCode;
 		if (zipCode) {
 			dispatch(setCurrentZip(zipCode));
 			getFoodbanks(zipCode);
 		}
+
+		return () => {
+			isMountedRef.current = false;
+		};
 	}, [dispatch, props.zipCode]);
 
 	const getFoodbanks = async (zip: string): Promise<void> => {
@@ -56,7 +68,9 @@ const LocalFoodBankComponent: React.FC<LocalFoodBankComponentProps> = props => {
 					}
 				);
 				const { data } = resp;
-				setFoodBankData(data?.foodbanks?.[0] || "no_foodbanks_found");
+				safeSetState(() =>
+					setFoodBankData(data?.foodbanks?.[0] || "no_foodbanks_found"),
+				);
 			} catch (err) {
 				// setServerError(true);
 				// setLoading(false);

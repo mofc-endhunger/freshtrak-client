@@ -178,7 +178,7 @@ describe("RegistrationContainer", () => {
 		);
 	};
 
-	test("renders without crashing", () => {
+	test("renders without crashing", async () => {
 		// Mock that user is not authenticated (no token)
 		mockStorageService.getUserToken.mockReturnValue(null);
 		mockStorageService.getGuestUser.mockReturnValue(null);
@@ -187,6 +187,9 @@ describe("RegistrationContainer", () => {
 
 		const { container } = renderWithProviders(<RegistrationContainer />);
 		expect(container).toBeInTheDocument();
+		await waitFor(() => {
+			expect(mockAxios.get).toHaveBeenCalled();
+		});
 	});
 
 	test("shows auth modal when user is not authenticated", async () => {
@@ -257,7 +260,7 @@ describe("RegistrationContainer", () => {
 		await waitFor(() => {
 			// Verify axios.get was called with the URL containing the eventDateId from the URL
 			expect(mockAxios.get).toHaveBeenCalledWith(
-				expect.stringContaining("/api/event_dates/123/event_details")
+				expect.stringContaining("api/event_dates/123/event_details")
 			);
 		}, { timeout: 3000 });
 	});

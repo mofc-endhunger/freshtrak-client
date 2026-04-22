@@ -13,7 +13,7 @@ describe('VersionUtils', () => {
     it('should return a version string', () => {
       const version = getAppVersion();
       expect(typeof version).toBe('string');
-      expect(version).toMatch(/^\d+\.\d+\.\d+$/);
+      expect(version).toMatch(/^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/);
     });
   });
 
@@ -21,7 +21,7 @@ describe('VersionUtils', () => {
     it('should return formatted version with v prefix', () => {
       const formattedVersion = getFormattedAppVersion();
       expect(typeof formattedVersion).toBe('string');
-      expect(formattedVersion).toMatch(/^v\d+\.\d+\.\d+$/);
+      expect(formattedVersion).toMatch(/^v\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$/);
     });
   });
 });

@@ -5,6 +5,7 @@ import { RENDER_URL } from "../../Utils/Urls";
 import HeaderComponent from "./HeaderComponent";
 import HeaderDataComponent from "./HeaderDataComponent";
 import { HeaderContainerProps } from "./types/header.types";
+import bannerBackgroundImage from "../../Assets/img/banner-bg.png";
 
 /**
  * HeaderContainer - Container component that handles page-specific header logic
@@ -55,7 +56,7 @@ const HeaderContainer: React.FC<HeaderContainerProps> = () => {
 				<header
 					className="bg-[#28ce85] bg-no-repeat bg-center bg-cover h-[300px] sm:h-[400px]"
 					style={{
-						backgroundImage: `url(${require("../../Assets/img/banner-bg.png")})`,
+						backgroundImage: `url(${bannerBackgroundImage})`,
 					}}
 				>
 					<HeaderComponent />

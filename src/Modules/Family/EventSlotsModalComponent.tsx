@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useRef, useState, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import {
 	Dialog,
@@ -110,6 +110,13 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	const [isLoadingHousehold, setIsLoadingHousehold] = useState(false);
 	const [householdError, setHouseholdError] = useState<string | null>(null);
 	const [selectedSlot, setSelectedSlot] = useState<EventSlot | null>(null);
+	const isMountedRef = useRef(true);
+
+	const safeSetState = (callback: () => void) => {
+		if (isMountedRef.current) {
+			callback();
+		}
+	};
 
 	// Services
 	const householdRegistrationService = new HouseholdRegistrationService();
@@ -140,28 +147,30 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 		const slot = findEventSlot(slotId);
 		if (!slot) return;
 
-		setSelectedSlot(slot);
-		setIsLoadingHousehold(true);
-		setHouseholdError(null);
+		safeSetState(() => {
+			setSelectedSlot(slot);
+			setIsLoadingHousehold(true);
+			setHouseholdError(null);
+		});
 
 		// If user is not authenticated (guest user), skip household data fetch
 		if (!isAuthenticated) {
 			navigateToRegistration(slot, null);
-			setIsLoadingHousehold(false);
+			safeSetState(() => setIsLoadingHousehold(false));
 			return;
 		}
 
 		// Case managers register on behalf of others; never prefill or confirm their own household
 		if (StorageService.isCaseManager()) {
 			navigateToRegistration(slot, null);
-			setIsLoadingHousehold(false);
+			safeSetState(() => setIsLoadingHousehold(false));
 			return;
 		}
 
 		try {
 			// Fetch household data only for authenticated users
 			const household = await householdsApiService.getUsersMe();
-			setHouseholdData(household);
+			safeSetState(() => setHouseholdData(household));
 
 			// Check if user has completed household setup by verifying DOB is not placeholder
 			// When household is auto-created on signup, DOB defaults to "1900-01-01"
@@ -175,17 +184,19 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 
 			if (hasCompletedSetup) {
 				// Show confirmation modal for users who completed household setup
-				setShowHouseholdModal(true);
+				safeSetState(() => setShowHouseholdModal(true));
 			} else {
 				// Proceed directly to registration form with prefilled data
 				navigateToRegistration(slot, household);
 			}
 		} catch (error) {
-			setHouseholdError(localization.error_failed_load_household);
+			safeSetState(() =>
+				setHouseholdError(localization.error_failed_load_household),
+			);
 			// Proceed to registration form without prefilled data
 			navigateToRegistration(slot, null);
 		} finally {
-			setIsLoadingHousehold(false);
+			safeSetState(() => setIsLoadingHousehold(false));
 		}
 	};
 
@@ -206,7 +217,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				},
 			},
 		);
-		setShow(false);
+		safeSetState(() => setShow(false));
 	};
 
 	// Check if error message indicates "already registered"
@@ -234,8 +245,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	const handleHouseholdConfirm = async () => {
 		if (!selectedSlot) return;
 
-		setIsLoadingHousehold(true);
-		setHouseholdError(null);
+		safeSetState(() => {
+			setIsLoadingHousehold(true);
+			setHouseholdError(null);
+		});
 
 		try {
 			// Send additional-member counts (HOH excluded) to the reservation endpoint.
@@ -268,16 +281,20 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 						user: transformHouseholdDataToUserData(householdData),
 					},
 				});
-				setShowHouseholdModal(false);
-				setShow(false);
+				safeSetState(() => {
+					setShowHouseholdModal(false);
+					setShow(false);
+				});
 			} else {
 				// Check for "already registered" error
 				const errorMessage =
 					result.error || localization.error_registration_failed;
 				if (isAlreadyRegisteredError(errorMessage)) {
 					// Redirect to already registered page instead of showing error
-					setShowHouseholdModal(false);
-					setShow(false);
+					safeSetState(() => {
+						setShowHouseholdModal(false);
+						setShow(false);
+					});
 					navigate(RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL, {
 						state: {
 							eventName: event?.agencyName || event?.name,
@@ -288,7 +305,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 
 				// Registration failed - show error for other errors
 				console.warn("Household registration failed:", result.error);
-				setHouseholdError(errorMessage);
+				safeSetState(() => setHouseholdError(errorMessage));
 			}
 		} catch (error: any) {
 			console.error("Household registration error:", error);
@@ -306,8 +323,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 					))
 			) {
 				// Redirect to already registered page
-				setShowHouseholdModal(false);
-				setShow(false);
+				safeSetState(() => {
+					setShowHouseholdModal(false);
+					setShow(false);
+				});
 				navigate(RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL, {
 					state: {
 						eventName: event?.agencyName || event?.name,
@@ -316,9 +335,9 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				return;
 			}
 
-			setHouseholdError(errorMessage);
+			safeSetState(() => setHouseholdError(errorMessage));
 		} finally {
-			setIsLoadingHousehold(false);
+			safeSetState(() => setIsLoadingHousehold(false));
 		}
 	};
 
@@ -329,8 +348,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	};
 
 	const handleHouseholdModalClose = () => {
-		setShowHouseholdModal(false);
-		setHouseholdError(null);
+		safeSetState(() => {
+			setShowHouseholdModal(false);
+			setHouseholdError(null);
+		});
 	};
 
 	const handleBackHome = () => {
@@ -338,14 +359,19 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 	};
 
 	useEffect(() => {
+		isMountedRef.current = true;
 		if (acceptReservations === 1 && eventDateId) {
 			handleShow();
 			getEventHours(eventDateId);
 		}
+
+		return () => {
+			isMountedRef.current = false;
+		};
 	}, [eventDateId, acceptReservations]);
 
 	const getEventHours = async (eventDateId: string) => {
-		setIsLoading(true);
+		safeSetState(() => setIsLoading(true));
 		try {
 			const { EVENT_DATES_URL } = API_URL;
 			const resp = await axios.get(
@@ -357,13 +383,15 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 				data.event_date &&
 				data.event_date.event_hours !== undefined
 			) {
-				setEventHour(data.event_date.event_hours);
-				setEventDate(data.event_date.date);
+				safeSetState(() => {
+					setEventHour(data.event_date.event_hours);
+					setEventDate(data.event_date.date);
+				});
 			}
 		} catch (e) {
 			// Error handling for event slot selection
 		} finally {
-			setIsLoading(false);
+			safeSetState(() => setIsLoading(false));
 		}
 	};
 

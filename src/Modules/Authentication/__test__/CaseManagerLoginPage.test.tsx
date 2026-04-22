@@ -4,10 +4,29 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 
 const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useNavigate: () => mockNavigate,
-}));
+jest.mock("react-router-dom", () => {
+  const actual = jest.requireActual("react-router-dom");
+  const React = jest.requireActual("react");
+  const withFutureFlags = (RouterComponent: React.ComponentType<any>) => {
+    const WrappedRouter = ({ future, ...props }: any) =>
+      React.createElement(RouterComponent, {
+        ...props,
+        future: {
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+          ...(future || {}),
+        },
+      });
+    return WrappedRouter;
+  };
+
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    MemoryRouter: withFutureFlags(actual.MemoryRouter),
+    BrowserRouter: withFutureFlags(actual.BrowserRouter),
+  };
+});
 
 const mockSignIn = jest.fn();
 const mockSignOut = jest.fn();

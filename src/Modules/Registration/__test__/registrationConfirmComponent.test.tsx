@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
@@ -8,12 +8,32 @@ import RegistrationConfirmComponent from "../RegistrationConfirmComponent";
 import { Event, RegistrationFormData } from "../types/registration.types";
 
 jest.mock("axios");
+const mockAxios = require("axios");
 
 const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => ({
-	...jest.requireActual("react-router-dom"),
-	useNavigate: () => mockNavigate,
-}));
+jest.mock("react-router-dom", () => {
+	const actual = jest.requireActual("react-router-dom");
+	const React = jest.requireActual("react");
+	const withFutureFlags = (RouterComponent: React.ComponentType<any>) => {
+		const WrappedRouter = ({ future, ...props }: any) =>
+			React.createElement(RouterComponent, {
+				...props,
+				future: {
+					v7_startTransition: true,
+					v7_relativeSplatPath: true,
+					...(future || {}),
+				},
+			});
+		return WrappedRouter;
+	};
+
+	return {
+		...actual,
+		useNavigate: () => mockNavigate,
+		MemoryRouter: withFutureFlags(actual.MemoryRouter),
+		BrowserRouter: withFutureFlags(actual.BrowserRouter),
+	};
+});
 
 jest.mock("../../../Utils/StorageService", () => ({
 	StorageService: {
@@ -89,6 +109,32 @@ const eventData = {
 	eventName: "Test Food Drive",
 } as Event;
 
+const eventDetailsApiResponse = {
+	address: "123 Test St",
+	city: "Test City",
+	state: "TS",
+	zip: "12345",
+	forms: [],
+	agency_name: "Test Agency",
+	name: "Test Food Drive",
+	exception_note: "",
+	estimated_distance: 0,
+	service_category: { service_category_name: "Food" },
+	event_details: "",
+	event_dates: [
+		{
+			id: 123,
+			event_id: 1,
+			accept_reservations: true,
+			accept_interest: false,
+			accept_walkin: true,
+			start_time: "09:00 AM",
+			end_time: "10:00 AM",
+			date: "2024-01-01",
+		},
+	],
+};
+
 const initialState: TestState = {
 	event: { event: eventData },
 	user: { user: mockFamily },
@@ -129,6 +175,9 @@ describe("RegistrationConfirmComponent", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		mockNavigate.mockClear();
+		mockAxios.get.mockResolvedValue({
+			data: { event: eventDetailsApiResponse },
+		});
 	});
 
 	it("should render without errors", () => {
@@ -153,7 +202,7 @@ describe("RegistrationConfirmComponent", () => {
 		}).not.toThrow();
 	});
 
-	it("should load without errors with empty event", () => {
+	it("should load without errors with empty event", async () => {
 		const emptyStore = mockStore({
 			event: { event: {} as Event },
 			user: { user: mockFamily },
@@ -162,17 +211,17 @@ describe("RegistrationConfirmComponent", () => {
 			state: { user: mockFamily, eventTimeStamp: {} },
 		};
 
-		expect(() => {
-			render(
-				<Provider store={emptyStore}>
-					<MemoryRouter>
-						<RegistrationConfirmComponent
-							location={user_mock_data}
-						/>
-					</MemoryRouter>
-				</Provider>,
-			);
-		}).not.toThrow();
+		render(
+			<Provider store={emptyStore}>
+				<MemoryRouter>
+					<RegistrationConfirmComponent location={user_mock_data} />
+				</MemoryRouter>
+			</Provider>,
+		);
+
+		await waitFor(() => {
+			expect(mockAxios.get).toHaveBeenCalled();
+		});
 	});
 
 	it("should show the event data and user data", () => {
@@ -276,10 +325,8 @@ describe("RegistrationConfirmComponent", () => {
 		it("navigates to event registration when Continue is clicked", async () => {
 			renderWithState(cmLocationState);
 			fireEvent.click(screen.getByText("Register Another Person"));
-
-			await waitFor(() => {
-				fireEvent.click(screen.getByText("Continue"));
-			});
+			const continueButton = await screen.findByText("Continue");
+			fireEvent.click(continueButton);
 
 			expect(mockNavigate).toHaveBeenCalledWith(
 				expect.stringContaining("/456"),
@@ -352,7 +399,7 @@ describe("RegistrationConfirmComponent", () => {
 	});
 
 	describe("Guest sign-in modal", () => {
-		it("does not show guest modal for case managers", () => {
+		it("does not show guest modal for case managers", async () => {
 			jest.useFakeTimers();
 			const { StorageService } = require("../../../Utils/StorageService");
 			StorageService.isGuestUser.mockReturnValue(true);
@@ -365,7 +412,9 @@ describe("RegistrationConfirmComponent", () => {
 				eventDateId: "456",
 			});
 
-			jest.advanceTimersByTime(4000);
+			await act(async () => {
+				jest.advanceTimersByTime(4000);
+			});
 
 			expect(
 				screen.queryByText("Create an Account"),

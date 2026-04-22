@@ -43,21 +43,27 @@ jest.mock("../../Localization/LocalizationComponent", () => ({
 
 // Mock GooglePlacesAutocomplete
 jest.mock("../../General/GooglePlacesAutocomplete", () => {
-	return function MockGooglePlacesAutocomplete(props: any) {
-		return (
-			<input
-				type="text"
-				className={props.className}
-				id={props.id}
-				name={props.name}
-				value={props.value}
-				onChange={e => props.onChange && props.onChange(e)}
-				placeholder={props.placeholder}
-				data-testid="google-places-autocomplete"
-				{...props}
-			/>
-		);
-	};
+	const React = require("react");
+	const MockGooglePlacesAutocomplete = React.forwardRef(
+		(props: any, ref: React.Ref<HTMLInputElement>) => {
+			return (
+				<input
+					ref={ref}
+					type="text"
+					className={props.className}
+					id={props.id}
+					name={props.name}
+					value={props.value}
+					onChange={e => props.onChange && props.onChange(e)}
+					placeholder={props.placeholder}
+					data-testid="google-places-autocomplete"
+					{...props}
+				/>
+			);
+		}
+	);
+	MockGooglePlacesAutocomplete.displayName = "MockGooglePlacesAutocomplete";
+	return MockGooglePlacesAutocomplete;
 });
 
 // Mock StateDropdownComponent

@@ -258,7 +258,17 @@ export const resolveUserNameWithFallback = async (
 		email?: string;
 	}>("pendingUser");
 
-	let userName = pendingUser?.name || authUser?.name;
+	// Only trust pendingUser.name when its email matches the confirming user's email.
+	// A stale pendingUser from a different user's incomplete sign-up must not
+	// contaminate the name of the user who is currently confirming.
+	const confirmedEmail = pendingEmail || authUser?.email;
+	const pendingNameIsForThisUser =
+		pendingUser?.name &&
+		(!pendingUser.email ||
+			!confirmedEmail ||
+			pendingUser.email === confirmedEmail);
+
+	let userName = (pendingNameIsForThisUser ? pendingUser?.name : undefined) || authUser?.name;
 	let userEmail = pendingEmail || pendingUser?.email || authUser?.email;
 
 	// If name not found in localStorage or context, try fetching from Cognito attributes

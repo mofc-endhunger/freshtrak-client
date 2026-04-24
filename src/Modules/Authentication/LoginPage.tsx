@@ -67,14 +67,17 @@ const LoginPage: React.FC = () => {
 			// Clear Cognito authentication data when logging in as guest
 			StorageService.clearAuthData("cognito");
 
-			const resp = await axios.post(GUEST_USER);
-			const userProfile = resp.data;
-			// Use StorageService to store guest user profile (uses 'freshtrak_user_guest' key)
-			StorageService.setItem("freshtrak_user_guest", userProfile);
-			// Also store token if available
-			if (userProfile.token) {
-				StorageService.setUserToken(userProfile.token);
-			}
+		const resp = await axios.post(GUEST_USER);
+		const userProfile = resp.data;
+		// Use StorageService to store guest user profile (uses 'freshtrak_user_guest' key)
+		StorageService.setItem("freshtrak_user_guest", userProfile);
+		// Also store token if available
+		if (userProfile.token) {
+			StorageService.setUserToken(userProfile.token);
+		}
+		// Mark this guest session as belonging to the current browser session so
+		// App.js can detect and discard stale guest data after a tab/browser close.
+		StorageService.setGuestSessionMarker();
 
 			// Track guest login event with Google Tag Manager
 			const gtmEvent: GTMEvent = {

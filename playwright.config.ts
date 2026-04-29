@@ -1,7 +1,10 @@
 import 'dotenv/config';
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:5000';
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL ||
+  process.env.PLAYWRIGHT_TEST_BASE_URL ||
+  'http://localhost:5000';
 
 export default defineConfig({
   testDir: './e2e/tests',
@@ -47,9 +50,9 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: process.env.CI ? 'npx vite' : 'npm start',
+    command: process.env.CI ? 'npx vite preview' : 'npm start',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 60_000,
   },
 });

@@ -98,7 +98,7 @@
     "*.{ts,tsx,js,jsx}": [
       "eslint --fix",
       "prettier --write",
-      "jest --watchAll=false --bail --findRelatedTests"
+      "jest --watchAll=false --bail --findRelatedTests --passWithNoTests"
     ],
     "*.{json,md,css,scss}": [
       "prettier --write"

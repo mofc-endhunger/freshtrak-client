@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Fragment, useEffect, useState, useCallback, useRef } from "react";
+import { Fragment, useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RENDER_URL, API_URL } from "../../Utils/Urls";
+import { RENDER_URL, BASE_URL } from "../../Utils/Urls";
 import axios from "axios";
 import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
 import { selectUser } from "../../Store/userSlice";
@@ -57,15 +57,29 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 		useState<boolean>(false);
 	const [showRegisterAnotherDialog, setShowRegisterAnotherDialog] =
 		useState<boolean>(false);
-	const isMountedRef = useRef(true);
-	const guestSigninTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const eventDateId = StorageService.getRegisteredEventDateID();
 
-	const safeSetState = (setter: () => void) => {
-		if (isMountedRef.current) {
-			setter();
+	/**
+	 * Called by the Dialog's own close mechanism (X button, Escape key, outside click).
+	 * When the user dismisses the popup without creating an account, all guest session
+	 * data must be cleared so that a subsequent sign-up by a different person in the
+	 * same browser session cannot accidentally inherit this guest's household via the
+	 * guest-upgrade flow.
+	 *
+	 * NOTE: when the "Create Account" button is clicked it calls setShowGuestSigninModal
+	 * directly, which bypasses onOpenChange entirely, so this handler is NOT invoked in
+	 * that case – the guest token is intentionally preserved for the upgrade flow.
+	 */
+	const handleGuestModalOpenChange = (open: boolean): void => {
+		if (!open) {
+			StorageService.removeItem("freshtrak_user_guest");
+			StorageService.removeItem("userProfile"); // legacy key
+			StorageService.removeItem("guestId");
+			StorageService.removeItem("guestType");
+			StorageService.clearUserToken();
 		}
+		setShowGuestSigninModal(open);
 	};
+	const eventDateId = StorageService.getRegisteredEventDateID();
 
 	const isLoggedIn = StorageService.getItem<string>("isLoggedIn");
 	if (!isLoggedIn || isLoggedIn !== "true") {
@@ -87,21 +101,21 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 	const getEvent = useCallback(async (): Promise<void> => {
 		try {
 			const resp = await axios.get<EventApiResponse>(
-				API_URL.EVENT_DATE_DETAILS(eventDateId),
+				`${BASE_URL}api/event_dates/${eventDateId}/event_details`,
 			);
 			const { data } = resp;
 			if (data && data.event !== undefined) {
 				const eventData = EventFormat(data.event, eventDateId);
 				dispatch(setCurrentEvent(eventData));
-				safeSetState(() => setSelectedEvent(eventData));
+				setSelectedEvent(eventData);
 			} else {
-				safeSetState(() => setPageError(true));
+				setPageError(true);
 			}
 		} catch (e: unknown) {
 			console.error(e);
-			safeSetState(() => setIsError(true));
+			setIsError(true);
 			if (e && typeof e === "object" && "response" in e) {
-				safeSetState(() => setPageError(true));
+				setPageError(true);
 			}
 		}
 	}, [eventDateId, dispatch]);
@@ -132,29 +146,22 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 
 	// Show guest signin modal for guest users only (not for case managers)
 	useEffect(() => {
-		isMountedRef.current = true;
-		if (!isCaseManager) {
-			const isGuest = StorageService.isGuestUser();
-			const isCognito = StorageService.isLoggedInUser();
+		if (isCaseManager) return;
 
-			if (isGuest && !isCognito) {
-				guestSigninTimerRef.current = setTimeout(() => {
-					safeSetState(() => setShowGuestSigninModal(true));
-				}, 3000);
-			}
+		const isGuest = StorageService.isGuestUser();
+		const isCognito = StorageService.isLoggedInUser();
+
+		if (isGuest && !isCognito) {
+			setTimeout(() => {
+				setShowGuestSigninModal(true);
+			}, 3000);
 		}
-		return () => {
-			isMountedRef.current = false;
-			if (guestSigninTimerRef.current) {
-				clearTimeout(guestSigninTimerRef.current);
-			}
-		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isCaseManager]);
+	}, []);
 
 	function fetchBusinesses(): void {
 		const token = localStorage.getItem("userToken");
-		safeSetState(() => setUserToken(token || undefined));
+		setUserToken(token || undefined);
 		if (!isError && !pageError) {
 			if (Object.keys(selectedEvent).length === 0) {
 				getEvent();
@@ -570,11 +577,11 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (
 				</div>
 			)}
 
-			{/* Guest Sign-in Modal */}
-			<Dialog
-				open={showGuestSigninModal}
-				onOpenChange={setShowGuestSigninModal}
-			>
+		{/* Guest Sign-in Modal */}
+		<Dialog
+			open={showGuestSigninModal}
+			onOpenChange={handleGuestModalOpenChange}
+		>
 				<DialogContent className="sm:max-w-md bg-white border border-gray-200 text-gray-900">
 					<DialogHeader>
 						<DialogTitle className="text-center text-gray-900">

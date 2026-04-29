@@ -68,6 +68,7 @@ npm start
 ### Technology Stack
 
 - **Frontend Framework**: React 18.2 with TypeScript
+- **Build Tool**: Vite 6 (migrated from Create React App)
 - **State Management**: Redux Toolkit with Redux Persist
 - **Routing**: React Router v6
 - **Authentication**: AWS Amplify/Cognito
@@ -123,6 +124,9 @@ REACT_APP_USER_POOL_CLIENT_ID=<cognito-client-id>
 REACT_APP_GOOGLE_MAPS_API_KEY=<google-maps-key>
 ```
 
+Current compatibility supports `REACT_APP_*` variables in both build-time and runtime config.
+Future migration target is `VITE_*` naming after Vite stabilization.
+
 ## 📦 Available Scripts
 
 ### Development
@@ -130,7 +134,8 @@ REACT_APP_GOOGLE_MAPS_API_KEY=<google-maps-key>
 ```bash
 npm start              # Start development server
 npm test              # Run tests in watch mode
-npm run test:coverage # Run tests with coverage report
+npm run test:ci       # Run tests once with coverage (CI mode)
+npm run preview       # Preview production build locally
 ```
 
 ### Building
@@ -203,8 +208,8 @@ The build process:
 # Run all tests
 npm test
 
-# Run with coverage
-npm run test:coverage
+# Run with coverage in CI mode
+npm run test:ci
 
 # Run specific test file
 npm test -- --testPathPattern=Family

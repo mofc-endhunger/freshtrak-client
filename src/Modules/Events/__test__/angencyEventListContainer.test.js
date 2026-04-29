@@ -1,5 +1,5 @@
 import React from "react";
-import { render, waitFor } from "@testing-library/react";
+import { render, waitFor, screen } from "@testing-library/react";
 import AgencyEventListContainer from "../AgencyEventListContainer";
 import {
 	mockAgencyBuilder,
@@ -35,8 +35,15 @@ describe("AgencyEventListContainer", () => {
 
 	test("should show loading", async () => {
 		axios.get.mockResolvedValue({ data: { agency: {} } });
-		// Not asserting spinner, just checking no crash
 		renderWithRoute(<AgencyEventListContainer />);
+		await waitFor(() => {
+			expect(axios.get).toHaveBeenCalled();
+		});
+		await waitFor(() => {
+			expect(
+				screen.queryByText("Something went wrong")
+			).not.toBeInTheDocument();
+		});
 	});
 
 	test("should show error if server error", async () => {

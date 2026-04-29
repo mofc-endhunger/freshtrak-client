@@ -6,6 +6,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import HomeContainer from "../HomeContainer";
 // search slice mocked in test
 
+jest.mock("../LocalFoodBankComponent", () => {
+	return function MockLocalFoodBankComponent() {
+		return <div data-testid="local-food-bank-component">Local Food Bank</div>;
+	};
+});
+
 // Mock axios
 jest.mock("axios");
 const mockAxios = require("axios");
@@ -72,14 +78,23 @@ const createMockStore = () => {
 
 describe("HomeContainer", () => {
 	let mockStore: ReturnType<typeof createMockStore>;
+	let consoleErrorSpy: jest.SpyInstance;
 
 	beforeEach(() => {
 		mockStore = createMockStore();
 		mockAxios.get.mockClear();
+		mockAxios.get.mockResolvedValue({
+			data: { agencies: [], foodbanks: [], data: [] },
+		});
 		// Mock axios.all to return an empty array by default
 		if (mockAxios.all) {
 			mockAxios.all.mockClear();
 		}
+		consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+	});
+
+	afterEach(() => {
+		consoleErrorSpy.mockRestore();
 	});
 
 	const renderWithProvider = () => {
@@ -88,6 +103,12 @@ describe("HomeContainer", () => {
 				<HomeContainer />
 			</Provider>
 		);
+	};
+
+	const waitForHomeReady = async () => {
+		await waitFor(() => {
+			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
+		});
 	};
 
 	it("renders the component with correct heading and form", async () => {
@@ -112,15 +133,18 @@ describe("HomeContainer", () => {
 		).toBeInTheDocument();
 	});
 
-	it("renders all child components", () => {
+	it("renders all child components", async () => {
 		// Mock the reservations API call
 		mockAxios.get.mockResolvedValueOnce({
 			data: [],
 		});
 
 		renderWithProvider();
+		await waitForHomeReady();
 
-		expect(screen.getByText("Your Local Food Bank")).toBeInTheDocument();
+		expect(
+			screen.getByTestId("local-food-bank-component"),
+		).toBeInTheDocument();
 		expect(
 			screen.getByText("Your UpComing Reservations")
 		).toBeInTheDocument();
@@ -226,7 +250,10 @@ describe("HomeContainer", () => {
 		});
 		// Mock the events API call with delay
 		mockAxios.get.mockImplementation(
-			() => new Promise(resolve => setTimeout(resolve, 100))
+			() =>
+				new Promise(resolve =>
+					setTimeout(() => resolve({ data: { agencies: [] } }), 100)
+				)
 		);
 
 		renderWithProvider();
@@ -274,6 +301,7 @@ describe("HomeContainer", () => {
 			// Should still render the component
 			expect(screen.getByText("Zip Code")).toBeInTheDocument();
 		});
+		expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error));
 	});
 
 	it("fetches user reservations on component mount", async () => {
@@ -300,13 +328,14 @@ describe("HomeContainer", () => {
 		});
 	});
 
-	it("renders with correct background and spacing classes", () => {
+	it("renders with correct background and spacing classes", async () => {
 		// Mock the reservations API call
 		mockAxios.get.mockResolvedValueOnce({
 			data: [],
 		});
 
 		renderWithProvider();
+		await waitForHomeReady();
 
 		const section = screen.getByText("Zip Code").closest("section");
 		expect(section).toHaveClass("bg-[#F2F0F4]");

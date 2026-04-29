@@ -2,7 +2,7 @@
  * Runtime configuration utility
  *
  * This module provides access to environment variables that work in both:
- * 1. Local development: Uses process.env (build-time from .env files)
+ * 1. Local development: Uses import.meta.env/process.env (build-time from .env files)
  * 2. Production Docker: Uses window._env_ (runtime from ECS task definition)
  *
  * The runtime approach allows the same Docker image to be used across all environments.
@@ -26,9 +26,25 @@ interface EnvConfig {
 // Check if running in browser with runtime config
 const hasRuntimeConfig = typeof window !== 'undefined' && window._env_;
 
+function getViteEnv(): Record<string, string | undefined> {
+  try {
+    const viteEnvAccessor = new Function(
+      'return (typeof import.meta !== "undefined" && import.meta.env) ? import.meta.env : {};'
+    );
+    const viteEnv = viteEnvAccessor();
+    if (viteEnv && typeof viteEnv === 'object') {
+      return viteEnv as Record<string, string | undefined>;
+    }
+  } catch (error) {
+    // Jest and some build contexts don't support import.meta; ignore and fall back.
+  }
+
+  return {};
+}
+
 /**
  * Get a configuration value
- * Priority: window._env_ (runtime) > process.env (build-time)
+ * Priority: window._env_ (runtime) > import.meta.env/process.env (build-time)
  */
 function getConfig(key: keyof EnvConfig): string {
   // First check runtime config (Docker/production)
@@ -37,8 +53,21 @@ function getConfig(key: keyof EnvConfig): string {
   }
 
   // Fallback to build-time config (local development)
-  const processEnvKey = `REACT_APP_${key}`;
-  return process.env[processEnvKey] || '';
+  const reactAppKey = `REACT_APP_${key}`;
+  const viteKey = `VITE_${key}`;
+  const viteEnv = getViteEnv();
+  const processEnv =
+    (typeof process !== 'undefined' &&
+      (process as typeof process & { env?: Record<string, string | undefined> }).env) ||
+    {};
+
+  return (
+    viteEnv[reactAppKey] ||
+    viteEnv[viteKey] ||
+    processEnv[reactAppKey] ||
+    processEnv[viteKey] ||
+    ''
+  );
 }
 
 /**

@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { geocodeAddress } from "../../Utils/MapUtils";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 // Fix for default markers in Leaflet with webpack
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-	iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-	iconUrl: require("leaflet/dist/images/marker-icon.png"),
-	shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+	iconRetinaUrl: markerIcon2x,
+	iconUrl: markerIcon,
+	shadowUrl: markerShadow,
 });
 
 // Helper to check if a coordinate is valid (not 0, '0', or '0.0')

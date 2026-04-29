@@ -1,8 +1,23 @@
 import moment from "moment";
 
-export const formatDateDayAndDate = x => moment(x).format("dddd, M/D/YYYY");
+const toMoment = (value) => {
+	if (value instanceof Date) {
+		return moment(value);
+	}
 
-export const formatMMDDYYYY = x => moment(x).format("L");
+	if (typeof value === "string") {
+		const normalizedDate = new Date(value);
+		if (!Number.isNaN(normalizedDate.getTime())) {
+			return moment(normalizedDate);
+		}
+	}
+
+	return moment(value);
+};
+
+export const formatDateDayAndDate = x => toMoment(x).format("dddd, M/D/YYYY");
+
+export const formatMMDDYYYY = x => toMoment(x).format("L");
 
 export const formatDateForServer = value => {
 	if (!value || typeof value !== "string") {

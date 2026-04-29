@@ -20,12 +20,5 @@ echo "};" >> /usr/share/nginx/html/runtime-config.js
 echo "Runtime configuration generated successfully:"
 cat /usr/share/nginx/html/runtime-config.js
 
-# Replace Google Maps API key placeholder in index.html
-# This is needed because the script tag in HTML needs the key at load time
-if [ -n "$REACT_APP_GOOGLE_GEOLOCATION_KEY" ]; then
-  echo "Injecting Google Maps API key into index.html..."
-  sed -i "s|%REACT_APP_GOOGLE_GEOLOCATION_KEY%|${REACT_APP_GOOGLE_GEOLOCATION_KEY}|g" /usr/share/nginx/html/index.html
-fi
-
 # Start nginx
 exec nginx -g 'daemon off;'

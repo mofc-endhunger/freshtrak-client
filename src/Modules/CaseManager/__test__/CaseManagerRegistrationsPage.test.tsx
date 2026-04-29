@@ -5,10 +5,29 @@ import { MemoryRouter } from "react-router-dom";
 import CaseManagerRegistrationsPage from "../CaseManagerRegistrationsPage";
 
 const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useNavigate: () => mockNavigate,
-}));
+jest.mock("react-router-dom", () => {
+  const actual = jest.requireActual("react-router-dom");
+  const React = jest.requireActual("react");
+  const withFutureFlags = (RouterComponent: React.ComponentType<any>) => {
+    const WrappedRouter = ({ future, ...props }: any) =>
+      React.createElement(RouterComponent, {
+        ...props,
+        future: {
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+          ...(future || {}),
+        },
+      });
+    return WrappedRouter;
+  };
+
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+    MemoryRouter: withFutureFlags(actual.MemoryRouter),
+    BrowserRouter: withFutureFlags(actual.BrowserRouter),
+  };
+});
 
 jest.mock("axios");
 const mockAxios = require("axios");
@@ -135,10 +154,17 @@ const renderPage = () =>
   );
 
 describe("CaseManagerRegistrationsPage", () => {
+  let consoleErrorSpy: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockStorageService.isCaseManager.mockReturnValue(true);
     mockStorageService.getUserToken.mockReturnValue("mock-token");
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
 
   describe("Access control", () => {
@@ -180,6 +206,10 @@ describe("CaseManagerRegistrationsPage", () => {
           ),
         ).toBeInTheDocument();
       });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Failed to fetch CM registrations:",
+        expect.objectContaining({ response: { status: 403 } })
+      );
     });
 
     it("shows generic load failure for non-403 errors", async () => {
@@ -193,6 +223,10 @@ describe("CaseManagerRegistrationsPage", () => {
           ),
         ).toBeInTheDocument();
       });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Failed to fetch CM registrations:",
+        expect.objectContaining({ response: { status: 500 } })
+      );
     });
 
     it("shows retry button on error and retries on click", async () => {
@@ -209,6 +243,10 @@ describe("CaseManagerRegistrationsPage", () => {
       await waitFor(() => {
         expect(mockAxios.get).toHaveBeenCalledTimes(2);
       });
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Failed to fetch CM registrations:",
+        expect.objectContaining({ response: { status: 500 } })
+      );
     });
   });
 

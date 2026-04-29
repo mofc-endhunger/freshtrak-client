@@ -2,7 +2,7 @@ import React from "react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
-import { render, waitFor } from "@testing-library/react";
+import { render, waitFor, screen } from "@testing-library/react";
 import EventContainer from "../EventContainer";
 import axios from "axios";
 import { mockFoodBank } from "../../../Testing";
@@ -55,11 +55,17 @@ describe("EventContainer", () => {
 		jest.clearAllMocks();
 	});
 
-	test("should load without errors", () => {
+	test("should load without errors", async () => {
 		axios.get.mockResolvedValue({ data: { foodbanks: [mockFoodBank] } });
-		expect(() => {
-			renderWithRoute(<EventContainer />);
-		}).not.toThrowError();
+		renderWithRoute(<EventContainer />);
+		await waitFor(() => {
+			expect(axios.get).toHaveBeenCalled();
+		});
+		await waitFor(() => {
+			expect(
+				screen.queryByText("Something went wrong")
+			).not.toBeInTheDocument();
+		});
 	});
 
 	test("Successful api call", async () => {

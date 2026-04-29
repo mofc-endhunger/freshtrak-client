@@ -5,21 +5,34 @@ import config from '../config';
 
 export const BASE_URL = config.PANTRY_FINDER_API;
 const REGISTRATION_URL = config.REGISTRATION_API;
+
+const joinApiUrl = (base, path) => {
+	const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+	if (!base) {
+		return normalizedPath;
+	}
+
+	const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
+	return `${normalizedBase}${normalizedPath}`;
+};
+
 export const API_URL = {
-	EVENTS_LIST: BASE_URL + "api/agencies",
-	FOODBANK_LIST: BASE_URL + "api/foodbanks",
-	EVENT_URL: BASE_URL + "api/events",
-	EVENT_DATES_URL: BASE_URL + "api/event_dates",
-	AGENCY_EVENTS: `${BASE_URL}api/agencies`,
+	EVENTS_LIST: joinApiUrl(BASE_URL, "api/agencies"),
+	FOODBANK_LIST: joinApiUrl(BASE_URL, "api/foodbanks"),
+	EVENT_URL: joinApiUrl(BASE_URL, "api/events"),
+	EVENT_DATES_URL: joinApiUrl(BASE_URL, "api/event_dates"),
+	EVENT_DATE_DETAILS: eventDateId =>
+		joinApiUrl(BASE_URL, `api/event_dates/${eventDateId}/event_details`),
+	AGENCY_EVENTS: joinApiUrl(BASE_URL, "api/agencies"),
 	//GUEST_AUTH: `${REGISTRATION_URL}api/auth/guest`,
-	GUEST_USER: `${REGISTRATION_URL}api/guest-authentications`,
-	CREATE_RESERVATION: `${REGISTRATION_URL}api/registrations`,
-	TWILIO_SMS: `${REGISTRATION_URL}twilio/sms`,
-	SEND_EMAIL: `${REGISTRATION_URL}twilio/email`,
+	GUEST_USER: joinApiUrl(REGISTRATION_URL, "api/guest-authentications"),
+	CREATE_RESERVATION: joinApiUrl(REGISTRATION_URL, "api/registrations"),
+	TWILIO_SMS: joinApiUrl(REGISTRATION_URL, "twilio/sms"),
+	SEND_EMAIL: joinApiUrl(REGISTRATION_URL, "twilio/email"),
 	// Household endpoints
-	HOUSEHOLDS: `${REGISTRATION_URL}households`,
+	HOUSEHOLDS: joinApiUrl(REGISTRATION_URL, "households"),
 	HOUSEHOLD_MEMBERS: householdId =>
-		`${REGISTRATION_URL}households/${householdId}/members`,
+		joinApiUrl(REGISTRATION_URL, `households/${householdId}/members`),
 };
 
 export const RENDER_URL = {

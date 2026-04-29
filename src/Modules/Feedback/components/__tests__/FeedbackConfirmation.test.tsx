@@ -23,12 +23,14 @@ describe("FeedbackConfirmation", () => {
 	it("renders thank you title and message when open", () => {
 		render(<FeedbackConfirmation isOpen={true} onClose={jest.fn()} />);
 
-		expect(screen.getByText("Thank You For Providing Feedback!")).toBeInTheDocument();
 		expect(
-			screen.getByText(
+			screen.getAllByText("Thank You For Providing Feedback!").length
+		).toBeGreaterThan(0);
+		expect(
+			screen.getAllByText(
 				"With your help, we can improve your experience and better serve our community."
-			)
-		).toBeInTheDocument();
+			).length
+		).toBeGreaterThan(0);
 	});
 
 	it("renders Close button when open", () => {

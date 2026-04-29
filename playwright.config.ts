@@ -47,7 +47,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm start',
+    command: process.env.CI ? 'npx vite' : 'npm start',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

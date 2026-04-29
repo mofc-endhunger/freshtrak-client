@@ -71,6 +71,7 @@
   },
   "scripts": {
     "start": "env-cmd -f .env vite",
+    "start:ci": "vite",
     "build": "vite build",
     "build:development": "env-cmd -f .env npm run build",
     "build:beta": "vite build",

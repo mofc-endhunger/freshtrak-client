@@ -38,7 +38,7 @@ describe("EventListContainer", () => {
 					</MemoryRouter>
 				</Provider>,
 			);
-		}).not.toThrowError();
+		}).not.toThrow();
 	});
 
 	test("Successful Api with no Events dates", async () => {

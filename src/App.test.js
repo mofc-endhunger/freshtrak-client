@@ -23,5 +23,5 @@ it("renders without crashing", () => {
 				<App />
 			</Provider>
 		);
-	}).not.toThrowError();
+	}).not.toThrow();
 });

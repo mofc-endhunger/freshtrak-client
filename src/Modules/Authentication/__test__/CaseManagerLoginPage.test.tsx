@@ -170,7 +170,7 @@ describe("CaseManagerLoginPage", () => {
       const token = buildJwt({ "cognito:groups": ["case_managers"] });
       mockSignIn.mockResolvedValue(undefined);
       mockFetchAuthSession.mockResolvedValue({
-        tokens: { accessToken: { toString: () => token } },
+        tokens: { idToken: { toString: () => token } },
       });
 
       renderPage();
@@ -188,7 +188,7 @@ describe("CaseManagerLoginPage", () => {
       const token = buildJwt({ "cognito:groups": ["case_managers"] });
       mockSignIn.mockResolvedValue(undefined);
       mockFetchAuthSession.mockResolvedValue({
-        tokens: { accessToken: { toString: () => token } },
+        tokens: { idToken: { toString: () => token } },
       });
 
       renderPage();
@@ -209,7 +209,7 @@ describe("CaseManagerLoginPage", () => {
       const token = buildJwt({ "cognito:groups": ["regular_users"] });
       mockSignIn.mockResolvedValue(undefined);
       mockFetchAuthSession.mockResolvedValue({
-        tokens: { accessToken: { toString: () => token } },
+        tokens: { idToken: { toString: () => token } },
       });
 
       renderPage();
@@ -248,7 +248,7 @@ describe("CaseManagerLoginPage", () => {
       const token = buildJwt({});
       mockSignIn.mockResolvedValue(undefined);
       mockFetchAuthSession.mockResolvedValue({
-        tokens: { accessToken: { toString: () => token } },
+        tokens: { idToken: { toString: () => token } },
       });
 
       renderPage();

@@ -212,7 +212,7 @@ npm test
 npm run test:ci
 
 # Run specific test file
-npm test -- --testPathPattern=Family
+npm test -- --testPathPatterns=Family
 
 # Update snapshots
 npm test -- -u

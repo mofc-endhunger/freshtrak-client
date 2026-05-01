@@ -257,34 +257,80 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 					</h3>
 				)}
 				{Object.keys(events).length > 0 &&
-					Object.entries(events).map(([date, event]) => (
-						<div key={date} className="space-y-4">
-							<div className="mb-4">
-								<h3 className="text-lg font-semibold text-gray-800 mb-3">
-									{formatDateDayAndDate(date)}
-								</h3>
-							</div>
-							<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-								{event &&
-									event.map((ev) => (
-										<EventCardComponent
-											key={ev.id}
-											event={ev}
-											targetUrl={targetUrl}
-											registrationView={registrationView}
-											alreadyRegistered={isRegisteredEvent(
-												ev
-											)}
-											variant="tile"
-											agencyLatitude={ev.agencyLatitude}
-											agencyLongitude={ev.agencyLongitude}
-										/>
-									))}
-							</div>
+					(() => {
+						const dateEntries = Object.entries(events);
+						const lastDateIndex = dateEntries.length - 1;
+
+						return dateEntries.map(([date, event], dateIndex) => {
+							const isLastDateGroup = dateIndex === lastDateIndex;
+							const lastEventIndex = event.length - 1;
+
+							return (
+								<div key={date} className="space-y-4">
+									<div className="mb-4">
+										<h3 className="text-lg font-semibold text-gray-800 mb-3">
+											{formatDateDayAndDate(date)}
+										</h3>
+									</div>
+									<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+										{event &&
+											event.map((ev, evIdx) => {
+												const isLastItem =
+													isLastDateGroup &&
+													evIdx === lastEventIndex;
+												return (
+													<div
+														key={ev.id}
+														ref={
+															isLastItem && lastItemRef
+																? lastItemRef
+																: undefined
+														}
+													>
+														<EventCardComponent
+															event={ev}
+															targetUrl={targetUrl}
+															registrationView={
+																registrationView
+															}
+															alreadyRegistered={isRegisteredEvent(
+																ev
+															)}
+															variant="tile"
+															agencyLatitude={
+																ev.agencyLatitude
+															}
+															agencyLongitude={
+																ev.agencyLongitude
+															}
+														/>
+													</div>
+												);
+											})}
+									</div>
+								</div>
+							);
+						});
+					})()}
+
+				{/* Loading indicator for infinite scroll */}
+				{loadingMore && (
+					<div className="flex justify-center py-6">
+						<div className="flex items-center space-x-2 text-gray-600">
+							<div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+							<span>{localization.loading_more_events || "Loading more events..."}</span>
 						</div>
-					))}
-			</div>
-		);
+					</div>
+				)}
+
+				{/* End of results indicator */}
+				{!hasMore && Object.keys(events).length > 0 && !loadingMore && (
+					<div className="text-center py-4 text-gray-500">
+						<span>{localization.no_more_events || "No more events to load"}</span>
+					</div>
+				)}
+		</div>
+	);
 	}
 
 	// List view - Map + List side by side

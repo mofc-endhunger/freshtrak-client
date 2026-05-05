@@ -66,6 +66,65 @@ export const SEL = {
   // Footer
   footerPrivacy: 'footer-privacy',
   footerTerms: 'footer-terms',
+
+  // Event Details page (RegistrationEventDetailsContainer)
+  registerNowButton: 'register-now-button',
+
+  // Timeslot selection dialog (EventSlotsModalComponent)
+  timeslotDialog: 'timeslot-dialog',
+  timeslotGoBack: 'timeslot-go-back',
+  timeslotSaveContinue: 'timeslot-save-continue',
+  noTimeslotsMessage: 'no-timeslots-message',
+
+  // Household confirmation modal (HouseholdConfirmationModal)
+  householdConfirmationModal: 'household-confirmation-modal',
+  householdConfirmButton: 'confirm-register-button',
+  householdReviewButton: 'review-update-button',
+
+  // Household info display (HouseholdInfoDisplay)
+  householdInfoDisplay: 'household-info-display',
+  householdAddress: 'household-address',
+  householdMembers: 'household-members',
+  householdContact: 'household-contact',
+
+  // Registration form – Your Details step (PrimaryInfoFormComponent)
+  firstNameInput: 'first-name-input',
+  middleNameInput: 'middle-name-input',
+  lastNameInput: 'last-name-input',
+  suffixSelect: 'suffix-select',
+  dateOfBirthInput: 'date-of-birth-input',
+  genderSelect: 'gender-select',
+  continueButton: 'continue-button',
+
+  // Registration form – Your Address Details step (AddressComponent + ContactInformationComponent)
+  addressComponent: 'address-component',
+  addressLine1Input: 'address-line-1-input',
+  addressLine1Error: 'address-line-1-error',
+  addressLine2Input: 'address-line-2-input',
+  cityInput: 'city-input',
+  cityError: 'city-error',
+  stateSelect: 'state-select',
+  phoneInput: 'phone-input',
+  phoneError: 'phone-error',
+  emailInput: 'email-input',
+  emailError: 'email-error',
+  phonePermissionLabel: 'phone permission',
+  emailPermissionLabel: 'email permission',
+  previousButton: 'previous button',
+  addressStepContinueButton: 'continue button',
+
+  // Registration form – Your Family Details step (MemberCountFormComponent)
+  memberCountForm: 'member-count-form-component',
+  seniorCountInput: 'senior-count-input',
+  adultCountInput: 'adult-count-input',
+  childCountInput: 'child-count-input',
+  seniorIncButton: 'count_senior_inc',
+  seniorDecButton: 'count_senior_dec',
+  adultIncButton: 'count_adult_inc',
+  adultDecButton: 'count_adult_dec',
+  childIncButton: 'count_kid_inc',
+  childDecButton: 'count_kid_dec',
+  submitButton: 'submit-button',
 } as const;
 
 export type SelectorKey = keyof typeof SEL;

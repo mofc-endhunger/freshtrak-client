@@ -85,6 +85,7 @@ const StateDropdownComponent: React.FC<StateDropdownProps> = ({
     <Select value={value || ''} onValueChange={onValueChange} disabled={disabled}>
       <SelectTrigger
         id="state"
+        data-testid="state-select"
         className={`w-full bg-white border-gray-300 data-[size=default]:h-[42px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''}`}
         aria-invalid={error ? true : false}
       >

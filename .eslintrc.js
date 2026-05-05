@@ -40,5 +40,20 @@ module.exports = {
         'jest/no-conditional-expect': 'warn',
       },
     },
+    {
+      // Playwright E2E specs use page.getByTestId() — not React Testing Library.
+      // Disable RTL and Jest rules that don't apply in this context.
+      files: ['e2e/**/*.spec.*', 'e2e/**/*.test.*'],
+      rules: {
+        'testing-library/prefer-screen-queries': 'off',
+        'testing-library/no-wait-for-multiple-assertions': 'off',
+        'testing-library/no-wait-for-side-effects': 'off',
+        'testing-library/no-node-access': 'off',
+        'testing-library/no-unnecessary-act': 'off',
+        'testing-library/no-container': 'off',
+        'testing-library/prefer-presence-queries': 'off',
+        'jest/no-conditional-expect': 'off',
+      },
+    },
   ],
 };

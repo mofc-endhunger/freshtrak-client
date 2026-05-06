@@ -67,14 +67,17 @@ const LoginPage: React.FC = () => {
 			// Clear Cognito authentication data when logging in as guest
 			StorageService.clearAuthData("cognito");
 
-			const resp = await axios.post(GUEST_USER);
-			const userProfile = resp.data;
-			// Use StorageService to store guest user profile (uses 'freshtrak_user_guest' key)
-			StorageService.setItem("freshtrak_user_guest", userProfile);
-			// Also store token if available
-			if (userProfile.token) {
-				StorageService.setUserToken(userProfile.token);
-			}
+		const resp = await axios.post(GUEST_USER);
+		const userProfile = resp.data;
+		// Use StorageService to store guest user profile (uses 'freshtrak_user_guest' key)
+		StorageService.setItem("freshtrak_user_guest", userProfile);
+		// Also store token if available
+		if (userProfile.token) {
+			StorageService.setUserToken(userProfile.token);
+		}
+		// Mark this guest session as belonging to the current browser session so
+		// App.js can detect and discard stale guest data after a tab/browser close.
+		StorageService.setGuestSessionMarker();
 
 			// Track guest login event with Google Tag Manager
 			const gtmEvent: GTMEvent = {
@@ -401,6 +404,17 @@ const LoginPage: React.FC = () => {
 						className="text-gray-600 hover:text-gray-900"
 					>
 						← {localization.button_back_to_home || "Back to Home"}
+					</Button>
+				</div>
+
+				{/* Case Manager Link */}
+				<div className="text-center mt-2">
+					<Button
+						variant="link"
+						onClick={() => navigate(RENDER_URL.CASE_MANAGER_LOGIN_URL)}
+						className="text-xs text-gray-400 hover:text-gray-600 h-auto p-0"
+					>
+						{localization.cm_login_link}
 					</Button>
 				</div>
 			</div>

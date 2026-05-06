@@ -1,13 +1,23 @@
 import React from "react";
 import { HouseholdInfoDisplayProps } from "../types/household-registration.types";
+import { getAdditionalMemberCounts } from "../../Households/utils/householdUtils";
 import localization from "../../Localization/LocalizationComponent";
 
 const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
 	householdData,
 	className = "",
 }) => {
+	const hohDob = householdData.members?.find(
+		(m) => m.is_head_of_household === 1,
+	)?.date_of_birth ?? householdData.members?.[0]?.date_of_birth;
+
+	const additionalCounts = getAdditionalMemberCounts(
+		householdData.counts,
+		hohDob,
+	);
+
 	const formatMemberCounts = () => {
-		const { adults, children, seniors } = householdData.counts;
+		const { adults, children, seniors } = additionalCounts;
 		const counts = [];
 
 		if (adults > 0) counts.push(`${adults} ${localization.label_adults}`);
@@ -92,7 +102,7 @@ const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
 					{formatMemberCounts()}
 				</p>
 				<p className="text-xs text-gray-500">
-					{localization.label_total_members}: {householdData.counts.total}
+					{localization.label_total_members}: {additionalCounts.adults + additionalCounts.children + additionalCounts.seniors}
 				</p>
 			</section>
 

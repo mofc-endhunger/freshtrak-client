@@ -197,8 +197,26 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			if (!isUserAuthenticated) {
 				setShowAuthModal(true);
 			} else if (!user) {
-				// Handle user data for both guest and Cognito users
-				if (userProfile) {
+				if (StorageService.isCaseManager()) {
+					// Case managers register on behalf of others -- start with an empty form
+					setUser(
+						sanitizeUser({
+							first_name: "",
+							last_name: "",
+							email: "",
+							phone_number: "",
+							address: "",
+							city: "",
+							state: "",
+							zip_code: "",
+							adult_count: 1,
+							senior_count: 0,
+							child_count: 0,
+							permission_to_text: false,
+							permission_to_email: false,
+						}),
+					);
+				} else if (userProfile) {
 					// Guest user - use existing userProfile
 					try {
 						setUser(sanitizeUser(userProfile as any));
@@ -235,7 +253,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			} else if (
 				user &&
 				location.state?.householdData &&
-				!householdDataProcessedRef.current
+				!householdDataProcessedRef.current &&
+				!StorageService.isCaseManager()
 			) {
 				// Prefill form with household data if available (only once)
 				try {
@@ -329,7 +348,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							? getSuffixFromId(primaryMember.suffix_id)
 							: user.suffix || "",
 						// Prefill household member counts (excludes HOH from the correct age bucket)
-						...((): Pick<RegistrationFormData, 'adults_in_household' | 'children_in_household' | 'seniors_in_household'> => {
+						...((): Pick<
+							RegistrationFormData,
+							| "adults_in_household"
+							| "children_in_household"
+							| "seniors_in_household"
+						> => {
 							const counts = getAdditionalMemberCounts(
 								householdData.counts || {},
 								primaryMember?.date_of_birth,
@@ -552,7 +576,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	};
 
 	// Helper function to determine user type
-	const determineUserType = (): "guest" | "cognito" => {
+	const determineUserType = (): "guest" | "cognito" | "case_manager" => {
+		if (StorageService.isCaseManager()) {
+			return "case_manager";
+		}
 		if (StorageService.isLoggedInUser()) {
 			return "cognito";
 		}
@@ -581,8 +608,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		currentHousehold: UsersMeResponse,
 	): UpdateHouseholdApiRequest => {
 		// Exclude updated_at, language_id, preferred_language (API expects language_id only, not code)
-		const { updated_at, language_id: _currentLangId, preferred_language: _omitLangCode, ...currentHouseholdWithoutTimestamp } =
-			currentHousehold;
+		const {
+			updated_at,
+			language_id: _currentLangId,
+			preferred_language: _omitLangCode,
+			...currentHouseholdWithoutTimestamp
+		} = currentHousehold;
 
 		// Convert registration gender to gender_id if provided
 		let genderId: number | null = null;
@@ -635,11 +666,16 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			};
 		});
 
-		const langCode = registrationData.preferred_language || currentHousehold.preferred_language || "en";
+		const langCode =
+			registrationData.preferred_language ||
+			currentHousehold.preferred_language ||
+			"en";
 		const languageOption = getLanguageOptionByCode(langCode);
 		const languageId =
 			languageOption?.id ??
-			(_currentLangId !== undefined && _currentLangId !== null ? _currentLangId : undefined);
+			(_currentLangId !== undefined && _currentLangId !== null
+				? _currentLangId
+				: undefined);
 
 		const payload = {
 			// Preserve existing household structure (excluding updated_at, language_id)
@@ -660,7 +696,6 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			permission_to_text: registrationData.permission_to_text ?? null,
 			permission_to_email: registrationData.permission_to_email ?? null,
 
-			// Update counts from registration
 			counts: {
 				seniors: registrationData.seniors_in_household || 0,
 				adults: registrationData.adults_in_household || 0,
@@ -732,7 +767,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 	// Helper function to handle errors gracefully
 	const handleRegistrationError = (
 		error: any,
-		userType: "guest" | "cognito",
+		userType: "guest" | "cognito" | "case_manager",
 	) => {
 		console.error(`${userType} registration error:`, error);
 
@@ -787,7 +822,9 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		const userType = determineUserType();
 
 		try {
-			if (userType === "guest") {
+			if (userType === "case_manager") {
+				// Case manager flow: skip profile update; backend creates the registrant
+			} else if (userType === "guest") {
 				// Existing guest flow
 				// Get identification_code from stored user profile
 				const userProfile = StorageService.getGuestUser();
@@ -809,8 +846,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 					}
 				}
 
+				const { preferred_language: _omitLang, ...cleanUser } =
+					updatedUser;
 				const guestPayload = {
-					...updatedUser,
+					...cleanUser,
 					phone: updatedUser.phone
 						? normalizePhoneInput(updatedUser.phone)
 						: "",
@@ -831,8 +870,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			// Handle authentication errors specifically
 			if (
 				handleAuthError(e, {
-					userType,
-					redirectPath: userType === "cognito" ? "/login" : "/",
+					userType:
+						userType === "case_manager" ? "cognito" : userType,
+					redirectPath:
+						userType === "cognito" || userType === "case_manager"
+							? "/login"
+							: "/",
 					showToast,
 				})
 			) {
@@ -861,7 +904,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
 			// Add counts in appropriate format based on user type
 			// Guest users: flat fields (seniors, adults, children)
-			// Registered users: nested counts object
+			// Registered users and case managers: nested counts object
 			const countsPayload =
 				userType === "guest"
 					? {
@@ -878,9 +921,37 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 							},
 						};
 
+			// For case managers, include registrant info so the backend creates a user on their behalf
+			const registrantPayload =
+				userType === "case_manager"
+					? {
+							registrant: {
+								first_name: updatedUser.first_name,
+								last_name: updatedUser.last_name,
+								suffix: updatedUser.suffix || undefined,
+								gender: updatedUser.gender || undefined,
+								email: updatedUser.email || undefined,
+								date_of_birth:
+									updatedUser.date_of_birth || undefined,
+								phone: updatedUser.phone
+									? updatedUser.phone.replace(/\D/g, "")
+									: undefined,
+								address_line_1: updatedUser.address_line_1,
+								address_line_2: updatedUser.address_line_2,
+								city: updatedUser.city,
+								state: updatedUser.state,
+								zip_code: updatedUser.zip_code,
+								seniors: updatedUser.seniors_in_household || 0,
+								adults: updatedUser.adults_in_household || 0,
+								children:
+									updatedUser.children_in_household || 0,
+							},
+						}
+					: {};
+
 			await axios.post<ApiResponse<any>>(
 				CREATE_RESERVATION,
-				{ ...basePayload, ...countsPayload },
+				{ ...basePayload, ...countsPayload, ...registrantPayload },
 				{ headers },
 			);
 			TagManager.dataLayer({
@@ -910,6 +981,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 						end_time: location.state?.event_slot?.end_time,
 						event_slot_id: event_slot_id,
 					},
+					isCaseManager: userType === "case_manager",
 				},
 			});
 		} catch (e: any) {
@@ -918,8 +990,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 			// Handle authentication errors specifically
 			if (
 				handleAuthError(e, {
-					userType,
-					redirectPath: userType === "cognito" ? "/login" : "/",
+					userType:
+						userType === "case_manager" ? "cognito" : userType,
+					redirectPath:
+						userType === "cognito" || userType === "case_manager"
+							? "/login"
+							: "/",
 					showToast,
 				})
 			) {

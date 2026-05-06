@@ -42,9 +42,7 @@ const FooterComponent: React.FC = () => {
 						<div className="md:col-span-1">
 							<button
 								onClick={() =>
-									setCaseManagerExpanded(
-										!caseManagerExpanded
-									)
+									setCaseManagerExpanded(!caseManagerExpanded)
 								}
 								className="block font-bold text-sm mb-4 text-center md:text-left text-white bg-transparent border-none cursor-pointer p-0 hover:underline"
 							>
@@ -115,9 +113,7 @@ const FooterComponent: React.FC = () => {
 			<div className="pt-2 pb-3 mt-8">
 				<div className="text-center md:text-right">
 					<p className="text-xs">{localization.footer_copyright}</p>
-					<p className="text-xs mt-1">
-						{getFormattedAppVersion()}
-					</p>
+					<p className="text-xs mt-1">{getFormattedAppVersion()}</p>
 				</div>
 			</div>
 
@@ -138,9 +134,7 @@ const FooterComponent: React.FC = () => {
 					</DialogHeader>
 					<div className="flex flex-col sm:flex-row gap-3 mt-4">
 						<Button
-							onClick={() =>
-								setShowClearSessionDialog(false)
-							}
+							onClick={() => setShowClearSessionDialog(false)}
 							variant="outline"
 							className="flex-1"
 						>

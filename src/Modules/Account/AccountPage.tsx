@@ -21,11 +21,7 @@ import {
 import { StorageService } from "../../Utils/StorageService";
 import { LoadingCard } from "../Households/components/LoadingSpinner";
 import { UsersMeResponse } from "../Households/types/api.types";
-import {
-	calculateAge,
-	getSuffixFromId,
-} from "../Households/utils/householdUtils";
-import { formatUSPhoneInput } from "../Family/utils/phoneFormatting";
+import { getSuffixFromId } from "../Households/utils/householdUtils";
 import localization from "../Localization/LocalizationComponent";
 import {
 	YourReservations,

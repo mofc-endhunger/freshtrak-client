@@ -30,7 +30,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [user, setUser] = useState<any | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	// Whether the user needs to complete household setup (null = not yet determined)
-	const [needsHouseholdSetup, setNeedsHouseholdSetup] = useState<boolean | null>(null);
+	const [needsHouseholdSetup, setNeedsHouseholdSetup] = useState<
+		boolean | null
+	>(null);
 
 	// Check if user is authenticated
 	const isAuthenticated = !!user;
@@ -56,7 +58,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 	const handleSignIn = async (
 		email: string,
-		password: string
+		password: string,
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
@@ -88,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 						// Ignore sign out errors - session might already be invalid
 						console.warn(
 							"Could not sign out existing session:",
-							signOutError
+							signOutError,
 						);
 					}
 				}
@@ -111,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					// Sign-in didn't succeed but didn't throw - check nextStep to determine why
 					console.warn(
 						"Sign-in returned but isSignedIn is false:",
-						result
+						result,
 					);
 
 					// Check if nextStep indicates confirmation is needed
@@ -127,7 +129,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 					if (needsConfirmation) {
 						const unconfirmedError: any = new Error(
-							"User account is not confirmed. Please verify your email address."
+							"User account is not confirmed. Please verify your email address.",
 						);
 						unconfirmedError.name = "UserNotConfirmedException";
 						unconfirmedError.code = "UserNotConfirmedException";
@@ -139,7 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					// If we can't determine the reason, treat as potential unconfirmed user
 					// (since 400 Bad Request often means unconfirmed user)
 					const unconfirmedError: any = new Error(
-						"User account is not confirmed. Please verify your email address."
+						"User account is not confirmed. Please verify your email address.",
 					);
 					unconfirmedError.name = "UserNotConfirmedException";
 					unconfirmedError.code = "UserNotConfirmedException";
@@ -204,7 +206,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					!errorMessage.toLowerCase().includes("incorrect")
 				) {
 					const unconfirmedError: any = new Error(
-						"User account is not confirmed. Please verify your email address."
+						"User account is not confirmed. Please verify your email address.",
 					);
 					unconfirmedError.name = "UserNotConfirmedException";
 					unconfirmedError.code = "UserNotConfirmedException";
@@ -215,7 +217,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 				if (isUnconfirmedUserError) {
 					const unconfirmedError: any = new Error(
-						errorMessage || "User account is not confirmed"
+						errorMessage || "User account is not confirmed",
 					);
 					unconfirmedError.name =
 						errorName || "UserNotConfirmedException";
@@ -229,18 +231,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				throw signInError;
 			}
 
-			// Get access token from Amplify session
+			// Get ID token from Amplify session.
+			// The ID token carries identity claims (email, name, groups) needed by the backend.
+			// The access token is for AWS service calls and does not contain the email claim.
 			let accessToken: string | undefined;
 			if (result.isSignedIn) {
 				try {
 					const session = await fetchAuthSession();
-					if (session.tokens?.accessToken) {
-						accessToken = session.tokens.accessToken.toString();
+					if (session.tokens?.idToken) {
+						accessToken = session.tokens.idToken.toString();
 					}
 				} catch (sessionError) {
 					console.warn(
 						"Could not fetch session tokens:",
-						sessionError
+						sessionError,
 					);
 				}
 			}
@@ -271,13 +275,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				if (storedUserName && storedUserName.trim() !== "") {
 					userName = storedUserName;
 				} else {
-					// Fallback to pending user data (for unconfirmed users)
+					// Fallback to pending user data (for unconfirmed users completing sign-in).
+					// Guard with an email match: a stale pendingUser left behind by a different
+					// user's incomplete sign-up must not overwrite the name of the current user.
 					const pendingUser = StorageService.getItem<{
 						name?: string;
+						email?: string;
 						[key: string]: any;
 					}>("pendingUser");
 					if (pendingUser?.name && pendingUser.name.trim() !== "") {
-						userName = pendingUser.name;
+						if (!pendingUser.email || pendingUser.email === email) {
+							userName = pendingUser.name;
+						} else {
+							// Stale pendingUser belongs to a different account – discard it
+							StorageService.removeItem("pendingUser");
+						}
 					}
 				}
 
@@ -326,20 +338,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 							// auth_time is when the user was created/authn first time
 							if (payload.auth_time && !accountCreatedDate) {
 								accountCreatedDate = new Date(
-									payload.auth_time * 1000
+									payload.auth_time * 1000,
 								).toISOString();
 							}
 							// iat is "issued at" time - last auth time
 							if (payload.iat && !accountLastModified) {
 								accountLastModified = new Date(
-									payload.iat * 1000
+									payload.iat * 1000,
 								).toISOString();
 							}
 						}
 					} catch (jwtError) {
 						console.warn(
 							"Could not extract dates from JWT token:",
-							jwtError
+							jwtError,
 						);
 					}
 				}
@@ -367,28 +379,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				StorageService.setItem("cognitoUser", userData);
 				StorageService.setItem("isLoggedIn", "true");
 
-			// Set userToken for registration system compatibility
-			if (accessToken) {
-				StorageService.setUserToken(accessToken);
-			} else {
-				console.warn(
-					"⚠️ AuthContext - No accessToken available to set userToken"
-				);
-			}
-			StorageService.removeItem("household_signup_state");
-
-			// Restore the user's preferred language from their profile
-			try {
-				const householdsApi = new HouseholdsApiService();
-				const profile = await householdsApi.getUsersMe();
-				if (profile?.language_id) {
-					const langCode = getLanguageOptionById(Number(profile.language_id))?.code ?? "en";
-					dispatch(setCurrentLanguage(langCode));
-					setLanguage(langCode);
+				// Set userToken for registration system compatibility
+				if (accessToken) {
+					StorageService.setUserToken(accessToken);
+				} else {
+					console.warn(
+						"⚠️ AuthContext - No accessToken available to set userToken",
+					);
 				}
-			} catch {
-				// Non-critical: language stays at default if profile fetch fails
-			}
+				StorageService.removeItem("household_signup_state");
+
+				// Restore the user's preferred language from their profile
+				try {
+					const householdsApi = new HouseholdsApiService();
+					const profile = await householdsApi.getUsersMe();
+					if (profile?.language_id) {
+						const langCode =
+							getLanguageOptionById(Number(profile.language_id))
+								?.code ?? "en";
+						dispatch(setCurrentLanguage(langCode));
+						setLanguage(langCode);
+					}
+				} catch {
+					// Non-critical: language stays at default if profile fetch fails
+				}
 			}
 		} catch (error: any) {
 			console.warn("Sign in error:", error);
@@ -413,7 +427,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			// If it's an unconfirmed user error, throw a special error that preserves the original structure
 			if (isUnconfirmedUserError) {
 				const unconfirmedError: any = new Error(
-					error.message || "User account is not confirmed"
+					error.message || "User account is not confirmed",
 				);
 				unconfirmedError.name =
 					error.name || error.__type || "UserNotConfirmedException";
@@ -432,7 +446,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const handleSignUp = async (
 		email: string,
 		password: string,
-		name: string
+		name: string,
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
@@ -471,7 +485,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				error.message?.includes("UsernameExistsException") ||
 				error.message?.includes("AliasExistsException") ||
 				error.message?.includes(
-					"An account with the given email already exists"
+					"An account with the given email already exists",
 				) ||
 				error.message?.toLowerCase().includes("username exists") ||
 				error.message?.toLowerCase().includes("email already exists");
@@ -479,7 +493,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			// If it's an unverified user error, throw a special error that preserves the original structure
 			if (isUnverifiedUserError) {
 				const unverifiedError: any = new Error(
-					error.message || "An account with this email already exists"
+					error.message ||
+						"An account with this email already exists",
 				);
 				unverifiedError.name = error.name || "UsernameExistsException";
 				unverifiedError.code = error.code;
@@ -507,7 +522,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 	const handleConfirmSignUp = async (
 		email: string,
-		code: string
+		code: string,
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
@@ -548,7 +563,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 				} catch (signInError) {
 					console.warn(
 						"Could not automatically sign in user:",
-						signInError
+						signInError,
 					);
 					// Fall through to fallback behavior
 				}
@@ -627,7 +642,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const handleConfirmResetPassword = async (
 		email: string,
 		code: string,
-		newPassword: string
+		newPassword: string,
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
@@ -640,7 +655,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			});
 		} catch (error: any) {
 			throw new Error(
-				error.message || "Failed to confirm reset password"
+				error.message || "Failed to confirm reset password",
 			);
 		} finally {
 			setIsLoading(false);
@@ -648,7 +663,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	};
 
 	const handleResendConfirmationCode = async (
-		email: string
+		email: string,
 	): Promise<void> => {
 		try {
 			setIsLoading(true);
@@ -659,7 +674,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			});
 		} catch (error: any) {
 			throw new Error(
-				error.message || "Failed to resend confirmation code"
+				error.message || "Failed to resend confirmation code",
 			);
 		} finally {
 			setIsLoading(false);

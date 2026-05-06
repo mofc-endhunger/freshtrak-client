@@ -404,6 +404,41 @@ export class StorageService {
     }
 
     // ============================================================================
+    // User Role Methods
+    // ============================================================================
+
+    /**
+     * Set the current user's role (e.g. 'case_manager').
+     * Called after successful case manager login once group membership is verified.
+     */
+    static setUserRole(role: string): void {
+        this.setItem('freshtrak_user_role', role);
+    }
+
+    /**
+     * Get the current user's role.
+     * @returns Role string (e.g. 'case_manager') or null if not set.
+     */
+    static getUserRole(): string | null {
+        return this.getItem<string>('freshtrak_user_role');
+    }
+
+    /**
+     * Check if the current user is a case manager.
+     * @returns true if the stored role is 'case_manager'.
+     */
+    static isCaseManager(): boolean {
+        return this.getUserRole() === 'case_manager';
+    }
+
+    /**
+     * Clear the stored user role.
+     */
+    static clearUserRole(): void {
+        this.removeItem('freshtrak_user_role');
+    }
+
+    // ============================================================================
     // Token Management Methods
     // ============================================================================
 
@@ -566,6 +601,40 @@ export class StorageService {
     // Session Management Methods
     // ============================================================================
 
+    // ============================================================================
+    // Guest Session Marker
+    //
+    // sessionStorage is automatically wiped when a tab or browser window is closed.
+    // localStorage is not.  We use a short-lived sessionStorage flag to track
+    // whether the current browser session created the guest profile that lives in
+    // localStorage.  On app startup we compare the two: if guest data exists in
+    // localStorage but the session marker is absent, the data belongs to a prior
+    // session and must be cleared before it can contaminate a new user's flow.
+    // ============================================================================
+
+    /**
+     * Write the guest session marker to sessionStorage.
+     * Must be called immediately after a new guest profile is created.
+     */
+    static setGuestSessionMarker(): void {
+        this.setItem('freshtrak_guest_session_active', true, 'session');
+    }
+
+    /**
+     * Returns true if the guest session marker exists in sessionStorage,
+     * meaning the guest profile in localStorage was created in this browser session.
+     */
+    static hasGuestSessionMarker(): boolean {
+        return this.getItem<boolean>('freshtrak_guest_session_active', 'session') === true;
+    }
+
+    /**
+     * Remove the guest session marker from sessionStorage.
+     */
+    static clearGuestSessionMarker(): void {
+        this.removeItem('freshtrak_guest_session_active', 'session');
+    }
+
     /**
      * Clear authentication data based on user type
      * @param userType - 'cognito' or 'guest'
@@ -578,10 +647,12 @@ export class StorageService {
         } else {
             this.removeItem('freshtrak_user_guest');
             this.removeItem('freshtrak_user_token');
+            this.clearGuestSessionMarker();
         }
 
         // Clear common auth data
         this.removeItem('freshtrak_user_current');
+        this.removeItem('freshtrak_user_role');
     }
 
     /**
@@ -593,6 +664,7 @@ export class StorageService {
         this.removeItem('freshtrak_user_token');
         this.removeItem('freshtrak_user_current');
         this.removeItem('freshtrak_user_logged_in');
+        this.removeItem('freshtrak_user_role');
     }
 
     /**

@@ -68,6 +68,7 @@ const FooterComponent: React.FC = () => {
                   <Link
                     to={RENDER_URL.PRIVACY}
                     className="text-white text-sm underline hover:no-underline"
+                    data-testid="footer-privacy"
                   >
                     {localization.footer_privacy_policy}
                   </Link>
@@ -75,6 +76,7 @@ const FooterComponent: React.FC = () => {
                   <Link
                     to={RENDER_URL.TERMS}
                     className="text-white text-sm underline hover:no-underline"
+                    data-testid="footer-terms"
                   >
                     {localization.footer_terms_of_use}
                   </Link>

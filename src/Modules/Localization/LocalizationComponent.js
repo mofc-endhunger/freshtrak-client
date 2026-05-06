@@ -400,6 +400,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: 'PrivacyPolicy',
     footer_terms_of_use: 'Terms of Use',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: 'For Case Managers',
+    footer_register_another_person: 'Register Another Person',
+    footer_clear_session_title: 'Clear Current Session',
+    footer_clear_session_description:
+      'This will clear your current registration session so you can register another person. Make sure you have saved or printed any confirmation before proceeding.',
+    footer_clear_session_confirm: 'Continue',
+    footer_clear_session_cancel: 'Cancel',
     cm_login_title: 'Case Manager Sign In',
     cm_login_subtitle: 'Sign in with your case manager credentials to register people for events.',
     cm_login_email_label: 'Email',
@@ -874,10 +881,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Have you saved or printed the confirmation information? This data will not be available after you leave this page.',
     family_member_count_plural: 'family members',
-    button_view_photos: 'View Photos',
-    label_location_photos: 'Location',
-    label_event_instructions: 'Event Info',
-    label_more_photos: '+{0} more',
   },
 
   spa: {
@@ -1280,6 +1283,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: 'Política de Privacidad',
     footer_terms_of_use: 'Términos de Uso',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: 'Para Administradores de Casos',
+    footer_register_another_person: 'Registrar Otra Persona',
+    footer_clear_session_title: 'Borrar Sesión Actual',
+    footer_clear_session_description:
+      'Esto borrará su sesión de registro actual para que pueda registrar a otra persona. Asegúrese de haber guardado o impreso cualquier confirmación antes de continuar.',
+    footer_clear_session_confirm: 'Continuar',
+    footer_clear_session_cancel: 'Cancelar',
     cm_login_title: 'Inicio de Sesión para Administradores de Casos',
     cm_login_subtitle:
       'Inicie sesión con sus credenciales de administrador de casos para registrar personas en eventos.',
@@ -1760,10 +1770,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       '¿Ha guardado o impreso la información de confirmación? Estos datos no estarán disponibles después de salir de esta página.',
     family_member_count_plural: 'miembros de la familia',
-    button_view_photos: 'Ver Fotos',
-    label_location_photos: 'Ubicación',
-    label_event_instructions: 'Info del Evento',
-    label_more_photos: '+{0} más',
   },
   som: {
     home_freshtrack: 'FreshTrak waxay halkan u joogtaa inay ku caawiso!',
@@ -2163,6 +2169,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: 'Siyaasadda Qarsoodiga',
     footer_terms_of_use: 'Shuruudaha Isticmaalka',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: 'Maamulayaasha Kiisaska',
+    footer_register_another_person: 'Diiwaan Geli Qof Kale',
+    footer_clear_session_title: 'Tirtir Kulanka Hadda',
+    footer_clear_session_description:
+      'Tani waxay tirtiri doontaa kulanka diiwaangelintaada hadda si aad u diiwaan gelin kartid qof kale. Hubi inaad kaydisay ama daabacday wixii xaqiijin ah ka hor intaadan sii wadin.',
+    footer_clear_session_confirm: 'Sii Wad',
+    footer_clear_session_cancel: 'Ka Noqo',
     cm_login_title: 'Gelitaanka Maamulaha Kiiska',
     cm_login_subtitle:
       'Ku gal aqoonsigaaga maamulaha kiiska si aad u diiwaan geliso dadka dhacdooyinka.',
@@ -2642,10 +2655,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Ma keydisay ama daabacday macluumaadka xaqiijinta? Xogtan lama heli doono markaad ka tagto boggan.',
     family_member_count_plural: 'xubnaha qoyska',
-    button_view_photos: 'Eeg Sawirrada',
-    label_location_photos: 'Goobta',
-    label_event_instructions: 'Macluumaadka Dhacdada',
-    label_more_photos: '+{0} dheeraad ah',
   },
   rus: {
     home_freshtrack: 'FreshTrak здесь, чтобы помочь!',
@@ -3046,6 +3055,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: 'Политика конфиденциальности',
     footer_terms_of_use: 'Условия использования',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: 'Для кейс-менеджеров',
+    footer_register_another_person: 'Зарегистрировать другого человека',
+    footer_clear_session_title: 'Очистить текущую сессию',
+    footer_clear_session_description:
+      'Это очистит вашу текущую сессию регистрации, чтобы вы могли зарегистрировать другого человека. Убедитесь, что вы сохранили или распечатали подтверждение перед продолжением.',
+    footer_clear_session_confirm: 'Продолжить',
+    footer_clear_session_cancel: 'Отмена',
     cm_login_title: 'Вход для кейс-менеджеров',
     cm_login_subtitle:
       'Войдите с учётными данными кейс-менеджера для регистрации людей на мероприятия.',
@@ -3531,10 +3547,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Вы сохранили или распечатали информацию о подтверждении? Эти данные будут недоступны после того, как вы покинете эту страницу.',
     family_member_count_plural: 'членов семьи',
-    button_view_photos: 'Просмотреть Фото',
-    label_location_photos: 'Местоположение',
-    label_event_instructions: 'Информация о Мероприятии',
-    label_more_photos: '+{0} ещё',
   },
   tur: {
     home_freshtrack: 'FreshTrak yardım etmek için burada!',
@@ -3932,6 +3944,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: 'Gizlilik Politikası',
     footer_terms_of_use: 'Kullanım Koşulları',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: 'Vaka Yöneticileri İçin',
+    footer_register_another_person: 'Başka Bir Kişiyi Kaydet',
+    footer_clear_session_title: 'Mevcut Oturumu Temizle',
+    footer_clear_session_description:
+      'Bu, mevcut kayıt oturumunuzu temizleyecek ve başka bir kişiyi kaydetmenize olanak tanıyacaktır. Devam etmeden önce onayınızı kaydettiğinizden veya yazdırdığınızdan emin olun.',
+    footer_clear_session_confirm: 'Devam Et',
+    footer_clear_session_cancel: 'İptal',
     cm_login_title: 'Vaka Yöneticisi Girişi',
     cm_login_subtitle:
       'Etkinliklere kişi kaydetmek için vaka yöneticisi kimlik bilgilerinizle giriş yapın.',
@@ -4410,10 +4429,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Onay bilgilerini kaydettiniz veya yazdırdınız mı? Bu sayfadan ayrıldıktan sonra bu veriler kullanılamayacaktır.',
     family_member_count_plural: 'aile üyeleri',
-    button_view_photos: 'Fotoğrafları Görüntüle',
-    label_location_photos: 'Konum',
-    label_event_instructions: 'Etkinlik Bilgileri',
-    label_more_photos: '+{0} daha',
   },
   ara: {
     home_freshtrack: 'FreshTrak هنا للمساعدة!',
@@ -4809,6 +4824,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: 'سياسة الخصوصية',
     footer_terms_of_use: 'شروط الاستخدام',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: 'لمديري الحالات',
+    footer_register_another_person: 'تسجيل شخص آخر',
+    footer_clear_session_title: 'مسح الجلسة الحالية',
+    footer_clear_session_description:
+      'سيؤدي هذا إلى مسح جلسة التسجيل الحالية حتى تتمكن من تسجيل شخص آخر. تأكد من حفظ أو طباعة أي تأكيد قبل المتابعة.',
+    footer_clear_session_confirm: 'متابعة',
+    footer_clear_session_cancel: 'إلغاء',
     cm_login_title: 'تسجيل دخول مدير الحالات',
     cm_login_subtitle: 'سجّل الدخول بأوراق اعتماد مدير الحالات لتسجيل الأشخاص في الفعاليات.',
     cm_login_email_label: 'البريد الإلكتروني',
@@ -5274,10 +5296,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'هل قمت بحفظ أو طباعة معلومات التأكيد؟ لن تكون هذه البيانات متاحة بعد مغادرة هذه الصفحة.',
     family_member_count_plural: 'أفراد الأسرة',
-    button_view_photos: 'عرض الصور',
-    label_location_photos: 'الموقع',
-    label_event_instructions: 'معلومات الفعالية',
-    label_more_photos: '+{0} المزيد',
   },
   zho: {
     home_freshtrack: 'FreshTrak在這里為您提供幫助',
@@ -5666,6 +5684,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: '隐私政策',
     footer_terms_of_use: '使用条款',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: '案例管理员',
+    footer_register_another_person: '注册另一个人',
+    footer_clear_session_title: '清除当前会话',
+    footer_clear_session_description:
+      '这将清除您当前的注册会话，以便您可以注册另一个人。请确保在继续之前已保存或打印了任何确认信息。',
+    footer_clear_session_confirm: '继续',
+    footer_clear_session_cancel: '取消',
     cm_login_title: '案例管理员登录',
     cm_login_subtitle: '使用您的案例管理员凭据登录以为活动注册人员。',
     cm_login_email_label: '电子邮件',
@@ -6124,10 +6149,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       '您是否已保存或打印确认信息？离开此页面后将无法获取这些数据。',
     family_member_count_plural: '家庭成员',
-    button_view_photos: '查看照片',
-    label_location_photos: '位置',
-    label_event_instructions: '活动信息',
-    label_more_photos: '+{0} 更多',
   },
   hin: {
     home_freshtrack: 'FreshTrak मदद करने के लिए यहाँ है!',
@@ -6525,6 +6546,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: 'गोपनीयता नीति',
     footer_terms_of_use: 'उपयोग की शर्तें',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: 'केस मैनेजरों के लिए',
+    footer_register_another_person: 'एक और व्यक्ति को पंजीकृत करें',
+    footer_clear_session_title: 'वर्तमान सत्र साफ़ करें',
+    footer_clear_session_description:
+      'यह आपके वर्तमान पंजीकरण सत्र को साफ़ कर देगा ताकि आप एक और व्यक्ति को पंजीकृत कर सकें। आगे बढ़ने से पहले सुनिश्चित करें कि आपने कोई भी पुष्टि सहेज ली है या प्रिंट कर ली है।',
+    footer_clear_session_confirm: 'जारी रखें',
+    footer_clear_session_cancel: 'रद्द करें',
     cm_login_title: 'केस मैनेजर साइन इन',
     cm_login_subtitle:
       'इवेंट्स के लिए लोगों को पंजीकृत करने के लिए अपने केस मैनेजर क्रेडेंशियल्स से साइन इन करें।',
@@ -6975,10 +7003,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'क्या आपने पुष्टि जानकारी सहेज ली है या प्रिंट कर लिया है? इस पृष्ठ से जाने के बाद यह डेटा उपलब्ध नहीं होगा।',
     family_member_count_plural: 'परिवार के सदस्य',
-    button_view_photos: 'फ़ोटो देखें',
-    label_location_photos: 'स्थान',
-    label_event_instructions: 'कार्यक्रम की जानकारी',
-    label_more_photos: '+{0} और',
 
     // FEEDBACK
     feedback_give_feedback: 'प्रतिक्रिया दें',
@@ -7403,6 +7427,13 @@ const localization = new LocalizedStrings({
     footer_privacy_policy: 'गोपनीयता नीति',
     footer_terms_of_use: 'प्रयोगका सर्तहरू',
     footer_copyright: '© 2025 FreshTrak',
+    footer_for_case_managers: 'केस प्रबन्धकहरूका लागि',
+    footer_register_another_person: 'अर्को व्यक्तिलाई दर्ता गर्नुहोस्',
+    footer_clear_session_title: 'हालको सत्र खाली गर्नुहोस्',
+    footer_clear_session_description:
+      'यसले तपाईंको हालको दर्ता सत्र खाली गर्नेछ ताकि तपाईं अर्को व्यक्तिलाई दर्ता गर्न सक्नुहुन्छ। अगाडि बढ्नु अघि कुनै पनि पुष्टिकरण बचत वा प्रिन्ट गरेको सुनिश्चित गर्नुहोस्।',
+    footer_clear_session_confirm: 'जारी राख्नुहोस्',
+    footer_clear_session_cancel: 'रद्द गर्नुहोस्',
     cm_login_title: 'केस प्रबन्धक साइन इन',
     cm_login_subtitle:
       'कार्यक्रमहरूमा मानिसहरूलाई दर्ता गर्न आफ्नो केस प्रबन्धक प्रमाणपत्रहरूसँग साइन इन गर्नुहोस्।',
@@ -7880,10 +7911,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'के तपाईंले पुष्टि जानकारी बचत गर्नुभयो वा प्रिन्ट गर्नुभयो? यो पृष्ठ छोडेपछि यो डेटा उपलब्ध हुनेछैन।',
     family_member_count_plural: 'परिवारका सदस्यहरू',
-    button_view_photos: 'फोटोहरू हेर्नुहोस्',
-    label_location_photos: 'स्थान',
-    label_event_instructions: 'कार्यक्रम जानकारी',
-    label_more_photos: '+{0} थप',
   },
 });
 

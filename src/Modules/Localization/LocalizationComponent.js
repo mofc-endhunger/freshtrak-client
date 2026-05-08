@@ -88,6 +88,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: 'Summary',
     tab_account: 'Account',
+    tab_favorites: 'Favorites',
     text_profile: 'Profile',
 
     // RESERVATIONS
@@ -970,6 +971,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: 'Resumen',
     tab_account: 'Cuenta',
+    tab_favorites: 'Favoritos',
     text_profile: 'Perfil',
 
     // RESERVATIONS
@@ -1857,6 +1859,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: 'Kooban',
     tab_account: 'Akoon',
+    tab_favorites: 'Favorites',
     text_profile: 'Aqoonsiga',
 
     // RESERVATIONS
@@ -2743,6 +2746,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: 'Сводка',
     tab_account: 'Аккаунт',
+    tab_favorites: 'Избранное',
     text_profile: 'Профиль',
 
     // RESERVATIONS
@@ -3633,6 +3637,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: 'Özet',
     tab_account: 'Hesap',
+    tab_favorites: 'Favoriler',
     text_profile: 'Profil',
 
     // RESERVATIONS
@@ -4514,6 +4519,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: 'ملخص',
     tab_account: 'الحساب',
+    tab_favorites: 'المفضلة',
     text_profile: 'الملف الشخصي',
 
     // RESERVATIONS
@@ -5375,6 +5381,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: '摘要',
     tab_account: '账户',
+    tab_favorites: '收藏夹',
     text_profile: '个人资料',
 
     // RESERVATIONS
@@ -6234,6 +6241,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: 'सारांश',
     tab_account: 'खाता',
+    tab_favorites: 'पसंदीदा',
     text_profile: 'प्रोफ़ाइल',
 
     // RESERVATIONS
@@ -7115,6 +7123,7 @@ const localization = new LocalizedStrings({
     // TABS
     tab_summary: 'सारांश',
     tab_account: 'खाता',
+    tab_favorites: 'पसंदीदा',
     text_profile: 'प्रोफाइल',
 
     // RESERVATIONS

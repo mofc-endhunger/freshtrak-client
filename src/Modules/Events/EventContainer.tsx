@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import SearchComponent, { SearchFormData } from '../General/SearchComponent';
 import ResourceListComponent from './ResourceListComponent';
 import EventListContainer from './EventListContainer';
 import { API_URL } from '../../Utils/Urls';
 import { setCurrentZip } from '../../Store/Search/searchSlice';
+import { selectFavoriteEventIds } from '../../Store/Favorites/favoritesSlice';
+import { useAuth } from '../Authentication/AuthContext';
 import axios from 'axios';
 import '../../Assets/scss/main.scss';
 import { DEFAULT_DISTANCE } from '../../Utils/Constants';
 import serviceCatFilter from '../../Utils/serviceCatFilter';
 import LoadingSpinner from '../General/LoadingSpinner';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
+import { cn } from '../../lib/utils';
 
 // Number of events to render per batch for progressive loading
 const EVENTS_PER_BATCH = 30;
@@ -68,6 +71,9 @@ const EventContainer: React.FC = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const favoriteEventIds = useSelector(selectFavoriteEventIds);
+  const [favoritesFilterActive, setFavoritesFilterActive] = useState(false);
   const categories = serviceCatFilter(filteredData);
 
   // Load more events handler for infinite scroll
@@ -242,9 +248,59 @@ const EventContainer: React.FC = () => {
             )}
             {!loading && <ResourceList />}
           </div>
+          {/* Favorites filter chip — visible to authenticated users only */}
+          {isAuthenticated && (
+            <div className="flex items-center gap-2 mt-2 mb-4" data-testid="favorites-filter-bar">
+              <button
+                type="button"
+                data-testid="favorites-filter-chip"
+                onClick={() => setFavoritesFilterActive((prev) => !prev)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-colors',
+                  favoritesFilterActive
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-primary hover:text-primary',
+                )}
+              >
+                ★ Favorites
+              </button>
+            </div>
+          )}
+
+          {/* Favorites filter empty state */}
+          {favoritesFilterActive &&
+            !loading &&
+            (() => {
+              const allEvents = agencyData.flatMap((a) => a.events ?? []);
+              const hasMatch = allEvents.some((ev: any) =>
+                favoriteEventIds.includes(Number(ev.id)),
+              );
+              if (!hasMatch) {
+                return (
+                  <div
+                    className="text-center text-muted-foreground py-10 text-sm"
+                    data-testid="favorites-empty-state"
+                  >
+                    None of your saved events match this search. Try a different location or remove
+                    the Favorites filter.
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
           {!loading && (
             <EventListContainer
-              agencyData={agencyData}
+              agencyData={
+                favoritesFilterActive
+                  ? agencyData.map((agency) => ({
+                      ...agency,
+                      events: (agency.events ?? []).filter((ev: any) =>
+                        favoriteEventIds.includes(Number(ev.id)),
+                      ),
+                    }))
+                  : agencyData
+              }
               visibleEventCount={visibleEventCount}
               zipCode={zipCode}
               availabilityFilter={availability}

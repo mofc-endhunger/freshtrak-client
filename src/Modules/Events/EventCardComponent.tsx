@@ -19,6 +19,7 @@ import {
 } from '../../components/ui/dropdown-menu';
 import { sanitizeHtml } from '../../Utils/sanitizeHtml';
 import ImageThumbnailStrip from '../../components/shared/ImageThumbnailStrip';
+import FavoriteButton from '../../components/shared/FavoriteButton';
 import '../../Assets/scss/main.scss';
 
 interface EventImage {
@@ -201,10 +202,14 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
           </div>
 
           <div
-            className={`flex-1 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 ${
+            className={`relative flex-1 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 ${
               isHighlighted ? 'ring-2 ring-orange-400' : ''
             }`}
           >
+            {/* Favorite toggle — top-right, outside main flow */}
+            <div className="absolute top-1 right-1 z-10">
+              <FavoriteButton eventId={Number(id)} />
+            </div>
             <div className="flex flex-row">
               {/* Date/Time Section */}
               <div className="bg-text-primary text-white p-2 sm:p-3 lg:p-4 w-[70px] sm:w-[90px] lg:w-[110px] flex flex-col justify-center items-center shrink-0">
@@ -423,9 +428,13 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
       data-testid="event-card"
     >
       <div className="bg-white rounded-lg shadow-md">
-        <div className="bg-text-primary text-white p-4 rounded-t-lg">
-          <div className="text-lg font-bold pb-2 truncate">{agencyName}</div>
-          <div className="text-lg font-bold pb-2 truncate">{eventName}</div>
+        <div className="relative bg-text-primary text-white p-4 rounded-t-lg">
+          {/* Favorite toggle — top-right of tile header */}
+          <div className="absolute top-2 right-2">
+            <FavoriteButton eventId={Number(id)} className="hover:bg-white/20" />
+          </div>
+          <div className="text-lg font-bold pb-2 truncate pr-10">{agencyName}</div>
+          <div className="text-lg font-bold pb-2 truncate pr-10">{eventName}</div>
           <div className="flex justify-between text-xs">
             <div className="flex-grow truncate font-varela">{eventService}</div>
           </div>

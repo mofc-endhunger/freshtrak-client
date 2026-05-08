@@ -15,6 +15,7 @@ import { StorageService, CognitoUser } from '../../Utils/StorageService';
 import { persistor } from '../../Store/store';
 import { useDispatch } from 'react-redux';
 import { setCurrentLanguage } from '../../Store/languageSlice';
+import { fetchFavorites, clearFavorites } from '../../Store/Favorites/favoritesSlice';
 import { setLanguage } from '../Localization/localizationUtils';
 import { getLanguageOptionById } from '../Localization/languageOptions';
 import { HouseholdsApiService } from '../../Services/HouseholdsApiService';
@@ -354,6 +355,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } catch {
           // Non-critical: language stays at default if profile fetch fails
         }
+
+        // Load the user's favorites from the registration API
+        dispatch(fetchFavorites() as any);
       }
     } catch (error: any) {
       console.warn('Sign in error:', error);
@@ -543,6 +547,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await signOut();
       setUser(null);
       setNeedsHouseholdSetup(null);
+
+      // Clear favorites from Redux store before purging persisted state
+      dispatch(clearFavorites());
 
       // Clear all application data from localStorage and sessionStorage
       // This includes auth data, household data, preferences, etc.

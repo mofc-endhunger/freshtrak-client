@@ -3,6 +3,37 @@ import { screen } from '@testing-library/react';
 import EventListComponent from '../EventListComponent';
 import { preformattedEventData, renderWithRouter } from '../../../Testing';
 
+// FavoriteButton is now rendered inside EventCardComponent. Mock it here so
+// tests don't need AuthProvider or a full Redux favorites store.
+jest.mock('../../../components/shared/FavoriteButton', () => () => null);
+
+// AuthContext is imported by FavoriteButton; provide a safe fallback even
+// when the module-level mock above prevents FavoriteButton from rendering.
+jest.mock('../../../Modules/Authentication/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: false }),
+}));
+
+// Ensure axios.create() returns a proper mock instance so FavoritesApiService
+// (imported transitively via FavoriteButton → favoritesSlice) does not throw.
+jest.mock('axios', () => {
+  const mockAxiosInstance = {
+    get: jest.fn(),
+    post: jest.fn(),
+    delete: jest.fn(),
+    interceptors: {
+      request: { use: jest.fn() },
+      response: { use: jest.fn() },
+    },
+  };
+  return {
+    ...jest.requireActual('axios'),
+    get: jest.fn(),
+    post: jest.fn(),
+    delete: jest.fn(),
+    create: jest.fn(() => mockAxiosInstance),
+  };
+});
+
 const VIEW_MODE_STORAGE_KEY = 'freshtrak_event_view_mode';
 
 // Suppress the moment deprecation warning from test-data-bot

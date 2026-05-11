@@ -44,27 +44,7 @@ jest.mock('../../../../Modules/Events/EventCardComponent', () => () => (
   <div data-testid="event-card" />
 ));
 
-jest.mock('../../../../Utils/EventHandler', () => ({
-  EventFormat: (raw: any) => ({
-    id: String(raw.id),
-    eventName: raw.name || 'Mock Event',
-    agencyName: raw.agency_name || 'Mock Agency',
-    startTime: '9:00 AM',
-    endTime: '11:00 AM',
-    date: raw.event_dates?.[0]?.date || '2099-12-31',
-    eventAddress: '123 Main St',
-    eventCity: 'Springfield',
-    eventState: 'OH',
-    eventZip: '43004',
-    phoneNumber: '555-0100',
-    eventService: 'Food Pantry',
-    acceptReservations: false,
-    acceptInterest: false,
-    acceptWalkin: true,
-    eventDetails: '',
-    eventDates: raw.event_dates || [],
-  }),
-}));
+// FavoritesTab no longer uses EventHandler — no mock needed.
 
 jest.mock('../../../../Utils/Urls', () => ({
   API_URL: {
@@ -117,7 +97,15 @@ const makeEventResponse = (id: number, dates: string[]) => ({
       id,
       name: `Event ${id}`,
       agency_name: `Agency ${id}`,
-      event_dates: dates.map((d) => ({ date: d })),
+      event_dates: dates.map((d, i) => ({
+        id: id * 1000 + i,
+        date: d,
+        start_time: '9 AM',
+        end_time: '11 AM',
+        accept_reservations: 0,
+        accept_interest: 0,
+        accept_walkin: 1,
+      })),
     },
   },
 });

@@ -31,6 +31,8 @@ interface EventImage {
 
 interface Event {
   id: string;
+  /** The parent event's database ID (event.id), distinct from id which is event_date.id */
+  eventId?: string;
   startTime: string;
   endTime: string;
   date: string;
@@ -81,6 +83,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
   const {
     event: {
       id,
+      eventId,
       startTime,
       endTime,
       date,
@@ -206,10 +209,6 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
               isHighlighted ? 'ring-2 ring-orange-400' : ''
             }`}
           >
-            {/* Favorite toggle — top-right, outside main flow */}
-            <div className="absolute top-1 right-1 z-10">
-              <FavoriteButton eventId={Number(id)} />
-            </div>
             <div className="flex flex-row">
               {/* Date/Time Section */}
               <div className="bg-text-primary text-white p-2 sm:p-3 lg:p-4 w-[70px] sm:w-[90px] lg:w-[110px] flex flex-col justify-center items-center shrink-0">
@@ -228,8 +227,12 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
               <div className="flex-1 p-2 sm:p-3 lg:p-4 flex flex-col sm:flex-row gap-2 overflow-hidden min-w-0">
                 {/* Event Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="font-bold text-gray-900 truncate text-xs sm:text-sm">
-                    {agencyName}
+                  {/* Agency name row — star sits inline at the end, associated with event identity */}
+                  <div className="flex items-center gap-1">
+                    <div className="font-bold text-gray-900 truncate text-xs sm:text-sm min-w-0">
+                      {agencyName}
+                    </div>
+                    <FavoriteButton eventId={Number(eventId ?? id)} className="-m-1.5 shrink-0" />
                   </div>
                   <div className="font-bold text-gray-700 truncate mt-0.5 text-xs sm:text-sm">
                     {eventName}
@@ -301,75 +304,6 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
                   )}
                 </div>
 
-                {/* Mobile Actions - Ellipsis Menu (visible below sm) */}
-                <div className="flex sm:hidden items-start shrink-0">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        className="p-2 hover:bg-gray-100 rounded-full"
-                        aria-label="More actions"
-                      >
-                        <MoreVertical className="w-5 h-5 text-gray-600" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white">
-                      {((eventDetails && eventDetails.length > 0) ||
-                        (agencyImages && agencyImages.length > 0) ||
-                        (eventImages && eventImages.length > 0)) && (
-                        <DropdownMenuItem onClick={() => setShowDetails(!showDetails)}>
-                          {!showDetails
-                            ? localization.button_view_details
-                            : localization.button_hide_details}
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem onClick={handleGetDirections}>
-                        {localization.button_get_directions}
-                      </DropdownMenuItem>
-                      {!!acceptReservations && !registrationView && !alreadyRegistered && (
-                        <DropdownMenuItem
-                          onClick={() => {
-                            const currentPath = window.location.pathname;
-                            if (currentPath.startsWith('/events/list')) {
-                              sessionStorage.setItem(
-                                'searchResultsUrl',
-                                currentPath + window.location.search,
-                              );
-                            }
-                            dispatch(setCurrentEvent(props.event));
-                            window.location.href =
-                              props.targetUrl !== undefined
-                                ? `${props.targetUrl}/${id}`
-                                : `${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${id}`;
-                          }}
-                        >
-                          {localization.button_reserve_time}
-                        </DropdownMenuItem>
-                      )}
-                      {!!showRsvp && !registrationView && !alreadyRegistered && (
-                        <DropdownMenuItem
-                          onClick={() => {
-                            const currentPath = window.location.pathname;
-                            if (currentPath.startsWith('/events/list')) {
-                              sessionStorage.setItem(
-                                'searchResultsUrl',
-                                currentPath + window.location.search,
-                              );
-                            }
-                            dispatch(setCurrentEvent(props.event));
-                            window.location.href =
-                              props.targetUrl !== undefined
-                                ? `${props.targetUrl}/${id}`
-                                : `${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${id}`;
-                          }}
-                        >
-                          {localization.button_rsvp}
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
                 {/* Desktop Actions Section (visible sm and up) */}
                 <div className="hidden sm:flex flex-col gap-1.5 w-[120px] lg:w-[140px] xl:w-[160px] shrink-0">
                   {((eventDetails && eventDetails.length > 0) ||
@@ -401,6 +335,76 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
                   {ButtonView() && <div onClick={(e) => e.stopPropagation()}>{ButtonView()}</div>}
                 </div>
               </div>
+
+              {/* Mobile Actions — sits at the same flex level as date + content,
+                  so it anchors to the top-right of the card row (hidden sm+) */}
+              <div className="flex sm:hidden items-start shrink-0 pt-1 pr-1">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="p-2 hover:bg-gray-100 rounded-full"
+                      aria-label="More actions"
+                    >
+                      <MoreVertical className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-white">
+                    {((eventDetails && eventDetails.length > 0) ||
+                      (agencyImages && agencyImages.length > 0) ||
+                      (eventImages && eventImages.length > 0)) && (
+                      <DropdownMenuItem onClick={() => setShowDetails(!showDetails)}>
+                        {!showDetails
+                          ? localization.button_view_details
+                          : localization.button_hide_details}
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem onClick={handleGetDirections}>
+                      {localization.button_get_directions}
+                    </DropdownMenuItem>
+                    {!!acceptReservations && !registrationView && !alreadyRegistered && (
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const currentPath = window.location.pathname;
+                          if (currentPath.startsWith('/events/list')) {
+                            sessionStorage.setItem(
+                              'searchResultsUrl',
+                              currentPath + window.location.search,
+                            );
+                          }
+                          dispatch(setCurrentEvent(props.event));
+                          window.location.href =
+                            props.targetUrl !== undefined
+                              ? `${props.targetUrl}/${id}`
+                              : `${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${id}`;
+                        }}
+                      >
+                        {localization.button_reserve_time}
+                      </DropdownMenuItem>
+                    )}
+                    {!!showRsvp && !registrationView && !alreadyRegistered && (
+                      <DropdownMenuItem
+                        onClick={() => {
+                          const currentPath = window.location.pathname;
+                          if (currentPath.startsWith('/events/list')) {
+                            sessionStorage.setItem(
+                              'searchResultsUrl',
+                              currentPath + window.location.search,
+                            );
+                          }
+                          dispatch(setCurrentEvent(props.event));
+                          window.location.href =
+                            props.targetUrl !== undefined
+                              ? `${props.targetUrl}/${id}`
+                              : `${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/${id}`;
+                        }}
+                      >
+                        {localization.button_rsvp}
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
         </div>
@@ -431,7 +435,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
         <div className="relative bg-text-primary text-white p-4 rounded-t-lg">
           {/* Favorite toggle — top-right of tile header */}
           <div className="absolute top-2 right-2">
-            <FavoriteButton eventId={Number(id)} className="hover:bg-white/20" />
+            <FavoriteButton eventId={Number(eventId ?? id)} className="hover:bg-white/20" />
           </div>
           <div className="text-lg font-bold pb-2 truncate pr-10">{agencyName}</div>
           <div className="text-lg font-bold pb-2 truncate pr-10">{eventName}</div>

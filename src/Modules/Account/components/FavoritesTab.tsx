@@ -4,7 +4,6 @@ import axios from 'axios';
 import { Star } from 'lucide-react';
 import { selectFavoriteEventIds } from '../../../Store/Favorites/favoritesSlice';
 import { API_URL } from '../../../Utils/Urls';
-import { EventFormat } from '../../../Utils/EventHandler';
 import EventCardComponent from '../../Events/EventCardComponent';
 import { Badge } from '../../../components/ui/badge';
 
@@ -64,10 +63,42 @@ const FavoritesTab: React.FC = () => {
         try {
           const resp = await axios.get(`${API_URL.EVENT_URL}/${eventId}`);
           const raw = resp.data?.event ?? resp.data;
-          if (raw) {
-            // EventFormat normalises the shape to match EventCardComponent's expectations
-            results.push(EventFormat(raw, undefined) as unknown as FavoriteEvent);
-          }
+          if (!raw) continue;
+
+          // The finder API already filters event_dates to future-only dates.
+          // An empty array means no upcoming occurrences (effectively a "past" event).
+          const rawEventDates: Array<Record<string, unknown>> = raw.event_dates ?? [];
+          const firstDate = rawEventDates[0] ?? {};
+
+          results.push({
+            // id: use first event_date.id for card navigation URLs (event_date routes).
+            // Falls back to eventId so the card still renders for past events.
+            id: String((firstDate.id as number | undefined) ?? eventId),
+            // eventId: the parent event's real ID — used by FavoriteButton to
+            // match against favoriteEventIds in Redux (was the root cause bug).
+            eventId: String((raw.id as number | undefined) ?? eventId),
+            eventName: (raw.name as string | undefined) ?? '',
+            agencyName: (raw.agency_name as string | undefined) ?? '',
+            startTime: String(firstDate.start_time ?? ''),
+            endTime: String(firstDate.end_time ?? ''),
+            date: String(firstDate.date ?? ''),
+            eventAddress: (raw.address as string | undefined) ?? '',
+            eventCity: (raw.city as string | undefined) ?? '',
+            eventState: (raw.state as string | undefined) ?? '',
+            eventZip: (raw.zip as string | undefined) ?? '',
+            phoneNumber: (raw.agency_phone as string | undefined) ?? '',
+            eventService:
+              ((raw.service_category as Record<string, unknown> | undefined)
+                ?.service_category_name as string | undefined) ?? '',
+            acceptReservations: Boolean(firstDate.accept_reservations),
+            acceptInterest: Boolean(firstDate.accept_interest),
+            acceptWalkin: Boolean(firstDate.accept_walkin),
+            eventDetails: (raw.event_details as string | undefined) ?? '',
+            agencyImages: [],
+            eventImages: Array.isArray(raw.images) ? raw.images : [],
+            // Preserve all raw event_dates so isEventPast can check actual dates.
+            eventDates: rawEventDates.map((d) => ({ date: String(d.date ?? ''), ...d })),
+          } as unknown as FavoriteEvent);
         } catch {
           // Skip events that fail to load — they may have been deleted
         }

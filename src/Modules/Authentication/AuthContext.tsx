@@ -44,6 +44,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const storedUser = StorageService.getCognitoUser();
         if (storedUser) {
           setUser(storedUser);
+          // Sync favorites with the server on every app load so persisted
+          // state never drifts from the source of truth.
+          dispatch(fetchFavorites() as any);
         }
       } catch (error) {
         console.error('Error initializing auth:', error);

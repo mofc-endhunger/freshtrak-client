@@ -20,9 +20,17 @@ const BackButtonComponent = () => {
     // /register/form/:eventDateId/:timeslotId (5 parts) -> go to event details
 
     if (pathParts.length === 4 && pathParts[2] === 'event') {
-      // /register/event/:eventDateId - go back to search results or home
+      // /register/event/:eventDateId - go back to the page that initiated navigation.
 
-      // First, try to retrieve stored search results URL from sessionStorage
+      // Priority 1: explicit source passed via router state (e.g. Profile page).
+      // This is set when navigating programmatically with navigate(url, { state: { from } }).
+      if (location.state?.from) {
+        navigate(location.state.from);
+        return;
+      }
+
+      // Priority 2: search results URL stored in sessionStorage by EventCardComponent
+      // when the user clicks Reserve from the event list.
       const storedSearchUrl = sessionStorage.getItem('searchResultsUrl');
       if (storedSearchUrl) {
         sessionStorage.removeItem('searchResultsUrl');

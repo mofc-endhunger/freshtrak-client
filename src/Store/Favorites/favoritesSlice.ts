@@ -18,7 +18,9 @@ export const fetchFavorites = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await favoritesApiService.getFavorites();
-      return response.favorites.map((f) => f.event_id);
+      // Coerce to number — JSON/MySQL can return event_id as a string,
+      // and Array.includes uses strict equality, so "425697" !== 425697.
+      return response.favorites.map((f) => Number(f.event_id));
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -31,7 +33,14 @@ export const addFavorite = createAsyncThunk(
     try {
       await favoritesApiService.addFavorite(eventId);
       return eventId;
-    } catch (error) {
+    } catch (error: unknown) {
+      // 409 means the server already has this event in favorites.
+      // Treat it as success so the optimistic state is preserved
+      // rather than rolling back and showing the star as unfilled.
+      const apiError = error as { status?: number };
+      if (apiError?.status === 409) {
+        return eventId;
+      }
       return rejectWithValue(eventId);
     }
   },

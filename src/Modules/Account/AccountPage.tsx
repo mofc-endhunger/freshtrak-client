@@ -17,7 +17,7 @@ import { getSuffixFromId } from '../Households/utils/householdUtils';
 import localization from '../Localization/LocalizationComponent';
 import { YourReservations, PastEventsSection } from '../Reservations/components';
 import { AccountInfoSection, HouseholdMembersSection } from './components';
-import FavoritesTab from './components/FavoritesTab';
+import FavoritesSection from './components/FavoritesSection';
 
 /**
  * AccountPage - User account management page
@@ -203,9 +203,6 @@ const AccountPage: React.FC = () => {
               <TabsTrigger value="account" data-testid="tab-account">
                 {localization.tab_account}
               </TabsTrigger>
-              <TabsTrigger value="favorites" data-testid="tab-favorites">
-                {localization.tab_favorites}
-              </TabsTrigger>
             </TabsList>
 
             {/* Summary Tab Content */}
@@ -215,6 +212,9 @@ const AccountPage: React.FC = () => {
 
               {/* Past Events / History */}
               <PastEventsSection />
+
+              {/* Saved / Favorited Events */}
+              <FavoritesSection />
             </TabsContent>
 
             {/* Account Tab Content */}
@@ -285,11 +285,6 @@ const AccountPage: React.FC = () => {
                   <HouseholdMembersSection householdData={householdData} />
                 </div>
               </LoadingCard>
-            </TabsContent>
-
-            {/* Favorites Tab Content */}
-            <TabsContent value="favorites" className="mt-6">
-              <FavoritesTab />
             </TabsContent>
           </Tabs>
         </div>

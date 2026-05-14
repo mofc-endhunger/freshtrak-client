@@ -117,6 +117,14 @@ const localization = new LocalizedStrings({
     title_past_events: 'Past Events',
     text_no_past_events: 'No past events found.',
     text_past_events_description: 'Your event history from the last 30 days.',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: 'Saved Events',
+    text_saved_events_description: 'Events you have saved for easy access.',
+    loading_saved_events: 'Loading saved events...',
+    text_no_saved_events: "You haven't saved any events yet.",
+    text_save_events_hint: 'Tap ★ on any event to save it here.',
+
     status_cancelled: 'Cancelled',
     status_confirmed: 'Confirmed',
 
@@ -202,6 +210,7 @@ const localization = new LocalizedStrings({
     button_next_member: 'Next Member',
     button_skip_step: 'Skip This Step',
     button_view_details: 'View Details',
+    button_event_details: 'Event Details',
     button_hide_details: 'Hide details',
     button_reserve_time: 'Reserve Time',
     button_rsvp: 'RSVP',
@@ -1001,6 +1010,14 @@ const localization = new LocalizedStrings({
     title_past_events: 'Eventos Pasados',
     text_no_past_events: 'No se encontraron eventos pasados.',
     text_past_events_description: 'Su historial de eventos de los últimos 30 días.',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: 'Eventos Guardados',
+    text_saved_events_description: 'Eventos que has guardado para fácil acceso.',
+    loading_saved_events: 'Cargando eventos guardados...',
+    text_no_saved_events: 'Aún no has guardado ningún evento.',
+    text_save_events_hint: 'Toca ★ en cualquier evento para guardarlo aquí.',
+
     status_cancelled: 'Cancelado',
     status_confirmed: 'Confirmado',
 
@@ -1086,6 +1103,7 @@ const localization = new LocalizedStrings({
     button_next_member: 'Siguiente Miembro',
     button_skip_step: 'Omitir Este Paso',
     button_view_details: 'Ver Detalles',
+    button_event_details: 'Detalles del Evento',
     button_hide_details: 'Ocultar detalles',
     button_reserve_time: 'Reservar Hora',
     button_rsvp: 'RSVP',
@@ -1888,6 +1906,14 @@ const localization = new LocalizedStrings({
     title_past_events: 'Dhacdooyinkii Hore',
     text_no_past_events: 'Lama helin dhacdooyin hore.',
     text_past_events_description: 'Taariikhda dhacdooyinkaaga 30-kii maalmood ee la soo dhaafay.',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: 'Dhacdooyinka La Keydsaday',
+    text_saved_events_description: 'Dhacdooyinka aad u keydsatay si fudud u helitaan.',
+    loading_saved_events: 'Dhacdooyinka la keydsaday ayaa soo dejinaya...',
+    text_no_saved_events: 'Weli ma keydsanin wax dhacdooyin ah.',
+    text_save_events_hint: 'Taabo ★ dhacdooyin kasta si aad halkan ugu keydsato.',
+
     status_cancelled: 'La Joojiyay',
     status_confirmed: 'La Xaqiijiyay',
 
@@ -1973,6 +1999,7 @@ const localization = new LocalizedStrings({
     button_next_member: 'Xubinta Xiga',
     button_skip_step: 'Tallaabada Iska Dhaaf',
     button_view_details: 'Faahfaahinta Eeg',
+    button_event_details: 'Faahfaahinta Dhacdada',
     button_hide_details: 'Faahfaahinta Qari',
     button_reserve_time: 'Waqti Kaydi',
     button_rsvp: 'RSVP',
@@ -2775,6 +2802,14 @@ const localization = new LocalizedStrings({
     title_past_events: 'Прошедшие мероприятия',
     text_no_past_events: 'Прошедшие мероприятия не найдены.',
     text_past_events_description: 'История ваших мероприятий за последние 30 дней.',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: 'Сохранённые мероприятия',
+    text_saved_events_description: 'Мероприятия, которые вы сохранили для быстрого доступа.',
+    loading_saved_events: 'Загрузка сохранённых мероприятий...',
+    text_no_saved_events: 'Вы ещё не сохранили ни одного мероприятия.',
+    text_save_events_hint: 'Нажмите ★ на любом мероприятии, чтобы сохранить его здесь.',
+
     status_cancelled: 'Отменено',
     status_confirmed: 'Подтверждено',
 
@@ -2860,6 +2895,7 @@ const localization = new LocalizedStrings({
     button_next_member: 'Следующий член',
     button_skip_step: 'Пропустить этот шаг',
     button_view_details: 'Просмотр деталей',
+    button_event_details: 'Детали мероприятия',
     button_hide_details: 'Скрыть детали',
     button_reserve_time: 'Забронировать время',
     button_rsvp: 'RSVP',
@@ -3666,6 +3702,14 @@ const localization = new LocalizedStrings({
     title_past_events: 'Geçmiş Etkinlikler',
     text_no_past_events: 'Geçmiş etkinlik bulunamadı.',
     text_past_events_description: 'Son 30 gündeki etkinlik geçmişiniz.',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: 'Kaydedilen Etkinlikler',
+    text_saved_events_description: 'Kolay erişim için kaydettiğiniz etkinlikler.',
+    loading_saved_events: 'Kaydedilen etkinlikler yükleniyor...',
+    text_no_saved_events: 'Henüz hiçbir etkinlik kaydetmediniz.',
+    text_save_events_hint: 'Buraya kaydetmek için herhangi bir etkinlikte ★ simgesine dokunun.',
+
     status_cancelled: 'İptal Edildi',
     status_confirmed: 'Onaylandı',
 
@@ -3751,6 +3795,7 @@ const localization = new LocalizedStrings({
     button_next_member: 'Sonraki Üye',
     button_skip_step: 'Bu Adımı Atla',
     button_view_details: 'Detayları Görüntüle',
+    button_event_details: 'Etkinlik Detayları',
     button_hide_details: 'Detayları gizle',
     button_reserve_time: 'Zaman Ayır',
     button_rsvp: 'RSVP',
@@ -4547,6 +4592,14 @@ const localization = new LocalizedStrings({
     title_past_events: 'الأحداث السابقة',
     text_no_past_events: 'لم يتم العثور على أحداث سابقة.',
     text_past_events_description: 'سجل أحداثك من آخر 30 يومًا.',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: 'الأحداث المحفوظة',
+    text_saved_events_description: 'الأحداث التي حفظتها للوصول السريع.',
+    loading_saved_events: 'جاري تحميل الأحداث المحفوظة...',
+    text_no_saved_events: 'لم تقم بحفظ أي أحداث بعد.',
+    text_save_events_hint: 'اضغط ★ على أي حدث لحفظه هنا.',
+
     status_cancelled: 'ملغى',
     status_confirmed: 'مؤكد',
 
@@ -4632,6 +4685,7 @@ const localization = new LocalizedStrings({
     button_next_member: 'العضو التالي',
     button_skip_step: 'تخطي هذه الخطوة',
     button_view_details: 'عرض التفاصيل',
+    button_event_details: 'تفاصيل الحدث',
     button_hide_details: 'إخفاء التفاصيل',
     button_reserve_time: 'حجز الوقت',
     button_rsvp: 'RSVP',
@@ -5409,6 +5463,14 @@ const localization = new LocalizedStrings({
     title_past_events: '过去的活动',
     text_no_past_events: '未找到过去的活动。',
     text_past_events_description: '您过去30天的活动历史。',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: '已保存的活动',
+    text_saved_events_description: '您保存的活动以便快速访问。',
+    loading_saved_events: '正在加载已保存的活动...',
+    text_no_saved_events: '您尚未保存任何活动。',
+    text_save_events_hint: '点击任意活动上的 ★ 将其保存到这里。',
+
     status_cancelled: '已取消',
     status_confirmed: '已确认',
 
@@ -5494,6 +5556,7 @@ const localization = new LocalizedStrings({
     button_next_member: '下一个成员',
     button_skip_step: '跳过此步骤',
     button_view_details: '查看详情',
+    button_event_details: '活动详情',
     button_hide_details: '隐藏详情',
     button_reserve_time: '预约时间',
     button_rsvp: 'RSVP',
@@ -6271,6 +6334,14 @@ const localization = new LocalizedStrings({
     title_past_events: 'पिछले कार्यक्रम',
     text_no_past_events: 'कोई पिछले कार्यक्रम नहीं मिले।',
     text_past_events_description: 'पिछले 30 दिनों का आपका कार्यक्रम इतिहास।',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: 'सहेजे गए कार्यक्रम',
+    text_saved_events_description: 'आसान पहुँच के लिए आपके सहेजे गए कार्यक्रम।',
+    loading_saved_events: 'सहेजे गए कार्यक्रम लोड हो रहे हैं...',
+    text_no_saved_events: 'आपने अभी तक कोई कार्यक्रम नहीं सहेजा।',
+    text_save_events_hint: 'इसे यहाँ सहेजने के लिए किसी भी कार्यक्रम पर ★ दबाएँ।',
+
     status_cancelled: 'रद्द',
     status_confirmed: 'पुष्टि',
 
@@ -6356,6 +6427,7 @@ const localization = new LocalizedStrings({
     button_next_member: 'अगला सदस्य',
     button_skip_step: 'इस चरण को छोड़ें',
     button_view_details: 'विवरण देखें',
+    button_event_details: 'कार्यक्रम विवरण',
     button_hide_details: 'विवरण छुपाएं',
     button_reserve_time: 'समय आरक्षित करें',
     button_rsvp: 'RSVP',
@@ -7152,6 +7224,14 @@ const localization = new LocalizedStrings({
     title_past_events: 'विगतका कार्यक्रमहरू',
     text_no_past_events: 'विगतका कार्यक्रमहरू फेला परेनन्।',
     text_past_events_description: 'गत ३० दिनको तपाईंको कार्यक्रम इतिहास।',
+
+    // SAVED EVENTS (FAVORITES)
+    title_saved_events: 'बचत गरिएका कार्यक्रमहरू',
+    text_saved_events_description: 'सजिलो पहुँचको लागि बचत गरिएका कार्यक्रमहरू।',
+    loading_saved_events: 'बचत गरिएका कार्यक्रमहरू लोड हुँदैछन्...',
+    text_no_saved_events: 'तपाईंले अझै कुनै कार्यक्रम बचत गर्नुभएको छैन।',
+    text_save_events_hint: 'यहाँ बचत गर्न जुनसुकै कार्यक्रममा ★ थिच्नुहोस्।',
+
     status_cancelled: 'रद्द',
     status_confirmed: 'पुष्टि',
 
@@ -7237,6 +7317,7 @@ const localization = new LocalizedStrings({
     button_next_member: 'अर्को सदस्य',
     button_skip_step: 'यो चरण छोड्नुहोस्',
     button_view_details: 'विवरण हेर्नुहोस्',
+    button_event_details: 'कार्यक्रम विवरण',
     button_hide_details: 'विवरण लुकाउनुहोस्',
     button_reserve_time: 'समय आरक्षण गर्नुहोस्',
     button_rsvp: 'RSVP',

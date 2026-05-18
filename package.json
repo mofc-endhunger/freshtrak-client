@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "3.3.0-favorite-events",
+  "version": "3.3.0-nearby-events",
   "private": true,
   "homepage": "https://freshtrak.com",
   "dependencies": {

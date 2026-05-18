@@ -253,6 +253,13 @@ export interface EventListProps {
 export type LoadingSpinnerSize = 'small' | 'medium' | 'large';
 
 /**
+ * NearbyEventsSection component props
+ */
+export interface NearbyEventsSectionProps {
+  reservedEvents?: ReservedEvent[];
+}
+
+/**
  * Search component props
  */
 export interface SearchComponentProps {

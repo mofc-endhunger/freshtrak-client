@@ -3,6 +3,8 @@ import LocalizedStrings from 'react-localization';
 const localization = new LocalizedStrings({
   en: {
     home_freshtrack: 'FreshTrak is here to help!',
+    nearby_events_title: 'Nearby Events',
+    nearby_events_loading: 'Finding events near you...',
     title_welcome: 'Welcome',
     description_create_account_username_password:
       'Create a username and password to create FreshTrak account.',
@@ -895,6 +897,8 @@ const localization = new LocalizedStrings({
 
   spa: {
     home_freshtrack: 'FreshTrak está aquí para ayudar!',
+    nearby_events_title: 'Eventos Cercanos',
+    nearby_events_loading: 'Buscando eventos cerca de ti...',
     title_welcome: 'Bienvenido',
     description_create_account_username_password:
       'Crea un nombre de usuario y contraseña para crear una cuenta de FreshTrak.',
@@ -1793,6 +1797,8 @@ const localization = new LocalizedStrings({
   },
   som: {
     home_freshtrack: 'FreshTrak waxay halkan u joogtaa inay ku caawiso!',
+    nearby_events_title: 'Dhacdooyinka Dhow',
+    nearby_events_loading: 'Raadinta dhacdooyinka ku dhow...',
     title_welcome: 'Soo dhawoow',
     description_create_account_username_password:
       'Abuur magaca isticmaalaha iyo erifka si aad akoon FreshTrak u abuurto.',
@@ -2688,6 +2694,8 @@ const localization = new LocalizedStrings({
   },
   rus: {
     home_freshtrack: 'FreshTrak здесь, чтобы помочь!',
+    nearby_events_title: 'Ближайшие мероприятия',
+    nearby_events_loading: 'Поиск мероприятий рядом с вами...',
     title_welcome: 'Добро пожаловать',
     description_create_account_username_password:
       'Создайте имя пользователя и пароль для создания аккаунта FreshTrak.',
@@ -3590,6 +3598,8 @@ const localization = new LocalizedStrings({
   },
   tur: {
     home_freshtrack: 'FreshTrak yardım etmek için burada!',
+    nearby_events_title: 'Yakın Etkinlikler',
+    nearby_events_loading: 'Yakınındaki etkinlikler aranıyor...',
     title_welcome: 'Hoş geldiniz',
     description_create_account_username_password:
       'FreshTrak hesabı oluşturmak için bir kullanıcı adı ve şifre oluşturun.',
@@ -4482,6 +4492,8 @@ const localization = new LocalizedStrings({
   },
   ara: {
     home_freshtrack: 'FreshTrak هنا للمساعدة!',
+    nearby_events_title: 'الأحداث القريبة',
+    nearby_events_loading: 'البحث عن الأحداث بالقرب منك...',
     title_welcome: 'مرحباً',
     description_create_account_username_password:
       'قم بإنشاء اسم مستخدم وكلمة مرور لإنشاء حساب FreshTrak.',
@@ -5359,6 +5371,8 @@ const localization = new LocalizedStrings({
   },
   zho: {
     home_freshtrack: 'FreshTrak在這里為您提供幫助',
+    nearby_events_title: '附近活动',
+    nearby_events_loading: '正在查找您附近的活动...',
     title_welcome: '欢迎',
     description_create_account_username_password: '创建用户名和密码以创建 FreshTrak 账户。',
     home_stay: '保持最新',
@@ -6222,6 +6236,8 @@ const localization = new LocalizedStrings({
   },
   hin: {
     home_freshtrack: 'FreshTrak मदद करने के लिए यहाँ है!',
+    nearby_events_title: 'निकटवर्ती कार्यक्रम',
+    nearby_events_loading: 'आपके पास के कार्यक्रम खोजे जा रहे हैं...',
     title_welcome: 'स्वागत है',
     description_create_account_username_password:
       'FreshTrak खाता बनाने के लिए एक उपयोगकर्ता नाम और पासवर्ड बनाएं।',
@@ -7111,6 +7127,8 @@ const localization = new LocalizedStrings({
   },
   nep: {
     home_freshtrack: 'फ्रेशट्र्याक मद्दत गर्न यहाँ छ!',
+    nearby_events_title: 'नजिकका कार्यक्रमहरू',
+    nearby_events_loading: 'तपाईंको नजिकका कार्यक्रमहरू खोज्दै...',
     title_welcome: 'स्वागत छ',
     description_create_account_username_password:
       'FreshTrak खाता बनाउनको लागि प्रयोगकर्ता नाम र पासवर्ड बनाउनुहोस्।',

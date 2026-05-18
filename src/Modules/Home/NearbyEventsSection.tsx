@@ -95,7 +95,12 @@ const NearbyEventsSection: React.FC<NearbyEventsSectionProps> = ({ reservedEvent
 
   if (isLoading) {
     return (
-      <div role="status" aria-label={localization.nearby_events_loading} className="py-6">
+      <div
+        role="status"
+        aria-label={localization.nearby_events_loading}
+        data-testid="nearby-events-loading"
+        className="py-6"
+      >
         <LoadingSpinner size="medium" />
       </div>
     );
@@ -107,7 +112,11 @@ const NearbyEventsSection: React.FC<NearbyEventsSectionProps> = ({ reservedEvent
   }
 
   return (
-    <section aria-labelledby="nearby-events-heading" className="space-y-4 pb-24">
+    <section
+      aria-labelledby="nearby-events-heading"
+      data-testid="nearby-events-section"
+      className="space-y-4 pb-24"
+    >
       <h2 id="nearby-events-heading" className="mb-5 font-bold text-center text-2xl">
         {localization.nearby_events_title} ({resolvedZip})
       </h2>

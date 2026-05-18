@@ -32,6 +32,10 @@ export const SEL = {
   searchSubmit: 'search-submit',
   featureCard: 'feature-card',
 
+  // Nearby Events Section (NearbyEventsSection)
+  nearbyEventsSection: 'nearby-events-section',
+  nearbyEventsLoading: 'nearby-events-loading',
+
   // Account / Profile
   accountPage: 'account-page',
   tabSummary: 'tab-summary',

@@ -27,10 +27,19 @@ const createMockStore = () => {
 
 describe("LocalFoodBankComponent", () => {
 	let mockStore: ReturnType<typeof createMockStore>;
+	let consoleErrorSpy: jest.SpyInstance;
 
 	beforeEach(() => {
 		mockStore = createMockStore();
 		mockAxios.get.mockClear();
+		mockAxios.get.mockResolvedValue({
+			data: { foodbanks: [] },
+		});
+		consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+	});
+
+	afterEach(() => {
+		consoleErrorSpy.mockRestore();
 	});
 
 	const renderWithProvider = (props: any) => {
@@ -117,5 +126,11 @@ describe("LocalFoodBankComponent", () => {
 
 		// Should show spinner initially
 		expect(screen.getByTestId("spinner")).toBeInTheDocument();
+		await waitFor(() => {
+			expect(consoleErrorSpy).toHaveBeenCalledWith(
+				"Error fetching food banks:",
+				expect.any(Error)
+			);
+		});
 	});
 });

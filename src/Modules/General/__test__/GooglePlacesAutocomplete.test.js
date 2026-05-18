@@ -91,7 +91,8 @@ describe("GooglePlacesAutocomplete", () => {
 		render(<GooglePlacesAutocomplete {...defaultProps} />);
 		const input = screen.getByRole("textbox");
 
-		fireEvent.change(input, { target: { value: "123 Main" } });
+		// Keep input short so this assertion does not trigger async suggestions fetching.
+		fireEvent.change(input, { target: { value: "12" } });
 
 		// Check that onChange was called with an event object
 		expect(defaultProps.onChange).toHaveBeenCalledWith(

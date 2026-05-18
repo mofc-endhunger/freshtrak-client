@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+
+# shadcn/ui Usage
+
+This project uses **shadcn/ui** (new-york style) for all UI elements. Configuration is in [components.json](mdc:components.json).
+
+## Setup
+
+shadcn/ui is already initialized. If re-initialization is ever needed:
+
+```bash
+npx shadcn@latest init
+```
+
+## Adding Components
+
+When a required shadcn component is not yet installed, add it with:
+
+```bash
+npx shadcn@latest add <component-name>
+```
+
+For example: `npx shadcn@latest add button`
+
+## Installed Components
+
+The following components are available in `src/components/ui/`:
+
+alert, alert-dialog, badge, button, card, checkbox, dialog, dropdown-menu, form, input, label, select, separator, slider, star-rating, switch, table, tabs, textarea
+
+## Rules
+
+1. **Always prefer shadcn/ui components** over raw HTML elements (`<button>`, `<input>`, `<select>`, `<table>`, etc.) when an equivalent exists.
+2. **Import from `src/components/ui/`** — e.g., `import { Button } from "../components/ui/button"`.
+3. **Use the `cn()` utility** from [src/lib/utils.ts](mdc:src/lib/utils.ts) to merge Tailwind classes safely when customizing component styles.
+4. **Do not modify installed component files directly** unless there is a project-wide design requirement. Prefer composition and wrapper components instead.
+5. **If a needed component is missing**, install it via `npx shadcn@latest add <name>` before writing custom markup.
+6. **Tailwind CSS variables** are enabled (`cssVariables: true`). Use CSS variable-based colors (e.g., `bg-primary`, `text-muted-foreground`) for consistency with the design system.

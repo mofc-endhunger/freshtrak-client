@@ -18,7 +18,7 @@
  * ============================================================================
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { History, AlertCircle } from "lucide-react";
 import ReservationCard from "./ReservationCard";
 import { Reservation, ReservationsResponse } from "../types/reservation.types";
@@ -47,6 +47,13 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 	const [pastReservations, setPastReservations] = useState<Reservation[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const isMountedRef = useRef(true);
+
+	const safeSetState = (setter: () => void) => {
+		if (isMountedRef.current) {
+			setter();
+		}
+	};
 
 	// Initialize API service
 	const reservationsApiService = useMemo(
@@ -55,8 +62,10 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 	);
 
 	const fetchPastReservations = useCallback(async () => {
-		setIsLoading(true);
-		setError(null);
+		safeSetState(() => {
+			setIsLoading(true);
+			setError(null);
+		});
 
 		try {
 			const data: ReservationsResponse =
@@ -72,20 +81,26 @@ const PastEventsSection: React.FC<PastEventsSectionProps> = ({
 				}
 			);
 
-			setPastReservations(sortedReservations);
+			safeSetState(() => setPastReservations(sortedReservations));
 		} catch (err: any) {
 			console.error("Error fetching past reservations:", err);
-			setError(
-				localization.error_loading_reservations ||
-					"Failed to load past events"
+			safeSetState(() =>
+				setError(
+					localization.error_loading_reservations ||
+						"Failed to load past events",
+				),
 			);
 		} finally {
-			setIsLoading(false);
+			safeSetState(() => setIsLoading(false));
 		}
 	}, [reservationsApiService]);
 
 	useEffect(() => {
+		isMountedRef.current = true;
 		fetchPastReservations();
+		return () => {
+			isMountedRef.current = false;
+		};
 	}, [fetchPastReservations]);
 
 	/**

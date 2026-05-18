@@ -5,6 +5,7 @@ A modern React-based web application for food bank event management and family r
 ## 🎯 Overview
 
 FreshTrak Client is the frontend application for the FreshTrak platform, enabling:
+
 - **Families** to find and register for food distribution events
 - **Food banks** to manage event information and capacity
 - **Communities** to improve food distribution efficiency
@@ -67,6 +68,7 @@ npm start
 ### Technology Stack
 
 - **Frontend Framework**: React 18.2 with TypeScript
+- **Build Tool**: Vite 6 (migrated from Create React App)
 - **State Management**: Redux Toolkit with Redux Persist
 - **Routing**: React Router v6
 - **Authentication**: AWS Amplify/Cognito
@@ -105,11 +107,13 @@ src/
 ### Environment Variables
 
 Environment files are used for different deployment stages:
+
 - `.env.development` - Local development
 - `.env.beta` - Beta/staging environment
 - `.env.production` - Production environment
 
 Key variables (see `.env.development.example`):
+
 ```bash
 REACT_APP_ENV=development
 REACT_APP_PANTRY_FINDER_API=<backend-api-url>
@@ -120,16 +124,22 @@ REACT_APP_USER_POOL_CLIENT_ID=<cognito-client-id>
 REACT_APP_GOOGLE_MAPS_API_KEY=<google-maps-key>
 ```
 
+Current compatibility supports `REACT_APP_*` variables in both build-time and runtime config.
+Future migration target is `VITE_*` naming after Vite stabilization.
+
 ## 📦 Available Scripts
 
 ### Development
+
 ```bash
 npm start              # Start development server
 npm test              # Run tests in watch mode
-npm run test:coverage # Run tests with coverage report
+npm run test:ci       # Run tests once with coverage (CI mode)
+npm run preview       # Preview production build locally
 ```
 
 ### Building
+
 ```bash
 npm run build:development  # Build for development
 npm run build:beta        # Build for beta/staging
@@ -137,6 +147,7 @@ npm run build:production # Build for production
 ```
 
 ### Docker Development
+
 ```bash
 npm run docker:build   # Build Docker image
 npm run docker:up      # Start container
@@ -151,6 +162,7 @@ npm run docker:rebuild # Full rebuild
 The application uses AWS services for deployment:
 
 ### Current Architecture (Production)
+
 - **Hosting**: AWS S3 static website hosting
 - **CDN**: CloudFront for global distribution
 - **CI/CD**: AWS CodeBuild with `buildspec.yml`
@@ -172,6 +184,7 @@ To deploy your feature branch to the dev environment:
 7. Click **"Release"**
 
 ### Deployment Process
+
 ```bash
 # Beta deployment
 ./deploy.sh beta
@@ -181,6 +194,7 @@ To deploy your feature branch to the dev environment:
 ```
 
 The build process:
+
 1. CodeBuild triggers on git push
 2. Builds the React application
 3. Uploads to S3 bucket
@@ -188,19 +202,47 @@ The build process:
 
 ## 🧪 Testing
 
+### Unit Tests (Jest + React Testing Library)
+
 ```bash
 # Run all tests
 npm test
 
-# Run with coverage
-npm run test:coverage
+# Run with coverage in CI mode
+npm run test:ci
 
 # Run specific test file
-npm test -- --testPathPattern=Family
+npm test -- --testPathPatterns=Family
 
 # Update snapshots
 npm test -- -u
 ```
+
+### E2E Tests (Playwright)
+
+End-to-end tests run against a real browser and cover Login, Home, Profile, and Search Results pages.
+
+**Prerequisites:** The app must be running (Playwright auto-starts it via `npm start`).
+
+```bash
+# Run all E2E tests (headless)
+npm run test:e2e
+
+# Run with interactive UI mode
+npm run test:e2e:ui
+
+# Run in headed mode (see the browser)
+npm run test:e2e:headed
+
+# Run a single spec file
+npx playwright test e2e/tests/login.spec.ts
+```
+
+**Environment variables** for E2E (set in `.env` or export before running):
+
+- `E2E_TEST_EMAIL` - Test user email for Cognito login
+- `E2E_TEST_PASSWORD` - Test user password
+- `PLAYWRIGHT_BASE_URL` - Override base URL (default: `http://localhost:3000`)
 
 ## 📝 License
 
@@ -209,6 +251,7 @@ This project is part of the FreshTrak platform for food bank management and dist
 ## 🆘 Support
 
 For questions or issues:
+
 - Check existing [GitHub Issues](https://github.com/[org]/freshtrak-client/issues)
 - Review documentation in `/docs`
 - Contact the development team

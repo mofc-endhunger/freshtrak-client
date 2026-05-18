@@ -10,7 +10,7 @@ test("should render without errors", () => {
 				<SignInContainer />
 			</MemoryRouter>
 		);
-	}).not.toThrowError();
+	}).not.toThrow();
 });
 
 test(`should show 'Your password is required' if no password is submitted`, async () => {

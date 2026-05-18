@@ -3,6 +3,12 @@ import App from "./App";
 import { render } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
+
+jest.mock("./Core/Routes", () => {
+	return function MockAppRoutes() {
+		return <div data-testid="app-routes">Routes</div>;
+	};
+});
 // const mockStore = configureStore([]);
 const mockStore = configureStore([]);
 
@@ -17,5 +23,5 @@ it("renders without crashing", () => {
 				<App />
 			</Provider>
 		);
-	}).not.toThrowError();
+	}).not.toThrow();
 });

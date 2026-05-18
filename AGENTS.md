@@ -26,7 +26,7 @@ npm run build:development    # Build with .env file
 npm test               # Run all tests in watch mode
 npm test -- --testNamePattern="ComponentName" --watchAll=false    # Run specific test
 npm test -- --coverage     # Run tests with coverage report
-npm test -- --testPathPattern="path/to/test.tsx"  # Run test file
+npm test -- --testPathPatterns="path/to/test.tsx"  # Run test file
 ```
 
 ### Docker

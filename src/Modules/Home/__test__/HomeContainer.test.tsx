@@ -1,350 +1,383 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import HomeContainer from "../HomeContainer";
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import HomeContainer from '../HomeContainer';
 // search slice mocked in test
 
+jest.mock('../LocalFoodBankComponent', () => {
+  return function MockLocalFoodBankComponent() {
+    return <div data-testid="local-food-bank-component">Local Food Bank</div>;
+  };
+});
+
 // Mock axios
-jest.mock("axios");
-const mockAxios = require("axios");
-// Mock axios.all
-mockAxios.all = jest.fn((promises) => Promise.all(promises));
+jest.mock('axios', () => {
+  const mockAxiosInstance = {
+    get: jest.fn(),
+    post: jest.fn(),
+    delete: jest.fn(),
+    interceptors: {
+      request: { use: jest.fn() },
+      response: { use: jest.fn() },
+    },
+  };
+  return {
+    ...jest.requireActual('axios'),
+    get: jest.fn(),
+    post: jest.fn(),
+    delete: jest.fn(),
+    create: jest.fn(() => mockAxiosInstance),
+    all: jest.fn((promises: Promise<unknown>[]) => Promise.all(promises)),
+  };
+});
+const mockAxios = require('axios');
+
+// FavoriteButton (rendered inside EventCardComponent via UsersRegistrations)
+// needs AuthContext; provide a safe default.
+jest.mock('../../Authentication/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: false }),
+}));
+jest.mock('../../../components/shared/FavoriteButton', () => () => null);
 
 // Mock StorageService
-jest.mock("../../../Utils/StorageService", () => ({
-	StorageService: {
-		getItem: jest.fn((key: string) => {
-			if (key === "search_zip") return "12345";
-			return null;
-		}),
-		getUserToken: jest.fn(() => "mock-token"),
-	},
+jest.mock('../../../Utils/StorageService', () => ({
+  StorageService: {
+    getItem: jest.fn((key: string) => {
+      if (key === 'search_zip') return '12345';
+      return null;
+    }),
+    getUserToken: jest.fn(() => 'mock-token'),
+  },
 }));
 
 // Mock the LoadingSpinner component
-jest.mock("../../General/LoadingSpinner", () => {
-	return function MockLoadingSpinner({ size }: { size: string }) {
-		return <div data-testid={`loading-spinner-${size}`}>Loading...</div>;
-	};
+jest.mock('../../General/LoadingSpinner', () => {
+  return function MockLoadingSpinner({ size }: { size: string }) {
+    return <div data-testid={`loading-spinner-${size}`}>Loading...</div>;
+  };
 });
 
 // Mock the EventListComponent
-jest.mock("../../Events/EventListComponent", () => {
-	return function MockEventListComponent({ events, zipCode }: any) {
-		return (
-			<div data-testid="event-list-component">
-				Mock Event List for zip: {zipCode}
-			</div>
-		);
-	};
+jest.mock('../../Events/EventListComponent', () => {
+  return function MockEventListComponent({ events, zipCode }: any) {
+    return <div data-testid="event-list-component">Mock Event List for zip: {zipCode}</div>;
+  };
 });
 
 // Mock the EventHandler and HomeEventFormat functions
 jest.mock(
-	"../../../Utils/EventHandler",
-	() => ({
-		EventHandler: jest.fn(data => ({
-			"2024-01-01": [{ id: "1", name: "Test Event" }],
-		})),
-		HomeEventFormat: jest.fn((event, dateId) => ({
-			id: "1",
-			eventName: "Test Event",
-			acceptReservations: true,
-			acceptInterest: true,
-			acceptWalkin: true,
-			eventService: "test-service",
-		})),
-	}),
-	{ virtual: true }
+  '../../../Utils/EventHandler',
+  () => ({
+    EventHandler: jest.fn((data) => ({
+      '2024-01-01': [{ id: '1', name: 'Test Event' }],
+    })),
+    HomeEventFormat: jest.fn((event, dateId) => ({
+      id: '1',
+      eventName: 'Test Event',
+      acceptReservations: true,
+      acceptInterest: true,
+      acceptWalkin: true,
+      eventService: 'test-service',
+    })),
+  }),
+  { virtual: true },
 );
 
 // Create a mock store
 const createMockStore = () => {
-	return configureStore({
-		reducer: {
-			// Use a minimal mock reducer for the search slice to avoid TS/module resolution issues
-			search: (state = {}, _action) => state,
-		},
-	});
+  return configureStore({
+    reducer: {
+      // Use a minimal mock reducer for the search slice to avoid TS/module resolution issues
+      search: (state = {}, _action) => state,
+    },
+  });
 };
 
-describe("HomeContainer", () => {
-	let mockStore: ReturnType<typeof createMockStore>;
+describe('HomeContainer', () => {
+  let mockStore: ReturnType<typeof createMockStore>;
+  let consoleErrorSpy: jest.SpyInstance;
 
-	beforeEach(() => {
-		mockStore = createMockStore();
-		mockAxios.get.mockClear();
-		// Mock axios.all to return an empty array by default
-		if (mockAxios.all) {
-			mockAxios.all.mockClear();
-		}
-	});
+  beforeEach(() => {
+    mockStore = createMockStore();
+    mockAxios.get.mockClear();
+    mockAxios.get.mockResolvedValue({
+      data: { agencies: [], foodbanks: [], data: [] },
+    });
+    // Mock axios.all to return an empty array by default
+    if (mockAxios.all) {
+      mockAxios.all.mockClear();
+    }
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
-	const renderWithProvider = () => {
-		return render(
-			<Provider store={mockStore}>
-				<HomeContainer />
-			</Provider>
-		);
-	};
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+  });
 
-	it("renders the component with correct heading and form", async () => {
-		// Mock the reservations API call
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
+  const renderWithProvider = () => {
+    return render(
+      <Provider store={mockStore}>
+        <HomeContainer />
+      </Provider>,
+    );
+  };
 
-		renderWithProvider();
+  const waitForHomeReady = async () => {
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    });
+  };
 
-		// Wait for initial loading to finish
-		await waitFor(() => {
-			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
-		});
+  it('renders the component with correct heading and form', async () => {
+    // Mock the reservations API call
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
 
-		expect(screen.getByText("Zip Code")).toBeInTheDocument();
-		expect(
-			screen.getByPlaceholderText("Enter zip code")
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole("button", { name: "Search" })
-		).toBeInTheDocument();
-	});
+    renderWithProvider();
 
-	it("renders all child components", () => {
-		// Mock the reservations API call
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
+    // Wait for initial loading to finish
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    });
 
-		renderWithProvider();
+    expect(screen.getByText('Zip Code')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter zip code')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument();
+  });
 
-		expect(screen.getByText("Your Local Food Bank")).toBeInTheDocument();
-		expect(
-			screen.getByText("Your UpComing Reservations")
-		).toBeInTheDocument();
-		expect(screen.getByText("Resource Events")).toBeInTheDocument();
-	});
+  it('renders all child components', async () => {
+    // Mock the reservations API call
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
 
-	it("handles form submission correctly", async () => {
-		// Mock the reservations API call first (called on mount)
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
-		// Mock the events API call (called on form submit)
-		mockAxios.get.mockResolvedValueOnce({
-			data: { agencies: [] },
-		});
+    renderWithProvider();
+    await waitForHomeReady();
 
-		renderWithProvider();
+    expect(screen.getByTestId('local-food-bank-component')).toBeInTheDocument();
+    expect(screen.getByText('Your UpComing Reservations')).toBeInTheDocument();
+    expect(screen.getByText('Resource Events')).toBeInTheDocument();
+  });
 
-		const zipInput = screen.getByPlaceholderText("Enter zip code");
+  it('handles form submission correctly', async () => {
+    // Mock the reservations API call first (called on mount)
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
+    // Mock the events API call (called on form submit)
+    mockAxios.get.mockResolvedValueOnce({
+      data: { agencies: [] },
+    });
 
-		// Wait for loading to finish, then find the search button
-		await waitFor(() => {
-			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
-		});
+    renderWithProvider();
 
-		const searchButton = screen.getByRole("button", { name: "Search" });
+    const zipInput = screen.getByPlaceholderText('Enter zip code');
 
-		// Fill in the form
-		fireEvent.change(zipInput, { target: { value: "67890" } });
-		fireEvent.click(searchButton);
+    // Wait for loading to finish, then find the search button
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    });
 
-		await waitFor(() => {
-			expect(zipInput).toHaveValue("67890");
-		});
-	});
+    const searchButton = screen.getByRole('button', { name: 'Search' });
 
-	it("shows validation error for empty zip code", async () => {
-		// Mock the reservations API call to return empty array
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
-		// Mock axios.all if it exists
-		if (mockAxios.all) {
-			mockAxios.all.mockResolvedValue([]);
-		}
+    // Fill in the form
+    fireEvent.change(zipInput, { target: { value: '67890' } });
+    fireEvent.click(searchButton);
 
-		renderWithProvider();
+    await waitFor(() => {
+      expect(zipInput).toHaveValue('67890');
+    });
+  });
 
-		// Wait for loading to finish, then find the search button
-		await waitFor(() => {
-			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
-		});
+  it('shows validation error for empty zip code', async () => {
+    // Mock the reservations API call to return empty array
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
+    // Mock axios.all if it exists
+    if (mockAxios.all) {
+      mockAxios.all.mockResolvedValue([]);
+    }
 
-		const searchButton = screen.getByRole("button", { name: "Search" });
-		fireEvent.click(searchButton);
+    renderWithProvider();
 
-		await waitFor(() => {
-			expect(
-				screen.getByText("Zip code is required")
-			).toBeInTheDocument();
-		});
-	});
+    // Wait for loading to finish, then find the search button
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    });
 
-	it("calls API with correct parameters when form is submitted", async () => {
-		// Mock the reservations API call first (called on mount)
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
-		// Mock axios.all if it exists
-		if (mockAxios.all) {
-			mockAxios.all.mockResolvedValue([]);
-		}
-		// Mock the events API call (called on form submit)
-		mockAxios.get.mockResolvedValueOnce({
-			data: { agencies: [] },
-		});
+    const searchButton = screen.getByRole('button', { name: 'Search' });
+    fireEvent.click(searchButton);
 
-		renderWithProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Zip code is required')).toBeInTheDocument();
+    });
+  });
 
-		const zipInput = screen.getByPlaceholderText("Enter zip code");
+  it('calls API with correct parameters when form is submitted', async () => {
+    // Mock the reservations API call first (called on mount)
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
+    // Mock axios.all if it exists
+    if (mockAxios.all) {
+      mockAxios.all.mockResolvedValue([]);
+    }
+    // Mock the events API call (called on form submit)
+    mockAxios.get.mockResolvedValueOnce({
+      data: { agencies: [] },
+    });
 
-		// Wait for loading to finish, then find the search button
-		await waitFor(() => {
-			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
-		});
+    renderWithProvider();
 
-		const searchButton = screen.getByRole("button", { name: "Search" });
+    const zipInput = screen.getByPlaceholderText('Enter zip code');
 
-		fireEvent.change(zipInput, { target: { value: "67890" } });
-		fireEvent.click(searchButton);
+    // Wait for loading to finish, then find the search button
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    });
 
-		await waitFor(() => {
-			expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
-				params: { zip_code: "67890" },
-			});
-		});
-	});
+    const searchButton = screen.getByRole('button', { name: 'Search' });
 
-	it("shows loading spinner when fetching events", async () => {
-		// Mock the reservations API call first (called on mount)
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
-		// Mock the events API call with delay
-		mockAxios.get.mockImplementation(
-			() => new Promise(resolve => setTimeout(resolve, 100))
-		);
+    fireEvent.change(zipInput, { target: { value: '67890' } });
+    fireEvent.click(searchButton);
 
-		renderWithProvider();
+    await waitFor(() => {
+      expect(mockAxios.get).toHaveBeenCalledWith(expect.any(String), {
+        params: { zip_code: '67890' },
+      });
+    });
+  });
 
-		// Wait for initial loading to finish
-		await waitFor(() => {
-			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
-		});
+  it('shows loading spinner when fetching events', async () => {
+    // Mock the reservations API call first (called on mount)
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
+    // Mock the events API call with delay
+    mockAxios.get.mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve({ data: { agencies: [] } }), 100)),
+    );
 
-		const zipInput = screen.getByPlaceholderText("Enter zip code");
-		const searchButton = screen.getByRole("button", { name: "Search" });
+    renderWithProvider();
 
-		fireEvent.change(zipInput, { target: { value: "67890" } });
-		fireEvent.click(searchButton);
+    // Wait for initial loading to finish
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    });
 
-		await waitFor(() => {
-			expect(
-				screen.getByTestId("loading-spinner-medium")
-			).toBeInTheDocument();
-		});
-	});
+    const zipInput = screen.getByPlaceholderText('Enter zip code');
+    const searchButton = screen.getByRole('button', { name: 'Search' });
 
-	it("handles API errors gracefully", async () => {
-		// Mock the reservations API call first (called on mount)
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
-		// Mock the events API call to reject
-		mockAxios.get.mockRejectedValueOnce(new Error("API Error"));
+    fireEvent.change(zipInput, { target: { value: '67890' } });
+    fireEvent.click(searchButton);
 
-		renderWithProvider();
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner-medium')).toBeInTheDocument();
+    });
+  });
 
-		// Wait for initial loading to finish
-		await waitFor(() => {
-			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
-		});
+  it('handles API errors gracefully', async () => {
+    // Mock the reservations API call first (called on mount)
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
+    // Mock the events API call to reject
+    mockAxios.get.mockRejectedValueOnce(new Error('API Error'));
 
-		const zipInput = screen.getByPlaceholderText("Enter zip code");
-		const searchButton = screen.getByRole("button", { name: "Search" });
+    renderWithProvider();
 
-		fireEvent.change(zipInput, { target: { value: "67890" } });
-		fireEvent.click(searchButton);
+    // Wait for initial loading to finish
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    });
 
-		await waitFor(() => {
-			// Should still render the component
-			expect(screen.getByText("Zip Code")).toBeInTheDocument();
-		});
-	});
+    const zipInput = screen.getByPlaceholderText('Enter zip code');
+    const searchButton = screen.getByRole('button', { name: 'Search' });
 
-	it("fetches user reservations on component mount", async () => {
-		// Mock axios.all to return empty array
-		if (mockAxios.all) {
-			mockAxios.all.mockResolvedValue([]);
-		}
-		// Mock the reservations API call
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
+    fireEvent.change(zipInput, { target: { value: '67890' } });
+    fireEvent.click(searchButton);
 
-		renderWithProvider();
+    await waitFor(() => {
+      // Should still render the component
+      expect(screen.getByText('Zip Code')).toBeInTheDocument();
+    });
+    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error));
+  });
 
-		await waitFor(() => {
-			expect(mockAxios.get).toHaveBeenCalledWith(
-				expect.any(String),
-				expect.objectContaining({
-					headers: expect.objectContaining({
-						Authorization: expect.stringContaining("Bearer"),
-					}),
-				})
-			);
-		});
-	});
+  it('fetches user reservations on component mount', async () => {
+    // Mock axios.all to return empty array
+    if (mockAxios.all) {
+      mockAxios.all.mockResolvedValue([]);
+    }
+    // Mock the reservations API call
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
 
-	it("renders with correct background and spacing classes", () => {
-		// Mock the reservations API call
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
+    renderWithProvider();
 
-		renderWithProvider();
+    await waitFor(() => {
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: expect.stringContaining('Bearer'),
+          }),
+        }),
+      );
+    });
+  });
 
-		const section = screen.getByText("Zip Code").closest("section");
-		expect(section).toHaveClass("bg-[#F2F0F4]");
+  it('renders with correct background and spacing classes', async () => {
+    // Mock the reservations API call
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
 
-		const container = section?.querySelector(".container");
-		expect(container).toHaveClass(
-			"pt-16",
-			"sm:pt-24",
-			"lg:pt-[150px]",
-			"pb-16",
-			"sm:pb-24",
-			"lg:pb-[150px]"
-		);
-	});
+    renderWithProvider();
+    await waitForHomeReady();
 
-	it("renders form with shadcn components", async () => {
-		// Mock the reservations API call
-		mockAxios.get.mockResolvedValueOnce({
-			data: [],
-		});
+    const section = screen.getByText('Zip Code').closest('section');
+    expect(section).toHaveClass('bg-[#F2F0F4]');
 
-		renderWithProvider();
+    const container = section?.querySelector('.container');
+    expect(container).toHaveClass(
+      'pt-16',
+      'sm:pt-24',
+      'lg:pt-[150px]',
+      'pb-16',
+      'sm:pb-24',
+      'lg:pb-[150px]',
+    );
+  });
 
-		// Wait for loading to finish
-		await waitFor(() => {
-			expect(screen.queryByText("Searching...")).not.toBeInTheDocument();
-		});
+  it('renders form with shadcn components', async () => {
+    // Mock the reservations API call
+    mockAxios.get.mockResolvedValueOnce({
+      data: [],
+    });
 
-		// Check that Label component is used
-		const label = screen.getByText("Zip Code");
-		expect(label.tagName).toBe("LABEL");
+    renderWithProvider();
 
-		// Check that Input component is used
-		const input = screen.getByPlaceholderText("Enter zip code");
-		expect(input).toBeInTheDocument();
+    // Wait for loading to finish
+    await waitFor(() => {
+      expect(screen.queryByText('Searching...')).not.toBeInTheDocument();
+    });
 
-		// Check that Button component is used
-		const button = screen.getByRole("button", { name: "Search" });
-		expect(button).toBeInTheDocument();
-	});
+    // Check that Label component is used
+    const label = screen.getByText('Zip Code');
+    expect(label.tagName).toBe('LABEL');
+
+    // Check that Input component is used
+    const input = screen.getByPlaceholderText('Enter zip code');
+    expect(input).toBeInTheDocument();
+
+    // Check that Button component is used
+    const button = screen.getByRole('button', { name: 'Search' });
+    expect(button).toBeInTheDocument();
+  });
 });

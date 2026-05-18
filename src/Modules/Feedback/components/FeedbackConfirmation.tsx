@@ -9,6 +9,8 @@ import React from "react";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
+	DialogTitle,
 } from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
 import { CheckCircle } from "lucide-react";
@@ -31,6 +33,15 @@ const FeedbackConfirmation: React.FC<FeedbackConfirmationProps> = ({
 				className="p-0 gap-0 max-w-[320px] sm:max-w-[320px] overflow-hidden border-0 shadow-xl rounded-lg"
 				showCloseButton={false}
 			>
+				<DialogTitle className="sr-only">
+					{localization.feedback_thank_you_title ||
+						"Thank You For Providing Feedback!"}
+				</DialogTitle>
+				<DialogDescription className="sr-only">
+					{localization.feedback_thank_you_message ||
+						"With your help, we can improve your experience and better serve our community."}
+				</DialogDescription>
+
 				{/* Full Green Background Content */}
 				<div className="bg-text-primary text-white p-6 min-h-[400px] flex flex-col items-center relative rounded-lg">
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import configureStore from "redux-mock-store";
@@ -80,6 +80,12 @@ jest.mock("../../../Services/HouseholdsApiService", () => ({
 		getUsersMe: jest.fn().mockResolvedValue({
 			id: 1,
 			name: "Test Family",
+			members: [
+				{
+					is_head_of_household: 1,
+					date_of_birth: "1985-01-01",
+				},
+			],
 			address_line_1: "123 Test St",
 			city: "Test City",
 			state: "TS",
@@ -174,9 +180,18 @@ describe("EventSlotsModalComponent", () => {
 		mockedAxios.get.mockResolvedValue(mockApiResponse);
 	});
 
+	afterEach(async () => {
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 0));
+		});
+	});
+
 	describe("Rendering", () => {
-		test("should render without crashing", () => {
-			expect(() => renderComponent()).not.toThrow();
+		test("should render without crashing", async () => {
+			renderComponent();
+			await waitFor(() => {
+				expect(screen.getByRole("dialog")).toBeInTheDocument();
+			});
 		});
 
 		test("should show modal when acceptReservations is 1", async () => {
@@ -279,10 +294,9 @@ describe("EventSlotsModalComponent", () => {
 		test("should call onSlotChange when radio button is clicked", async () => {
 			const mockOnSlotChange = jest.fn();
 			renderComponent({ onSlotChange: mockOnSlotChange });
-
+			const radioButton = await screen.findByDisplayValue("1");
+			fireEvent.click(radioButton);
 			await waitFor(() => {
-				const radioButton = screen.getByDisplayValue("1");
-				fireEvent.click(radioButton);
 				expect(mockOnSlotChange).toHaveBeenCalled();
 			});
 		});
@@ -300,19 +314,18 @@ describe("EventSlotsModalComponent", () => {
 
 		test("should close modal when Go Back button is clicked", async () => {
 			renderComponent();
-
-			await waitFor(() => {
-				const goBackButton = screen.getByText("Go Back");
-				fireEvent.click(goBackButton);
-			});
+			const goBackButton = await screen.findByText("Go Back");
+			fireEvent.click(goBackButton);
 		});
 
 		test("should close modal when Save and Continue button is clicked", async () => {
 			renderComponent({ selectedSlotId: "1" });
-
+			const saveButton = await screen.findByText("Save and Continue");
+			fireEvent.click(saveButton);
 			await waitFor(() => {
-				const saveButton = screen.getByText("Save and Continue");
-				fireEvent.click(saveButton);
+				expect(
+					screen.getByTestId("household-confirmation-modal"),
+				).toBeInTheDocument();
 			});
 		});
 	});
@@ -320,12 +333,12 @@ describe("EventSlotsModalComponent", () => {
 	describe("Household Confirmation Flow", () => {
 		test("should trigger household confirmation flow when Save and Continue is clicked", async () => {
 			renderComponent({ selectedSlotId: "1" });
-
+			const saveButton = await screen.findByText("Save and Continue");
+			fireEvent.click(saveButton);
 			await waitFor(() => {
-				const saveButton = screen.getByText("Save and Continue");
-				fireEvent.click(saveButton);
-				// The component should now be in the household confirmation flow
-				// This will be tested more thoroughly in integration tests
+				expect(
+					screen.getByTestId("household-confirmation-modal"),
+				).toBeInTheDocument();
 			});
 		});
 
@@ -349,26 +362,12 @@ describe("EventSlotsModalComponent", () => {
 			// Click the button - this will trigger the loading state
 			fireEvent.click(saveButton);
 
-			// The button should show loading state immediately after click
-			// Since the component may navigate away, we check for loading text or disabled state
-			// Use a shorter timeout and check if button text changes or button becomes disabled
+			// Clicking continue should eventually open the household confirmation modal.
 			await waitFor(
 				() => {
-					// Try to find button with loading text
-					const buttons = screen.queryAllByRole("button");
-					const loadingButton = buttons.find(
-						(btn) =>
-							btn.textContent?.includes("Loading") ||
-							(btn as HTMLButtonElement).disabled
-					);
-					// If we can't find a loading button, the component may have navigated (which is expected behavior)
-					if (loadingButton) {
-						expect(loadingButton).toBeInTheDocument();
-					} else {
-						// Component may have navigated away, which is expected after loading completes
-						// This test verifies the loading state is triggered, not that it persists
-						expect(true).toBe(true);
-					}
+					expect(
+						screen.getByTestId("household-confirmation-modal"),
+					).toBeInTheDocument();
 				},
 				{ timeout: 1000 }
 			);

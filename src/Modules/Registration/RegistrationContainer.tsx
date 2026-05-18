@@ -13,7 +13,7 @@ import { setCurrentEvent, selectEvent } from "../../Store/Events/eventSlice";
 import { selectUser } from "../../Store/userSlice";
 import SpinnerComponent from "../General/SpinnerComponent";
 import ErrorComponent from "../General/ErrorComponent";
-import { API_URL, BASE_URL, RENDER_URL } from "../../Utils/Urls";
+import { API_URL, RENDER_URL } from "../../Utils/Urls";
 import axios from "axios";
 import RegistrationComponent from "./RegistrationComponent";
 import { EventFormat } from "../../Utils/EventHandler";
@@ -134,7 +134,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 		try {
 			setLoading(true);
 			const resp = await axios.get<{ event: Event; errors?: string[] }>(
-				`${BASE_URL}api/event_dates/${eventDateId}/event_details`,
+				API_URL.EVENT_DATE_DETAILS(eventDateId),
 			);
 			const { data } = resp;
 			if (data && data.event) {

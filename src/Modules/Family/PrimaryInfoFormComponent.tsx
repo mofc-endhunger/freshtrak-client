@@ -1,337 +1,290 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import {
-	UseFormRegister,
-	UseFormWatch,
-	UseFormSetValue,
-	UseFormGetValues,
-	UseFormTrigger,
-	FieldErrors,
-} from "react-hook-form";
-import localization from "../Localization/LocalizationComponent";
-import { Button } from "../../components/ui/button";
-import { validateDobText, formatDateInput } from "./utils/dateValidation";
-import { getTranslatedLanguageOptions } from "../Localization/languageOptions";
+  UseFormRegister,
+  UseFormWatch,
+  UseFormSetValue,
+  UseFormGetValues,
+  UseFormTrigger,
+  FieldErrors,
+} from 'react-hook-form';
+import localization from '../Localization/LocalizationComponent';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../components/ui/select';
+import { validateDobText, formatDateInput } from './utils/dateValidation';
+import { getTranslatedLanguageOptions } from '../Localization/languageOptions';
 
-// Component props interface
+import type { RegistrationFormData } from '../Registration/types/registration.types';
+
 interface PrimaryInfoFormComponentProps {
-	register: UseFormRegister<any>;
-	watch: UseFormWatch<any>;
-	setValue: UseFormSetValue<any>;
-	getValues: UseFormGetValues<any>;
-	trigger: UseFormTrigger<any>;
-	errors: FieldErrors<any>;
-	continueHandler?: (values: any) => void;
-	className?: string;
-	"data-testid"?: string;
-	isHouseholdSetup?: boolean;
+  register: UseFormRegister<RegistrationFormData>;
+  watch: UseFormWatch<RegistrationFormData>;
+  setValue: UseFormSetValue<RegistrationFormData>;
+  getValues: UseFormGetValues<RegistrationFormData>;
+  trigger: UseFormTrigger<RegistrationFormData>;
+  errors: FieldErrors<RegistrationFormData>;
+  continueHandler?: (values: Partial<RegistrationFormData>) => void;
+  className?: string;
+  'data-testid'?: string;
+  isHouseholdSetup?: boolean;
 }
 
+const SUFFIX_NONE_VALUE = 'none';
+
 const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
-	register,
-	watch,
-	setValue,
-	getValues,
-	trigger,
-	errors,
-	continueHandler,
-	className = "",
-	"data-testid": testId = "primary-info-form-component",
-	isHouseholdSetup = false,
+  register,
+  watch,
+  setValue,
+  getValues,
+  trigger,
+  errors,
+  continueHandler,
+  className = '',
+  'data-testid': testId = 'primary-info-form-component',
+  isHouseholdSetup = false,
 }) => {
-	const date_of_birth = watch("date_of_birth") || "";
+  const date_of_birth = watch('date_of_birth') || '';
+  const suffixValue = watch('suffix') || '';
+  const genderValue = watch('gender') || '';
+  const preferredLanguageValue = watch('preferred_language') || '';
 
-	// Date of birth input handler - formats as user types
-	const handleChangeDob = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const formattedValue = formatDateInput(e.target.value);
-		setValue("date_of_birth", formattedValue);
-	};
+  useEffect(() => {
+    if (!isHouseholdSetup) return;
+    register('preferred_language', { required: true });
+  }, [register, isHouseholdSetup]);
 
-	// Continue button handler
-	const handleContinue = async () => {
-		const values = getValues();
-		const result = await trigger([
-			"first_name",
-			"last_name",
-			"date_of_birth",
-			"gender",
-		]);
-		if (result && continueHandler) {
-			continueHandler(values);
-		}
-	};
+  const handleChangeDob = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatDateInput(e.target.value);
+    setValue('date_of_birth', formattedValue);
+  };
 
-	return (
-		<div className={`space-y-6 ${className}`} data-testid={testId}>
-			<h2 className="text-lg font-semibold text-highlight">
-				{localization.register_who_are_you}
-			</h2>
+  const handleContinue = async () => {
+    const values = getValues();
+    const result = await trigger(['first_name', 'last_name', 'date_of_birth', 'gender']);
+    if (result && continueHandler) {
+      continueHandler(values);
+    }
+  };
 
-			{/* First Name Field */}
-			<div className="space-y-2">
-				<label
-					htmlFor="first_name"
-					className="block text-sm font-medium text-gray-700"
-				>
-					{localization?.first_name}
-					<span className="text-red-500 ml-1">*</span>
-				</label>
-				<input
-					type="text"
-					className={`
-            w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-            placeholder-gray-400 focus:outline-none focus:ring-2 
-            focus:ring-indigo-500 focus:border-indigo-500 
-            ${
-				errors?.first_name
-					? "border-red-500 focus:ring-red-500 focus:border-red-500"
-					: ""
-			}
-          `}
-					id="first_name"
-					data-testid="first-name-input"
-					{...register("first_name", { required: true })}
-				/>
-				{errors?.first_name && (
-					<span
-						className="text-sm text-red-600"
-						data-testid="first-name-error"
-					>
-						{localization.error_first_name_required}
-					</span>
-				)}
-			</div>
+  return (
+    <div className={`space-y-6 ${className}`} data-testid={testId}>
+      <h2 className="text-lg font-semibold text-highlight">{localization.register_who_are_you}</h2>
 
-			{/* Middle Name Field */}
-			<div className="space-y-2">
-				<label
-					htmlFor="middle_name"
-					className="block text-sm font-medium text-gray-700"
-				>
-					{localization.middle_name}
-				</label>
-				<input
-					type="text"
-					className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                   placeholder-gray-400 focus:outline-none focus:ring-2 
-                   focus:ring-indigo-500 focus:border-indigo-500"
-					id="middle_name"
-					data-testid="middle-name-input"
-					{...register("middle_name")}
-				/>
-			</div>
+      {/* First Name Field */}
+      <div className="space-y-2">
+        <Label htmlFor="first_name" className="text-sm font-medium text-gray-700">
+          {localization?.first_name}
+          <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          type="text"
+          className={`h-[42px] bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary ${errors?.first_name ? 'border-red-500' : ''}`}
+          id="first_name"
+          aria-invalid={!!errors?.first_name}
+          data-testid="first-name-input"
+          {...register('first_name', { required: true })}
+        />
+        {errors?.first_name && (
+          <span className="text-sm text-red-600" data-testid="first-name-error">
+            {localization.error_first_name_required}
+          </span>
+        )}
+      </div>
 
-			{/* Last Name Field */}
-			<div className="space-y-2">
-				<label
-					htmlFor="last_name"
-					className="block text-sm font-medium text-gray-700"
-				>
-					{localization?.last_name}
-					<span className="text-red-500 ml-1">*</span>
-				</label>
-				<input
-					type="text"
-					className={`
-            w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-            placeholder-gray-400 focus:outline-none focus:ring-2 
-            focus:ring-indigo-500 focus:border-indigo-500 
-            ${
-				errors?.last_name
-					? "border-red-500 focus:ring-red-500 focus:border-red-500"
-					: ""
-			}
-          `}
-					id="last_name"
-					data-testid="last-name-input"
-					{...register("last_name", { required: true })}
-				/>
-				{errors?.last_name && (
-					<span
-						className="text-sm text-red-600"
-						data-testid="last-name-error"
-					>
-						{localization.error_last_name_required}
-					</span>
-				)}
-			</div>
+      {/* Middle Name Field */}
+      <div className="space-y-2">
+        <Label htmlFor="middle_name" className="text-sm font-medium text-gray-700">
+          {localization.middle_name}
+        </Label>
+        <Input
+          type="text"
+          className="h-[42px] bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+          id="middle_name"
+          data-testid="middle-name-input"
+          {...register('middle_name')}
+        />
+      </div>
 
-			{/* Suffix Field */}
-			<div className="space-y-2">
-				<label
-					htmlFor="suffix"
-					className="block text-sm font-medium text-gray-700"
-				>
-					{localization.suffix}
-				</label>
-				<select
-					className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-					id="suffix"
-					data-testid="suffix-select"
-					{...register("suffix")}
-				>
-					<option value="">{localization.option_suffix_none}</option>
-					<option value="Jr">{localization.option_suffix_jr}</option>
-					<option value="Sr">{localization.option_suffix_sr}</option>
-					<option value="II">{localization.option_suffix_ii}</option>
-					<option value="III">
-						{localization.option_suffix_iii}
-					</option>
-					<option value="IV">{localization.option_suffix_iv}</option>
-					<option value="V">{localization.option_suffix_v}</option>
-				</select>
-			</div>
+      {/* Last Name Field */}
+      <div className="space-y-2">
+        <Label htmlFor="last_name" className="text-sm font-medium text-gray-700">
+          {localization?.last_name}
+          <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          type="text"
+          className={`h-[42px] bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary ${errors?.last_name ? 'border-red-500' : ''}`}
+          id="last_name"
+          aria-invalid={!!errors?.last_name}
+          data-testid="last-name-input"
+          {...register('last_name', { required: true })}
+        />
+        {errors?.last_name && (
+          <span className="text-sm text-red-600" data-testid="last-name-error">
+            {localization.error_last_name_required}
+          </span>
+        )}
+      </div>
 
-			{/* Date of Birth Field */}
-			<div className="space-y-2">
-				<label
-					htmlFor="date_of_birth"
-					className="block text-sm font-medium text-gray-700"
-				>
-					{localization.dob}
-					<span className="text-red-500 ml-1">*</span>
-				</label>
-				<input
-					type="text"
-					className={`
-            w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-            placeholder-gray-400 focus:outline-none focus:ring-2 
-            focus:ring-indigo-500 focus:border-indigo-500 
-            ${
-				errors?.date_of_birth
-					? "border-red-500 focus:ring-red-500 focus:border-red-500"
-					: ""
-			}
-          `}
-					id="date_of_birth"
-					value={date_of_birth}
-					placeholder={localization.placeholder_date_format}
-					data-testid="date-of-birth-input"
-					{...register("date_of_birth", {
-						validate: validateDobText,
-						onChange: handleChangeDob,
-					})}
-				/>
-				{errors?.date_of_birth && (
-					<span
-						className="text-sm text-red-600"
-						data-testid="date-of-birth-error"
-					>
-						{String(
-							errors.date_of_birth?.message ||
-								localization.error_please_enter_valid_date,
-						)}
-					</span>
-				)}
-			</div>
+      {/* Suffix Field */}
+      <div className="space-y-2">
+        <Label htmlFor="suffix" className="text-sm font-medium text-gray-700">
+          {localization.suffix}
+        </Label>
+        <input type="hidden" {...register('suffix')} />
+        <Select
+          value={suffixValue || SUFFIX_NONE_VALUE}
+          onValueChange={(val) =>
+            setValue('suffix', val === SUFFIX_NONE_VALUE ? '' : val, { shouldDirty: true })
+          }
+        >
+          <SelectTrigger
+            id="suffix"
+            className="w-full bg-white border-gray-300 data-[size=default]:h-[42px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+            data-testid="suffix-select"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-white">
+            <SelectItem value={SUFFIX_NONE_VALUE}>{localization.option_suffix_none}</SelectItem>
+            <SelectItem value="Jr">{localization.option_suffix_jr}</SelectItem>
+            <SelectItem value="Sr">{localization.option_suffix_sr}</SelectItem>
+            <SelectItem value="II">{localization.option_suffix_ii}</SelectItem>
+            <SelectItem value="III">{localization.option_suffix_iii}</SelectItem>
+            <SelectItem value="IV">{localization.option_suffix_iv}</SelectItem>
+            <SelectItem value="V">{localization.option_suffix_v}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-			{/* Gender Field */}
-			<div className="space-y-2">
-				<label
-					htmlFor="gender"
-					className="block text-sm font-medium text-gray-700"
-				>
-					{localization?.gender}
-					<span className="text-red-500 ml-1">*</span>
-				</label>
-				<select
-					className={`
-            w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
-            ${
-				errors?.gender
-					? "border-red-500 focus:ring-red-500 focus:border-red-500"
-					: ""
-			}
-          `}
-					id="gender"
-					data-testid="gender-select"
-					{...register("gender", { required: true })}
-				>
-					<option value=""></option>
-					<option value="male">
-						{localization.option_gender_male}
-					</option>
-					<option value="female">
-						{localization.option_gender_female}
-					</option>
-					<option value="other">
-						{localization.option_gender_other}
-					</option>
-					<option value="not_specify">
-						{localization.option_gender_prefer_not_to_say}
-					</option>
-				</select>
-				{errors?.gender && (
-					<span
-						className="text-sm text-red-600"
-						data-testid="gender-error"
-					>
-						{localization.error_field_required}
-					</span>
-				)}
-			</div>
+      {/* Date of Birth Field */}
+      <div className="space-y-2">
+        <Label htmlFor="date_of_birth" className="text-sm font-medium text-gray-700">
+          {localization.dob}
+          <span className="text-red-500 ml-1">*</span>
+        </Label>
+        <Input
+          type="text"
+          className={`h-[42px] bg-white border-gray-300 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary ${errors?.date_of_birth ? 'border-red-500' : ''}`}
+          id="date_of_birth"
+          value={date_of_birth}
+          placeholder={localization.placeholder_date_format}
+          aria-invalid={!!errors?.date_of_birth}
+          data-testid="date-of-birth-input"
+          {...register('date_of_birth', {
+            validate: validateDobText,
+            onChange: handleChangeDob,
+          })}
+        />
+        {errors?.date_of_birth && (
+          <span className="text-sm text-red-600" data-testid="date-of-birth-error">
+            {String(errors.date_of_birth?.message || localization.error_please_enter_valid_date)}
+          </span>
+        )}
+      </div>
 
-			{/* Preferred Language (household setup only) */}
-			{isHouseholdSetup && (
-				<div className="space-y-2">
-					<label
-						htmlFor="preferred_language"
-						className="block text-sm font-medium text-gray-700"
-					>
-						{localization.label_preferred_language ||
-							"Preferred language"}
-						<span className="text-red-500 ml-1">*</span>
-					</label>
-					<select
-						className={`
-            w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-            focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 
-            ${
-				errors?.preferred_language
-					? "border-red-500 focus:ring-red-500 focus:border-red-500"
-					: ""
-			}
-          `}
-						id="preferred_language"
-						data-testid="preferred-language-select"
-						{...register("preferred_language", {
-							required: isHouseholdSetup,
-						})}
-					>
-						{getTranslatedLanguageOptions().map((opt) => (
-							<option key={opt.id} value={opt.code}>
-								{opt.text}
-							</option>
-						))}
-					</select>
-					{errors?.preferred_language && (
-						<span
-							className="text-sm text-red-600"
-							data-testid="preferred-language-error"
-						>
-							{localization.error_please_select_valid_language ||
-								"Please select a language"}
-						</span>
-					)}
-				</div>
-			)}
+      {/* Gender Field */}
+      <div className="space-y-2">
+        <Label htmlFor="gender" className="text-sm font-medium text-gray-700">
+          {localization?.gender}
+          <span className="text-red-500">*</span>
+        </Label>
+        <input type="hidden" {...register('gender', { required: true })} />
+        <Select
+          value={genderValue}
+          onValueChange={(val) =>
+            setValue('gender', val, {
+              shouldValidate: true,
+              shouldDirty: true,
+            })
+          }
+        >
+          <SelectTrigger
+            id="gender"
+            className={`w-full bg-white border-gray-300 data-[size=default]:h-[42px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary ${errors?.gender ? 'border-red-500' : ''}`}
+            aria-invalid={!!errors?.gender}
+            data-testid="gender-select"
+          >
+            <SelectValue placeholder="" />
+          </SelectTrigger>
+          <SelectContent className="bg-white">
+            <SelectItem value="male">{localization.option_gender_male}</SelectItem>
+            <SelectItem value="female">{localization.option_gender_female}</SelectItem>
+            <SelectItem value="other">{localization.option_gender_other}</SelectItem>
+            <SelectItem value="not_specify">
+              {localization.option_gender_prefer_not_to_say}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        {errors?.gender && (
+          <span className="text-sm text-red-600" data-testid="gender-error">
+            {localization.error_field_required}
+          </span>
+        )}
+      </div>
 
-			{/* Continue Button */}
-			{!isHouseholdSetup && (
-				<div className="flex justify-start pt-4">
-					<Button
-						type="button"
-						onClick={handleContinue}
-						variant="highlight"
-						data-testid="continue-button"
-					>
-						{localization.button_continue}
-					</Button>
-				</div>
-			)}
-		</div>
-	);
+      {/* Preferred Language (household setup only) */}
+      {isHouseholdSetup && (
+        <div className="space-y-2">
+          <Label htmlFor="preferred_language" className="text-sm font-medium text-gray-700">
+            {localization.label_preferred_language || 'Preferred language'}
+            <span className="text-red-500 ml-1">*</span>
+          </Label>
+          <Select
+            value={preferredLanguageValue}
+            onValueChange={(val) =>
+              setValue('preferred_language', val, {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
+            }
+          >
+            <SelectTrigger
+              id="preferred_language"
+              className="w-full bg-white border-gray-300 data-[size=default]:h-[42px] focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+              aria-invalid={!!errors?.preferred_language}
+              data-testid="preferred-language-select"
+            >
+              <SelectValue placeholder="" />
+            </SelectTrigger>
+            <SelectContent className="bg-white">
+              {getTranslatedLanguageOptions().map((opt) => (
+                <SelectItem key={opt.id} value={opt.code}>
+                  {opt.text}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors?.preferred_language && (
+            <span className="text-sm text-red-600" data-testid="preferred-language-error">
+              {localization.error_please_select_valid_language || 'Please select a language'}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Continue Button */}
+      {!isHouseholdSetup && (
+        <div className="flex justify-start pt-4">
+          <Button
+            type="button"
+            onClick={handleContinue}
+            variant="highlight"
+            data-testid="continue-button"
+          >
+            {localization.button_continue}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default PrimaryInfoFormComponent;

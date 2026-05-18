@@ -68,8 +68,17 @@ const createMockReservation = (id: number, date: string, name: string): any => (
 });
 
 describe("PastEventsSection", () => {
+	let consoleErrorSpy: jest.SpyInstance;
+
 	beforeEach(() => {
 		jest.clearAllMocks();
+		consoleErrorSpy = jest
+			.spyOn(console, "error")
+			.mockImplementation(() => {});
+	});
+
+	afterEach(() => {
+		consoleErrorSpy.mockRestore();
 	});
 
 	it("shows loading state initially", () => {
@@ -130,6 +139,10 @@ describe("PastEventsSection", () => {
 		await waitFor(() => {
 			expect(screen.getByText("Failed to load past events")).toBeInTheDocument();
 		});
+		expect(consoleErrorSpy).toHaveBeenCalledWith(
+			"Error fetching past reservations:",
+			expect.any(Error),
+		);
 	});
 
 	it("passes fetchPastReservations as onFeedbackSubmitted to ReservationCard", async () => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import EventSlotsModalComponent from "../EventSlotsModalComponent";
@@ -39,6 +39,12 @@ jest.mock("../../../Services/HouseholdsApiService", () => ({
 		getUsersMe: jest.fn().mockResolvedValue({
 			id: 1,
 			name: "Test Family",
+			members: [
+				{
+					is_head_of_household: 1,
+					date_of_birth: "1985-01-01",
+				},
+			],
 			address_line_1: "123 Test St",
 			city: "Test City",
 			state: "TS",
@@ -163,6 +169,12 @@ describe("EventSlotsModalComponent Accessibility", () => {
 					],
 				},
 			},
+		});
+	});
+
+	afterEach(async () => {
+		await act(async () => {
+			await new Promise((resolve) => setTimeout(resolve, 0));
 		});
 	});
 
@@ -307,6 +319,8 @@ describe("EventSlotsModalComponent Accessibility", () => {
 
 	describe("Loading State Accessibility", () => {
 		it("should have proper loading state ARIA attributes", () => {
+			const axios = require("axios");
+			axios.get.mockImplementationOnce(() => new Promise(() => {}));
 			renderWithRouter(<EventSlotsModalComponent {...defaultProps} />);
 
 			// Initially loading
@@ -443,14 +457,10 @@ describe("EventSlotsModalComponent Accessibility", () => {
 				/>
 			);
 
-			await waitFor(async () => {
-				const continueButton = screen.getByText("Save and Continue");
-				continueButton.focus();
-
-				await user.keyboard("{Enter}");
-				// Button should be clickable (not disabled)
-				expect(continueButton).not.toBeDisabled();
-			});
+			const continueButton = await screen.findByText("Save and Continue");
+			continueButton.focus();
+			await user.keyboard("{Enter}");
+			expect(continueButton).not.toBeDisabled();
 		});
 	});
 
@@ -541,7 +551,10 @@ describe("EventSlotsModalComponent Accessibility", () => {
 			renderWithRouter(<EventSlotsModalComponent {...defaultProps} />);
 
 			await waitFor(() => {
-				const image = screen.getByRole("img", { hidden: true });
+				const image = document.querySelector(
+					'img[aria-hidden="true"]'
+				) as HTMLImageElement | null;
+				expect(image).not.toBeNull();
 				expect(image).toHaveAttribute("aria-hidden", "true");
 				expect(image).toHaveAttribute("alt", "");
 			});

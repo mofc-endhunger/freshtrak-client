@@ -1,13 +1,38 @@
-import React from "react";
-import { waitFor, render } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import configureStore from "redux-mock-store";
-import EventListContainer from "../EventListContainer";
-import { mockAgency, testData } from "../../../Testing";
-import { Provider } from "react-redux";
-import axios from "axios";
+import React from 'react';
+import { waitFor, render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import configureStore from 'redux-mock-store';
+import EventListContainer from '../EventListContainer';
+import { mockAgency, testData } from '../../../Testing';
+import { Provider } from 'react-redux';
+import axios from 'axios';
 
-jest.mock("axios");
+jest.mock('axios', () => {
+  const mockAxiosInstance = {
+    get: jest.fn(),
+    post: jest.fn(),
+    delete: jest.fn(),
+    interceptors: {
+      request: { use: jest.fn() },
+      response: { use: jest.fn() },
+    },
+  };
+  return {
+    ...jest.requireActual('axios'),
+    get: jest.fn(),
+    post: jest.fn(),
+    delete: jest.fn(),
+    create: jest.fn(() => mockAxiosInstance),
+  };
+});
+
+// FavoriteButton (now inside EventCardComponent) requires AuthContext
+jest.mock('../../Authentication/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: false }),
+}));
+
+// Avoid rendering FavoriteButton's full Redux + dialog tree in these tests
+jest.mock('../../../components/shared/FavoriteButton', () => () => null);
 
 const mockStore = configureStore([]);
 const store = mockStore({});
@@ -16,63 +41,62 @@ const store = mockStore({});
 // and does not show in reality
 const originalWarn = console.warn.bind(console.warn);
 beforeAll(() => {
-	console.warn = (msg) =>
-		!msg.toString().includes("Deprecation warning") && originalWarn(msg);
+  console.warn = (msg) => !msg.toString().includes('Deprecation warning') && originalWarn(msg);
 });
 afterAll(() => {
-	console.warn = originalWarn;
+  console.warn = originalWarn;
 });
 
-describe("EventListContainer", () => {
-	beforeEach(() => {
-		jest.clearAllMocks();
-	});
+describe('EventListContainer', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-	test("should load without errors", () => {
-		axios.get.mockResolvedValue({ data: [] });
-		expect(() => {
-			render(
-				<Provider store={store}>
-					<MemoryRouter>
-						<EventListContainer searchData={{}} />
-					</MemoryRouter>
-				</Provider>,
-			);
-		}).not.toThrowError();
-	});
+  test('should load without errors', () => {
+    axios.get.mockResolvedValue({ data: [] });
+    expect(() => {
+      render(
+        <Provider store={store}>
+          <MemoryRouter>
+            <EventListContainer searchData={{}} />
+          </MemoryRouter>
+        </Provider>,
+      );
+    }).not.toThrow();
+  });
 
-	test("Successful Api with no Events dates", async () => {
-		axios.get.mockResolvedValue({ data: [] });
-		const { getByText } = render(
-			<Provider store={store}>
-				<MemoryRouter>
-					<EventListContainer zipCode={mockAgency.zip} />
-				</MemoryRouter>
-			</Provider>,
-		);
-		await waitFor(() => {
-			getByText(/No Events Currently Scheduled/i);
-		});
-	});
+  test('Successful Api with no Events dates', async () => {
+    axios.get.mockResolvedValue({ data: [] });
+    const { getByText } = render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <EventListContainer zipCode={mockAgency.zip} />
+        </MemoryRouter>
+      </Provider>,
+    );
+    await waitFor(() => {
+      getByText(/No Events Currently Scheduled/i);
+    });
+  });
 
-	test("Successful Api with Events dates", async () => {
-		// No need to mock axios for this test, just pass agencyData.
-		// Use availabilityFilter="All" so test is not flaky: test-data-bot uses
-		// random future dates which may fall outside the default "next_7_days".
-		const eventName = testData[0].events[0].name;
-		const { getByText } = render(
-			<Provider store={store}>
-				<MemoryRouter>
-					<EventListContainer
-						agencyData={testData}
-						zipCode={mockAgency.zip}
-						availabilityFilter="All"
-					/>
-				</MemoryRouter>
-			</Provider>,
-		);
-		await waitFor(() => {
-			getByText(eventName);
-		});
-	});
+  test('Successful Api with Events dates', async () => {
+    // No need to mock axios for this test, just pass agencyData.
+    // Use availabilityFilter="All" so test is not flaky: test-data-bot uses
+    // random future dates which may fall outside the default "next_7_days".
+    const eventName = testData[0].events[0].name;
+    const { getByText } = render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <EventListContainer
+            agencyData={testData}
+            zipCode={mockAgency.zip}
+            availabilityFilter="All"
+          />
+        </MemoryRouter>
+      </Provider>,
+    );
+    await waitFor(() => {
+      getByText(eventName);
+    });
+  });
 });

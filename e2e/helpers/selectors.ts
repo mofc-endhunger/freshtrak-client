@@ -59,6 +59,30 @@ export const SEL = {
   filterReservations: 'filter-reservations',
   filterClose: 'filter-close',
 
+  // Favorite Button (EventCardComponent)
+  favoriteButton: 'favorite-button',
+  starFilled: 'star-filled',
+  starOutline: 'star-outline',
+
+  // Favorites filter chip (EventContainer)
+  favoritesFilterBar: 'favorites-filter-bar',
+  favoritesFilterChip: 'favorites-filter-chip',
+  favoritesEmptyState: 'favorites-empty-state',
+
+  // Profile – Saved Events section (FavoritesSection)
+  favoritesSection: 'favorites-section',
+  favoritesSectionEmpty: 'favorites-section-empty',
+  favoritesSectionList: 'favorites-section-list',
+  savedEventCard: 'saved-event-card',
+  upcomingCountBadge: 'upcoming-count-badge',
+  pastEventBadge: 'past-event-badge',
+
+  // Date Selection Dialog (FavoritesSection → DateSelectionDialog)
+  dateSelectionDialog: 'date-selection-dialog',
+  dateList: 'date-list',
+  dateListItem: 'date-list-item',
+  dateListItemWalkin: 'date-list-item-walkin',
+
   // ChatBot
   chatbotToggle: 'chatbot-toggle',
   chatbotWindow: 'chatbot-window',

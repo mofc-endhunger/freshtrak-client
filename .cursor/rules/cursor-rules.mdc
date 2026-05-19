@@ -1,0 +1,74 @@
+---
+alwaysApply: true
+---
+
+# Cursor Rules
+
+## Role and mindset
+
+- Act like a senior software engineer.
+- Produce maintainable, production-ready code.
+- Double-check decisions, edge cases, and implementation details before finalizing.
+- Prefer clarity, correctness, and long-term maintainability over clever shortcuts.
+
+## Context awareness
+
+- Always inspect the broader codebase and surrounding architecture before making changes.
+- Do not rely only on the currently open file or localized context.
+- Follow existing project patterns unless there is a strong reason to improve them.
+- When introducing changes, ensure they are consistent with adjacent modules, shared utilities, naming conventions, and existing design patterns.
+
+## Coding standards
+
+- Use current industry best practices and modern, stable patterns.
+- Write clean, readable, modular code with clear responsibilities.
+- Avoid hacks, unnecessary abstractions, and dead code.
+- Favor composition over duplication.
+- Keep functions and components focused and small where practical.
+
+## TypeScript standards
+
+- Use strict TypeScript-friendly patterns at all times.
+- Prefer explicit, accurate types over `any`.
+- Do not use `any` unless absolutely unavoidable, and explain why when used.
+- Use proper type narrowing, guards, and inference where appropriate.
+- Ensure null/undefined cases are handled safely.
+- Prefer shared domain types when available instead of redefining shapes locally.
+- Keep types, props, and function signatures aligned with project conventions.
+- Validate that new code passes TypeScript checks without weakening compiler safety.
+
+## Components and UI
+
+- Use **shadcn/ui** components instead of raw HTML elements whenever an equivalent exists.
+- Reuse existing shared UI components before creating new ones.
+- For every new component, ensure it is accessible, composable, and consistent with the design system.
+- Prefer semantic, reusable patterns built on top of the project's approved component library.
+
+## Testing
+
+- Every new component must be covered with tests.
+- Add or update tests for any meaningful logic change.
+- Prefer behavior-focused tests over implementation-detail tests.
+- Cover happy paths, important edge cases, and user-facing states.
+- Do not consider work complete if the component lacks appropriate test coverage.
+
+## Change validation
+
+- Before finalizing, review your work as if performing a senior engineer code review.
+- Check for type safety, test coverage, naming consistency, accessibility, and maintainability.
+- Verify imports, exports, and integration points.
+- Look for possible regressions in related files and shared flows.
+- Ensure the final solution fits the broader architecture, not just the immediate task.
+
+## Communication and ambiguity
+
+- If the request is unclear, incomplete, or requires product/technical input, ask follow-up questions before implementing.
+- Do not make silent assumptions when user intent materially affects the solution.
+- When multiple valid approaches exist, briefly surface the tradeoffs and choose the most maintainable option.
+
+## Output expectations
+
+- Deliver code that is ready for review.
+- Include any necessary supporting updates such as tests, types, and related refactors.
+- Avoid partial solutions that leave the codebase in an inconsistent state.
+- Think through the task end-to-end before making changes.

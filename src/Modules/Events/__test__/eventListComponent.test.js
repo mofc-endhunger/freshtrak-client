@@ -8,8 +8,7 @@ const VIEW_MODE_STORAGE_KEY = 'freshtrak_event_view_mode';
 // Suppress the moment deprecation warning from test-data-bot
 const originalWarn = console.warn.bind(console.warn);
 beforeAll(() => {
-  console.warn = (msg) =>
-    !msg.toString().includes('Deprecation warning') && originalWarn(msg);
+  console.warn = (msg) => !msg.toString().includes('Deprecation warning') && originalWarn(msg);
 });
 afterAll(() => {
   console.warn = originalWarn;
@@ -50,14 +49,16 @@ describe('EventListComponent', () => {
       const events = { [preformattedEventData.date]: [preformattedEventData] };
       renderWithRouter(<EventListComponent events={events} zipCode={43123} />);
       expect(screen.getByText(preformattedEventData.agencyName)).toBeInTheDocument();
-      expect(screen.getByText(/Resource Events Serving Residents of Zip Code 43123/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Resource Events Serving Residents of Zip Code 43123/i),
+      ).toBeInTheDocument();
     });
 
     it('calls lastItemRef with the last card element so infinite scroll can fire', () => {
       const lastItemRef = jest.fn();
       const events = makeEvents('Agency A', 'Agency B', 'Agency C');
       renderWithRouter(
-        <EventListComponent events={events} zipCode="43701" lastItemRef={lastItemRef} />
+        <EventListComponent events={events} zipCode="43701" lastItemRef={lastItemRef} />,
       );
       // The ref callback must have been invoked with a DOM element (not null/undefined)
       expect(lastItemRef).toHaveBeenCalled();
@@ -70,7 +71,7 @@ describe('EventListComponent', () => {
       const lastItemRef = jest.fn();
       const events = makeEvents('First Agency', 'Middle Agency', 'Last Agency');
       renderWithRouter(
-        <EventListComponent events={events} zipCode="43701" lastItemRef={lastItemRef} />
+        <EventListComponent events={events} zipCode="43701" lastItemRef={lastItemRef} />,
       );
       // Should be called exactly once (for the sentinel element on the last card)
       expect(lastItemRef).toHaveBeenCalledTimes(1);
@@ -79,7 +80,7 @@ describe('EventListComponent', () => {
     it('does not call lastItemRef when there are no events', () => {
       const lastItemRef = jest.fn();
       renderWithRouter(
-        <EventListComponent events={{}} zipCode="43701" lastItemRef={lastItemRef} />
+        <EventListComponent events={{}} zipCode="43701" lastItemRef={lastItemRef} />,
       );
       expect(lastItemRef).not.toHaveBeenCalled();
     });
@@ -87,7 +88,7 @@ describe('EventListComponent', () => {
     it('shows the loading spinner when loadingMore is true', () => {
       const events = { [preformattedEventData.date]: [preformattedEventData] };
       renderWithRouter(
-        <EventListComponent events={events} zipCode="43701" loadingMore={true} hasMore={true} />
+        <EventListComponent events={events} zipCode="43701" loadingMore={true} hasMore={true} />,
       );
       expect(screen.getByText(/loading more events/i)).toBeInTheDocument();
     });
@@ -95,7 +96,7 @@ describe('EventListComponent', () => {
     it('shows the end-of-results indicator when hasMore is false and events exist', () => {
       const events = { [preformattedEventData.date]: [preformattedEventData] };
       renderWithRouter(
-        <EventListComponent events={events} zipCode="43701" hasMore={false} loadingMore={false} />
+        <EventListComponent events={events} zipCode="43701" hasMore={false} loadingMore={false} />,
       );
       expect(screen.getByText(/no more events to load/i)).toBeInTheDocument();
     });
@@ -103,7 +104,7 @@ describe('EventListComponent', () => {
     it('does not show the end-of-results indicator when loadingMore is true', () => {
       const events = { [preformattedEventData.date]: [preformattedEventData] };
       renderWithRouter(
-        <EventListComponent events={events} zipCode="43701" hasMore={false} loadingMore={true} />
+        <EventListComponent events={events} zipCode="43701" hasMore={false} loadingMore={true} />,
       );
       expect(screen.queryByText(/no more events to load/i)).not.toBeInTheDocument();
     });
@@ -116,7 +117,7 @@ describe('EventListComponent', () => {
       const lastItemRef = jest.fn();
       const events = makeEvents('Agency A', 'Agency B', 'Agency C');
       renderWithRouter(
-        <EventListComponent events={events} zipCode="43701" lastItemRef={lastItemRef} />
+        <EventListComponent events={events} zipCode="43701" lastItemRef={lastItemRef} />,
       );
       expect(lastItemRef).toHaveBeenCalled();
       const lastCall = lastItemRef.mock.calls[lastItemRef.mock.calls.length - 1][0];
@@ -127,7 +128,7 @@ describe('EventListComponent', () => {
       const lastItemRef = jest.fn();
       const events = makeEvents('First Agency', 'Middle Agency', 'Last Agency');
       renderWithRouter(
-        <EventListComponent events={events} zipCode="43701" lastItemRef={lastItemRef} />
+        <EventListComponent events={events} zipCode="43701" lastItemRef={lastItemRef} />,
       );
       expect(lastItemRef).toHaveBeenCalledTimes(1);
     });

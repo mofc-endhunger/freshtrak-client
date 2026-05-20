@@ -63,6 +63,20 @@ const RegistrationEventDetailsContainer: React.FC<RegistrationEventDetailsContai
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventDateId]);
 
+  useEffect(() => {
+    // Store the referrer URL if it's a search results page (backup for navigation)
+    if (typeof window !== 'undefined' && document.referrer) {
+      try {
+        const referrerUrl = new URL(document.referrer);
+        if (referrerUrl.pathname.startsWith('/events/list')) {
+          sessionStorage.setItem('searchResultsUrl', referrerUrl.pathname + referrerUrl.search);
+        }
+      } catch (e) {
+        // Ignore URL parsing errors
+      }
+    }
+  }, []);
+
   // Check authentication on component mount and when authentication state might change
   useEffect(() => {
     if (isUserAuthenticated()) {
@@ -106,6 +120,9 @@ const RegistrationEventDetailsContainer: React.FC<RegistrationEventDetailsContai
       const userProfile = resp.data;
       // Use StorageService to store guest user profile
       StorageService.setItem('freshtrak_user_guest', userProfile);
+      // Mark this guest session as belonging to the current browser session so
+      // App.js can detect and discard stale guest data after a tab/browser close.
+      StorageService.setGuestSessionMarker();
 
       setLoading(false);
       setshowAuthenticationModal(false);

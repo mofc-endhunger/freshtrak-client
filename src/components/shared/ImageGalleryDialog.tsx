@@ -53,8 +53,8 @@ const ImageCarousel: React.FC<{ images: AgencyImage[] }> = ({ images }) => {
         </CarouselContent>
         {images.length > 1 && (
           <>
-            <CarouselPrevious className="-left-4" />
-            <CarouselNext className="-right-4" />
+            <CarouselPrevious className="left-1" />
+            <CarouselNext className="right-1" />
           </>
         )}
       </Carousel>

@@ -38,6 +38,13 @@ const hasValidCoordinates = (event: {
   return true;
 };
 
+interface EventImage {
+  id: number;
+  type: string;
+  caption: string;
+  src: string;
+}
+
 interface Event {
   id: string;
   startTime: string;
@@ -60,6 +67,8 @@ interface Event {
   longitude?: number;
   agencyLatitude?: number;
   agencyLongitude?: number;
+  agencyImages?: EventImage[];
+  eventImages?: EventImage[];
   [key: string]: any;
 }
 

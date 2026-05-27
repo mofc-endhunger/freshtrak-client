@@ -26,6 +26,7 @@ import PrintableConfirmationCard, {
   generateConfirmationCardPNG,
 } from './components/PrintableConfirmationCard';
 import { StorageService } from '../../Utils/StorageService';
+import ImageThumbnailStrip from '../../components/shared/ImageThumbnailStrip';
 // Type imports from registration.types.ts
 import {
   RegistrationConfirmProps,
@@ -252,6 +253,15 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (props)
                 <p className="text-sm text-gray-600">{eventDateFormatted}</p>
                 <p className="text-sm text-gray-600 mb-3">{eventTime}</p>
                 <p className="text-sm text-gray-500">{agencyAddress}</p>
+                {((event as any).agencyImages?.length > 0 ||
+                  (event as any).eventImages?.length > 0) && (
+                  <div className="mt-3">
+                    <ImageThumbnailStrip
+                      agencyImages={(event as any).agencyImages}
+                      eventImages={(event as any).eventImages}
+                    />
+                  </div>
+                )}
                 <Separator className="my-4 bg-gray-200" />
                 <h3 className="text-lg font-bold text-gray-900 mb-1">
                   {first_name} {middle_name} {last_name} {suffix}

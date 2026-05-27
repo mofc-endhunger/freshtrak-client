@@ -30,12 +30,24 @@ export interface FoodBankApiResponse {
 }
 
 /**
+ * Image attached to an agency or event from the API
+ */
+export interface AgencyImage {
+  id: number;
+  type: string;
+  caption: string;
+  src: string;
+}
+
+/**
  * Agency data structure for events
  */
 export interface Agency {
   id: string;
   name: string;
+  nickname?: string;
   events: Event[];
+  images?: AgencyImage[];
   [key: string]: any; // Allow additional properties
 }
 
@@ -70,6 +82,8 @@ export interface Event {
   adultAge?: number;
   maxHouseholdSize?: number;
   availableSlots?: number;
+  agencyImages?: AgencyImage[];
+  eventImages?: AgencyImage[];
   [key: string]: any; // Allow additional properties
 }
 
@@ -106,6 +120,8 @@ export interface HomeEventFormatData {
   eventDetails: string;
   seniorAge: number;
   adultAge: number;
+  agencyImages?: AgencyImage[];
+  eventImages?: AgencyImage[];
   [key: string]: any; // Allow additional properties
 }
 

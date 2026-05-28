@@ -46,6 +46,7 @@ export const eventDateMapper = (
 ) => {
   const { event_dates, forms, exception_note, images: eventImages } = event;
   if (event_dates && event_dates.length > 0) {
+    const safeForms = forms || [];
     return event_dates.map((dateOfEvent) => {
       const {
         id,
@@ -74,11 +75,11 @@ export const eventDateMapper = (
         agencyName: name,
         eventName: event.name,
         exceptionNote: exception_note,
-        eventService: event.service_category['service_category_name'],
+        eventService: event.service_category ? event.service_category['service_category_name'] : '',
         estimated_distance,
         eventDetails: event.event_details,
-        seniorAge: forms.length > 0 ? forms[0].display_age_senior : 60,
-        adultAge: forms.length > 0 ? forms[0].display_age_adult : 18,
+        seniorAge: safeForms.length > 0 ? safeForms[0].display_age_senior : 60,
+        adultAge: safeForms.length > 0 ? safeForms[0].display_age_adult : 18,
         agencyLatitude,
         agencyLongitude,
         agencyImages: agencyImages || [],
@@ -217,15 +218,19 @@ export const AgencyHandler = (agencies) => {
 
     if (events && events.length > 0) {
       events.forEach((event) => {
-        eventDateMapper(
-          event,
-          phone,
-          name,
-          estimated_distance,
-          latitude,
-          longitude,
-          images,
-        ).forEach((x) => eventDates.push(x));
+        try {
+          eventDateMapper(
+            event,
+            phone,
+            name,
+            estimated_distance,
+            latitude,
+            longitude,
+            images,
+          ).forEach((x) => eventDates.push(x));
+        } catch (err) {
+          console.warn('AgencyHandler: skipping malformed event data for agency', name, err);
+        }
       });
     }
   });

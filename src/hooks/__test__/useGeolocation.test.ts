@@ -145,9 +145,11 @@ describe('useGeolocation', () => {
       expect.any(Function),
       expect.any(Function),
       expect.objectContaining({
-        timeout: 8_000,
         maximumAge: 300_000,
       }),
     );
+    // No timeout property — must not be set so the browser uses Infinity
+    const receivedOptions = getCurrentPositionMock.mock.calls[0][2] as PositionOptions;
+    expect(receivedOptions.timeout).toBeUndefined();
   });
 });

@@ -88,6 +88,8 @@ interface EventListComponentProps {
   lastItemRef?: (node: HTMLElement | null) => void;
   loadingMore?: boolean;
   hasMore?: boolean;
+  /** When provided the component runs in controlled mode — parent drives the active view. */
+  viewMode?: ViewMode;
 }
 
 const EventListComponent: React.FC<EventListComponentProps> = ({
@@ -101,11 +103,15 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
   lastItemRef,
   loadingMore = false,
   hasMore = false,
+  viewMode: controlledViewMode,
 }) => {
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+  const [localViewMode, setLocalViewMode] = useState<ViewMode>(() => {
     const stored = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
     return stored === 'list' || stored === 'grid' ? stored : 'grid';
   });
+
+  // Controlled prop wins; falls back to internal localStorage-backed state.
+  const viewMode: ViewMode = controlledViewMode ?? localViewMode;
   const [highlightedEventIndex, setHighlightedEventIndex] = useState<number | null>(null);
   const [focusedMapIndex, setFocusedMapIndex] = useState<number | null>(null);
 
@@ -116,7 +122,7 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
 
   useEffect(() => {
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
-  }, [viewMode]);
+  }, [viewMode]); // persists whichever value is active (controlled or local)
 
   const isRegisteredEvent = (event: Event): boolean => {
     const found =
@@ -233,7 +239,7 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
             <h2 className="text-2xl font-bold text-gray-900">
               {localization.resource_zip_code_events} {zipCode}
             </h2>
-            <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+            <ViewToggle viewMode={viewMode} onViewModeChange={setLocalViewMode} />
           </div>
         )}
         {Object.keys(events).length === 0 && (
@@ -312,7 +318,7 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
           <h2 className="text-2xl font-bold text-gray-900">
             {localization.resource_zip_code_events} {zipCode}
           </h2>
-          <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+          <ViewToggle viewMode={viewMode} onViewModeChange={setLocalViewMode} />
         </div>
       )}
       {Object.keys(events).length === 0 && (

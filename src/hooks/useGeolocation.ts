@@ -9,7 +9,11 @@ export interface UseGeolocationResult {
 }
 
 const GEOLOCATION_OPTIONS: PositionOptions = {
-  timeout: 8_000,
+  // No timeout — the browser default is Infinity, which is intentional here.
+  // The permission dialog can take any amount of time for the user to respond;
+  // a hard timeout would fire before they click "Allow" and silently hide the
+  // section.  Hardware/GPS delays after permission is granted are handled by
+  // the browser itself.
   maximumAge: 300_000,
   enableHighAccuracy: false,
 };

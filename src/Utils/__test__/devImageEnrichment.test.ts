@@ -1,3 +1,5 @@
+import type { AgencyImage } from '../../Modules/Home/types/home.types';
+
 const mockConfig = {
   ALLOW_DEV_MOCK_IMAGES: undefined as string | undefined,
 };
@@ -106,19 +108,25 @@ describe('devImageEnrichment', () => {
       localStorage.setItem(STORAGE_KEY, 'true');
 
       const { enrichEventWithMockImages } = loadModule();
-      const result = enrichEventWithMockImages({ id: '123' });
+      const result = enrichEventWithMockImages({
+        id: '123',
+        agencyImages: [],
+        eventImages: [],
+      });
 
-      expect(result.agencyImages?.length || result.eventImages?.length).toBeGreaterThan(0);
+      expect(
+        (result.agencyImages?.length ?? 0) + (result.eventImages?.length ?? 0),
+      ).toBeGreaterThan(0);
     });
 
     it('does not replace existing agency or event images', () => {
       process.env.NODE_ENV = 'development';
       localStorage.setItem(STORAGE_KEY, 'true');
 
-      const existingAgencyImages = [
+      const existingAgencyImages: AgencyImage[] = [
         { id: 1, type: 'Logo', caption: 'Real logo', src: '/real.png' },
       ];
-      const existingEventImages = [
+      const existingEventImages: AgencyImage[] = [
         { id: 2, type: 'Instructions', caption: 'Real map', src: '/map.png' },
       ];
 

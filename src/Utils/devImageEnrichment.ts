@@ -1,21 +1,51 @@
 /**
  * Dev-only utility that injects mock images into events for visual testing.
  *
- * Toggle via browser console:
- *   localStorage.setItem('FRESHTRAK_DEV_MOCK_IMAGES', 'true')   // enable
- *   localStorage.removeItem('FRESHTRAK_DEV_MOCK_IMAGES')         // disable
+ * Security model (all layers must pass before mock images appear):
+ * 1. Environment allowlist — local dev, localhost preview, or beta2 with runtime flag
+ * 2. Explicit opt-in — localStorage key must be set via browser console
+ * 3. Non-destructive — only fills in missing images; never replaces real API data
  *
- * Then refresh the page. Every event will receive a deterministic set of
- * mock agency and/or event images so you can exercise the Carousel, Tabs,
- * ImageThumbnailStrip, and ImageGalleryDialog across all views.
+ * Enable on beta2 (requires REACT_APP_ALLOW_DEV_MOCK_IMAGES=true on that deployment):
+ *   localStorage.setItem('FRESHTRAK_DEV_MOCK_IMAGES', 'true')
+ *   localStorage.removeItem('FRESHTRAK_DEV_MOCK_IMAGES')  // disable
+ *
+ * Then refresh the page.
  */
+
+import { config } from '../config';
 
 import type { AgencyImage } from '../Modules/Home/types/home.types';
 
 const STORAGE_KEY = 'FRESHTRAK_DEV_MOCK_IMAGES';
 
+/** Non-production hostnames where mock images may be enabled in built environments. */
+const MOCK_IMAGES_ALLOWED_HOSTNAMES = new Set(['localhost', '127.0.0.1', 'beta2.freshtrak.com']);
+
+function getHostname(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.location.hostname;
+}
+
+function isMockImagesEnvironmentAllowed(): boolean {
+  if (process.env.NODE_ENV === 'development') {
+    return true;
+  }
+
+  const hostname = getHostname();
+  if (!hostname || !MOCK_IMAGES_ALLOWED_HOSTNAMES.has(hostname)) {
+    return false;
+  }
+
+  if (hostname === 'beta2.freshtrak.com') {
+    return config.ALLOW_DEV_MOCK_IMAGES === 'true';
+  }
+
+  return true;
+}
+
 export function isDevMockImagesEnabled(): boolean {
-  if (process.env.NODE_ENV !== 'development') return false;
+  if (!isMockImagesEnvironmentAllowed()) return false;
 
   try {
     return localStorage.getItem(STORAGE_KEY) === 'true';

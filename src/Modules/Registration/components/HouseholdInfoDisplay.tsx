@@ -6,9 +6,14 @@ const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
   householdData,
   className = '',
 }) => {
-  const { adults = 0, children = 0, seniors = 0 } = householdData.counts ?? {};
+  const memberCounts = {
+    adults: householdData.counts?.adults ?? 0,
+    children: householdData.counts?.children ?? 0,
+    seniors: householdData.counts?.seniors ?? 0,
+  };
 
   const formatMemberCounts = () => {
+    const { adults, children, seniors } = memberCounts;
     const counts = [];
 
     if (adults > 0) counts.push(`${adults} ${localization.label_adults}`);
@@ -93,7 +98,8 @@ const HouseholdInfoDisplay: React.FC<HouseholdInfoDisplayProps> = ({
           {formatMemberCounts()}
         </p>
         <p className="text-xs text-gray-500">
-          {localization.label_total_members}: {adults + children + seniors}
+          {localization.label_total_members}:{' '}
+          {memberCounts.adults + memberCounts.children + memberCounts.seniors}
         </p>
       </section>
 

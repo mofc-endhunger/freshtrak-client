@@ -28,15 +28,15 @@ Use `__test__` (singular) for new directories, matching project convention from 
 ## Import Order
 
 ```typescript
-import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 
 // jest.mock() calls (hoisted automatically)
 
 // Component/module under test (import AFTER jest.mock calls)
-import ComponentUnderTest from "../ComponentUnderTest";
+import ComponentUnderTest from '../ComponentUnderTest';
 ```
 
 Place `jest.mock()` calls **before** importing the module under test. Jest hoists mocks, but importing after mocks improves readability and avoids subtle ordering issues.

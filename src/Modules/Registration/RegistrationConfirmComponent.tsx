@@ -54,6 +54,28 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (props)
   const [user, setUser] = useState<RegistrationFormData | null>(currentUser);
   const [showGuestSigninModal, setShowGuestSigninModal] = useState<boolean>(false);
   const [showRegisterAnotherDialog, setShowRegisterAnotherDialog] = useState<boolean>(false);
+
+  /**
+   * Called by the Dialog's own close mechanism (X button, Escape key, outside click).
+   * When the user dismisses the popup without creating an account, all guest session
+   * data must be cleared so that a subsequent sign-up by a different person in the
+   * same browser session cannot accidentally inherit this guest's household via the
+   * guest-upgrade flow.
+   *
+   * NOTE: when the "Create Account" button is clicked it calls setShowGuestSigninModal
+   * directly, which bypasses onOpenChange entirely, so this handler is NOT invoked in
+   * that case – the guest token is intentionally preserved for the upgrade flow.
+   */
+  const handleGuestModalOpenChange = (open: boolean): void => {
+    if (!open) {
+      StorageService.removeItem('freshtrak_user_guest');
+      StorageService.removeItem('userProfile'); // legacy key
+      StorageService.removeItem('guestId');
+      StorageService.removeItem('guestType');
+      StorageService.clearUserToken();
+    }
+    setShowGuestSigninModal(open);
+  };
   const eventDateId = StorageService.getRegisteredEventDateID();
 
   const isLoggedIn = StorageService.getItem<string>('isLoggedIn');
@@ -488,7 +510,7 @@ const RegistrationConfirmComponent: React.FC<RegistrationConfirmProps> = (props)
       )}
 
       {/* Guest Sign-in Modal */}
-      <Dialog open={showGuestSigninModal} onOpenChange={setShowGuestSigninModal}>
+      <Dialog open={showGuestSigninModal} onOpenChange={handleGuestModalOpenChange}>
         <DialogContent className="sm:max-w-md bg-white border border-gray-200 text-gray-900">
           <DialogHeader>
             <DialogTitle className="text-center text-gray-900">

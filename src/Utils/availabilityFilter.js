@@ -69,9 +69,17 @@ export const filterEventsByAvailability = (eventsByDate, availabilityFilter) => 
 };
 
 /**
- * Filters events by reservations acceptance
+ * Returns true when an event date accepts reservations or RSVP (interest).
+ * @param {Object} event - Event from EventHandler
+ * @returns {boolean}
+ */
+export const acceptsReservationsOrInterest = (event) =>
+  event.acceptReservations === 1 || event.acceptInterest === 1;
+
+/**
+ * Filters events by reservations or RSVP acceptance
  * @param {Object} eventsByDate - Events grouped by date (from EventHandler)
- * @param {boolean} reservationsFilter - The reservations filter to apply (true to show only events that accept reservations, false to show all)
+ * @param {boolean} reservationsFilter - When true, show only events that accept reservations or RSVP
  * @returns {Object} Filtered events grouped by date
  */
 export const filterEventsByReservations = (eventsByDate, reservationsFilter) => {
@@ -83,7 +91,7 @@ export const filterEventsByReservations = (eventsByDate, reservationsFilter) => 
 
   Object.keys(eventsByDate).forEach((dateKey) => {
     const events = eventsByDate[dateKey];
-    const filteredEventsForDate = events.filter((event) => event.acceptReservations === 1);
+    const filteredEventsForDate = events.filter(acceptsReservationsOrInterest);
 
     if (filteredEventsForDate.length > 0) {
       filteredEvents[dateKey] = filteredEventsForDate;

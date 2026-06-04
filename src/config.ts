@@ -21,6 +21,8 @@ interface EnvConfig {
   USER_POOL_ID: string;
   USER_POOL_CLIENT_ID: string;
   AWS_REGION: string;
+  /** Set to "true" only on approved non-production hosts (e.g. beta2). */
+  ALLOW_DEV_MOCK_IMAGES?: string;
 }
 
 // Check if running in browser with runtime config
@@ -58,6 +60,7 @@ export const config: EnvConfig = {
   USER_POOL_ID: getConfig('USER_POOL_ID'),
   USER_POOL_CLIENT_ID: getConfig('USER_POOL_CLIENT_ID'),
   AWS_REGION: getConfig('AWS_REGION'),
+  ALLOW_DEV_MOCK_IMAGES: getConfig('ALLOW_DEV_MOCK_IMAGES') || undefined,
 };
 
 export default config;

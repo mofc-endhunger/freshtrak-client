@@ -17,6 +17,22 @@ const App = () => {
     // Clear expired data from both localStorage and sessionStorage on app initialization
     StorageService.clearExpiredData('local');
     StorageService.clearExpiredData('session');
+
+    // Cross-session guest data guard.
+    //
+    // sessionStorage is wiped automatically when a tab or browser is closed, but
+    // localStorage is not.  If guest data is present in localStorage but the
+    // session marker is absent from sessionStorage, the data belongs to a prior
+    // browser session (e.g. the user closed the tab before dismissing the
+    // "Create Account" popup).  Clear it now so it cannot be picked up as an
+    // active guest session by a different person using the same browser.
+    if (StorageService.getGuestUser() && !StorageService.hasGuestSessionMarker()) {
+      StorageService.removeItem('freshtrak_user_guest');
+      StorageService.removeItem('userProfile'); // legacy key
+      StorageService.removeItem('guestId');
+      StorageService.removeItem('guestType');
+      StorageService.clearUserToken();
+    }
   }, []);
 
   // Page visibility handling - clear expired data when page becomes visible

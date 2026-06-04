@@ -72,6 +72,9 @@ const LoginPage: React.FC = () => {
       if (userProfile.token) {
         StorageService.setUserToken(userProfile.token);
       }
+      // Mark this guest session as belonging to the current browser session so
+      // App.js can detect and discard stale guest data after a tab/browser close.
+      StorageService.setGuestSessionMarker();
 
       // Track guest login event with Google Tag Manager
       const gtmEvent: GTMEvent = {

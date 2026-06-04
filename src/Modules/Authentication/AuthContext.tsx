@@ -203,13 +203,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw signInError;
       }
 
-      // Get access token from Amplify session
+      // Get ID token from Amplify session.
+      // The ID token carries identity claims (email, name, groups) needed by the backend.
+      // The access token is for AWS service calls and does not contain the email claim.
       let accessToken: string | undefined;
       if (result.isSignedIn) {
         try {
           const session = await fetchAuthSession();
-          if (session.tokens?.accessToken) {
-            accessToken = session.tokens.accessToken.toString();
+          if (session.tokens?.idToken) {
+            accessToken = session.tokens.idToken.toString();
           }
         } catch (sessionError) {
           console.warn('Could not fetch session tokens:', sessionError);
@@ -241,13 +243,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (storedUserName && storedUserName.trim() !== '') {
           userName = storedUserName;
         } else {
-          // Fallback to pending user data (for unconfirmed users)
+          // Fallback to pending user data (for unconfirmed users completing sign-in).
+          // Guard with an email match: a stale pendingUser left behind by a different
+          // user's incomplete sign-up must not overwrite the name of the current user.
           const pendingUser = StorageService.getItem<{
             name?: string;
+            email?: string;
             [key: string]: any;
           }>('pendingUser');
           if (pendingUser?.name && pendingUser.name.trim() !== '') {
-            userName = pendingUser.name;
+            if (!pendingUser.email || pendingUser.email === email) {
+              userName = pendingUser.name;
+            } else {
+              // Stale pendingUser belongs to a different account – discard it
+              StorageService.removeItem('pendingUser');
+            }
           }
         }
 

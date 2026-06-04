@@ -3,6 +3,9 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
+// Import after all jest.mock calls
+import CaseManagerLoginPage from '../CaseManagerLoginPage';
+
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -67,9 +70,6 @@ jest.mock('../../../Utils/StorageService', () => ({
     setUserRole: jest.fn(),
   },
 }));
-
-// Import after all jest.mock calls
-import CaseManagerLoginPage from '../CaseManagerLoginPage';
 
 function buildJwt(payload: Record<string, any>): string {
   const header = btoa(JSON.stringify({ alg: 'HS256' }));
@@ -147,7 +147,7 @@ describe('CaseManagerLoginPage', () => {
       const token = buildJwt({ 'cognito:groups': ['case_managers'] });
       mockSignIn.mockResolvedValue(undefined);
       mockFetchAuthSession.mockResolvedValue({
-        tokens: { accessToken: { toString: () => token } },
+        tokens: { idToken: { toString: () => token } },
       });
 
       renderPage();
@@ -165,7 +165,7 @@ describe('CaseManagerLoginPage', () => {
       const token = buildJwt({ 'cognito:groups': ['case_managers'] });
       mockSignIn.mockResolvedValue(undefined);
       mockFetchAuthSession.mockResolvedValue({
-        tokens: { accessToken: { toString: () => token } },
+        tokens: { idToken: { toString: () => token } },
       });
 
       renderPage();
@@ -184,7 +184,7 @@ describe('CaseManagerLoginPage', () => {
       const token = buildJwt({ 'cognito:groups': ['regular_users'] });
       mockSignIn.mockResolvedValue(undefined);
       mockFetchAuthSession.mockResolvedValue({
-        tokens: { accessToken: { toString: () => token } },
+        tokens: { idToken: { toString: () => token } },
       });
 
       renderPage();
@@ -217,7 +217,7 @@ describe('CaseManagerLoginPage', () => {
       const token = buildJwt({});
       mockSignIn.mockResolvedValue(undefined);
       mockFetchAuthSession.mockResolvedValue({
-        tokens: { accessToken: { toString: () => token } },
+        tokens: { idToken: { toString: () => token } },
       });
 
       renderPage();

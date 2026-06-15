@@ -253,7 +253,8 @@ export class HouseholdSignUpIntegrationService implements HouseholdSignUpActions
         return false;
       }
 
-      const fallbackResult = state.isNewUser && state.userId === userEmail && !state.hasOfferedSetup;
+      const fallbackResult =
+        state.isNewUser && state.userId === userEmail && !state.hasOfferedSetup;
 
       return fallbackResult;
     } catch (error) {

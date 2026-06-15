@@ -1,15 +1,23 @@
 // Form Data and Validation TypeScript Interfaces
 
-import { FieldError, FieldErrors, UseFormRegister, UseFormWatch, UseFormSetValue, UseFormGetValues, UseFormTrigger } from 'react-hook-form';
+import {
+  FieldError,
+  FieldErrors,
+  UseFormRegister,
+  UseFormWatch,
+  UseFormSetValue,
+  UseFormGetValues,
+  UseFormTrigger,
+} from 'react-hook-form';
 
 // React Hook Form specific types
-export interface FormRegister extends UseFormRegister<any> { }
-export interface FormWatch extends UseFormWatch<any> { }
-export interface FormSetValue extends UseFormSetValue<any> { }
-export interface FormGetValues extends UseFormGetValues<any> { }
-export interface FormTrigger extends UseFormTrigger<any> { }
-export interface FormErrors extends Record<string, FieldError> { }
-export interface FormError extends FieldError { }
+export interface FormRegister extends UseFormRegister<any> {}
+export interface FormWatch extends UseFormWatch<any> {}
+export interface FormSetValue extends UseFormSetValue<any> {}
+export interface FormGetValues extends UseFormGetValues<any> {}
+export interface FormTrigger extends UseFormTrigger<any> {}
+export interface FormErrors extends Record<string, FieldError> {}
+export interface FormError extends FieldError {}
 
 // Form field validation rules
 export interface ValidationRules {
@@ -91,14 +99,15 @@ export interface AdditionalPickupFormData {
 }
 
 // Complete Family Registration Form Data
-export interface CompleteFamilyFormData extends
-  PrimaryInfoFormData,
-  AddressFormData,
-  ContactInfoFormData,
-  HouseholdFormData,
-  EventSelectionFormData,
-  Partial<PasswordFormData>,
-  Partial<AdditionalPickupFormData> {
+export interface CompleteFamilyFormData
+  extends
+    PrimaryInfoFormData,
+    AddressFormData,
+    ContactInfoFormData,
+    HouseholdFormData,
+    EventSelectionFormData,
+    Partial<PasswordFormData>,
+    Partial<AdditionalPickupFormData> {
   // Additional form-wide properties
   form_step?: number;
   is_complete?: boolean;

@@ -1,6 +1,6 @@
 /**
  * StorageService Unit Tests
- * 
+ *
  * Comprehensive test suite for StorageService including:
  * - Core CRUD operations
  * - Error handling scenarios
@@ -8,7 +8,12 @@
  * - Integration scenarios
  */
 
-import { StorageService, CognitoUser, GuestUserProfile, HouseholdSignUpState } from '../StorageService';
+import {
+  StorageService,
+  CognitoUser,
+  GuestUserProfile,
+  HouseholdSignUpState,
+} from '../StorageService';
 import { validateToken } from '../TokenUtils';
 
 // Mock TokenUtils
@@ -129,7 +134,7 @@ describe('StorageService', () => {
         // Check that sessionStorage.setItem was called with the correct key
         expect(window.sessionStorage.setItem).toHaveBeenCalledWith(
           'freshtrak_session_test',
-          JSON.stringify(testData)
+          JSON.stringify(testData),
         );
       });
 
@@ -661,7 +666,7 @@ describe('StorageService', () => {
       it('should store and retrieve event date ID from session storage', () => {
         StorageService.setRegisteredEventDateID('event-date-123');
         expect(mockSessionStorage['freshtrak_session_registered_event_date_id']).toBe(
-          JSON.stringify('event-date-123')
+          JSON.stringify('event-date-123'),
         );
 
         const result = StorageService.getRegisteredEventDateID();
@@ -738,4 +743,3 @@ describe('StorageService', () => {
     });
   });
 });
-

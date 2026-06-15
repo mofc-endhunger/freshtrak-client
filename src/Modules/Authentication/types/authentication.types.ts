@@ -91,7 +91,14 @@ export interface AuthContextType {
 }
 
 // Authentication modal tab types
-export type AuthModalTab = 'signin' | 'signup' | 'confirm' | 'reset' | 'confirmReset' | 'guest' | 'loading';
+export type AuthModalTab =
+  | 'signin'
+  | 'signup'
+  | 'confirm'
+  | 'reset'
+  | 'confirmReset'
+  | 'guest'
+  | 'loading';
 
 // Extended AuthenticationModal props
 export interface ExtendedAuthenticationModalProps extends AuthenticationModalProps {

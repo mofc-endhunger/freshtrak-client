@@ -1,148 +1,100 @@
 //routing files
-import React, { lazy, Suspense } from "react";
-import { RENDER_URL } from "../Utils/Urls";
-import {
-	BrowserRouter as Router,
-	Routes,
-	Route,
-	Navigate,
-} from "react-router-dom";
-import ScrollContainer from "./ScrollContainer";
-const DashBoardContainer = lazy(() =>
-	import("../Modules/Dashboard/DashBoardContainer")
-);
-const EventContainer = lazy(() => import("../Modules/Events/EventContainer"));
-const WrapperComponent = lazy(() =>
-	import("../Modules/General/WrapperComponent")
-);
-const FamilyContainer = lazy(() => import("../Modules/Family/FamilyContainer"));
+import React, { lazy, Suspense } from 'react';
+import { RENDER_URL } from '../Utils/Urls';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ScrollContainer from './ScrollContainer';
+const DashBoardContainer = lazy(() => import('../Modules/Dashboard/DashBoardContainer'));
+const EventContainer = lazy(() => import('../Modules/Events/EventContainer'));
+const WrapperComponent = lazy(() => import('../Modules/General/WrapperComponent'));
+const FamilyContainer = lazy(() => import('../Modules/Family/FamilyContainer'));
 // Out of scope
 // const EditFamilyContainer = lazy(() => import('../Modules/Family/EditFamilyContainer'));
 // const SignInContainer = lazy(() => import('../Modules/Sign-In/SignInContainer'));
 
-const StaticPageContainer = lazy(() =>
-	import("../Modules/StaticPages/StaticPageContainer")
-);
-const RegistrationContainer = lazy(() =>
-	import("../Modules/Registration/RegistrationContainer")
-);
+const StaticPageContainer = lazy(() => import('../Modules/StaticPages/StaticPageContainer'));
+const RegistrationContainer = lazy(() => import('../Modules/Registration/RegistrationContainer'));
 // const FamilyContainer = lazy(() => import("../Modules/Family/FamilyContainer"));
 // Out of scope
 // const EditFamilyContainer = lazy(() => import('../Modules/Family/EditFamilyContainer'));
 // const SignInContainer = lazy(() => import('../Modules/Sign-In/SignInContainer'));
-const AgencyEventListContainer = lazy(() =>
-	import("../Modules/Events/AgencyEventListContainer")
+const AgencyEventListContainer = lazy(() => import('../Modules/Events/AgencyEventListContainer'));
+const RegistrationEventDetailsContainer = lazy(
+  () => import('../Modules/Registration/RegistrationEventDetailsContainer'),
 );
-const RegistrationEventDetailsContainer = lazy(() =>
-	import("../Modules/Registration/RegistrationEventDetailsContainer")
+const RegistrationConfirmComponent = lazy(
+  () => import('../Modules/Registration/RegistrationConfirmComponent'),
 );
-const RegistrationConfirmComponent = lazy(() =>
-	import("../Modules/Registration/RegistrationConfirmComponent")
+const AlreadyRegisteredPage = lazy(() => import('../Modules/Registration/AlreadyRegisteredPage'));
+const HomeContainer = lazy(() => import('../Modules/Home/HomeContainer.tsx'));
+const QRCodeComponent = lazy(() => import('../Modules/Registration/QRCodeComponent'));
+const PrivacyComponent = lazy(() => import('../Modules/Policies/PrivacyComponent'));
+const TermsComponent = lazy(() => import('../Modules/Policies/TermsComponent'));
+const LoginPage = lazy(() => import('../Modules/Authentication/LoginPage'));
+const CaseManagerLoginPage = lazy(() => import('../Modules/Authentication/CaseManagerLoginPage'));
+const CaseManagerRegistrationsPage = lazy(
+  () => import('../Modules/CaseManager/CaseManagerRegistrationsPage'),
 );
-const AlreadyRegisteredPage = lazy(() =>
-	import("../Modules/Registration/AlreadyRegisteredPage")
-);
-const HomeContainer = lazy(() => import("../Modules/Home/HomeContainer.tsx"));
-const QRCodeComponent = lazy(() =>
-	import("../Modules/Registration/QRCodeComponent")
-);
-const PrivacyComponent = lazy(() =>
-	import("../Modules/Policies/PrivacyComponent")
-);
-const TermsComponent = lazy(() => import("../Modules/Policies/TermsComponent"));
-const LoginPage = lazy(() => import("../Modules/Authentication/LoginPage"));
-const CaseManagerLoginPage = lazy(() =>
-	import("../Modules/Authentication/CaseManagerLoginPage")
-);
-const CaseManagerRegistrationsPage = lazy(() =>
-	import("../Modules/CaseManager/CaseManagerRegistrationsPage")
-);
-const HouseholdContainer = lazy(() =>
-	import("../Modules/Households/HouseholdContainer")
-);
-const AccountPage = lazy(() => import("../Modules/Account/AccountPage"));
-const ProtectedRoute = lazy(() =>
-	import("../Modules/Authentication/ProtectedRoute")
-);
+const HouseholdContainer = lazy(() => import('../Modules/Households/HouseholdContainer'));
+const AccountPage = lazy(() => import('../Modules/Account/AccountPage'));
+const ProtectedRoute = lazy(() => import('../Modules/Authentication/ProtectedRoute'));
 
 const AppRoutes = () => {
-	React.useEffect(() => {}, []);
+  React.useEffect(() => {}, []);
 
-	return (
-		<Router
-			basename="/"
-			future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-		>
-			<ScrollContainer />
-			<Suspense fallback={<div className="displayNone"> </div>}>
-				<WrapperComponent>
-					<Routes>
-						<Route
-							path={RENDER_URL.ROOT_URL}
-							element={<DashBoardContainer />}
-						/>
-						<Route
-							path={RENDER_URL.LOGIN_URL}
-							element={<LoginPage />}
-						/>
-						<Route
-							path={RENDER_URL.CASE_MANAGER_LOGIN_URL}
-							element={<CaseManagerLoginPage />}
-						/>
-						<Route
-							path={RENDER_URL.EVENT_LIST_URL}
-							element={<EventContainer />}
-						/>
-						<Route
-							path={RENDER_URL.ADD_FAMILY_URL}
-							element={<FamilyContainer />}
-						/>
-						{/* Flag to turn off/on Home Page Container for Loggedin user feature */}
-						<Route
-							path={RENDER_URL.USER_HOME_URL}
-							element={<HomeContainer />}
-						/>
+  return (
+    <Router basename="/" future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <ScrollContainer />
+      <Suspense fallback={<div className="displayNone"> </div>}>
+        <WrapperComponent>
+          <Routes>
+            <Route path={RENDER_URL.ROOT_URL} element={<DashBoardContainer />} />
+            <Route path={RENDER_URL.LOGIN_URL} element={<LoginPage />} />
+            <Route path={RENDER_URL.CASE_MANAGER_LOGIN_URL} element={<CaseManagerLoginPage />} />
+            <Route path={RENDER_URL.EVENT_LIST_URL} element={<EventContainer />} />
+            <Route path={RENDER_URL.ADD_FAMILY_URL} element={<FamilyContainer />} />
+            {/* Flag to turn off/on Home Page Container for Loggedin user feature */}
+            <Route path={RENDER_URL.USER_HOME_URL} element={<HomeContainer />} />
 
-						{/* Household Management - Protected Routes */}
-						<Route
-							path={RENDER_URL.HOUSEHOLDS_URL}
-							element={
-								<ProtectedRoute>
-									<HouseholdContainer />
-								</ProtectedRoute>
-							}
-						/>
-						<Route
-							path={RENDER_URL.HOUSEHOLD_SETUP_URL}
-							element={
-								<ProtectedRoute>
-									<HouseholdContainer />
-								</ProtectedRoute>
-							}
-						/>
+            {/* Household Management - Protected Routes */}
+            <Route
+              path={RENDER_URL.HOUSEHOLDS_URL}
+              element={
+                <ProtectedRoute>
+                  <HouseholdContainer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={RENDER_URL.HOUSEHOLD_SETUP_URL}
+              element={
+                <ProtectedRoute>
+                  <HouseholdContainer />
+                </ProtectedRoute>
+              }
+            />
 
-						{/* Account Management - Protected Route */}
-						<Route
-							path={RENDER_URL.ACCOUNT_URL}
-							element={
-								<ProtectedRoute>
-									<AccountPage />
-								</ProtectedRoute>
-							}
-						/>
+            {/* Account Management - Protected Route */}
+            <Route
+              path={RENDER_URL.ACCOUNT_URL}
+              element={
+                <ProtectedRoute>
+                  <AccountPage />
+                </ProtectedRoute>
+              }
+            />
 
-						{/* Case Manager Registrations - Protected Route */}
-						<Route
-							path={RENDER_URL.CASE_MANAGER_REGISTRATIONS_URL}
-							element={
-								<ProtectedRoute>
-									<CaseManagerRegistrationsPage />
-								</ProtectedRoute>
-							}
-						/>
+            {/* Case Manager Registrations - Protected Route */}
+            <Route
+              path={RENDER_URL.CASE_MANAGER_REGISTRATIONS_URL}
+              element={
+                <ProtectedRoute>
+                  <CaseManagerRegistrationsPage />
+                </ProtectedRoute>
+              }
+            />
 
-						{/* Out of Scope */}
-						{/* <Route
+            {/* Out of Scope */}
+            {/* <Route
               exact path={RENDER_URL.EDIT_FAMILY_URL}
               component={EditFamilyContainer}
             />
@@ -152,65 +104,51 @@ const AppRoutes = () => {
               component={SignInContainer}
             /> */}
 
-						{/* Out of Scope - redirection chnaged to Freshtrak Partners*/}
-						{/* <Route
+            {/* Out of Scope - redirection chnaged to Freshtrak Partners*/}
+            {/* <Route
               path={RENDER_URL.FRESHTRAK_WORKING}
               component={StaticPageContainer}
             /> */}
-						<Route
-							path={RENDER_URL.FRESHTRAK_ABOUT}
-							element={<StaticPageContainer />}
-						/>
+            <Route path={RENDER_URL.FRESHTRAK_ABOUT} element={<StaticPageContainer />} />
 
-						<Route
-							path={`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/:id`}
-							element={<RegistrationEventDetailsContainer />}
-						/>
+            <Route
+              path={`${RENDER_URL.REGISTRATION_EVENT_DETAILS_URL}/:id`}
+              element={<RegistrationEventDetailsContainer />}
+            />
 
-						<Route
-							path={`${RENDER_URL.REGISTRATION_FORM_URL}/:eventDateId`}
-							element={<RegistrationContainer />}
-						/>
+            <Route
+              path={`${RENDER_URL.REGISTRATION_FORM_URL}/:eventDateId`}
+              element={<RegistrationContainer />}
+            />
 
-						<Route
-							path={`${RENDER_URL.REGISTRATION_FORM_URL}/:eventDateId/:eventSlotId`}
-							element={<RegistrationContainer />}
-						/>
+            <Route
+              path={`${RENDER_URL.REGISTRATION_FORM_URL}/:eventDateId/:eventSlotId`}
+              element={<RegistrationContainer />}
+            />
 
-						<Route
-							path={`${RENDER_URL.REGISTRATION_CONFIRM_URL}`}
-							element={<RegistrationConfirmComponent />}
-						/>
+            <Route
+              path={`${RENDER_URL.REGISTRATION_CONFIRM_URL}`}
+              element={<RegistrationConfirmComponent />}
+            />
 
-						<Route
-							path={
-								RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL
-							}
-							element={<AlreadyRegisteredPage />}
-						/>
+            <Route
+              path={RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL}
+              element={<AlreadyRegisteredPage />}
+            />
 
-						<Route
-							path={`${RENDER_URL.QRCODE_URL}/:code`}
-							element={<QRCodeComponent />}
-						/>
+            <Route path={`${RENDER_URL.QRCODE_URL}/:code`} element={<QRCodeComponent />} />
 
-						<Route
-							path={`${RENDER_URL.PRIVACY}`}
-							element={<PrivacyComponent />}
-						/>
+            <Route path={`${RENDER_URL.PRIVACY}`} element={<PrivacyComponent />} />
 
-						<Route
-							path={`${RENDER_URL.TERMS}`}
-							element={<TermsComponent />}
-						/>
+            <Route path={`${RENDER_URL.TERMS}`} element={<TermsComponent />} />
 
-						<Route
-							path={`${RENDER_URL.AGENCY_EVENT_LIST}/:agencyId`}
-							element={<AgencyEventListContainer />}
-						/>
+            <Route
+              path={`${RENDER_URL.AGENCY_EVENT_LIST}/:agencyId`}
+              element={<AgencyEventListContainer />}
+            />
 
-						{/* Out of Scope */}
-						{/* <Route
+            {/* Out of Scope */}
+            {/* <Route
               exact path={RENDER_URL.ADD_FAMILY_URL}
               component={FamilyContainer}
             />
@@ -225,18 +163,13 @@ const AppRoutes = () => {
               component={SignInContainer}
             /> */}
 
-						<Route
-							path="*"
-							element={
-								<Navigate to={RENDER_URL.ROOT_URL} replace />
-							}
-						/>
+            <Route path="*" element={<Navigate to={RENDER_URL.ROOT_URL} replace />} />
 
-						{/* Add URLs above this line */}
-					</Routes>
-				</WrapperComponent>
-			</Suspense>
-		</Router>
-	);
+            {/* Add URLs above this line */}
+          </Routes>
+        </WrapperComponent>
+      </Suspense>
+    </Router>
+  );
 };
 export default AppRoutes;

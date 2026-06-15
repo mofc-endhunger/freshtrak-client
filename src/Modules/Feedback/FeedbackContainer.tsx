@@ -20,67 +20,64 @@
  * ============================================================================
  */
 
-import React, { useState, useCallback, useEffect } from "react";
-import FeedbackModal from "./components/FeedbackModal";
-import FeedbackConfirmation from "./components/FeedbackConfirmation";
-import { FeedbackProvider, useFeedback } from "./context";
-import { FeedbackContainerProps } from "./types";
+import React, { useState, useCallback, useEffect } from 'react';
+import FeedbackModal from './components/FeedbackModal';
+import FeedbackConfirmation from './components/FeedbackConfirmation';
+import { FeedbackProvider, useFeedback } from './context';
+import { FeedbackContainerProps } from './types';
 
 /**
  * Internal component that uses the context
  */
 const FeedbackContainerInternal: React.FC<{
-	isOpen: boolean;
-	onClose: () => void;
-	onSubmitComplete?: () => void;
-	locationName?: string;
-	visitDate?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmitComplete?: () => void;
+  locationName?: string;
+  visitDate?: string;
 }> = ({ isOpen, onClose, onSubmitComplete, locationName, visitDate }) => {
-	const { modalState, saveProgress } = useFeedback();
-	const [showConfirmation, setShowConfirmation] = useState(false);
+  const { modalState, saveProgress } = useFeedback();
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-	useEffect(() => {
-		if (modalState === "confirmation") {
-			setShowConfirmation(true);
-		}
-	}, [modalState]);
+  useEffect(() => {
+    if (modalState === 'confirmation') {
+      setShowConfirmation(true);
+    }
+  }, [modalState]);
 
-	const handleClose = useCallback(() => {
-		if (modalState === "form") {
-			saveProgress();
-		}
-		setShowConfirmation(false);
-		onClose();
-	}, [onClose, modalState, saveProgress]);
+  const handleClose = useCallback(() => {
+    if (modalState === 'form') {
+      saveProgress();
+    }
+    setShowConfirmation(false);
+    onClose();
+  }, [onClose, modalState, saveProgress]);
 
-	const handleConfirmationClose = useCallback(() => {
-		setShowConfirmation(false);
-		onClose();
-		onSubmitComplete?.();
-	}, [onClose, onSubmitComplete]);
+  const handleConfirmationClose = useCallback(() => {
+    setShowConfirmation(false);
+    onClose();
+    onSubmitComplete?.();
+  }, [onClose, onSubmitComplete]);
 
-	// Don't render anything if not open
-	if (!isOpen && !showConfirmation) {
-		return null;
-	}
+  // Don't render anything if not open
+  if (!isOpen && !showConfirmation) {
+    return null;
+  }
 
-	return (
-		<>
-			{/* Feedback Form Modal */}
-			<FeedbackModal
-				isOpen={isOpen && !showConfirmation}
-				onClose={handleClose}
-				locationName={locationName}
-				visitDate={visitDate}
-			/>
+  return (
+    <>
+      {/* Feedback Form Modal */}
+      <FeedbackModal
+        isOpen={isOpen && !showConfirmation}
+        onClose={handleClose}
+        locationName={locationName}
+        visitDate={visitDate}
+      />
 
-			{/* Confirmation Modal */}
-			<FeedbackConfirmation
-				isOpen={showConfirmation}
-				onClose={handleConfirmationClose}
-			/>
-		</>
-	);
+      {/* Confirmation Modal */}
+      <FeedbackConfirmation isOpen={showConfirmation} onClose={handleConfirmationClose} />
+    </>
+  );
 };
 
 /**
@@ -89,35 +86,32 @@ const FeedbackContainerInternal: React.FC<{
  * Wraps the internal component with the FeedbackProvider.
  */
 const FeedbackContainer: React.FC<FeedbackContainerProps> = ({
-	isOpen,
-	onClose,
-	registrationId,
-	locationName,
-	visitDate,
-	onSubmitComplete,
+  isOpen,
+  onClose,
+  registrationId,
+  locationName,
+  visitDate,
+  onSubmitComplete,
 }) => {
-	const handleSubmitError = useCallback((error: string) => {
-		console.error("Feedback submission error:", error);
-	}, []);
+  const handleSubmitError = useCallback((error: string) => {
+    console.error('Feedback submission error:', error);
+  }, []);
 
-	if (!isOpen) {
-		return null;
-	}
+  if (!isOpen) {
+    return null;
+  }
 
-	return (
-		<FeedbackProvider
-			registrationId={registrationId}
-			onSubmitError={handleSubmitError}
-		>
-			<FeedbackContainerInternal
-				isOpen={isOpen}
-				onClose={onClose}
-				onSubmitComplete={onSubmitComplete}
-				locationName={locationName}
-				visitDate={visitDate}
-			/>
-		</FeedbackProvider>
-	);
+  return (
+    <FeedbackProvider registrationId={registrationId} onSubmitError={handleSubmitError}>
+      <FeedbackContainerInternal
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmitComplete={onSubmitComplete}
+        locationName={locationName}
+        visitDate={visitDate}
+      />
+    </FeedbackProvider>
+  );
 };
 
 export default FeedbackContainer;

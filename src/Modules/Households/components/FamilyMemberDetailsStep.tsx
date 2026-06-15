@@ -3,499 +3,403 @@
  * Form for collecting individual family member information
  */
 
-import React, { useState, useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
-import { HouseholdMember } from "../types/household.types";
-import { HouseholdCounts } from "../../Registration/types/registration.types";
-import { getGenderFromId } from "../utils/householdUtils";
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
+import React, { useState, useEffect, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { HouseholdMember } from '../types/household.types';
+import { HouseholdCounts } from '../../Registration/types/registration.types';
+import { getGenderFromId } from '../utils/householdUtils';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { validateDobNative, getDateInputConstraints } from '../../Family/utils/dateValidation';
 import {
-	validateDobNative,
-	getDateInputConstraints,
-} from "../../Family/utils/dateValidation";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "../../../components/ui/select";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "../../../components/ui/card";
-import localization from "../../Localization/LocalizationComponent";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import localization from '../../Localization/LocalizationComponent';
 
 interface FamilyMemberDetailsStepProps {
-	members: HouseholdMember[];
-	householdId: number;
-	originalCounts: HouseholdCounts; // Add original counts from step 3
-	onComplete: (
-		membersData: HouseholdMember[],
-		counts: HouseholdCounts
-	) => void;
-	onSkip: (counts: HouseholdCounts) => void;
-	onCancel: () => void;
+  members: HouseholdMember[];
+  householdId: number;
+  originalCounts: HouseholdCounts; // Add original counts from step 3
+  onComplete: (membersData: HouseholdMember[], counts: HouseholdCounts) => void;
+  onSkip: (counts: HouseholdCounts) => void;
+  onCancel: () => void;
 }
 
 interface MemberFormData {
-	first_name: string;
-	last_name: string;
-	middle_name?: string;
-	gender_id: number; // 1 for male, 2 for female, 3 for other, 4 for prefer_not_to_say
-	date_of_birth: string;
-	suffix_id?: number;
+  first_name: string;
+  last_name: string;
+  middle_name?: string;
+  gender_id: number; // 1 for male, 2 for female, 3 for other, 4 for prefer_not_to_say
+  date_of_birth: string;
+  suffix_id?: number;
 }
 
 const FamilyMemberDetailsStep: React.FC<FamilyMemberDetailsStepProps> = ({
-	members,
-	householdId,
-	originalCounts,
-	onComplete,
-	onSkip,
-	onCancel,
+  members,
+  householdId,
+  originalCounts,
+  onComplete,
+  onSkip,
+  onCancel,
 }) => {
-	const [currentMemberIndex, setCurrentMemberIndex] = useState(0);
-	const [membersData, setMembersData] = useState<MemberFormData[]>([]);
+  const [currentMemberIndex, setCurrentMemberIndex] = useState(0);
+  const [membersData, setMembersData] = useState<MemberFormData[]>([]);
 
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-		reset,
-		setValue,
-		watch,
-	} = useForm<MemberFormData>({
-		defaultValues: {
-			first_name: "",
-			last_name: "",
-			middle_name: "",
-			gender_id: 1,
-			date_of_birth: "",
-			suffix_id: undefined,
-		},
-	});
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = useForm<MemberFormData>({
+    defaultValues: {
+      first_name: '',
+      last_name: '',
+      middle_name: '',
+      gender_id: 1,
+      date_of_birth: '',
+      suffix_id: undefined,
+    },
+  });
 
-	// Date validation constraints (memoized for performance)
-	const dateConstraints = useMemo(() => getDateInputConstraints(), []);
+  // Date validation constraints (memoized for performance)
+  const dateConstraints = useMemo(() => getDateInputConstraints(), []);
 
-	// Helper to convert gender string to gender_id
-	const getGenderIdFromString = (gender: string | undefined): number => {
-		if (!gender) return 1;
-		const genderMap: Record<string, number> = {
-			male: 1,
-			female: 2,
-			other: 3,
-			prefer_not_to_say: 4,
-			not_specify: 4,
-		};
-		return genderMap[gender.toLowerCase()] || 1;
-	};
+  // Helper to convert gender string to gender_id
+  const getGenderIdFromString = (gender: string | undefined): number => {
+    if (!gender) return 1;
+    const genderMap: Record<string, number> = {
+      male: 1,
+      female: 2,
+      other: 3,
+      prefer_not_to_say: 4,
+      not_specify: 4,
+    };
+    return genderMap[gender.toLowerCase()] || 1;
+  };
 
-	// Helper to convert date format from yyyy-mm-dd to yyyy-mm-dd (for input)
-	const formatDateForInput = (dateString: string | undefined): string => {
-		if (!dateString || dateString === "1900-01-01") return "";
-		// If already in correct format, return as is
-		if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
-		// Try to parse and reformat
-		try {
-			const date = new Date(dateString);
-			if (isNaN(date.getTime())) return "";
-			return date.toISOString().split("T")[0];
-		} catch {
-			return "";
-		}
-	};
+  // Helper to convert date format from yyyy-mm-dd to yyyy-mm-dd (for input)
+  const formatDateForInput = (dateString: string | undefined): string => {
+    if (!dateString || dateString === '1900-01-01') return '';
+    // If already in correct format, return as is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return dateString;
+    // Try to parse and reformat
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      return date.toISOString().split('T')[0];
+    } catch {
+      return '';
+    }
+  };
 
-	// Initialize members data array with existing data where available
-	useEffect(() => {
-		const initialMembers: MemberFormData[] = members.map((member: any) => {
-			// Check if this member has data (either existing from API or previously saved)
-			if (member.first_name) {
-				return {
-					first_name: member.first_name || "",
-					last_name: member.last_name || "",
-					middle_name: member.middle_name || "",
-					gender_id: member.gender_id
-						? Number(member.gender_id)
-						: getGenderIdFromString(member.gender),
-					date_of_birth: formatDateForInput(member.date_of_birth),
-					suffix_id: member.suffix_id
-						? Number(member.suffix_id)
-						: undefined,
-				};
-			}
-			// New member - return empty form
-			return {
-				first_name: "",
-				last_name: "",
-				middle_name: "",
-				gender_id: 1,
-				date_of_birth: "",
-				suffix_id: undefined,
-			};
-		});
-		setMembersData(initialMembers);
-	}, [members]);
+  // Initialize members data array with existing data where available
+  useEffect(() => {
+    const initialMembers: MemberFormData[] = members.map((member: any) => {
+      // Check if this member has data (either existing from API or previously saved)
+      if (member.first_name) {
+        return {
+          first_name: member.first_name || '',
+          last_name: member.last_name || '',
+          middle_name: member.middle_name || '',
+          gender_id: member.gender_id
+            ? Number(member.gender_id)
+            : getGenderIdFromString(member.gender),
+          date_of_birth: formatDateForInput(member.date_of_birth),
+          suffix_id: member.suffix_id ? Number(member.suffix_id) : undefined,
+        };
+      }
+      // New member - return empty form
+      return {
+        first_name: '',
+        last_name: '',
+        middle_name: '',
+        gender_id: 1,
+        date_of_birth: '',
+        suffix_id: undefined,
+      };
+    });
+    setMembersData(initialMembers);
+  }, [members]);
 
-	// Update form when current member index changes
-	useEffect(() => {
-		if (membersData[currentMemberIndex]) {
-			const member = membersData[currentMemberIndex];
-			setValue("first_name", member.first_name);
-			setValue("last_name", member.last_name);
-			setValue("middle_name", member.middle_name || "");
-			setValue("gender_id", member.gender_id);
-			setValue("date_of_birth", member.date_of_birth);
-			setValue("suffix_id", member.suffix_id || undefined);
-		}
-	}, [currentMemberIndex, membersData, setValue]);
+  // Update form when current member index changes
+  useEffect(() => {
+    if (membersData[currentMemberIndex]) {
+      const member = membersData[currentMemberIndex];
+      setValue('first_name', member.first_name);
+      setValue('last_name', member.last_name);
+      setValue('middle_name', member.middle_name || '');
+      setValue('gender_id', member.gender_id);
+      setValue('date_of_birth', member.date_of_birth);
+      setValue('suffix_id', member.suffix_id || undefined);
+    }
+  }, [currentMemberIndex, membersData, setValue]);
 
-	const onSubmit = (
-		data: MemberFormData,
-		event?: React.BaseSyntheticEvent
-	) => {
-		// Prevent default form submission behavior
-		if (event) {
-			event.preventDefault();
-		}
+  const onSubmit = (data: MemberFormData, event?: React.BaseSyntheticEvent) => {
+    // Prevent default form submission behavior
+    if (event) {
+      event.preventDefault();
+    }
 
-		// Update the current member data
-		const updatedMembers = [...membersData];
-		updatedMembers[currentMemberIndex] = data;
-		setMembersData(updatedMembers);
+    // Update the current member data
+    const updatedMembers = [...membersData];
+    updatedMembers[currentMemberIndex] = data;
+    setMembersData(updatedMembers);
 
-		// Move to next member or complete
-		if (currentMemberIndex < members.length - 1) {
-			setCurrentMemberIndex(currentMemberIndex + 1);
-			reset();
-		} else {
-			// All members completed, convert to HouseholdMember format
-			const completedMembers: HouseholdMember[] = updatedMembers.map(
-				(member, index) => ({
-					...members[index],
-					first_name: member.first_name,
-					last_name: member.last_name,
-					middle_name: member.middle_name,
-					gender: getGenderFromId(member.gender_id),
-					gender_id: member.gender_id, // Preserve gender_id for backend
-					date_of_birth: member.date_of_birth,
-					suffix: member.suffix_id
-						? getSuffixText(member.suffix_id)
-						: "",
-					suffix_id: member.suffix_id, // Preserve suffix_id for backend
-				})
-			);
+    // Move to next member or complete
+    if (currentMemberIndex < members.length - 1) {
+      setCurrentMemberIndex(currentMemberIndex + 1);
+      reset();
+    } else {
+      // All members completed, convert to HouseholdMember format
+      const completedMembers: HouseholdMember[] = updatedMembers.map((member, index) => ({
+        ...members[index],
+        first_name: member.first_name,
+        last_name: member.last_name,
+        middle_name: member.middle_name,
+        gender: getGenderFromId(member.gender_id),
+        gender_id: member.gender_id, // Preserve gender_id for backend
+        date_of_birth: member.date_of_birth,
+        suffix: member.suffix_id ? getSuffixText(member.suffix_id) : '',
+        suffix_id: member.suffix_id, // Preserve suffix_id for backend
+      }));
 
-			const counts: HouseholdCounts = {
-				seniors: originalCounts.seniors,
-				adults: originalCounts.adults,
-				children: originalCounts.children,
-				total: originalCounts.total,
-			};
+      const counts: HouseholdCounts = {
+        seniors: originalCounts.seniors,
+        adults: originalCounts.adults,
+        children: originalCounts.children,
+        total: originalCounts.total,
+      };
 
-			onComplete(completedMembers, counts);
-		}
-	};
+      onComplete(completedMembers, counts);
+    }
+  };
 
-	const handleSkip = () => {
-		const counts: HouseholdCounts = {
-			seniors: originalCounts.seniors,
-			adults: originalCounts.adults,
-			children: originalCounts.children,
-			total: originalCounts.total,
-		};
-		onSkip(counts);
-	};
+  const handleSkip = () => {
+    const counts: HouseholdCounts = {
+      seniors: originalCounts.seniors,
+      adults: originalCounts.adults,
+      children: originalCounts.children,
+      total: originalCounts.total,
+    };
+    onSkip(counts);
+  };
 
-	const getMemberTypeLabel = (index: number): string => {
-		const member = members[index] as any;
-		const category = member?.member_category || "member";
+  const getMemberTypeLabel = (index: number): string => {
+    const member = members[index] as any;
+    const category = member?.member_category || 'member';
 
-		// Capitalize category for display
-		const categoryLabels: Record<string, string> = {
-			senior: localization.seniors || "Senior",
-			adult: localization.adults || "Adult",
-			child: localization.kids || "Child",
-			member: localization.title_family_member_details || "Family Member",
-		};
-		const categoryLabel = categoryLabels[category] || category;
+    // Capitalize category for display
+    const categoryLabels: Record<string, string> = {
+      senior: localization.seniors || 'Senior',
+      adult: localization.adults || 'Adult',
+      child: localization.kids || 'Child',
+      member: localization.title_family_member_details || 'Family Member',
+    };
+    const categoryLabel = categoryLabels[category] || category;
 
-		// If existing member with a name, show "Editing: Name"
-		if (member?.isExisting && member?.first_name) {
-			return `${localization.button_edit || "Edit"}: ${
-				member.first_name
-			} ${member.last_name || ""}`.trim();
-		}
+    // If existing member with a name, show "Editing: Name"
+    if (member?.isExisting && member?.first_name) {
+      return `${localization.button_edit || 'Edit'}: ${
+        member.first_name
+      } ${member.last_name || ''}`.trim();
+    }
 
-		// For new members, show "New Senior/Adult/Child"
-		return `${localization.button_add || "Add"} ${categoryLabel}`;
-	};
+    // For new members, show "New Senior/Adult/Child"
+    return `${localization.button_add || 'Add'} ${categoryLabel}`;
+  };
 
-	const getSuffixText = (suffixId: number): string => {
-		const suffixes: Record<number, string> = {
-			1: localization.option_suffix_jr,
-			2: localization.option_suffix_sr,
-			3: localization.option_suffix_ii,
-			4: localization.option_suffix_iii,
-			5: localization.option_suffix_iv,
-		};
-		return suffixes[suffixId] || "";
-	};
+  const getSuffixText = (suffixId: number): string => {
+    const suffixes: Record<number, string> = {
+      1: localization.option_suffix_jr,
+      2: localization.option_suffix_sr,
+      3: localization.option_suffix_ii,
+      4: localization.option_suffix_iii,
+      5: localization.option_suffix_iv,
+    };
+    return suffixes[suffixId] || '';
+  };
 
-	const getSuffixOptions = () => [
-		{ value: 1, label: localization.option_suffix_jr },
-		{ value: 2, label: localization.option_suffix_sr },
-		{ value: 3, label: localization.option_suffix_ii },
-		{ value: 4, label: localization.option_suffix_iii },
-		{ value: 5, label: localization.option_suffix_iv },
-	];
+  const getSuffixOptions = () => [
+    { value: 1, label: localization.option_suffix_jr },
+    { value: 2, label: localization.option_suffix_sr },
+    { value: 3, label: localization.option_suffix_ii },
+    { value: 4, label: localization.option_suffix_iii },
+    { value: 5, label: localization.option_suffix_iv },
+  ];
 
-	return (
-		<div className="space-y-6">
-			<div className="text-center">
-				<h3 className="text-xl font-semibold text-gray-900 mb-4">
-					{localization.description_noticed_family_members}
-				</h3>
-				<p className="text-gray-600 mb-6">
-					{localization.description_provide_details_family_member} (
-					{currentMemberIndex + 1} {localization.text_of}{" "}
-					{members.length})
-				</p>
-			</div>
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          {localization.description_noticed_family_members}
+        </h3>
+        <p className="text-gray-600 mb-6">
+          {localization.description_provide_details_family_member} ({currentMemberIndex + 1}{' '}
+          {localization.text_of} {members.length})
+        </p>
+      </div>
 
-			<Card>
-				<CardHeader>
-					<CardTitle className="text-lg font-medium text-gray-900">
-						{getMemberTypeLabel(currentMemberIndex)}
-					</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="space-y-4">
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							{/* First Name */}
-							<div className="space-y-2">
-								<Label htmlFor="first_name">
-									{localization.label_first_name_required}
-								</Label>
-								<Input
-									id="first_name"
-									type="text"
-									placeholder={
-										localization.placeholder_enter_first_name
-									}
-									{...register("first_name", {
-										required:
-											localization.error_first_name_required,
-									})}
-								/>
-								{errors.first_name && (
-									<p className="text-red-500 text-sm">
-										{errors.first_name.message}
-									</p>
-								)}
-							</div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-medium text-gray-900">
+            {getMemberTypeLabel(currentMemberIndex)}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* First Name */}
+              <div className="space-y-2">
+                <Label htmlFor="first_name">{localization.label_first_name_required}</Label>
+                <Input
+                  id="first_name"
+                  type="text"
+                  placeholder={localization.placeholder_enter_first_name}
+                  {...register('first_name', {
+                    required: localization.error_first_name_required,
+                  })}
+                />
+                {errors.first_name && (
+                  <p className="text-red-500 text-sm">{errors.first_name.message}</p>
+                )}
+              </div>
 
-							{/* Last Name */}
-							<div className="space-y-2">
-								<Label htmlFor="last_name">
-									{localization.label_last_name_required}
-								</Label>
-								<Input
-									id="last_name"
-									type="text"
-									placeholder={
-										localization.placeholder_enter_last_name
-									}
-									{...register("last_name", {
-										required:
-											localization.error_last_name_required,
-									})}
-								/>
-								{errors.last_name && (
-									<p className="text-red-500 text-sm">
-										{errors.last_name.message}
-									</p>
-								)}
-							</div>
+              {/* Last Name */}
+              <div className="space-y-2">
+                <Label htmlFor="last_name">{localization.label_last_name_required}</Label>
+                <Input
+                  id="last_name"
+                  type="text"
+                  placeholder={localization.placeholder_enter_last_name}
+                  {...register('last_name', {
+                    required: localization.error_last_name_required,
+                  })}
+                />
+                {errors.last_name && (
+                  <p className="text-red-500 text-sm">{errors.last_name.message}</p>
+                )}
+              </div>
 
-							{/* Middle Name */}
-							<div className="space-y-2">
-								<Label htmlFor="middle_name">
-									{localization.middle_name}
-								</Label>
-								<Input
-									id="middle_name"
-									type="text"
-									placeholder={
-										localization.placeholder_enter_middle_name_optional
-									}
-									{...register("middle_name")}
-								/>
-							</div>
+              {/* Middle Name */}
+              <div className="space-y-2">
+                <Label htmlFor="middle_name">{localization.middle_name}</Label>
+                <Input
+                  id="middle_name"
+                  type="text"
+                  placeholder={localization.placeholder_enter_middle_name_optional}
+                  {...register('middle_name')}
+                />
+              </div>
 
-							{/* Gender */}
-							<div className="space-y-2">
-								<Label htmlFor="gender_id">
-									{localization.label_gender_required}
-								</Label>
-								<Select
-									value={
-										watch("gender_id")?.toString() || "1"
-									}
-									onValueChange={(value: string) =>
-										setValue("gender_id", parseInt(value))
-									}
-								>
-									<SelectTrigger>
-										<SelectValue
-											placeholder={
-												localization.placeholder_select_gender
-											}
-										/>
-									</SelectTrigger>
-									<SelectContent className="bg-white">
-										<SelectItem value="1">
-											{localization.option_gender_male}
-										</SelectItem>
-										<SelectItem value="2">
-											{localization.option_gender_female}
-										</SelectItem>
-										<SelectItem value="3">
-											{localization.option_gender_other}
-										</SelectItem>
-										<SelectItem value="4">
-											{
-												localization.option_gender_prefer_not_to_say
-											}
-										</SelectItem>
-									</SelectContent>
-								</Select>
-								{errors.gender_id && (
-									<p className="text-red-500 text-sm">
-										{errors.gender_id.message}
-									</p>
-								)}
-							</div>
+              {/* Gender */}
+              <div className="space-y-2">
+                <Label htmlFor="gender_id">{localization.label_gender_required}</Label>
+                <Select
+                  value={watch('gender_id')?.toString() || '1'}
+                  onValueChange={(value: string) => setValue('gender_id', parseInt(value))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={localization.placeholder_select_gender} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="1">{localization.option_gender_male}</SelectItem>
+                    <SelectItem value="2">{localization.option_gender_female}</SelectItem>
+                    <SelectItem value="3">{localization.option_gender_other}</SelectItem>
+                    <SelectItem value="4">
+                      {localization.option_gender_prefer_not_to_say}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {errors.gender_id && (
+                  <p className="text-red-500 text-sm">{errors.gender_id.message}</p>
+                )}
+              </div>
 
-							{/* Date of Birth */}
-							<div className="space-y-2">
-								<Label htmlFor="date_of_birth">
-									{localization.label_date_of_birth_required}
-								</Label>
-								<Input
-									id="date_of_birth"
-									type="date"
-									max={dateConstraints.today}
-									min={dateConstraints.minDate}
-									{...register("date_of_birth", {
-										required:
-											localization.error_date_of_birth_required,
-										validate: validateDobNative,
-									})}
-								/>
-								{errors.date_of_birth && (
-									<p className="text-red-500 text-sm">
-										{errors.date_of_birth.message}
-									</p>
-								)}
-							</div>
+              {/* Date of Birth */}
+              <div className="space-y-2">
+                <Label htmlFor="date_of_birth">{localization.label_date_of_birth_required}</Label>
+                <Input
+                  id="date_of_birth"
+                  type="date"
+                  max={dateConstraints.today}
+                  min={dateConstraints.minDate}
+                  {...register('date_of_birth', {
+                    required: localization.error_date_of_birth_required,
+                    validate: validateDobNative,
+                  })}
+                />
+                {errors.date_of_birth && (
+                  <p className="text-red-500 text-sm">{errors.date_of_birth.message}</p>
+                )}
+              </div>
 
-							{/* Suffix */}
-							<div className="space-y-2">
-								<Label htmlFor="suffix_id">
-									{localization.label_suffix_optional}
-								</Label>
-								<Select
-									value={
-										watch("suffix_id")?.toString() || "none"
-									}
-									onValueChange={(value: string) =>
-										setValue(
-											"suffix_id",
-											value === "none"
-												? undefined
-												: parseInt(value)
-										)
-									}
-								>
-									<SelectTrigger>
-										<SelectValue
-											placeholder={
-												localization.placeholder_select_suffix
-											}
-										/>
-									</SelectTrigger>
-									<SelectContent className="bg-white">
-										<SelectItem value="none">
-											{localization.option_suffix_none}
-										</SelectItem>
-										{getSuffixOptions().map((option) => (
-											<SelectItem
-												key={option.value}
-												value={option.value.toString()}
-											>
-												{option.label}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						</div>
+              {/* Suffix */}
+              <div className="space-y-2">
+                <Label htmlFor="suffix_id">{localization.label_suffix_optional}</Label>
+                <Select
+                  value={watch('suffix_id')?.toString() || 'none'}
+                  onValueChange={(value: string) =>
+                    setValue('suffix_id', value === 'none' ? undefined : parseInt(value))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={localization.placeholder_select_suffix} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="none">{localization.option_suffix_none}</SelectItem>
+                    {getSuffixOptions().map((option) => (
+                      <SelectItem key={option.value} value={option.value.toString()}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-						{/* Navigation */}
-						<div className="flex flex-col space-y-2 md:space-y-0 md:flex-row justify-between pt-6 border-t">
-							<Button
-								type="button"
-								variant="highlight"
-								onClick={onCancel}
-							>
-								{localization.button_previous}
-							</Button>
+            {/* Navigation */}
+            <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row justify-between pt-6 border-t">
+              <Button type="button" variant="highlight" onClick={onCancel}>
+                {localization.button_previous}
+              </Button>
 
-							<div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-3">
-								<Button
-									type="button"
-									variant="highlightOutline"
-									onClick={handleSkip}
-								>
-									{localization.button_skip_step}
-								</Button>
+              <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-3">
+                <Button type="button" variant="highlightOutline" onClick={handleSkip}>
+                  {localization.button_skip_step}
+                </Button>
 
-								<Button
-									type="button"
-									variant="highlight"
-									onClick={() => handleSubmit(onSubmit)()}
-								>
-									{currentMemberIndex < members.length - 1
-										? localization.button_next_member
-										: localization.button_next}
-								</Button>
-							</div>
-						</div>
-					</div>
+                <Button type="button" variant="highlight" onClick={() => handleSubmit(onSubmit)()}>
+                  {currentMemberIndex < members.length - 1
+                    ? localization.button_next_member
+                    : localization.button_next}
+                </Button>
+              </div>
+            </div>
+          </div>
 
-					{/* Progress indicator */}
-					<div className="flex justify-center space-x-2 mt-6">
-						{Array.from({ length: members.length }, (_, index) => (
-							<div
-								key={index}
-								className={`w-3 h-3 rounded-full ${
-									index <= currentMemberIndex
-										? "bg-highlight"
-										: "bg-gray-300"
-								}`}
-							/>
-						))}
-					</div>
-				</CardContent>
-			</Card>
-		</div>
-	);
+          {/* Progress indicator */}
+          <div className="flex justify-center space-x-2 mt-6">
+            {Array.from({ length: members.length }, (_, index) => (
+              <div
+                key={index}
+                className={`w-3 h-3 rounded-full ${
+                  index <= currentMemberIndex ? 'bg-highlight' : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
 
 export default FamilyMemberDetailsStep;

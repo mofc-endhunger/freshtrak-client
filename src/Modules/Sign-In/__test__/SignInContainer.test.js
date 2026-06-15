@@ -1,30 +1,30 @@
-import React from "react";
-import { render, fireEvent, act } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import SignInContainer from "../SignInContainer";
+import React from 'react';
+import { render, fireEvent, act } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import SignInContainer from '../SignInContainer';
 
-test("should render without errors", () => {
-	expect(() => {
-		render(
-			<MemoryRouter>
-				<SignInContainer />
-			</MemoryRouter>
-		);
-	}).not.toThrowError();
+test('should render without errors', () => {
+  expect(() => {
+    render(
+      <MemoryRouter>
+        <SignInContainer />
+      </MemoryRouter>,
+    );
+  }).not.toThrowError();
 });
 
 test(`should show 'Your password is required' if no password is submitted`, async () => {
-	const { getByTestId, getByText } = render(
-		<MemoryRouter>
-			<SignInContainer />
-		</MemoryRouter>
-	);
+  const { getByTestId, getByText } = render(
+    <MemoryRouter>
+      <SignInContainer />
+    </MemoryRouter>,
+  );
 
-	await act(async () => {
-		fireEvent.click(getByTestId(/log in button/i));
-	});
+  await act(async () => {
+    fireEvent.click(getByTestId(/log in button/i));
+  });
 
-	getByText(/your password is required/i);
+  getByText(/your password is required/i);
 });
 
 // waiting for api

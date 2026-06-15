@@ -62,20 +62,30 @@ export const VALIDATION_PATTERNS = {
 export const getErrorMessage = () => ({
   REQUIRED: localization.error_field_required,
   INVALID_EMAIL: localization.error_please_enter_valid_email,
-  INVALID_PHONE: localization.error_phone_number_required || localization.error_please_enter_valid_email.replace('email', 'phone number'),
-  INVALID_ZIP: localization.error_zip_code_required || localization.error_please_enter_valid_email.replace('email', 'ZIP code'),
-  INVALID_PASSWORD: localization.error_password_required || 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character',
+  INVALID_PHONE:
+    localization.error_phone_number_required ||
+    localization.error_please_enter_valid_email.replace('email', 'phone number'),
+  INVALID_ZIP:
+    localization.error_zip_code_required ||
+    localization.error_please_enter_valid_email.replace('email', 'ZIP code'),
+  INVALID_PASSWORD:
+    localization.error_password_required ||
+    'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character',
   PASSWORDS_MISMATCH: 'Passwords do not match',
   MIN_LENGTH: (field: string, min: number) => {
     if (field.toLowerCase() === 'zip code' || field.toLowerCase() === 'zip') {
-      return localization.error_zip_code_min_length || `${field} must be at least ${min} characters`;
+      return (
+        localization.error_zip_code_min_length || `${field} must be at least ${min} characters`
+      );
     }
     return `${field} must be at least ${min} characters`;
   },
   MAX_LENGTH: (field: string, max: number) => `${field} cannot exceed ${max} characters`,
   INVALID_AGE: localization.error_please_enter_valid_date || 'Please enter a valid age',
   INVALID_NAME: localization.error_field_required || 'Please enter a valid name',
-  INVALID_FORMAT: (field: string) => localization.error_please_enter_valid_email.replace('email address', field) || `Please enter a valid ${field}`,
+  INVALID_FORMAT: (field: string) =>
+    localization.error_please_enter_valid_email.replace('email address', field) ||
+    `Please enter a valid ${field}`,
 });
 
 // Legacy ERROR_MESSAGES for backward compatibility - now uses function
@@ -194,7 +204,10 @@ export const validatePassword = (password: string): ValidationResult => {
 /**
  * Validates password confirmation
  */
-export const validatePasswordConfirm = (passwordConfirm: string, password: string): ValidationResult => {
+export const validatePasswordConfirm = (
+  passwordConfirm: string,
+  password: string,
+): ValidationResult => {
   if (!passwordConfirm) {
     return {
       isValid: false,
@@ -286,7 +299,7 @@ export const validateLength = (
   value: string,
   minLength: number,
   maxLength: number,
-  fieldName: string
+  fieldName: string,
 ): ValidationResult => {
   if (!value) {
     return { isValid: true }; // Optional field
@@ -318,7 +331,7 @@ export const validatePattern = (
   value: string,
   pattern: RegExp,
   errorMessage: string,
-  fieldName: string
+  fieldName: string,
 ): ValidationResult => {
   if (!value) {
     return { isValid: true }; // Optional field
@@ -340,7 +353,7 @@ export const validatePattern = (
  */
 export const validateFormData = (
   formData: Record<string, any>,
-  config: FormValidationConfig
+  config: FormValidationConfig,
 ): Record<string, ValidationResult> => {
   const results: Record<string, ValidationResult> = {};
 
@@ -382,7 +395,12 @@ export const validateFormData = (
 
     // Check pattern
     if (rules.pattern) {
-      const patternResult = validatePattern(value, rules.pattern.value, rules.pattern.message, fieldName);
+      const patternResult = validatePattern(
+        value,
+        rules.pattern.value,
+        rules.pattern.message,
+        fieldName,
+      );
       if (!patternResult.isValid) {
         results[fieldName] = patternResult;
         continue;
@@ -434,9 +452,10 @@ export const createValidationRules = (config: FormValidationConfig): Record<stri
     const rule: any = {};
 
     if (validationRule.required) {
-      rule.required = typeof validationRule.required === 'string'
-        ? validationRule.required
-        : ERROR_MESSAGES.REQUIRED;
+      rule.required =
+        typeof validationRule.required === 'string'
+          ? validationRule.required
+          : ERROR_MESSAGES.REQUIRED;
     }
 
     if (validationRule.minLength) {
@@ -466,10 +485,10 @@ export const createValidationRules = (config: FormValidationConfig): Record<stri
  */
 export const validateFormSubmission = (
   formData: Record<string, any>,
-  config: FormValidationConfig
+  config: FormValidationConfig,
 ): { isValid: boolean; errors: Record<string, ValidationResult> } => {
   const errors = validateFormData(formData, config);
-  const hasErrors = Object.values(errors).some(result => !result.isValid);
+  const hasErrors = Object.values(errors).some((result) => !result.isValid);
 
   return {
     isValid: !hasErrors,
@@ -480,7 +499,10 @@ export const validateFormSubmission = (
 /**
  * Gets field error message
  */
-export const getFieldError = (errors: Record<string, ValidationResult>, fieldName: string): string | undefined => {
+export const getFieldError = (
+  errors: Record<string, ValidationResult>,
+  fieldName: string,
+): string | undefined => {
   const error = errors[fieldName];
   return error?.isValid ? undefined : error?.error;
 };
@@ -489,7 +511,7 @@ export const getFieldError = (errors: Record<string, ValidationResult>, fieldNam
  * Checks if form has any errors
  */
 export const hasFormErrors = (errors: Record<string, ValidationResult>): boolean => {
-  return Object.values(errors).some(error => !error.isValid);
+  return Object.values(errors).some((error) => !error.isValid);
 };
 
 /**
@@ -497,7 +519,7 @@ export const hasFormErrors = (errors: Record<string, ValidationResult>): boolean
  */
 export const getAllErrorMessages = (errors: Record<string, ValidationResult>): string[] => {
   return Object.values(errors)
-    .filter(error => !error.isValid)
-    .map(error => error.error)
+    .filter((error) => !error.isValid)
+    .map((error) => error.error)
     .filter(Boolean) as string[];
 };

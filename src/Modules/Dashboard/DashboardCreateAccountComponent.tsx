@@ -1,9 +1,9 @@
-import React from "react";
-import CalenderIcon from "../../Assets/img/calendar.svg";
-import FindFoodIcon from "../../Assets/img/findfood.svg";
-import localization from "../Localization/LocalizationComponent";
-import { DashboardCreateAccountComponentProps } from "./types/dashboard.types";
-import FeatureCard from "./components/FeatureCard";
+import React from 'react';
+import CalenderIcon from '../../Assets/img/calendar.svg';
+import FindFoodIcon from '../../Assets/img/findfood.svg';
+import localization from '../Localization/LocalizationComponent';
+import { DashboardCreateAccountComponentProps } from './types/dashboard.types';
+import FeatureCard from './components/FeatureCard';
 
 /**
  * DashboardCreateAccountComponent - Displays feature information and call-to-action elements
@@ -21,34 +21,30 @@ import FeatureCard from "./components/FeatureCard";
  * <DashboardCreateAccountComponent />
  * ```
  */
-const DashboardCreateAccountComponent: React.FC<
-	DashboardCreateAccountComponentProps
-> = () => {
-	return (
-		<div>
-			<h2 className="mb-5 font-bold text-center text-2xl">
-				{localization.home_freshtrack}
-			</h2>
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-center justify-between">
-				<div className="flex flex-row content-center justify-center">
-					<FeatureCard
-						title={localization.home_stay}
-						content={localization.home_comming_soon}
-						imageUrl={CalenderIcon}
-						className="w-2/3 stay-up-to-date border-none shadow-none"
-					/>
-				</div>
-				<div className="flex flex-row content-center justify-center">
-					<FeatureCard
-						title={localization.home_findfood}
-						content={localization.home_zip_details}
-						imageUrl={FindFoodIcon}
-						className="w-2/3 find-food border-none shadow-none"
-					/>
-				</div>
-			</div>
-		</div>
-	);
+const DashboardCreateAccountComponent: React.FC<DashboardCreateAccountComponentProps> = () => {
+  return (
+    <div>
+      <h2 className="mb-5 font-bold text-center text-2xl">{localization.home_freshtrack}</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-center justify-between">
+        <div className="flex flex-row content-center justify-center">
+          <FeatureCard
+            title={localization.home_stay}
+            content={localization.home_comming_soon}
+            imageUrl={CalenderIcon}
+            className="w-2/3 stay-up-to-date border-none shadow-none"
+          />
+        </div>
+        <div className="flex flex-row content-center justify-center">
+          <FeatureCard
+            title={localization.home_findfood}
+            content={localization.home_zip_details}
+            imageUrl={FindFoodIcon}
+            className="w-2/3 find-food border-none shadow-none"
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default DashboardCreateAccountComponent;

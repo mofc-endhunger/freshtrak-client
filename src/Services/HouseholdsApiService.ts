@@ -1,6 +1,6 @@
 /**
  * Households API Service
- * 
+ *
  * Dedicated service for all household-related API operations.
  * Handles authentication, error handling, caching, and retry logic.
  */
@@ -23,10 +23,7 @@ import {
   logError,
   DEFAULT_RETRY_CONFIG,
 } from '../Modules/Households/utils/errorHandling';
-import {
-  mockHousehold,
-  mockHouseholdResponse,
-} from '../Testing/mock-households';
+import { mockHousehold, mockHouseholdResponse } from '../Testing/mock-households';
 import { normalizePhoneInput } from '../Modules/Family/utils/phoneFormatting';
 import config from '../config';
 
@@ -199,7 +196,7 @@ export class HouseholdsApiService {
       timeout: API_CONFIG.timeout,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
   }
@@ -219,7 +216,7 @@ export class HouseholdsApiService {
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(error),
     );
 
     // Response interceptor - Handle errors and caching
@@ -237,20 +234,21 @@ export class HouseholdsApiService {
         // These endpoints may return 401 for reasons other than expired session
         // (e.g., upgrade-guest may fail but we still want to try /api/users with the same token)
         const skipAuthErrorHandling =
-          requestUrl.includes('upgrade-guest') ||
-          requestUrl.includes('api/users');
+          requestUrl.includes('upgrade-guest') || requestUrl.includes('api/users');
 
         if (!skipAuthErrorHandling) {
           // Handle authentication errors for other endpoints
-          if (handleAuthError(error, {
-            userType: "cognito",
-            redirectPath: "/login",
-          })) {
+          if (
+            handleAuthError(error, {
+              userType: 'cognito',
+              redirectPath: '/login',
+            })
+          ) {
             // Auth error was handled, return a rejected promise with auth error
             return Promise.reject({
               type: 'AUTHENTICATION_ERROR',
               message: 'Authentication failed',
-              handled: true
+              handled: true,
             });
           }
         }
@@ -258,7 +256,7 @@ export class HouseholdsApiService {
         const apiError = ApiErrorHandler.createError(error);
         console.error('Households API Error:', apiError);
         return Promise.reject(apiError);
-      }
+      },
     );
   }
 
@@ -304,15 +302,12 @@ export class HouseholdsApiService {
   /**
    * Retry failed requests
    */
-  private async retryRequest<T>(
-    requestFn: () => Promise<T>,
-    attempt: number = 1
-  ): Promise<T> {
+  private async retryRequest<T>(requestFn: () => Promise<T>, attempt: number = 1): Promise<T> {
     try {
       return await requestFn();
     } catch (error: any) {
       if (attempt < API_CONFIG.retryAttempts && error.retryable) {
-        await new Promise(resolve => setTimeout(resolve, API_CONFIG.retryDelay * attempt));
+        await new Promise((resolve) => setTimeout(resolve, API_CONFIG.retryDelay * attempt));
         return this.retryRequest(requestFn, attempt + 1);
       }
       throw error;
@@ -330,7 +325,7 @@ export class HouseholdsApiService {
     // Use mock data if API is not available
     if (USE_MOCK_DATA) {
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Create a mock response with the provided data
       const mockResponse: HouseholdResponse = {
@@ -369,7 +364,8 @@ export class HouseholdsApiService {
       zip_code: data.zip_code || null,
       date_of_birth: data.date_of_birth || null,
       permission_to_email: data.permission_to_email !== undefined ? data.permission_to_email : null,
-      children_in_household: data.children_in_household !== undefined ? data.children_in_household : null,
+      children_in_household:
+        data.children_in_household !== undefined ? data.children_in_household : null,
     };
     if (data.language_id !== undefined) {
       apiData.language_id = data.language_id;
@@ -397,7 +393,12 @@ export class HouseholdsApiService {
           preferred_language: 'en',
           notes: '',
           members: [],
-          counts: { children: userResponse.children_in_household || 0, adults: 1, seniors: 0, total: 1 },
+          counts: {
+            children: userResponse.children_in_household || 0,
+            adults: 1,
+            seniors: 0,
+            total: 1,
+          },
         },
         message: 'User created successfully',
         success: true,
@@ -419,7 +420,7 @@ export class HouseholdsApiService {
     // Use mock data if API is not available
     if (USE_MOCK_DATA) {
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       return mockHouseholdResponse;
     }
@@ -431,7 +432,8 @@ export class HouseholdsApiService {
       return cachedData;
     }
 
-    const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getHouseholdById(householdId));
+    const requestFn = () =>
+      this.axiosInstance.get(API_CONFIG.endpoints.getHouseholdById(householdId));
     const response = await this.retryRequest(requestFn);
     return response.data;
   }
@@ -443,7 +445,7 @@ export class HouseholdsApiService {
     // Use mock data if API is not available
     if (USE_MOCK_DATA) {
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       return {
         ...mockHouseholdResponse,
@@ -489,7 +491,8 @@ export class HouseholdsApiService {
     const context = createErrorContext('getHouseholdByIdNew', { householdId });
 
     try {
-      const requestFn = () => this.axiosInstance.get(API_CONFIG.endpoints.getHouseholdById(householdId));
+      const requestFn = () =>
+        this.axiosInstance.get(API_CONFIG.endpoints.getHouseholdById(householdId));
       const response = await retryWithBackoff(requestFn, DEFAULT_RETRY_CONFIG, context);
 
       return response.data;
@@ -504,7 +507,8 @@ export class HouseholdsApiService {
    * Update household information
    */
   async updateHousehold(id: number, data: UpdateHouseholdRequest): Promise<HouseholdResponse> {
-    const requestFn = () => this.axiosInstance.patch(API_CONFIG.endpoints.updateHousehold(id), data);
+    const requestFn = () =>
+      this.axiosInstance.patch(API_CONFIG.endpoints.updateHousehold(id), data);
     const response = await this.retryRequest(requestFn);
 
     // Clear cache after update
@@ -517,10 +521,10 @@ export class HouseholdsApiService {
 
   /**
    * Upgrade a guest user to a registered Cognito user
-   * 
+   *
    * This endpoint links the existing guest user record to a Cognito account.
    * The guest token is invalidated after successful upgrade.
-   * 
+   *
    * @param guestToken - The guest token from POST /auth/guest
    * @returns Promise with upgrade result containing user_id
    * @throws Error with status code for handling:
@@ -544,7 +548,7 @@ export class HouseholdsApiService {
           headers: {
             'X-Guest-Token': guestToken,
           },
-        }
+        },
       );
 
       return response.data;
@@ -555,9 +559,14 @@ export class HouseholdsApiService {
 
       const upgradeError: any = new Error(message);
       upgradeError.status = status;
-      upgradeError.type = status === 409 ? 'CONFLICT' :
-        status === 401 ? 'AUTHENTICATION_ERROR' :
-          status === 400 ? 'BAD_REQUEST' : 'UNKNOWN_ERROR';
+      upgradeError.type =
+        status === 409
+          ? 'CONFLICT'
+          : status === 401
+            ? 'AUTHENTICATION_ERROR'
+            : status === 400
+              ? 'BAD_REQUEST'
+              : 'UNKNOWN_ERROR';
       upgradeError.originalError = error;
 
       logError(upgradeError, context, { status, message });

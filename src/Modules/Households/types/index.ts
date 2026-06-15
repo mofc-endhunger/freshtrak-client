@@ -62,8 +62,4 @@ export type {
 } from './error.types';
 
 // Export enums
-export {
-  HouseholdErrorCodes,
-  ErrorSeverity,
-  ErrorCategory,
-} from './error.types';
+export { HouseholdErrorCodes, ErrorSeverity, ErrorCategory } from './error.types';

@@ -7,18 +7,17 @@ const toastTypes = {
   success: toast.TYPE.SUCCESS,
   warn: toast.TYPE.WARNING,
   error: toast.TYPE.ERROR,
-  default: toast.TYPE.DEFAULT
-}
-export const showToast = (message, type = "default") => {
+  default: toast.TYPE.DEFAULT,
+};
+export const showToast = (message, type = 'default') => {
   toast(message, {
-    type: toastTypes[type]
-  })
-}
-export const NotifyToast = ({position='top-left', }) => {
-
+    type: toastTypes[type],
+  });
+};
+export const NotifyToast = ({ position = 'top-left' }) => {
   return (
-    <div className='notify-toast-container'>
-      <ToastContainer autoClose={false} position={position}/>
+    <div className="notify-toast-container">
+      <ToastContainer autoClose={false} position={position} />
     </div>
-  )
-}
+  );
+};

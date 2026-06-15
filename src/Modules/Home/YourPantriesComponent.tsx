@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment } from 'react';
 
 /**
  * YourPantriesComponent - Static informational component about user pantries
@@ -16,18 +16,18 @@ import React, { Fragment } from "react";
  * when the pantry functionality is implemented.
  */
 
-import { YourPantriesComponentProps } from "./types/home.types";
+import { YourPantriesComponentProps } from './types/home.types';
 
 const YourPantriesComponent: React.FC<YourPantriesComponentProps> = () => {
-	return (
-		<Fragment>
-			<h2 className="font-bold text-left">Your Pantries</h2>
-			<div className="text-gray-600 mt-4">
-				Once you visited a pantry. Your Pantries will populate here!
-				Explore the events below to get started!
-			</div>
-		</Fragment>
-	);
+  return (
+    <Fragment>
+      <h2 className="font-bold text-left">Your Pantries</h2>
+      <div className="text-gray-600 mt-4">
+        Once you visited a pantry. Your Pantries will populate here! Explore the events below to get
+        started!
+      </div>
+    </Fragment>
+  );
 };
 
 export default YourPantriesComponent;

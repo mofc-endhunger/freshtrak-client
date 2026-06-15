@@ -1,23 +1,18 @@
-import React from "react";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "../../../components/ui/card";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 
 /**
  * Props interface for FeatureCard component
  */
 interface FeatureCardProps {
-	/** The title/heading for the feature card */
-	title: string;
-	/** The descriptive content for the feature card */
-	content: string;
-	/** The URL/path to the icon image */
-	imageUrl: string;
-	/** Optional CSS class names for additional styling */
-	className?: string;
+  /** The title/heading for the feature card */
+  title: string;
+  /** The descriptive content for the feature card */
+  content: string;
+  /** The URL/path to the icon image */
+  imageUrl: string;
+  /** Optional CSS class names for additional styling */
+  className?: string;
 }
 
 /**
@@ -41,33 +36,20 @@ interface FeatureCardProps {
  * />
  * ```
  */
-const FeatureCard: React.FC<FeatureCardProps> = ({
-	title,
-	content,
-	imageUrl,
-	className = "",
-}) => {
-	return (
-		<Card className={`h-full ${className}`}>
-			<CardHeader className="text-center pb-4">
-				<div className="flex justify-center mb-3">
-					<img
-						alt={title}
-						src={imageUrl}
-						className="w-16 h-16 object-contain"
-					/>
-				</div>
-				<CardTitle className="text-lg font-semibold text-text-primary">
-					{title}
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="text-center">
-				<p className="text-sm text-muted-foreground leading-relaxed">
-					{content}
-				</p>
-			</CardContent>
-		</Card>
-	);
+const FeatureCard: React.FC<FeatureCardProps> = ({ title, content, imageUrl, className = '' }) => {
+  return (
+    <Card className={`h-full ${className}`}>
+      <CardHeader className="text-center pb-4">
+        <div className="flex justify-center mb-3">
+          <img alt={title} src={imageUrl} className="w-16 h-16 object-contain" />
+        </div>
+        <CardTitle className="text-lg font-semibold text-text-primary">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="text-center">
+        <p className="text-sm text-muted-foreground leading-relaxed">{content}</p>
+      </CardContent>
+    </Card>
+  );
 };
 
 export default FeatureCard;

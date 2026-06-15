@@ -8,9 +8,9 @@ import { StorageService } from './StorageService';
 import { isAuthenticationError } from './UserRecordHelper';
 
 export interface AuthErrorHandlerOptions {
-  userType: "cognito" | "guest";
+  userType: 'cognito' | 'guest';
   redirectPath?: string;
-  showToast?: (message: string, type: "error" | "success") => void;
+  showToast?: (message: string, type: 'error' | 'success') => void;
 }
 
 /**
@@ -19,27 +19,24 @@ export interface AuthErrorHandlerOptions {
  * @param options - Configuration options for error handling
  * @returns true if error was handled as auth error, false otherwise
  */
-export const handleAuthError = (
-  error: any,
-  options: AuthErrorHandlerOptions
-): boolean => {
+export const handleAuthError = (error: any, options: AuthErrorHandlerOptions): boolean => {
   // Check if this is a 401 authentication error
   if (isAuthenticationError(error)) {
     // Clean up storage based on user type using StorageService
     StorageService.clearAuthData(options.userType);
 
     // Show appropriate error message
-    const errorMessage = options.userType === "cognito"
-      ? "Your session has expired. Please sign in again."
-      : "Guest session expired. Please start over.";
+    const errorMessage =
+      options.userType === 'cognito'
+        ? 'Your session has expired. Please sign in again.'
+        : 'Guest session expired. Please start over.';
 
     if (options.showToast) {
-      options.showToast(errorMessage, "error");
+      options.showToast(errorMessage, 'error');
     }
 
     // Determine redirect path
-    const redirectPath = options.redirectPath ||
-      (options.userType === "cognito" ? "/login" : "/");
+    const redirectPath = options.redirectPath || (options.userType === 'cognito' ? '/login' : '/');
 
     // Redirect after a short delay to show the error message
     setTimeout(() => {
@@ -60,9 +57,9 @@ export const handleAuthError = (
  * @returns Function to handle authentication errors
  */
 export const useAuthErrorHandler = (
-  userType: "cognito" | "guest",
+  userType: 'cognito' | 'guest',
   redirectPath?: string,
-  showToast?: (message: string, type: "error" | "success") => void
+  showToast?: (message: string, type: 'error' | 'success') => void,
 ) => {
   return (error: any): boolean => {
     return handleAuthError(error, {
@@ -88,7 +85,7 @@ export const isGuestTokenExpired = (userProfile: string | null): boolean => {
     const now = new Date();
     return expiresAt <= now;
   } catch (error) {
-    console.warn("Could not parse userProfile:", error);
+    console.warn('Could not parse userProfile:', error);
     return true;
   }
 };
@@ -111,7 +108,7 @@ export const isCognitoTokenExpired = (cognitoUser: string | null): boolean => {
     const validation = validateToken(cognitoUserData.accessToken);
     return validation.isExpired;
   } catch (error) {
-    console.warn("Could not parse cognitoUser:", error);
+    console.warn('Could not parse cognitoUser:', error);
     return true;
   }
 };

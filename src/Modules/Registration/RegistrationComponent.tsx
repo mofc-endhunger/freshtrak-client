@@ -1,40 +1,40 @@
 // React imports
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Component imports
-import { HouseholdForm } from "../../components/shared";
+import { HouseholdForm } from '../../components/shared';
 
 // Type imports
-import { RegistrationComponentProps } from "./types/registration.types";
-import localization from "../Localization/LocalizationComponent";
+import { RegistrationComponentProps } from './types/registration.types';
+import localization from '../Localization/LocalizationComponent';
 
 const RegistrationComponent: React.FC<RegistrationComponentProps> = ({
-	user,
-	onRegister,
-	event,
-	disabled,
-	householdMembers = [],
+  user,
+  onRegister,
+  event,
+  disabled,
+  householdMembers = [],
 }) => {
-	const navigate = useNavigate();
+  const navigate = useNavigate();
 
-	return (
-		<HouseholdForm
-			mode="registration"
-			onSubmit={onRegister}
-			onCancel={() => {
-				navigate(-1);
-			}}
-			prefilledData={user}
-			event={event}
-			disabled={disabled}
-			title={localization.title_event_registration}
-			subtitle={localization.subtitle_complete_registration}
-			submitButtonText={localization.button_register}
-			cancelButtonText={localization.button_cancel}
-			currentHouseholdMembers={householdMembers}
-		/>
-	);
+  return (
+    <HouseholdForm
+      mode="registration"
+      onSubmit={onRegister}
+      onCancel={() => {
+        navigate(-1);
+      }}
+      prefilledData={user}
+      event={event}
+      disabled={disabled}
+      title={localization.title_event_registration}
+      subtitle={localization.subtitle_complete_registration}
+      submitButtonText={localization.button_register}
+      cancelButtonText={localization.button_cancel}
+      currentHouseholdMembers={householdMembers}
+    />
+  );
 };
 
 export default RegistrationComponent;

@@ -1,11 +1,11 @@
-import React from "react";
-import { render } from "@testing-library/react";
-import { Provider } from "react-redux";
-import configureStore from "redux-mock-store";
-import EventContainer from "../../Events/EventContainer";
-import { MemoryRouter } from "react-router-dom";
+import React from 'react';
+import { render } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
+import EventContainer from '../../Events/EventContainer';
+import { MemoryRouter } from 'react-router-dom';
 
-jest.mock("axios");
+jest.mock('axios');
 
 // import { mockFoodBank } from "../../../Testing";
 
@@ -13,42 +13,42 @@ const mockStore = configureStore([]);
 const store = mockStore({});
 
 /*** Mock Google Maps JavaScript API ***/
-jest.mock("../GooglePlacesAutocomplete", () => {
-	const React = require("react"); // eslint-disable-line
-	class GooglePlacesAutocomplete extends React.Component {
-		render() {
-			return (
-				<input
-					type="text"
-					className={this.props.className}
-					id={this.props.id}
-					name={this.props.name}
-					value={this.props.value}
-					onChange={this.props.onChange}
-					placeholder={this.props.placeholder}
-					{...this.props}
-				/>
-			);
-		}
-	}
+jest.mock('../GooglePlacesAutocomplete', () => {
+  const React = require('react'); // eslint-disable-line
+  class GooglePlacesAutocomplete extends React.Component {
+    render() {
+      return (
+        <input
+          type="text"
+          className={this.props.className}
+          id={this.props.id}
+          name={this.props.name}
+          value={this.props.value}
+          onChange={this.props.onChange}
+          placeholder={this.props.placeholder}
+          {...this.props}
+        />
+      );
+    }
+  }
 
-	return GooglePlacesAutocomplete;
+  return GooglePlacesAutocomplete;
 });
 
-test("should show error an invalid submit", async () => {
-	const { getAllByText } = render(
-		<Provider store={store}>
-			<MemoryRouter>
-				<EventContainer location={{ state: "" }} />
-			</MemoryRouter>
-		</Provider>
-	);
+test('should show error an invalid submit', async () => {
+  const { getAllByText } = render(
+    <Provider store={store}>
+      <MemoryRouter>
+        <EventContainer location={{ state: '' }} />
+      </MemoryRouter>
+    </Provider>,
+  );
 
-	const button = getAllByText(/search for resources/i)[0];
-	// await act(async () => {
-	//   fireEvent.click(button);
-	// });
-	// expect(baseElement).toHaveTextContent("This field is required");
+  const button = getAllByText(/search for resources/i)[0];
+  // await act(async () => {
+  //   fireEvent.click(button);
+  // });
+  // expect(baseElement).toHaveTextContent("This field is required");
 });
 
 // Note: temporary disabling below address autocomplete input test

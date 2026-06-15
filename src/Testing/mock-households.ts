@@ -1,6 +1,6 @@
 /**
  * Mock Household Data for Testing
- * 
+ *
  * Comprehensive mock data for household testing scenarios.
  */
 
@@ -134,8 +134,8 @@ export const mockCreateHouseholdRequest: CreateHouseholdRequest = {
 export const mockUpdateHouseholdRequest: UpdateHouseholdRequest = {
   id: 1,
   number: 0,
-  name: "Mock Household",
-  identification_code: "1234567890-123",
+  name: 'Mock Household',
+  identification_code: '1234567890-123',
   added_by: 123456,
   last_updated_by: 123456,
   deleted_by: null,

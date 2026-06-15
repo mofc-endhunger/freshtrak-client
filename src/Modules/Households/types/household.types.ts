@@ -65,7 +65,15 @@ export interface HouseholdCounts {
 // Member status types
 export type MemberStatus = 'child' | 'adult' | 'senior';
 export type MemberGender = 'male' | 'female' | 'other' | 'prefer_not_to_say';
-export type MemberRace = 'american_indian' | 'asian' | 'black' | 'hispanic' | 'native_hawaiian' | 'white' | 'other' | 'prefer_not_to_say';
+export type MemberRace =
+  | 'american_indian'
+  | 'asian'
+  | 'black'
+  | 'hispanic'
+  | 'native_hawaiian'
+  | 'white'
+  | 'other'
+  | 'prefer_not_to_say';
 export type MemberEthnicity = 'hispanic' | 'non_hispanic' | 'prefer_not_to_say';
 
 // Extended member information for UI display
@@ -202,7 +210,14 @@ export interface HouseholdAuditEntry {
   id: number;
   household_id: number;
   member_id?: number;
-  change_type: 'created' | 'updated' | 'deactivated' | 'reactivated' | 'removed' | 'primary_changed' | 'address_updated';
+  change_type:
+    | 'created'
+    | 'updated'
+    | 'deactivated'
+    | 'reactivated'
+    | 'removed'
+    | 'primary_changed'
+    | 'address_updated';
   changed_by_user_id?: number;
   changes: {
     before: any;
@@ -212,7 +227,17 @@ export interface HouseholdAuditEntry {
 }
 
 // Language preference options (codes must match shared LANGUAGE_OPTIONS in Localization/languageOptions)
-export type LanguagePreference = 'en' | 'spa' | 'som' | 'rus' | 'tur' | 'ara' | 'zho' | 'hin' | 'nep' | 'tgl';
+export type LanguagePreference =
+  | 'en'
+  | 'spa'
+  | 'som'
+  | 'rus'
+  | 'tur'
+  | 'ara'
+  | 'zho'
+  | 'hin'
+  | 'nep'
+  | 'tgl';
 
 // Utility types for age calculation
 export interface AgeCalculation {

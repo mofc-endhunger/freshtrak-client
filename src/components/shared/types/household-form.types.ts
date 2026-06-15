@@ -1,9 +1,12 @@
 // Unified HouseholdForm Component Type Definitions
 // This file contains all TypeScript interfaces and types for the unified HouseholdForm component
 
-import { RegistrationFormData, HouseholdCounts } from "../../../Modules/Registration/types/registration.types";
-import { HouseholdMember } from "../../../Modules/Households/types/household.types";
-import localization from "../../../Modules/Localization/LocalizationComponent";
+import {
+  RegistrationFormData,
+  HouseholdCounts,
+} from '../../../Modules/Registration/types/registration.types';
+import { HouseholdMember } from '../../../Modules/Households/types/household.types';
+import localization from '../../../Modules/Localization/LocalizationComponent';
 
 // ============================================================================
 // CORE COMPONENT TYPES
@@ -12,7 +15,7 @@ import localization from "../../../Modules/Localization/LocalizationComponent";
 /**
  * Mode for the unified HouseholdForm component
  */
-export type HouseholdFormMode = "registration" | "householdSetup";
+export type HouseholdFormMode = 'registration' | 'householdSetup';
 
 /**
  * Configuration for different form modes
@@ -67,7 +70,7 @@ export interface HouseholdFormProps {
 
   // Additional props for flexibility
   className?: string;
-  "data-testid"?: string;
+  'data-testid'?: string;
 }
 
 /**
@@ -115,7 +118,7 @@ export interface FormValidationConfig {
  * Default configuration for registration mode
  */
 export const getRegistrationModeConfig = (): FormModeConfig => ({
-  mode: "registration",
+  mode: 'registration',
   title: localization.title_event_registration,
   subtitle: localization.subtitle_complete_registration,
   showEventSlots: true,
@@ -124,9 +127,27 @@ export const getRegistrationModeConfig = (): FormModeConfig => ({
   submitButtonText: localization.button_register,
   cancelButtonText: localization.button_cancel,
   steps: [
-    { id: 0, title: localization.title_your_details, component: "PrimaryInfo", isVisible: true, isRequired: true },
-    { id: 1, title: localization.title_your_address_details, component: "AddressContact", isVisible: true, isRequired: true },
-    { id: 2, title: localization.title_your_family_details, component: "MemberCount", isVisible: true, isRequired: true },
+    {
+      id: 0,
+      title: localization.title_your_details,
+      component: 'PrimaryInfo',
+      isVisible: true,
+      isRequired: true,
+    },
+    {
+      id: 1,
+      title: localization.title_your_address_details,
+      component: 'AddressContact',
+      isVisible: true,
+      isRequired: true,
+    },
+    {
+      id: 2,
+      title: localization.title_your_family_details,
+      component: 'MemberCount',
+      isVisible: true,
+      isRequired: true,
+    },
   ],
 });
 
@@ -139,7 +160,7 @@ export const REGISTRATION_MODE_CONFIG: FormModeConfig = getRegistrationModeConfi
  * Default configuration for household setup mode
  */
 export const getHouseholdSetupModeConfig = (): FormModeConfig => ({
-  mode: "householdSetup",
+  mode: 'householdSetup',
   title: localization.title_set_up_household,
   subtitle: localization.subtitle_complete_household_profile,
   showEventSlots: false,
@@ -148,11 +169,41 @@ export const getHouseholdSetupModeConfig = (): FormModeConfig => ({
   submitButtonText: localization.button_complete_setup,
   cancelButtonText: localization.button_cancel,
   steps: [
-    { id: 0, title: localization.title_your_details, component: "PrimaryInfo", isVisible: true, isRequired: true },
-    { id: 1, title: localization.title_your_address_details, component: "Address", isVisible: true, isRequired: true },
-    { id: 2, title: localization.title_your_family_details, component: "MemberCount", isVisible: true, isRequired: true },
-    { id: 3, title: localization.title_contact_information, component: "Contact", isVisible: true, isRequired: true },
-    { id: 4, title: localization.title_family_member_details, component: "FamilyMemberDetails", isVisible: false, isRequired: false },
+    {
+      id: 0,
+      title: localization.title_your_details,
+      component: 'PrimaryInfo',
+      isVisible: true,
+      isRequired: true,
+    },
+    {
+      id: 1,
+      title: localization.title_your_address_details,
+      component: 'Address',
+      isVisible: true,
+      isRequired: true,
+    },
+    {
+      id: 2,
+      title: localization.title_your_family_details,
+      component: 'MemberCount',
+      isVisible: true,
+      isRequired: true,
+    },
+    {
+      id: 3,
+      title: localization.title_contact_information,
+      component: 'Contact',
+      isVisible: true,
+      isRequired: true,
+    },
+    {
+      id: 4,
+      title: localization.title_family_member_details,
+      component: 'FamilyMemberDetails',
+      isVisible: false,
+      isRequired: false,
+    },
   ],
 });
 
@@ -169,12 +220,12 @@ export const HOUSEHOLD_SETUP_MODE_CONFIG: FormModeConfig = getHouseholdSetupMode
  * Step component mapping
  */
 export type StepComponent =
-  | "PrimaryInfo"
-  | "Address"
-  | "AddressContact"
-  | "Contact"
-  | "MemberCount"
-  | "FamilyMemberDetails";
+  | 'PrimaryInfo'
+  | 'Address'
+  | 'AddressContact'
+  | 'Contact'
+  | 'MemberCount'
+  | 'FamilyMemberDetails';
 
 /**
  * Form step enumeration
@@ -191,7 +242,7 @@ export enum HouseholdFormStep {
 /**
  * Button variant types
  */
-export type ButtonVariant = "highlight" | "highlightOutline" | "outline" | "default";
+export type ButtonVariant = 'highlight' | 'highlightOutline' | 'outline' | 'default';
 
 /**
  * Progress indicator configuration
@@ -214,7 +265,10 @@ export type FormSubmitHandler = (data: RegistrationFormData) => Promise<void>;
 export type FormCancelHandler = () => void;
 export type StepChangeHandler = (step: number) => void;
 export type MemberDeleteHandler = (memberId: number) => void;
-export type FamilyMembersCompleteHandler = (members: HouseholdMember[], counts: HouseholdCounts) => void;
+export type FamilyMembersCompleteHandler = (
+  members: HouseholdMember[],
+  counts: HouseholdCounts,
+) => void;
 export type FamilyMembersSkipHandler = (counts: HouseholdCounts) => void;
 
 // ============================================================================
@@ -257,7 +311,7 @@ export const DEFAULT_FORM_STATE: HouseholdFormState = {
   familyMembers: [],
   householdCounts: null,
   hasAdditionalMembers: false,
-  selectedSlotId: "",
+  selectedSlotId: '',
 };
 
 /**
@@ -265,14 +319,14 @@ export const DEFAULT_FORM_STATE: HouseholdFormState = {
  */
 export const DEFAULT_VALIDATION_CONFIG: FormValidationConfig = {
   requiredFields: [
-    "first_name",
-    "last_name",
-    "date_of_birth",
-    "gender",
-    "address_line_1",
-    "city",
-    "state",
-    "zip_code",
+    'first_name',
+    'last_name',
+    'date_of_birth',
+    'gender',
+    'address_line_1',
+    'city',
+    'state',
+    'zip_code',
   ],
   conditionalFields: {
     phone: true,

@@ -81,15 +81,22 @@ const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({ householdData }
 
     const dob = headOfHousehold.date_of_birth;
 
-    // Format date of birth for display
-    const formattedDOB =
-      dob && dob !== '1900-01-01'
-        ? new Date(dob).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          })
-        : null;
+    // Format date of birth for display.
+    // Parse components directly to avoid the UTC-to-local timezone shift that
+    // occurs when Date parses an ISO date-only string (e.g. "1987-08-19" is
+    // treated as UTC midnight, which renders as the previous calendar day in
+    // US timezones).
+    const formattedDOB = (() => {
+      if (!dob || dob === '1900-01-01') return null;
+      const parts = dob.split('-').map(Number);
+      if (parts.length !== 3 || parts.some(isNaN)) return null;
+      const [year, month, day] = parts;
+      return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    })();
 
     // Convert gender_id to readable label (handle both string and number)
     const getGenderLabel = (genderId: number | string | null): string | null => {

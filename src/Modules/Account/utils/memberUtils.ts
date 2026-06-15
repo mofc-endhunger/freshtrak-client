@@ -27,12 +27,17 @@ export const calculateAgeFromDOB = (dateOfBirth: string): number => {
     return 0;
   }
 
-  const today = new Date();
-  const birthDate = new Date(dateOfBirth);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
+  // Parse components directly to avoid the UTC-to-local timezone shift that
+  // new Date("YYYY-MM-DD") introduces (it is interpreted as UTC midnight).
+  const parts = dateOfBirth.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return 0;
+  const [birthYear, birthMonth, birthDay] = parts;
 
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+  const today = new Date();
+  let age = today.getFullYear() - birthYear;
+  const monthDiff = today.getMonth() + 1 - birthMonth;
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDay)) {
     age--;
   }
 

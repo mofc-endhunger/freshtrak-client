@@ -739,7 +739,13 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
                             {member.date_of_birth && member.date_of_birth !== '1900-01-01' && (
                               <p className="text-sm text-gray-600">
                                 {localization.label_born}{' '}
-                                {new Date(member.date_of_birth).toLocaleDateString()}
+                                {(() => {
+                                  const parts = member.date_of_birth.split('-').map(Number);
+                                  if (parts.length !== 3 || parts.some(isNaN))
+                                    return member.date_of_birth;
+                                  const [y, m, d] = parts;
+                                  return new Date(y, m - 1, d).toLocaleDateString();
+                                })()}
                               </p>
                             )}
                           </div>

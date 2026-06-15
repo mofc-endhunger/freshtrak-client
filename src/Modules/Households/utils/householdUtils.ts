@@ -201,7 +201,17 @@ export const validateDateOfBirth = (dateOfBirth: string): { isValid: boolean; er
     return { isValid: false, error: localization.error_date_of_birth_required };
   }
 
-  const date = new Date(dateOfBirth);
+  // Parse YYYY-MM-DD by components to avoid UTC-to-local timezone shift;
+  // fall back to the Date constructor for other formats.
+  let date: Date;
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateOfBirth);
+  if (isoMatch) {
+    const [, y, m, d] = isoMatch.map(Number);
+    date = new Date(y, m - 1, d);
+  } else {
+    date = new Date(dateOfBirth);
+  }
+
   const today = new Date();
 
   if (isNaN(date.getTime())) {
@@ -272,7 +282,13 @@ export const formatDateOfBirth = (dateOfBirth: string | undefined): string => {
   if (!dateOfBirth) return localization.label_not_provided;
 
   try {
-    const date = new Date(dateOfBirth);
+    // Parse components directly to avoid UTC-to-local timezone shift from
+    // new Date("YYYY-MM-DD") (interpreted as UTC midnight, shifts back one day
+    // in negative-offset timezones).
+    const parts = dateOfBirth.split('-').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return localization.label_invalid_date;
+    const [year, month, day] = parts;
+    const date = new Date(year, month - 1, day);
     if (isNaN(date.getTime())) return localization.label_invalid_date;
 
     const lang = localization.getLanguage() || 'en';

@@ -43,8 +43,12 @@ export const formatDateForServer = (value) => {
   }
 
   try {
-    const date = new Date(year, month, day);
-    return date.toISOString().split('T')[0];
+    // Build the YYYY-MM-DD string directly to avoid any timezone conversion.
+    // month is already 0-indexed from the parsing above, so add 1 for the output.
+    const mm = String(month + 1).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    const yyyy = String(year);
+    return `${yyyy}-${mm}-${dd}`;
   } catch (error) {
     console.error('formatDateForServer: Error creating date:', error);
     return '';

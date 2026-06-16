@@ -14,19 +14,15 @@ const STORAGE_KEY = 'FRESHTRAK_DEV_MOCK_IMAGES';
 const originalNodeEnv = process.env.NODE_ENV;
 
 const setHostname = (hostname: string): void => {
-  Object.defineProperty(window, 'location', {
-    value: { hostname },
-    writable: true,
-    configurable: true,
-  });
+  jest.spyOn(window, 'location', 'get').mockReturnValue({ hostname } as Location);
 };
 
 const loadModule = () => require('../devImageEnrichment') as typeof import('../devImageEnrichment');
 
 describe('devImageEnrichment', () => {
   beforeEach(() => {
+    jest.restoreAllMocks();
     jest.resetModules();
-    jest.clearAllMocks();
     localStorage.clear();
     mockConfig.ALLOW_DEV_MOCK_IMAGES = undefined;
     setHostname('freshtrak.com');

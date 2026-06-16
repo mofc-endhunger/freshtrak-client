@@ -14,6 +14,7 @@
  */
 
 import { config } from '../config';
+import { getWindowHostname } from './windowUtils';
 
 import type { AgencyImage } from '../Modules/Home/types/home.types';
 
@@ -23,8 +24,7 @@ const STORAGE_KEY = 'FRESHTRAK_DEV_MOCK_IMAGES';
 const MOCK_IMAGES_ALLOWED_HOSTNAMES = new Set(['localhost', '127.0.0.1', 'beta2.freshtrak.com']);
 
 function getHostname(): string | null {
-  if (typeof window === 'undefined') return null;
-  return window.location.hostname;
+  return getWindowHostname();
 }
 
 function isMockImagesEnvironmentAllowed(): boolean {

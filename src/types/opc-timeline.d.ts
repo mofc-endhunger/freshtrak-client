@@ -12,4 +12,4 @@ declare global {
   interface HTMLElement {
     steps?: string[];
   }
-} 
+}

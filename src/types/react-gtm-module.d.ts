@@ -5,4 +5,4 @@ declare module 'react-gtm-module' {
 
   const TagManager: TagManager;
   export default TagManager;
-} 
+}

@@ -26,15 +26,12 @@
  *  - completed:   feedback already submitted
  *  - scheduled:   survey exists but not yet active
  */
-export type ReservationSurveyStatus =
-	| "in_progress"
-	| "completed"
-	| "scheduled";
+export type ReservationSurveyStatus = 'in_progress' | 'completed' | 'scheduled';
 
 /** Survey data attached to a reservation (from GET /reservations) */
 export interface ReservationSurvey {
-	id: number;
-	status: ReservationSurveyStatus;
+  id: number;
+  status: ReservationSurveyStatus;
 }
 
 // ============================================================================
@@ -46,8 +43,8 @@ export interface ReservationSurvey {
  * Note: API may return string IDs and name may be missing
  */
 export interface ReservationApiEvent {
-	id: number | string;
-	name?: string; // Optional - may not be provided by backend
+  id: number | string;
+  name?: string; // Optional - may not be provided by backend
 }
 
 /**
@@ -55,8 +52,8 @@ export interface ReservationApiEvent {
  * Times are in ISO 8601 format
  */
 export interface ReservationApiTimeslot {
-	start_time: string; // ISO: "2026-01-17T09:00:00.000Z"
-	end_time: string; // ISO: "2026-01-17T15:00:00.000Z"
+  start_time: string; // ISO: "2026-01-17T09:00:00.000Z"
+  end_time: string; // ISO: "2026-01-17T15:00:00.000Z"
 }
 
 /**
@@ -65,27 +62,27 @@ export interface ReservationApiTimeslot {
  * Note: date and timeslot can be null when data is incomplete
  */
 export interface ReservationApiResponse {
-	id: number | string;
-	event: ReservationApiEvent;
-	date: string | null; // Can be null
-	timeslot: ReservationApiTimeslot | null; // Can be null
-	public_event_slot_id?: number; // Additional field from backend
-	public_event_date_id?: number; // Additional field from backend
-	household_id: number;
-	created_at: string; // ISO timestamp
-	updated_at: string; // ISO timestamp
-	/** Survey availability for this reservation (populated by backend when available) */
-	survey?: ReservationSurvey;
+  id: number | string;
+  event: ReservationApiEvent;
+  date: string | null; // Can be null
+  timeslot: ReservationApiTimeslot | null; // Can be null
+  public_event_slot_id?: number; // Additional field from backend
+  public_event_date_id?: number; // Additional field from backend
+  household_id: number;
+  created_at: string; // ISO timestamp
+  updated_at: string; // ISO timestamp
+  /** Survey availability for this reservation (populated by backend when available) */
+  survey?: ReservationSurvey;
 }
 
 /**
  * List response from GET /reservations endpoint
  */
 export interface ReservationsApiListResponse {
-	reservations: ReservationApiResponse[];
-	total: number;
-	upcoming_count: number;
-	past_count: number;
+  reservations: ReservationApiResponse[];
+  total: number;
+  upcoming_count: number;
+  past_count: number;
 }
 
 // ============================================================================
@@ -97,14 +94,14 @@ export interface ReservationsApiListResponse {
  * Only "completed" status is used - shown for past events
  * Derived from date: date < today → "completed"
  */
-export type ReservationStatus = "completed";
+export type ReservationStatus = 'completed';
 
 /**
  * Event object for frontend display
  */
 export interface ReservationEvent {
-	id: number;
-	name: string;
+  id: number;
+  name: string;
 }
 
 /**
@@ -112,8 +109,8 @@ export interface ReservationEvent {
  * Times are in normalized HH:mm:ss format; locale formatting is done at the component level.
  */
 export interface ReservationTimeslot {
-	start_time: string; // "09:00:00" or "N/A"
-	end_time: string; // "15:00:00" or "N/A"
+  start_time: string; // "09:00:00" or "N/A"
+  end_time: string; // "15:00:00" or "N/A"
 }
 
 /**
@@ -121,30 +118,30 @@ export interface ReservationTimeslot {
  * This is the transformed format used by UI components
  */
 export interface Reservation {
-	id: number;
-	event: ReservationEvent;
-	date: string; // "2026-01-17"
-	timeslot: ReservationTimeslot;
-	status?: ReservationStatus; // Optional - only "completed" for past events
-	household_id: number;
-	created_at: string;
-	updated_at: string;
-	/** Event slot ID for feedback form lookup */
-	public_event_slot_id?: number;
-	/** Event date ID for feedback form lookup */
-	public_event_date_id?: number;
-	/** Survey availability — show "Give Feedback" only when status === 'available' */
-	survey?: ReservationSurvey;
+  id: number;
+  event: ReservationEvent;
+  date: string; // "2026-01-17"
+  timeslot: ReservationTimeslot;
+  status?: ReservationStatus; // Optional - only "completed" for past events
+  household_id: number;
+  created_at: string;
+  updated_at: string;
+  /** Event slot ID for feedback form lookup */
+  public_event_slot_id?: number;
+  /** Event date ID for feedback form lookup */
+  public_event_date_id?: number;
+  /** Survey availability — show "Give Feedback" only when status === 'available' */
+  survey?: ReservationSurvey;
 }
 
 /**
  * Frontend response wrapper for reservations list
  */
 export interface ReservationsResponse {
-	reservations: Reservation[];
-	total: number;
-	upcoming_count: number;
-	past_count: number;
+  reservations: Reservation[];
+  total: number;
+  upcoming_count: number;
+  past_count: number;
 }
 
 // ============================================================================
@@ -155,4 +152,4 @@ export interface ReservationsResponse {
  * Filter type for reservation lists
  * Used in UI to switch between views
  */
-export type ReservationFilter = "upcoming" | "past" | "all";
+export type ReservationFilter = 'upcoming' | 'past' | 'all';

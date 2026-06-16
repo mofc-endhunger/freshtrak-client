@@ -8,4 +8,4 @@ declare module 'react-router-bootstrap' {
   }
 
   export const LinkContainer: ComponentType<LinkContainerProps>;
-} 
+}

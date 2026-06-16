@@ -243,8 +243,8 @@ export class HouseholdCacheService {
 
     return this.get(
       key,
-      () => this.apiService.getHousehold(householdId).then(response => response.data),
-      10 * 60 * 1000 // 10 minutes TTL
+      () => this.apiService.getHousehold(householdId).then((response) => response.data),
+      10 * 60 * 1000, // 10 minutes TTL
     );
   }
 
@@ -261,7 +261,7 @@ export class HouseholdCacheService {
         const householdResponse = await this.apiService.getHousehold(householdId);
         return householdResponse.data.members || [];
       },
-      5 * 60 * 1000 // 5 minutes TTL
+      5 * 60 * 1000, // 5 minutes TTL
     );
   }
 
@@ -308,7 +308,9 @@ export class HouseholdCacheService {
   async addMember(householdId: number, data: any): Promise<HouseholdMember> {
     // NOTE: Individual member operations are not supported by the current API
     // This feature requires backend API support for per-member CRUD operations
-    throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
+    throw new Error(
+      'Individual member operations are not supported by the current API. Use household update instead.',
+    );
   }
 
   /**
@@ -319,7 +321,9 @@ export class HouseholdCacheService {
   async updateMember(householdId: number, memberId: number, data: any): Promise<HouseholdMember> {
     // NOTE: Individual member operations are not supported by the current API
     // This feature requires backend API support for per-member CRUD operations
-    throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
+    throw new Error(
+      'Individual member operations are not supported by the current API. Use household update instead.',
+    );
   }
 
   /**
@@ -330,7 +334,9 @@ export class HouseholdCacheService {
   async deleteMember(householdId: number, memberId: number): Promise<void> {
     // NOTE: Individual member operations are not supported by the current API
     // This feature requires backend API support for per-member CRUD operations
-    throw new Error('Individual member operations are not supported by the current API. Use household update instead.');
+    throw new Error(
+      'Individual member operations are not supported by the current API. Use household update instead.',
+    );
   }
 
   /**

@@ -56,12 +56,7 @@ export interface DashboardConstants {
 }
 
 // SVG icon types for better type safety
-export type DashboardIconType =
-  | 'calendar'
-  | 'findfood'
-  | 'predict'
-  | 'serve-food'
-  | 'move-quick';
+export type DashboardIconType = 'calendar' | 'findfood' | 'predict' | 'serve-food' | 'move-quick';
 
 // Icon mapping type for better type safety
 export type IconMapping = {

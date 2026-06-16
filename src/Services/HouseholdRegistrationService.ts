@@ -1,12 +1,15 @@
 import axios from 'axios';
 import { API_URL } from '../Utils/Urls';
 import { UsersMeResponse } from '../Modules/Households/types/api.types';
-import { RegistrationResponse, HouseholdRegistrationError } from '../Modules/Registration/types/household-registration.types';
+import {
+  RegistrationResponse,
+  HouseholdRegistrationError,
+} from '../Modules/Registration/types/household-registration.types';
 import { StorageService } from '../Utils/StorageService';
 
 /**
  * HouseholdRegistrationService
- * 
+ *
  * Service class for handling household-based registration operations.
  * Provides methods for registering with household data and checking completeness.
  */
@@ -49,7 +52,7 @@ export class HouseholdRegistrationService {
       seniors: number;
       adults: number;
       children: number;
-    }
+    },
   ): Promise<RegistrationResponse> {
     return this.registerWithRetry(timeslotData, counts, 0);
   }
@@ -68,11 +71,11 @@ export class HouseholdRegistrationService {
       eventSlotId: string;
     },
     counts: { seniors: number; adults: number; children: number } | undefined,
-    attempt: number
+    attempt: number,
   ): Promise<RegistrationResponse> {
     try {
       const headers = {
-        'Authorization': `Bearer ${this.getAuthToken()}`,
+        Authorization: `Bearer ${this.getAuthToken()}`,
         'Content-Type': 'application/json',
       };
 
@@ -80,8 +83,10 @@ export class HouseholdRegistrationService {
       // Coerce IDs to numbers - API expects numeric event_date_id and event_slot_id
       const payload: Record<string, any> = {
         event_id: Number(timeslotData.eventId) || timeslotData.eventId,
-        event_date_id: Number(timeslotData.eventDateId) || parseInt(String(timeslotData.eventDateId), 10),
-        event_slot_id: Number(timeslotData.eventSlotId) || parseInt(String(timeslotData.eventSlotId), 10),
+        event_date_id:
+          Number(timeslotData.eventDateId) || parseInt(String(timeslotData.eventDateId), 10),
+        event_slot_id:
+          Number(timeslotData.eventSlotId) || parseInt(String(timeslotData.eventSlotId), 10),
       };
 
       // Add counts in nested format for registered users
@@ -89,16 +94,10 @@ export class HouseholdRegistrationService {
         payload.counts = counts;
       }
 
-
-      const response = await axios.post<RegistrationResponse>(
-        API_URL.CREATE_RESERVATION,
-        payload,
-        {
-          headers,
-          timeout: this.timeout,
-        }
-      );
-
+      const response = await axios.post<RegistrationResponse>(API_URL.CREATE_RESERVATION, payload, {
+        headers,
+        timeout: this.timeout,
+      });
 
       return {
         success: true,
@@ -106,7 +105,6 @@ export class HouseholdRegistrationService {
         data: response.data,
       };
     } catch (error: any) {
-
       const registrationError = this.mapApiError(error);
 
       // Check if we should retry
@@ -129,7 +127,7 @@ export class HouseholdRegistrationService {
    * @returns Promise<void>
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -139,17 +137,10 @@ export class HouseholdRegistrationService {
    */
   checkHouseholdCompleteness(householdData: UsersMeResponse): boolean {
     // Required fields for registration
-    const requiredFields = [
-      'address_line_1',
-      'city',
-      'state',
-      'zip_code',
-      'phone',
-      'email',
-    ];
+    const requiredFields = ['address_line_1', 'city', 'state', 'zip_code', 'phone', 'email'];
 
     // Check if all required fields are present and not empty
-    const hasRequiredFields = requiredFields.every(field => {
+    const hasRequiredFields = requiredFields.every((field) => {
       const value = householdData[field as keyof UsersMeResponse];
       return value !== null && value !== undefined && value !== '';
     });
@@ -158,7 +149,7 @@ export class HouseholdRegistrationService {
     const hasMembers = householdData.counts.total > 0;
 
     // Check if counts are valid (non-negative)
-    const hasValidCounts = Object.values(householdData.counts).every(count => count >= 0);
+    const hasValidCounts = Object.values(householdData.counts).every((count) => count >= 0);
 
     const isComplete = hasRequiredFields && hasMembers && hasValidCounts;
 

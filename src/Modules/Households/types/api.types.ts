@@ -1,6 +1,13 @@
 // Households API TypeScript Interfaces
 
-import { Household, HouseholdMember, CreateHouseholdRequest, UpdateHouseholdRequest, CreateMemberRequest, UpdateMemberRequest } from './household.types';
+import {
+  Household,
+  HouseholdMember,
+  CreateHouseholdRequest,
+  UpdateHouseholdRequest,
+  CreateMemberRequest,
+  UpdateMemberRequest,
+} from './household.types';
 
 // API Response wrapper
 export interface ApiResponse<T> {
@@ -69,18 +76,18 @@ export interface ApiHouseholdMember {
 }
 
 // Household API responses
-export interface HouseholdResponse extends ApiResponse<Household> { }
-export interface HouseholdListResponse extends ApiResponse<Household[]> { }
+export type HouseholdResponse = ApiResponse<Household>;
+export type HouseholdListResponse = ApiResponse<Household[]>;
 
 // Member API responses
-export interface MemberResponse extends ApiResponse<HouseholdMember> { }
-export interface MemberListResponse extends ApiResponse<HouseholdMember[]> { }
+export type MemberResponse = ApiResponse<HouseholdMember>;
+export type MemberListResponse = ApiResponse<HouseholdMember[]>;
 
 // API Request types
-export interface CreateHouseholdApiRequest extends CreateHouseholdRequest { }
-export interface UpdateHouseholdApiRequest extends UpdateHouseholdRequest { }
-export interface CreateMemberApiRequest extends CreateMemberRequest { }
-export interface UpdateMemberApiRequest extends UpdateMemberRequest { }
+export type CreateHouseholdApiRequest = CreateHouseholdRequest;
+export type UpdateHouseholdApiRequest = UpdateHouseholdRequest;
+export type CreateMemberApiRequest = CreateMemberRequest;
+export type UpdateMemberApiRequest = UpdateMemberRequest;
 
 // API Endpoint configuration
 export interface HouseholdApiEndpoints {
@@ -104,7 +111,7 @@ export interface HouseholdApiConfig {
 export interface AuthHeaders {
   Authorization: string;
   'Content-Type': string;
-  'Accept': string;
+  Accept: string;
 }
 
 // API Request options
@@ -166,13 +173,23 @@ export interface HouseholdApiService {
   updateHousehold(id: number, data: UpdateHouseholdApiRequest): Promise<HouseholdResponse>;
 
   // Member operations
-  getMembers(householdId: number, options?: PaginationParams & MemberFilterOptions): Promise<MemberListResponse>;
+  getMembers(
+    householdId: number,
+    options?: PaginationParams & MemberFilterOptions,
+  ): Promise<MemberListResponse>;
   addMember(householdId: number, data: CreateMemberApiRequest): Promise<MemberResponse>;
-  updateMember(householdId: number, memberId: number, data: UpdateMemberApiRequest): Promise<MemberResponse>;
+  updateMember(
+    householdId: number,
+    memberId: number,
+    data: UpdateMemberApiRequest,
+  ): Promise<MemberResponse>;
   deactivateMember(householdId: number, memberId: number): Promise<MemberResponse>;
 
   // Bulk operations
-  bulkMemberOperation(householdId: number, operation: BulkMemberOperation): Promise<BulkOperationResponse>;
+  bulkMemberOperation(
+    householdId: number,
+    operation: BulkMemberOperation,
+  ): Promise<BulkOperationResponse>;
 }
 
 // Cache configuration

@@ -49,7 +49,10 @@ export const AGE_CONSTANTS = {
 /**
  * Validates if a string represents a valid date
  */
-export const isValidDate = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): boolean => {
+export const isValidDate = (
+  dateString: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
+): boolean => {
   if (!dateString || typeof dateString !== 'string') {
     return false;
   }
@@ -63,7 +66,7 @@ export const isValidDate = (dateString: string, format: string = DATE_CONSTANTS.
  */
 export const isValidDateOfBirth = (
   dateString: string,
-  options: DateValidationOptions = {}
+  options: DateValidationOptions = {},
 ): DateValidationResult => {
   const {
     minAge = DATE_CONSTANTS.MIN_AGE,
@@ -147,12 +150,12 @@ export const isValidDateOfBirth = (
  * @param max - Maximum allowed value (12 for month, 31 for day)
  */
 const checkDatePartValue = (str: string, max: number): string => {
-  if (str.charAt(0) !== "0" || str === "00") {
+  if (str.charAt(0) !== '0' || str === '00') {
     const num = parseInt(str);
-    if (isNaN(num) || num <= 0 || num > max) return "1";
+    if (isNaN(num) || num <= 0 || num > max) return '1';
     const result =
       num > parseInt(max.toString().charAt(0)) && num.toString().length === 1
-        ? "0" + num
+        ? '0' + num
         : num.toString();
     return result;
   }
@@ -174,7 +177,7 @@ export const formatDateInput = (input: string): string => {
   }
 
   // Split by separator and clean each part
-  const values = input.split("/").map(v => v.replace(/\D/g, ""));
+  const values = input.split('/').map((v) => v.replace(/\D/g, ''));
 
   // Validate month (max 12) and day (max 31) as user types
   if (values[0]) values[0] = checkDatePartValue(values[0], 12);
@@ -182,11 +185,11 @@ export const formatDateInput = (input: string): string => {
 
   // Format with separators
   const output = values.map((v, i) => {
-    return v.length === 2 && i < 2 ? v + " / " : v;
+    return v.length === 2 && i < 2 ? v + ' / ' : v;
   });
 
   // Limit to 14 characters (MM / DD / YYYY)
-  return output.join("").substr(0, 14);
+  return output.join('').substr(0, 14);
 };
 
 /**
@@ -194,7 +197,7 @@ export const formatDateInput = (input: string): string => {
  */
 export const validateAndFormatDateInput = (
   input: string,
-  options: DateValidationOptions = {}
+  options: DateValidationOptions = {},
 ): DateValidationResult => {
   const formattedInput = formatDateInput(input);
 
@@ -212,7 +215,10 @@ export const validateAndFormatDateInput = (
 /**
  * Calculates age from date of birth
  */
-export const calculateAge = (dateOfBirth: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): number => {
+export const calculateAge = (
+  dateOfBirth: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
+): number => {
   if (!isValidDate(dateOfBirth, format)) {
     return 0;
   }
@@ -244,7 +250,7 @@ export const getAgeCategory = (age: number): 'senior' | 'adult' | 'child' | 'inf
 export const isValidDateRange = (
   startDate: string,
   endDate: string,
-  format: string = DATE_CONSTANTS.DEFAULT_FORMAT
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
 ): DateValidationResult => {
   if (!isValidDate(startDate, format) || !isValidDate(endDate, format)) {
     return {
@@ -272,7 +278,10 @@ export const isValidDateRange = (
 /**
  * Converts date to server format (YYYY-MM-DD)
  */
-export const formatDateForServer = (dateString: string, inputFormat: string = DATE_CONSTANTS.DEFAULT_FORMAT): string => {
+export const formatDateForServer = (
+  dateString: string,
+  inputFormat: string = DATE_CONSTANTS.DEFAULT_FORMAT,
+): string => {
   if (!isValidDate(dateString, inputFormat)) {
     return '';
   }
@@ -284,7 +293,10 @@ export const formatDateForServer = (dateString: string, inputFormat: string = DA
 /**
  * Converts server date to display format
  */
-export const formatDateForDisplay = (serverDate: string, outputFormat: string = DATE_CONSTANTS.DISPLAY_FORMAT): string => {
+export const formatDateForDisplay = (
+  serverDate: string,
+  outputFormat: string = DATE_CONSTANTS.DISPLAY_FORMAT,
+): string => {
   if (!serverDate) {
     return '';
   }
@@ -300,7 +312,10 @@ export const formatDateForDisplay = (serverDate: string, outputFormat: string = 
 /**
  * Validates event date (must be in the future)
  */
-export const isValidEventDate = (eventDate: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): DateValidationResult => {
+export const isValidEventDate = (
+  eventDate: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
+): DateValidationResult => {
   if (!isValidDate(eventDate, format)) {
     return {
       isValid: false,
@@ -366,7 +381,10 @@ export const isValidTimeRange = (startTime: string, endTime: string): DateValida
 /**
  * Gets relative time description (e.g., "2 days ago", "in 3 hours")
  */
-export const getRelativeTime = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): string => {
+export const getRelativeTime = (
+  dateString: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
+): string => {
   if (!isValidDate(dateString, format)) {
     return '';
   }
@@ -378,7 +396,10 @@ export const getRelativeTime = (dateString: string, format: string = DATE_CONSTA
 /**
  * Checks if date is today
  */
-export const isToday = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): boolean => {
+export const isToday = (
+  dateString: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
+): boolean => {
   if (!isValidDate(dateString, format)) {
     return false;
   }
@@ -390,7 +411,10 @@ export const isToday = (dateString: string, format: string = DATE_CONSTANTS.DEFA
 /**
  * Checks if date is in the past
  */
-export const isPastDate = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): boolean => {
+export const isPastDate = (
+  dateString: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
+): boolean => {
   if (!isValidDate(dateString, format)) {
     return false;
   }
@@ -402,7 +426,10 @@ export const isPastDate = (dateString: string, format: string = DATE_CONSTANTS.D
 /**
  * Checks if date is in the future
  */
-export const isFutureDate = (dateString: string, format: string = DATE_CONSTANTS.DEFAULT_FORMAT): boolean => {
+export const isFutureDate = (
+  dateString: string,
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
+): boolean => {
   if (!isValidDate(dateString, format)) {
     return false;
   }
@@ -417,7 +444,7 @@ export const isFutureDate = (dateString: string, format: string = DATE_CONSTANTS
 export const getDaysBetween = (
   startDate: string,
   endDate: string,
-  format: string = DATE_CONSTANTS.DEFAULT_FORMAT
+  format: string = DATE_CONSTANTS.DEFAULT_FORMAT,
 ): number => {
   if (!isValidDate(startDate, format) || !isValidDate(endDate, format)) {
     return 0;
@@ -443,7 +470,7 @@ export const validateDateWithRules = (
     format?: string;
     allowFuture?: boolean;
     allowPast?: boolean;
-  } = {}
+  } = {},
 ): DateValidationResult => {
   const {
     required = true,
@@ -490,7 +517,7 @@ export const validateDateWithRules = (
 /**
  * Validates date of birth for react-hook-form (native date input - YYYY-MM-DD format)
  * Returns true if valid, or error message string if invalid
- * 
+ *
  * @example
  * ```tsx
  * <Input type="date" {...register("date_of_birth", { validate: validateDobNative })} />
@@ -511,7 +538,7 @@ export const validateDobNative = (value: string): string | true => {
     return localization.error_date_of_birth_future;
   }
 
-  const maxAgeDate = moment().subtract(DATE_CONSTANTS.MAX_AGE, "years");
+  const maxAgeDate = moment().subtract(DATE_CONSTANTS.MAX_AGE, 'years');
   if (date.isBefore(maxAgeDate)) {
     return localization.error_please_enter_valid_date;
   }
@@ -522,7 +549,7 @@ export const validateDobNative = (value: string): string | true => {
 /**
  * Validates date of birth for react-hook-form (text input - MM / DD / YYYY format)
  * Returns true if valid, or error message string if invalid
- * 
+ *
  * @example
  * ```tsx
  * <input type="text" {...register("date_of_birth", { validate: validateDobText })} />
@@ -543,7 +570,7 @@ export const validateDobText = (value: string): string | true => {
     return localization.error_date_of_birth_future;
   }
 
-  const maxAgeDate = moment().subtract(DATE_CONSTANTS.MAX_AGE, "years");
+  const maxAgeDate = moment().subtract(DATE_CONSTANTS.MAX_AGE, 'years');
   if (date.isBefore(maxAgeDate)) {
     return localization.error_please_enter_valid_date;
   }
@@ -562,13 +589,13 @@ export const getTodayForDateInput = (): string => {
  * Gets the minimum allowed date (123 years ago) in YYYY-MM-DD format
  */
 export const getMinDateForDateInput = (): string => {
-  return moment().subtract(DATE_CONSTANTS.MAX_AGE, "years").format(DATE_CONSTANTS.SERVER_FORMAT);
+  return moment().subtract(DATE_CONSTANTS.MAX_AGE, 'years').format(DATE_CONSTANTS.SERVER_FORMAT);
 };
 
 /**
  * Date input constraints for native date inputs
  * Use with max and min attributes
- * 
+ *
  * @example
  * ```tsx
  * const { today, minDate } = getDateInputConstraints();

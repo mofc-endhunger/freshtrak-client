@@ -1,6 +1,6 @@
 /**
  * StorageService Unit Tests
- * 
+ *
  * Comprehensive test suite for StorageService including:
  * - Core CRUD operations
  * - Error handling scenarios
@@ -8,7 +8,12 @@
  * - Integration scenarios
  */
 
-import { StorageService, CognitoUser, GuestUserProfile, HouseholdSignUpState } from '../StorageService';
+import {
+  StorageService,
+  CognitoUser,
+  GuestUserProfile,
+  HouseholdSignUpState,
+} from '../StorageService';
 import { validateToken } from '../TokenUtils';
 
 // Mock TokenUtils
@@ -129,16 +134,14 @@ describe('StorageService', () => {
         // Check that sessionStorage.setItem was called with the correct key
         expect(window.sessionStorage.setItem).toHaveBeenCalledWith(
           'freshtrak_session_test',
-          JSON.stringify(testData)
+          JSON.stringify(testData),
         );
       });
 
       it('should handle quota exceeded error with cleanup', () => {
         const originalSetItem = window.localStorage.setItem;
         let callCount = 0;
-        const consoleErrorSpy = jest
-          .spyOn(console, 'error')
-          .mockImplementation(() => {});
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
         // Mock setItem to throw QuotaExceededError on first call, succeed on second
         window.localStorage.setItem = jest.fn((key: string, value: string) => {
@@ -155,16 +158,14 @@ describe('StorageService', () => {
 
         expect(window.localStorage.setItem).toHaveBeenCalledTimes(2);
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-          'Storage quota exceeded. Clearing old data...'
+          'Storage quota exceeded. Clearing old data...',
         );
 
         consoleErrorSpy.mockRestore();
       });
 
       it('should throw error if quota exceeded after cleanup fails', () => {
-        const consoleErrorSpy = jest
-          .spyOn(console, 'error')
-          .mockImplementation(() => {});
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
         window.localStorage.setItem = jest.fn(() => {
           const error = new DOMException('Quota exceeded', 'QuotaExceededError');
@@ -175,11 +176,11 @@ describe('StorageService', () => {
           StorageService.setItem('test', { data: 'test' });
         }).toThrow('Storage quota exceeded and cleanup failed');
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-          'Storage quota exceeded. Clearing old data...'
+          'Storage quota exceeded. Clearing old data...',
         );
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           'Failed to store item after cleanup:',
-          expect.any(DOMException)
+          expect.any(DOMException),
         );
 
         consoleErrorSpy.mockRestore();
@@ -682,7 +683,7 @@ describe('StorageService', () => {
       it('should store and retrieve event date ID from session storage', () => {
         StorageService.setRegisteredEventDateID('event-date-123');
         expect(mockSessionStorage['freshtrak_session_registered_event_date_id']).toBe(
-          JSON.stringify('event-date-123')
+          JSON.stringify('event-date-123'),
         );
 
         const result = StorageService.getRegisteredEventDateID();
@@ -703,9 +704,7 @@ describe('StorageService', () => {
     });
 
     it('should handle missing storage gracefully', () => {
-      const consoleWarnSpy = jest
-        .spyOn(console, 'warn')
-        .mockImplementation(() => {});
+      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       // Simulate storage not available
       Object.defineProperty(window, 'localStorage', {
@@ -717,16 +716,14 @@ describe('StorageService', () => {
       expect(() => StorageService.getItem('test')).not.toThrow();
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Error getting item from storage (key: test):',
-        expect.any(TypeError)
+        expect.any(TypeError),
       );
 
       consoleWarnSpy.mockRestore();
     });
 
     it('should handle storage errors in setItem', () => {
-      const consoleErrorSpy = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       window.localStorage.setItem = jest.fn(() => {
         throw new Error('Storage error');
@@ -737,7 +734,7 @@ describe('StorageService', () => {
       }).toThrow('Storage error');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Error setting item in storage (key: test):',
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleErrorSpy.mockRestore();
@@ -779,4 +776,3 @@ describe('StorageService', () => {
     });
   });
 });
-

@@ -17,12 +17,12 @@ export interface TokenValidationResult {
 export const validateToken = (token: string): TokenValidationResult => {
   try {
     // Basic JWT structure validation
-    const tokenParts = token.split(".");
+    const tokenParts = token.split('.');
     if (tokenParts.length !== 3) {
       return {
         isValid: false,
         isExpired: false,
-        error: "Invalid token format"
+        error: 'Invalid token format',
       };
     }
 
@@ -35,7 +35,7 @@ export const validateToken = (token: string): TokenValidationResult => {
       return {
         isValid: false,
         isExpired: false,
-        error: "Token missing expiration claim"
+        error: 'Token missing expiration claim',
       };
     }
 
@@ -46,14 +46,13 @@ export const validateToken = (token: string): TokenValidationResult => {
       isValid: true,
       isExpired,
       expiresAt,
-      error: isExpired ? "Token expired" : undefined
+      error: isExpired ? 'Token expired' : undefined,
     };
-
   } catch (error) {
     return {
       isValid: false,
       isExpired: false,
-      error: `Token validation error: ${error instanceof Error ? error.message : 'Unknown error'}`
+      error: `Token validation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     };
   }
 };

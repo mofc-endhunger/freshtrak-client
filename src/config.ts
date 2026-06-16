@@ -21,6 +21,8 @@ interface EnvConfig {
   USER_POOL_ID: string;
   USER_POOL_CLIENT_ID: string;
   AWS_REGION: string;
+  /** Set to "true" only on approved non-production hosts (e.g. beta2). */
+  ALLOW_DEV_MOCK_IMAGES?: string;
 }
 
 // Check if running in browser with runtime config
@@ -29,7 +31,7 @@ const hasRuntimeConfig = typeof window !== 'undefined' && window._env_;
 function getViteEnv(): Record<string, string | undefined> {
   try {
     const viteEnvAccessor = new Function(
-      'return (typeof import.meta !== "undefined" && import.meta.env) ? import.meta.env : {};'
+      'return (typeof import.meta !== "undefined" && import.meta.env) ? import.meta.env : {};',
     );
     const viteEnv = viteEnvAccessor();
     if (viteEnv && typeof viteEnv === 'object') {
@@ -62,11 +64,7 @@ function getConfig(key: keyof EnvConfig): string {
     {};
 
   return (
-    viteEnv[reactAppKey] ||
-    viteEnv[viteKey] ||
-    processEnv[reactAppKey] ||
-    processEnv[viteKey] ||
-    ''
+    viteEnv[reactAppKey] || viteEnv[viteKey] || processEnv[reactAppKey] || processEnv[viteKey] || ''
   );
 }
 
@@ -87,6 +85,7 @@ export const config: EnvConfig = {
   USER_POOL_ID: getConfig('USER_POOL_ID'),
   USER_POOL_CLIENT_ID: getConfig('USER_POOL_CLIENT_ID'),
   AWS_REGION: getConfig('AWS_REGION'),
+  ALLOW_DEV_MOCK_IMAGES: getConfig('ALLOW_DEV_MOCK_IMAGES') || undefined,
 };
 
 export default config;

@@ -1,2 +1,1 @@
-export * from "./memberUtils";
-
+export * from './memberUtils';

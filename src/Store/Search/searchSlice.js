@@ -9,10 +9,10 @@ export const searchAddressSlice = createSlice({
     setCurrentZip(state, action) {
       const { payload } = action;
       state.zipCode = payload;
-    }
-  }
+    },
+  },
 });
 
 export const { setCurrentZip } = searchAddressSlice.actions;
-export const selectZip = state => state.addressSearch.zipCode;
+export const selectZip = (state) => state.addressSearch.zipCode;
 export default searchAddressSlice.reducer;

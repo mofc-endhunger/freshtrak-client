@@ -16,7 +16,7 @@ test('should render without errors', () => {
     renderWithRouter(
       <Provider store={store}>
         <HeaderDataComponent />
-      </Provider>
+      </Provider>,
     );
   }).not.toThrow();
 });
@@ -28,7 +28,7 @@ test(`should render 'Find food resources...' if location is not the event list u
     </Provider>,
     {
       route: RENDER_URL.REGISTRATION_FORM_URL,
-    }
+    },
   );
   getByTestId('subtext-on-header');
 });
@@ -41,7 +41,7 @@ test(`should render 'Resource Events in zip...' if location is the event list ur
     </Provider>,
     {
       route: RENDER_URL.EVENT_LIST_URL,
-    }
+    },
   );
   getByText(/resource events in zip code 43065/i);
 });

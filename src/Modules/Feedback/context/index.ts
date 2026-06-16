@@ -1,5 +1,1 @@
-export {
-    FeedbackProvider,
-    useFeedback,
-    default as FeedbackContext,
-} from "./FeedbackContext";
+export { FeedbackProvider, useFeedback, default as FeedbackContext } from './FeedbackContext';

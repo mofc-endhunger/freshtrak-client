@@ -124,7 +124,7 @@ const ChatBotWindow: React.FC<ChatBotWindowProps> = ({ onClose }) => {
 
   return (
     <Card
-      className="fixed bottom-20 right-4 w-[360px] h-[500px] z-50 flex flex-col gap-0 py-0 bg-white shadow-xl border sm:right-6"
+      className="fixed bottom-20 right-4 w-[360px] h-[500px] max-h-[calc(100vh-9rem)] z-[10000] flex flex-col gap-0 py-0 bg-white shadow-xl border sm:right-6"
       data-testid="chatbot-window"
     >
       {/* Header */}

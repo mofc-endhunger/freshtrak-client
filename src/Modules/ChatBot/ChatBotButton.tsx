@@ -14,7 +14,7 @@ const ChatBotButton: React.FC = () => {
 
       <Button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed bottom-4 right-4 z-50 size-12 rounded-full shadow-lg sm:right-6"
+        className="fixed bottom-4 right-4 z-[10000] size-12 rounded-full shadow-lg sm:right-6"
         size="icon"
         aria-label={isOpen ? 'Close chat' : 'Open chat'}
         data-testid="chatbot-toggle"

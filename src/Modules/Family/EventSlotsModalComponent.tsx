@@ -380,7 +380,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
           </DialogDescription>
         </VisuallyHidden>
         <DialogContent
-          className="sm:max-w-md bg-highlight border-none text-white"
+          className="sm:max-w-md bg-highlight border-none text-white flex flex-col max-h-[90vh]"
           onPointerDownOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
           showCloseButton={false}
@@ -401,7 +401,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
                 'Select an available time slot for your registration.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="container py-4">
+          <div className="container py-4 overflow-y-auto flex-1 min-h-0">
             {isLoading ? (
               <div
                 className="flex justify-center py-4"

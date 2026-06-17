@@ -104,14 +104,19 @@ test.describe('Home / Dashboard Page', () => {
 
   test('mobile menu button appears on small viewport', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(ROUTES.home);
+    await page.goto(ROUTES.home, { waitUntil: 'domcontentloaded' });
+    await page.getByTestId(SEL.headerNav).waitFor({ timeout: 10_000 });
 
     await expect(page.getByTestId(SEL.mobileMenuButton)).toBeVisible();
   });
 
   test('mobile menu shows navigation links', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(ROUTES.home);
+    await page.goto(ROUTES.home, { waitUntil: 'domcontentloaded' });
+    // Wait for the nav to fully settle before interacting — mirrors the
+    // beforeEach stabilization pattern; without this Firefox times out
+    // clicking the mobile-menu button due to fixed-nav rendering lag.
+    await page.getByTestId(SEL.headerNav).waitFor({ timeout: 10_000 });
 
     await page.getByTestId(SEL.mobileMenuButton).click();
     await expect(page.getByTestId(SEL.mobileMenuDialog)).toBeVisible();

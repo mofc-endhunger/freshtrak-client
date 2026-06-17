@@ -93,8 +93,13 @@ const UserAccountButton: React.FC = () => {
     return null;
   }
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open) window.dispatchEvent(new Event('freshtrak:close-chatbot'));
+  };
+
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
       <div className="relative">
         <DropdownMenuTrigger asChild>
           <button

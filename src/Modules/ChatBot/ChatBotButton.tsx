@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 
 import { Button } from '../../components/ui/button';
 
 import ChatBotWindow from './ChatBotWindow';
 
+const CLOSE_CHATBOT_EVENT = 'freshtrak:close-chatbot';
+
 const ChatBotButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleCloseRequest = () => setIsOpen(false);
+    window.addEventListener(CLOSE_CHATBOT_EVENT, handleCloseRequest);
+    return () => window.removeEventListener(CLOSE_CHATBOT_EVENT, handleCloseRequest);
+  }, []);
 
   return (
     <>

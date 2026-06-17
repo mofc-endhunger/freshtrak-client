@@ -50,6 +50,7 @@ export const SEL = {
   eventCard: 'event-card',
   eventDetailsToggle: 'event-details-toggle',
   eventReserveButton: 'event-reserve-button',
+  eventRsvpButton: 'event-rsvp-button',
   eventDirectionsLink: 'event-directions-link',
   noEventsMessage: 'no-events-message',
 

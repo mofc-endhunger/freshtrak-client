@@ -13,6 +13,8 @@ interface FeatureCardProps {
   imageUrl: string;
   /** Optional CSS class names for additional styling */
   className?: string;
+  /** Optional action element (e.g. a button) rendered below the content */
+  action?: React.ReactNode;
 }
 
 /**
@@ -36,7 +38,13 @@ interface FeatureCardProps {
  * />
  * ```
  */
-const FeatureCard: React.FC<FeatureCardProps> = ({ title, content, imageUrl, className = '' }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({
+  title,
+  content,
+  imageUrl,
+  className = '',
+  action,
+}) => {
   return (
     <Card className={`h-full ${className}`} data-testid="feature-card">
       <CardHeader className="text-center pb-4">
@@ -47,6 +55,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, content, imageUrl, cla
       </CardHeader>
       <CardContent className="text-center">
         <p className="text-sm text-muted-foreground leading-relaxed">{content}</p>
+        {action && <div className="mt-4">{action}</div>}
       </CardContent>
     </Card>
   );

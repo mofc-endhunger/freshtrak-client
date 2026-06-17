@@ -20,6 +20,15 @@ async function openTimeslotDialog(
   });
   await page.getByTestId(SEL.eventListPage).waitFor({ timeout: 30_000 });
 
+  // Expand the distance to "All distances" so reservation events outside the
+  // default 10-mile radius are included. Without this, only RSVP-only events
+  // may be visible and the timeslot dialog will never open.
+  await expect(page.getByTestId(SEL.filterDistance)).toBeVisible({ timeout: 15_000 });
+  await page.getByTestId(SEL.filterDistance).getByRole('combobox').click();
+  await page.getByRole('option', { name: /all distances/i }).click();
+  // Wait for the page to finish navigating and re-render with the new distance
+  await page.getByTestId(SEL.eventListPage).waitFor({ timeout: 15_000 });
+
   // Enable Reservations Only filter
   await expect(page.getByTestId(SEL.filterReservations)).toBeVisible({
     timeout: 15_000,

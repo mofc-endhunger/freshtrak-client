@@ -136,7 +136,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
     window.open(directionsUrl, '_blank');
   };
 
-  const getButton = (buttonName: string, targetUrl: string) => {
+  const getButton = (buttonName: string, targetUrl: string, testId: string) => {
     const buttonClass =
       variant === 'list'
         ? 'btn bg-[#392947] text-white py-1.5 lg:py-2 rounded-lg text-[10px] lg:text-xs font-bold uppercase min-h-[32px] lg:min-h-[36px] w-full'
@@ -146,7 +146,7 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
         <button
           type="button"
           className={buttonClass}
-          data-testid="event-reserve-button"
+          data-testid={testId}
           onClick={() => {
             // Store the current search results URL before navigating to event details
             const currentPath = window.location.pathname;
@@ -173,9 +173,9 @@ const EventCardComponent: React.FC<EventCardComponentProps> = (props) => {
       return null;
     }
     if (acceptReservations) {
-      return getButton(localization.button_reserve_time, targetUrl);
+      return getButton(localization.button_reserve_time, targetUrl, 'event-reserve-button');
     } else if (showRsvp) {
-      return getButton(localization.button_rsvp, targetUrl);
+      return getButton(localization.button_rsvp, targetUrl, 'event-rsvp-button');
     } else {
       return null;
     }

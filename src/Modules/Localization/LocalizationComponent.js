@@ -8,8 +8,8 @@ const localization = new LocalizedStrings({
       'Create a username and password to create FreshTrak account.',
     home_stay: 'Stay Up to Date',
     home_findfood: 'Find Food',
-    home_comming_soon:
-      'Coming soon... Make a FreshTrak account to stay up to date on local food access events.',
+    home_comming_soon: 'Make a FreshTrak account to stay up to date on local food access events.',
+    home_create_account_button: 'Create Account',
     home_zip_details:
       'Enter your zip code and get connected to food access resources in your community.',
     home_header_component:
@@ -891,7 +891,8 @@ const localization = new LocalizedStrings({
     home_stay: 'manténgase al tanto',
     home_findfood: 'Encontrar comida',
     home_comming_soon:
-      'Próximamente ... Cree una cuenta FreshTrak para mantenerse al tanto sobre los eventos locales de acceso a alimentos.',
+      'Cree una cuenta FreshTrak para mantenerse al tanto sobre los eventos locales de acceso a alimentos.',
+    home_create_account_button: 'Crear cuenta',
     home_zip_details:
       'Rellena con su código postal y conéctese a los recursos de acceso a alimentos en su comunidad.',
     home_header_component:
@@ -1779,7 +1780,8 @@ const localization = new LocalizedStrings({
     home_stay: 'La Soco Ilaa Taariikhda',
     home_findfood: 'Cunno hel',
     home_comming_soon:
-      'Goor dhow imaanaya ... Samee xisaab FreshTrak ah si aad ula socotid dhacdooyinka helitaanka cuntada ee maxalliga ah.',
+      'Samee xisaab FreshTrak ah si aad ula socotid dhacdooyinka helitaanka cuntada ee maxalliga ah.',
+    home_create_account_button: 'Samee Xisaab',
     home_zip_details:
       'Gali nambarkaaga sifo aadna ugu xirnaato ilaha helitaanka cuntada ee bulshadaada.',
     home_header_component:
@@ -2664,7 +2666,8 @@ const localization = new LocalizedStrings({
     home_stay: 'Будьте в курсе',
     home_findfood: 'Найти еду',
     home_comming_soon:
-      'Скоро ... Создайте учетную запись FreshTrak, чтобы быть в курсе местных событий по доступу к еде.',
+      'Создайте учетную запись FreshTrak, чтобы быть в курсе местных событий по доступу к еде.',
+    home_create_account_button: 'Создать аккаунт',
     home_zip_details:
       'Введите свой почтовый индекс и подключитесь к ресурсам по доступу к еде в вашем районе.',
     home_header_component:
@@ -3556,7 +3559,8 @@ const localization = new LocalizedStrings({
     home_stay: 'Güncel kal',
     home_findfood: 'Yiyecek bul',
     home_comming_soon:
-      'Yakında ... Yerel yiyecek erişim etkinliklerinden haberdar olmak için bir FreshTrak hesabı oluşturun.',
+      'Yerel yiyecek erişim etkinliklerinden haberdar olmak için bir FreshTrak hesabı oluşturun.',
+    home_create_account_button: 'Hesap Oluştur',
     home_zip_details:
       'Posta kodunuzu girin ve topluluğunuzdaki yiyecek erişim kaynaklarına bağlanın.',
     home_header_component:
@@ -4438,7 +4442,8 @@ const localization = new LocalizedStrings({
     home_stay: 'ابق على اطلاع',
     home_findfood: 'ابحث عن الطعام',
     home_comming_soon:
-      'قريبًا ... قم بإنشاء حساب FreshTrak للبقاء على اطلاع دائم بأحداث الوصول إلى الطعام المحلي.',
+      'قم بإنشاء حساب FreshTrak للبقاء على اطلاع دائم بأحداث الوصول إلى الطعام المحلي.',
+    home_create_account_button: 'إنشاء حساب',
     home_zip_details: 'أدخل الرمز البريدي الخاص بك واتصل بموارد الوصول إلى الطعام في مجتمعك.',
     home_header_component:
       'نحن هنا للمساعدة! أدخل الرمز البريدي الخاص بك للعثور على موارد الوصول إلى الطعام في مجتمعك.',
@@ -5303,7 +5308,8 @@ const localization = new LocalizedStrings({
     description_create_account_username_password: '创建用户名和密码以创建 FreshTrak 账户。',
     home_stay: '保持最新',
     home_findfood: '找食物',
-    home_comming_soon: '即將推出...註冊一個FreshTrak帳戶，以隨時了解當地的食物獲取活動。',
+    home_comming_soon: '註冊一個FreshTrak帳戶，以隨時了解當地的食物獲取活動。',
+    home_create_account_button: '创建账户',
     home_zip_details: '輸入您的郵政編碼，並連接到您社區中的食物獲取資源。',
     home_header_component: '我们在这里为您提供帮助！输入您的邮政编码以查找社区中的食物获取资源。',
     home_dashboard: '服务更多家庭',
@@ -6158,7 +6164,8 @@ const localization = new LocalizedStrings({
     home_stay: 'अद्यतन रहना',
     home_findfood: 'भोजन तलाशें',
     home_comming_soon:
-      'जल्द ही आ रहा है ... स्थानीय भोजन के उपयोग की घटनाओं पर तारीख तक रहने के लिए एक FreshTrak खाता बनाएँ।',
+      'स्थानीय भोजन के उपयोग की घटनाओं पर तारीख तक रहने के लिए एक FreshTrak खाता बनाएँ।',
+    home_create_account_button: 'खाता बनाएं',
     home_zip_details: 'अपना ज़िप कोड दर्ज करें और अपने समुदाय में भोजन पहुंच संसाधनों से जुड़े।',
     home_header_component:
       'हमलोग यहां सहायता करने के लिए हैं! अपने समुदाय में खाद्य पहुंच संसाधनों को खोजने के लिए अपना ज़िप कोड इनपुट करें।',
@@ -7036,8 +7043,8 @@ const localization = new LocalizedStrings({
       'FreshTrak खाता बनाउनको लागि प्रयोगकर्ता नाम र पासवर्ड बनाउनुहोस्।',
     home_stay: 'अद्यावधिक रहनुहोस्',
     home_findfood: 'खाना खोज्नुहोस्',
-    home_comming_soon:
-      'चाँडै आउँदैछ ... स्थानीय खाना पहुँच घटनाहरूमा अद्यावधिक रहन एक नयाँ ताजा खाता बनाउनुहोस्।',
+    home_comming_soon: 'स्थानीय खाना पहुँच घटनाहरूमा अद्यावधिक रहन FreshTrak खाता बनाउनुहोस्।',
+    home_create_account_button: 'खाता बनाउनुहोस्',
     home_zip_details:
       'तपाईंको जिप कोड प्रविष्ट गर्नुहोस् र तपाईंको समुदायमा खाना पहुँच स्रोतहरूमा जडान हुनुहोस्।',
     home_header_component:

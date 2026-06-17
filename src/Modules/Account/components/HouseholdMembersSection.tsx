@@ -31,7 +31,7 @@ const HouseholdMembersSection: React.FC<HouseholdMembersSectionProps> = ({ house
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="household-members-section">
       {/* Section Header */}
       <h2 className="font-noto-sans font-semibold text-lg text-gray-900">
         {localization.title_household_members || 'Household Members'}
@@ -66,6 +66,7 @@ const HouseholdMembersSection: React.FC<HouseholdMembersSectionProps> = ({ house
           variant="link"
           onClick={handleUpdateHousehold}
           className="font-noto-sans text-sm text-highlight underline hover:text-highlight/80"
+          data-testid="update-household-button"
         >
           {localization.link_update_household || 'Update Household'}
         </Button>

@@ -23,6 +23,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ viewMode, onViewModeChange }) =
         className="h-8 w-8 p-0"
         aria-label="Grid view"
         aria-pressed={viewMode === 'grid'}
+        data-testid="view-toggle-grid"
       >
         <LayoutGrid className="w-4 h-4" />
       </Button>
@@ -33,6 +34,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ viewMode, onViewModeChange }) =
         className="h-8 w-8 p-0"
         aria-label="Map with list view"
         aria-pressed={viewMode === 'list'}
+        data-testid="view-toggle-list"
       >
         <Map className="w-4 h-4" />
       </Button>

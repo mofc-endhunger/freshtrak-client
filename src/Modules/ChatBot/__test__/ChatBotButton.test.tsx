@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { act } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
@@ -79,6 +79,30 @@ describe('ChatBotButton', () => {
       expect(screen.getByTestId('chatbot-window')).toBeInTheDocument();
 
       await user.click(screen.getByTestId('chatbot-close'));
+      expect(screen.queryByTestId('chatbot-window')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Nav dropdown auto-close', () => {
+    it('closes the chat window when freshtrak:close-chatbot event is dispatched', async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
+      await user.click(screen.getByTestId('chatbot-toggle'));
+      expect(screen.getByTestId('chatbot-window')).toBeInTheDocument();
+
+      act(() => {
+        window.dispatchEvent(new Event('freshtrak:close-chatbot'));
+      });
+
+      expect(screen.queryByTestId('chatbot-window')).not.toBeInTheDocument();
+    });
+
+    it('does not error when event fires while chatbot is already closed', () => {
+      renderComponent();
+      expect(() => {
+        window.dispatchEvent(new Event('freshtrak:close-chatbot'));
+      }).not.toThrow();
       expect(screen.queryByTestId('chatbot-window')).not.toBeInTheDocument();
     });
   });

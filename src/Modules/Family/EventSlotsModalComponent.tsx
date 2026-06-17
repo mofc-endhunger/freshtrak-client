@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useRef, useState, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -102,6 +102,13 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
   const [isLoadingHousehold, setIsLoadingHousehold] = useState(false);
   const [householdError, setHouseholdError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<EventSlot | null>(null);
+  const isMountedRef = useRef(true);
+
+  const safeSetState = (callback: () => void) => {
+    if (isMountedRef.current) {
+      callback();
+    }
+  };
 
   // Services
   const householdRegistrationService = new HouseholdRegistrationService();
@@ -130,28 +137,30 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
     const slot = findEventSlot(slotId);
     if (!slot) return;
 
-    setSelectedSlot(slot);
-    setIsLoadingHousehold(true);
-    setHouseholdError(null);
+    safeSetState(() => {
+      setSelectedSlot(slot);
+      setIsLoadingHousehold(true);
+      setHouseholdError(null);
+    });
 
     // If user is not authenticated (guest user), skip household data fetch
     if (!isAuthenticated) {
       navigateToRegistration(slot, null);
-      setIsLoadingHousehold(false);
+      safeSetState(() => setIsLoadingHousehold(false));
       return;
     }
 
     // Case managers register on behalf of others; never prefill or confirm their own household
     if (StorageService.isCaseManager()) {
       navigateToRegistration(slot, null);
-      setIsLoadingHousehold(false);
+      safeSetState(() => setIsLoadingHousehold(false));
       return;
     }
 
     try {
       // Fetch household data only for authenticated users
       const household = await householdsApiService.getUsersMe();
-      setHouseholdData(household);
+      safeSetState(() => setHouseholdData(household));
 
       // Check if user has completed household setup by verifying DOB is not placeholder
       // When household is auto-created on signup, DOB defaults to "1900-01-01"
@@ -164,17 +173,17 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 
       if (hasCompletedSetup) {
         // Show confirmation modal for users who completed household setup
-        setShowHouseholdModal(true);
+        safeSetState(() => setShowHouseholdModal(true));
       } else {
         // Proceed directly to registration form with prefilled data
         navigateToRegistration(slot, household);
       }
     } catch (error) {
-      setHouseholdError(localization.error_failed_load_household);
+      safeSetState(() => setHouseholdError(localization.error_failed_load_household));
       // Proceed to registration form without prefilled data
       navigateToRegistration(slot, null);
     } finally {
-      setIsLoadingHousehold(false);
+      safeSetState(() => setIsLoadingHousehold(false));
     }
   };
 
@@ -190,7 +199,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
         },
       },
     );
-    setShow(false);
+    safeSetState(() => setShow(false));
   };
 
   // Check if error message indicates "already registered"
@@ -214,8 +223,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
   const handleHouseholdConfirm = async () => {
     if (!selectedSlot) return;
 
-    setIsLoadingHousehold(true);
-    setHouseholdError(null);
+    safeSetState(() => {
+      setIsLoadingHousehold(true);
+      setHouseholdError(null);
+    });
 
     try {
       // Send additional-member counts (HOH excluded) to the reservation endpoint.
@@ -246,15 +257,19 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
             user: transformHouseholdDataToUserData(householdData),
           },
         });
-        setShowHouseholdModal(false);
-        setShow(false);
+        safeSetState(() => {
+          setShowHouseholdModal(false);
+          setShow(false);
+        });
       } else {
         // Check for "already registered" error
         const errorMessage = result.error || localization.error_registration_failed;
         if (isAlreadyRegisteredError(errorMessage)) {
           // Redirect to already registered page instead of showing error
-          setShowHouseholdModal(false);
-          setShow(false);
+          safeSetState(() => {
+            setShowHouseholdModal(false);
+            setShow(false);
+          });
           navigate(RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL, {
             state: {
               eventName: event?.agencyName || event?.name,
@@ -265,7 +280,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
 
         // Registration failed - show error for other errors
         console.warn('Household registration failed:', result.error);
-        setHouseholdError(errorMessage);
+        safeSetState(() => setHouseholdError(errorMessage));
       }
     } catch (error: any) {
       console.error('Household registration error:', error);
@@ -280,8 +295,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
         (error?.response?.data && isAlreadyRegisteredError(JSON.stringify(error.response.data)))
       ) {
         // Redirect to already registered page
-        setShowHouseholdModal(false);
-        setShow(false);
+        safeSetState(() => {
+          setShowHouseholdModal(false);
+          setShow(false);
+        });
         navigate(RENDER_URL.REGISTRATION_ALREADY_REGISTERED_URL, {
           state: {
             eventName: event?.agencyName || event?.name,
@@ -290,9 +307,9 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
         return;
       }
 
-      setHouseholdError(errorMessage);
+      safeSetState(() => setHouseholdError(errorMessage));
     } finally {
-      setIsLoadingHousehold(false);
+      safeSetState(() => setIsLoadingHousehold(false));
     }
   };
 
@@ -303,8 +320,10 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
   };
 
   const handleHouseholdModalClose = () => {
-    setShowHouseholdModal(false);
-    setHouseholdError(null);
+    safeSetState(() => {
+      setShowHouseholdModal(false);
+      setHouseholdError(null);
+    });
   };
 
   const handleBackHome = () => {
@@ -312,26 +331,33 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
   };
 
   useEffect(() => {
+    isMountedRef.current = true;
     if (acceptReservations === 1 && eventDateId) {
       handleShow();
       getEventHours(eventDateId);
     }
+
+    return () => {
+      isMountedRef.current = false;
+    };
   }, [eventDateId, acceptReservations]);
 
   const getEventHours = async (eventDateId: string) => {
-    setIsLoading(true);
+    safeSetState(() => setIsLoading(true));
     try {
       const { EVENT_DATES_URL } = API_URL;
       const resp = await axios.get(EVENT_DATES_URL + '/' + eventDateId + '/event_hours');
       const { data } = resp;
       if (data && data.event_date && data.event_date.event_hours !== undefined) {
-        setEventHour(data.event_date.event_hours);
-        setEventDate(data.event_date.date);
+        safeSetState(() => {
+          setEventHour(data.event_date.event_hours);
+          setEventDate(data.event_date.date);
+        });
       }
     } catch (e) {
       // Error handling for event slot selection
     } finally {
-      setIsLoading(false);
+      safeSetState(() => setIsLoading(false));
     }
   };
 
@@ -358,6 +384,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
           onPointerDownOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
           showCloseButton={false}
+          data-testid="timeslot-dialog"
         >
           <DialogHeader>
             <DialogTitle
@@ -374,7 +401,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
                 'Select an available time slot for your registration.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="container py-4">
+          <div className="container py-4 overflow-y-auto max-h-[45vh]">
             {isLoading ? (
               <div
                 className="flex justify-center py-4"
@@ -388,7 +415,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
                 if (!hasAvailableSlots) {
                   return (
                     <div className="text-center py-6 px-4">
-                      <p className="text-sm leading-relaxed">
+                      <p className="text-sm leading-relaxed" data-testid="no-timeslots-message">
                         {localization.event_slots_no_available_message}
                       </p>
                     </div>
@@ -446,6 +473,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
               onClick={backHome}
               className="w-full sm:w-auto bg-white text-highlight min-h-12 uppercase"
               aria-describedby="back-button-description"
+              data-testid="timeslot-go-back"
             >
               {localization.button_go_back}
             </Button>
@@ -456,6 +484,7 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
                 className="w-full sm:w-auto flex-1 bg-primary text-white min-h-12 uppercase"
                 onClick={() => selectedSlotId && handleSlotSelection(selectedSlotId)}
                 aria-describedby="continue-button-description"
+                data-testid="timeslot-save-continue"
               >
                 {isLoadingHousehold
                   ? localization.loading_loading

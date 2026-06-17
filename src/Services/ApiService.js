@@ -33,12 +33,12 @@ const build_content = (first_name, identification_code, event, location) => {
 
 export const sendRegistrationConfirmationEmail = async (user, event, location) => {
   const { SEND_EMAIL } = API_URL;
-  let first_name = user['first_name'];
-  let identification_code = user['identification_code'];
-  let from = CONFIRMATION_EMAIL['FROM'];
-  let subject = CONFIRMATION_EMAIL['SUBJECT'];
-  let to = user['email'];
-  let content = build_content(first_name, identification_code, event, location);
+  const first_name = user['first_name'];
+  const identification_code = user['identification_code'];
+  const from = CONFIRMATION_EMAIL['FROM'];
+  const subject = CONFIRMATION_EMAIL['SUBJECT'];
+  const to = user['email'];
+  const content = build_content(first_name, identification_code, event, location);
   try {
     await axios.post(SEND_EMAIL, { from, subject, to, content });
   } catch (e) {

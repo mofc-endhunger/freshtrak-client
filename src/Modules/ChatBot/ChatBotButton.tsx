@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 
 import { Button } from '../../components/ui/button';
 
 import ChatBotWindow from './ChatBotWindow';
 
+const CLOSE_CHATBOT_EVENT = 'freshtrak:close-chatbot';
+
 const ChatBotButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleCloseRequest = () => setIsOpen(false);
+    window.addEventListener(CLOSE_CHATBOT_EVENT, handleCloseRequest);
+    return () => window.removeEventListener(CLOSE_CHATBOT_EVENT, handleCloseRequest);
+  }, []);
 
   return (
     <>
@@ -14,7 +22,7 @@ const ChatBotButton: React.FC = () => {
 
       <Button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed bottom-4 right-4 z-50 size-12 rounded-full shadow-lg sm:right-6"
+        className="fixed bottom-4 right-4 z-[10000] size-12 rounded-full shadow-lg sm:right-6"
         size="icon"
         aria-label={isOpen ? 'Close chat' : 'Open chat'}
         data-testid="chatbot-toggle"

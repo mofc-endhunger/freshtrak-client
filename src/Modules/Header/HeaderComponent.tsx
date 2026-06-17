@@ -178,6 +178,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
           overflow: 'visible',
         }}
         id="mainNav"
+        data-testid="header-nav"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ overflow: 'visible' }}>
           <div
@@ -186,7 +187,11 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
           >
             {/* Logo - centered on desktop, left-aligned on mobile */}
             <div className="md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
-              <Link to={RENDER_URL.ROOT_URL} className="flex items-center">
+              <Link
+                to={RENDER_URL.ROOT_URL}
+                className="flex items-center"
+                data-testid="header-logo"
+              >
                 <img
                   src={mainLogo}
                   alt={localization.alt_freshtrak_logo}
@@ -206,6 +211,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
                       variant="ghost"
                       className="text-white font-bold text-xs md:text-sm hover:text-white focus:outline-none"
                       onClick={() => navigate(RENDER_URL.LOGIN_URL)}
+                      data-testid="header-signin-button"
                     >
                       {localization.button_sign_in.toUpperCase()}
                     </Button>
@@ -228,6 +234,7 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
                   <button
                     className="md:hidden text-white p-2 hover:bg-white/10 rounded-md transition-colors"
                     aria-label={localization.aria_open_mobile_menu}
+                    data-testid="mobile-menu-button"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -239,7 +246,10 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({ shortHeader }) => {
                     </svg>
                   </button>
                 </DialogTrigger>
-                <DialogContent className="w-[300px] bg-primary text-white border-none">
+                <DialogContent
+                  className="w-[300px] bg-primary text-white border-none"
+                  data-testid="mobile-menu-dialog"
+                >
                   <DialogHeader>
                     <DialogTitle className="text-white">{localization.title_menu}</DialogTitle>
                     <DialogDescription></DialogDescription>

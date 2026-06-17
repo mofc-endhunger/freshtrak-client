@@ -8,8 +8,8 @@ const localization = new LocalizedStrings({
       'Create a username and password to create FreshTrak account.',
     home_stay: 'Stay Up to Date',
     home_findfood: 'Find Food',
-    home_comming_soon:
-      'Coming soon... Make a FreshTrak account to stay up to date on local food access events.',
+    home_comming_soon: 'Make a FreshTrak account to stay up to date on local food access events.',
+    home_create_account_button: 'Create Account',
     home_zip_details:
       'Enter your zip code and get connected to food access resources in your community.',
     home_header_component:
@@ -881,10 +881,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Have you saved or printed the confirmation information? This data will not be available after you leave this page.',
     family_member_count_plural: 'family members',
-    button_view_photos: 'View Photos',
-    label_location_photos: 'Location',
-    label_event_instructions: 'Event Info',
-    label_more_photos: '+{0} more',
   },
 
   spa: {
@@ -895,7 +891,8 @@ const localization = new LocalizedStrings({
     home_stay: 'manténgase al tanto',
     home_findfood: 'Encontrar comida',
     home_comming_soon:
-      'Próximamente ... Cree una cuenta FreshTrak para mantenerse al tanto sobre los eventos locales de acceso a alimentos.',
+      'Cree una cuenta FreshTrak para mantenerse al tanto sobre los eventos locales de acceso a alimentos.',
+    home_create_account_button: 'Crear cuenta',
     home_zip_details:
       'Rellena con su código postal y conéctese a los recursos de acceso a alimentos en su comunidad.',
     home_header_component:
@@ -1774,10 +1771,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       '¿Ha guardado o impreso la información de confirmación? Estos datos no estarán disponibles después de salir de esta página.',
     family_member_count_plural: 'miembros de la familia',
-    button_view_photos: 'Ver Fotos',
-    label_location_photos: 'Ubicación',
-    label_event_instructions: 'Info del Evento',
-    label_more_photos: '+{0} más',
   },
   som: {
     home_freshtrack: 'FreshTrak waxay halkan u joogtaa inay ku caawiso!',
@@ -1787,7 +1780,8 @@ const localization = new LocalizedStrings({
     home_stay: 'La Soco Ilaa Taariikhda',
     home_findfood: 'Cunno hel',
     home_comming_soon:
-      'Goor dhow imaanaya ... Samee xisaab FreshTrak ah si aad ula socotid dhacdooyinka helitaanka cuntada ee maxalliga ah.',
+      'Samee xisaab FreshTrak ah si aad ula socotid dhacdooyinka helitaanka cuntada ee maxalliga ah.',
+    home_create_account_button: 'Samee Xisaab',
     home_zip_details:
       'Gali nambarkaaga sifo aadna ugu xirnaato ilaha helitaanka cuntada ee bulshadaada.',
     home_header_component:
@@ -2663,10 +2657,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Ma keydisay ama daabacday macluumaadka xaqiijinta? Xogtan lama heli doono markaad ka tagto boggan.',
     family_member_count_plural: 'xubnaha qoyska',
-    button_view_photos: 'Eeg Sawirrada',
-    label_location_photos: 'Goobta',
-    label_event_instructions: 'Macluumaadka Dhacdada',
-    label_more_photos: '+{0} dheeraad ah',
   },
   rus: {
     home_freshtrack: 'FreshTrak здесь, чтобы помочь!',
@@ -2676,7 +2666,8 @@ const localization = new LocalizedStrings({
     home_stay: 'Будьте в курсе',
     home_findfood: 'Найти еду',
     home_comming_soon:
-      'Скоро ... Создайте учетную запись FreshTrak, чтобы быть в курсе местных событий по доступу к еде.',
+      'Создайте учетную запись FreshTrak, чтобы быть в курсе местных событий по доступу к еде.',
+    home_create_account_button: 'Создать аккаунт',
     home_zip_details:
       'Введите свой почтовый индекс и подключитесь к ресурсам по доступу к еде в вашем районе.',
     home_header_component:
@@ -3559,10 +3550,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Вы сохранили или распечатали информацию о подтверждении? Эти данные будут недоступны после того, как вы покинете эту страницу.',
     family_member_count_plural: 'членов семьи',
-    button_view_photos: 'Просмотреть Фото',
-    label_location_photos: 'Местоположение',
-    label_event_instructions: 'Информация о Мероприятии',
-    label_more_photos: '+{0} ещё',
   },
   tur: {
     home_freshtrack: 'FreshTrak yardım etmek için burada!',
@@ -3572,7 +3559,8 @@ const localization = new LocalizedStrings({
     home_stay: 'Güncel kal',
     home_findfood: 'Yiyecek bul',
     home_comming_soon:
-      'Yakında ... Yerel yiyecek erişim etkinliklerinden haberdar olmak için bir FreshTrak hesabı oluşturun.',
+      'Yerel yiyecek erişim etkinliklerinden haberdar olmak için bir FreshTrak hesabı oluşturun.',
+    home_create_account_button: 'Hesap Oluştur',
     home_zip_details:
       'Posta kodunuzu girin ve topluluğunuzdaki yiyecek erişim kaynaklarına bağlanın.',
     home_header_component:
@@ -4445,10 +4433,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Onay bilgilerini kaydettiniz veya yazdırdınız mı? Bu sayfadan ayrıldıktan sonra bu veriler kullanılamayacaktır.',
     family_member_count_plural: 'aile üyeleri',
-    button_view_photos: 'Fotoğrafları Görüntüle',
-    label_location_photos: 'Konum',
-    label_event_instructions: 'Etkinlik Bilgileri',
-    label_more_photos: '+{0} daha',
   },
   ara: {
     home_freshtrack: 'FreshTrak هنا للمساعدة!',
@@ -4458,7 +4442,8 @@ const localization = new LocalizedStrings({
     home_stay: 'ابق على اطلاع',
     home_findfood: 'ابحث عن الطعام',
     home_comming_soon:
-      'قريبًا ... قم بإنشاء حساب FreshTrak للبقاء على اطلاع دائم بأحداث الوصول إلى الطعام المحلي.',
+      'قم بإنشاء حساب FreshTrak للبقاء على اطلاع دائم بأحداث الوصول إلى الطعام المحلي.',
+    home_create_account_button: 'إنشاء حساب',
     home_zip_details: 'أدخل الرمز البريدي الخاص بك واتصل بموارد الوصول إلى الطعام في مجتمعك.',
     home_header_component:
       'نحن هنا للمساعدة! أدخل الرمز البريدي الخاص بك للعثور على موارد الوصول إلى الطعام في مجتمعك.',
@@ -5316,10 +5301,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'هل قمت بحفظ أو طباعة معلومات التأكيد؟ لن تكون هذه البيانات متاحة بعد مغادرة هذه الصفحة.',
     family_member_count_plural: 'أفراد الأسرة',
-    button_view_photos: 'عرض الصور',
-    label_location_photos: 'الموقع',
-    label_event_instructions: 'معلومات الفعالية',
-    label_more_photos: '+{0} المزيد',
   },
   zho: {
     home_freshtrack: 'FreshTrak在這里為您提供幫助',
@@ -5327,7 +5308,8 @@ const localization = new LocalizedStrings({
     description_create_account_username_password: '创建用户名和密码以创建 FreshTrak 账户。',
     home_stay: '保持最新',
     home_findfood: '找食物',
-    home_comming_soon: '即將推出...註冊一個FreshTrak帳戶，以隨時了解當地的食物獲取活動。',
+    home_comming_soon: '註冊一個FreshTrak帳戶，以隨時了解當地的食物獲取活動。',
+    home_create_account_button: '创建账户',
     home_zip_details: '輸入您的郵政編碼，並連接到您社區中的食物獲取資源。',
     home_header_component: '我们在这里为您提供帮助！输入您的邮政编码以查找社区中的食物获取资源。',
     home_dashboard: '服务更多家庭',
@@ -6173,10 +6155,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       '您是否已保存或打印确认信息？离开此页面后将无法获取这些数据。',
     family_member_count_plural: '家庭成员',
-    button_view_photos: '查看照片',
-    label_location_photos: '位置',
-    label_event_instructions: '活动信息',
-    label_more_photos: '+{0} 更多',
   },
   hin: {
     home_freshtrack: 'FreshTrak मदद करने के लिए यहाँ है!',
@@ -6186,7 +6164,8 @@ const localization = new LocalizedStrings({
     home_stay: 'अद्यतन रहना',
     home_findfood: 'भोजन तलाशें',
     home_comming_soon:
-      'जल्द ही आ रहा है ... स्थानीय भोजन के उपयोग की घटनाओं पर तारीख तक रहने के लिए एक FreshTrak खाता बनाएँ।',
+      'स्थानीय भोजन के उपयोग की घटनाओं पर तारीख तक रहने के लिए एक FreshTrak खाता बनाएँ।',
+    home_create_account_button: 'खाता बनाएं',
     home_zip_details: 'अपना ज़िप कोड दर्ज करें और अपने समुदाय में भोजन पहुंच संसाधनों से जुड़े।',
     home_header_component:
       'हमलोग यहां सहायता करने के लिए हैं! अपने समुदाय में खाद्य पहुंच संसाधनों को खोजने के लिए अपना ज़िप कोड इनपुट करें।',
@@ -7031,10 +7010,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'क्या आपने पुष्टि जानकारी सहेज ली है या प्रिंट कर लिया है? इस पृष्ठ से जाने के बाद यह डेटा उपलब्ध नहीं होगा।',
     family_member_count_plural: 'परिवार के सदस्य',
-    button_view_photos: 'फ़ोटो देखें',
-    label_location_photos: 'स्थान',
-    label_event_instructions: 'कार्यक्रम की जानकारी',
-    label_more_photos: '+{0} और',
 
     // FEEDBACK
     feedback_give_feedback: 'प्रतिक्रिया दें',
@@ -7068,8 +7043,8 @@ const localization = new LocalizedStrings({
       'FreshTrak खाता बनाउनको लागि प्रयोगकर्ता नाम र पासवर्ड बनाउनुहोस्।',
     home_stay: 'अद्यावधिक रहनुहोस्',
     home_findfood: 'खाना खोज्नुहोस्',
-    home_comming_soon:
-      'चाँडै आउँदैछ ... स्थानीय खाना पहुँच घटनाहरूमा अद्यावधिक रहन एक नयाँ ताजा खाता बनाउनुहोस्।',
+    home_comming_soon: 'स्थानीय खाना पहुँच घटनाहरूमा अद्यावधिक रहन FreshTrak खाता बनाउनुहोस्।',
+    home_create_account_button: 'खाता बनाउनुहोस्',
     home_zip_details:
       'तपाईंको जिप कोड प्रविष्ट गर्नुहोस् र तपाईंको समुदायमा खाना पहुँच स्रोतहरूमा जडान हुनुहोस्।',
     home_header_component:
@@ -7943,10 +7918,6 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'के तपाईंले पुष्टि जानकारी बचत गर्नुभयो वा प्रिन्ट गर्नुभयो? यो पृष्ठ छोडेपछि यो डेटा उपलब्ध हुनेछैन।',
     family_member_count_plural: 'परिवारका सदस्यहरू',
-    button_view_photos: 'फोटोहरू हेर्नुहोस्',
-    label_location_photos: 'स्थान',
-    label_event_instructions: 'कार्यक्रम जानकारी',
-    label_more_photos: '+{0} थप',
   },
 });
 

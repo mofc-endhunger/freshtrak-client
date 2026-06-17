@@ -10,15 +10,20 @@ jest.mock('../../config', () => ({
   default: mockConfig,
 }));
 
+// Mock windowUtils so tests never touch the non-configurable window.location.
+// jest.mock registrations survive jest.resetModules(), so the mock is applied
+// to every fresh require() of devImageEnrichment throughout this suite.
+let mockHostname = 'freshtrak.com';
+
+jest.mock('../../Utils/windowUtils', () => ({
+  getWindowHostname: () => mockHostname,
+}));
+
 const STORAGE_KEY = 'FRESHTRAK_DEV_MOCK_IMAGES';
 const originalNodeEnv = process.env.NODE_ENV;
 
 const setHostname = (hostname: string): void => {
-  Object.defineProperty(window, 'location', {
-    value: { hostname },
-    writable: true,
-    configurable: true,
-  });
+  mockHostname = hostname;
 };
 
 const loadModule = () => require('../devImageEnrichment') as typeof import('../devImageEnrichment');
@@ -26,7 +31,6 @@ const loadModule = () => require('../devImageEnrichment') as typeof import('../d
 describe('devImageEnrichment', () => {
   beforeEach(() => {
     jest.resetModules();
-    jest.clearAllMocks();
     localStorage.clear();
     mockConfig.ALLOW_DEV_MOCK_IMAGES = undefined;
     setHostname('freshtrak.com');

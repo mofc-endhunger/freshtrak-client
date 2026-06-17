@@ -33,9 +33,16 @@ const CountryListComponent: React.FC<CountryListComponentProps> = (props) => {
     props.change(syntheticEvent, { value });
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) window.dispatchEvent(new Event('freshtrak:close-chatbot'));
+  };
+
   return (
-    <Select value={selectedValue} onValueChange={handleValueChange}>
-      <SelectTrigger className="bg-white text-gray-400 border border-white rounded px-2 md:px-3 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 h-auto min-w-[140px]">
+    <Select value={selectedValue} onValueChange={handleValueChange} onOpenChange={handleOpenChange}>
+      <SelectTrigger
+        className="bg-white text-gray-400 border border-white rounded px-2 md:px-3 py-1 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 h-auto min-w-[140px]"
+        data-testid="language-selector"
+      >
         <SelectValue placeholder={localization.placeholder_select_language} />
       </SelectTrigger>
       <SelectContent className="bg-white z-[10000]">

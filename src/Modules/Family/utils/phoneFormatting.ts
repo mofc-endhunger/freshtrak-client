@@ -297,7 +297,7 @@ export const validatePhoneWithRules = (
 /**
  * Formats phone number for display with masking
  */
-export const maskPhoneNumber = (phoneNumber: string, maskChar: string = '*'): string => {
+export const maskPhoneNumber = (phoneNumber: string, maskChar = '*'): string => {
   if (!phoneNumber) return '';
 
   const parts = parsePhoneNumber(phoneNumber);

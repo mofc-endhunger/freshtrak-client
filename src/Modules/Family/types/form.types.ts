@@ -11,13 +11,13 @@ import {
 } from 'react-hook-form';
 
 // React Hook Form specific types
-export interface FormRegister extends UseFormRegister<any> {}
-export interface FormWatch extends UseFormWatch<any> {}
-export interface FormSetValue extends UseFormSetValue<any> {}
-export interface FormGetValues extends UseFormGetValues<any> {}
-export interface FormTrigger extends UseFormTrigger<any> {}
-export interface FormErrors extends Record<string, FieldError> {}
-export interface FormError extends FieldError {}
+export type FormRegister = UseFormRegister<any>;
+export type FormWatch = UseFormWatch<any>;
+export type FormSetValue = UseFormSetValue<any>;
+export type FormGetValues = UseFormGetValues<any>;
+export type FormTrigger = UseFormTrigger<any>;
+export type FormErrors = Record<string, FieldError>;
+export type FormError = FieldError;
 
 // Form field validation rules
 export interface ValidationRules {
@@ -161,29 +161,19 @@ export interface FormComponentProps {
 }
 
 // Specific form component props
-export interface PrimaryInfoFormProps extends FormComponentProps {
-  // Additional props specific to PrimaryInfoForm
-}
+export type PrimaryInfoFormProps = FormComponentProps;
 
-export interface AddressFormProps extends FormComponentProps {
-  // Additional props specific to AddressForm
-}
+export type AddressFormProps = FormComponentProps;
 
-export interface ContactInfoFormProps extends FormComponentProps {
-  // Additional props specific to ContactInfoForm
-}
+export type ContactInfoFormProps = FormComponentProps;
 
 export interface HouseholdFormProps extends FormComponentProps {
   event: any; // Event type from family.types.ts
 }
 
-export interface PasswordFormProps extends FormComponentProps {
-  // Additional props specific to PasswordForm
-}
+export type PasswordFormProps = FormComponentProps;
 
-export interface AdditionalPickupFormProps extends FormComponentProps {
-  // Additional props specific to AdditionalPickupForm
-}
+export type AdditionalPickupFormProps = FormComponentProps;
 
 // Form validation functions
 export type ValidationFunction<T> = (value: T) => boolean | string;

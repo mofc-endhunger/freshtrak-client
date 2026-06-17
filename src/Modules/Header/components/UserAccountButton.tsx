@@ -93,14 +93,20 @@ const UserAccountButton: React.FC = () => {
     return null;
   }
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open) window.dispatchEvent(new Event('freshtrak:close-chatbot'));
+  };
+
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
       <div className="relative">
         <DropdownMenuTrigger asChild>
           <button
             type="button"
             className="h-8 w-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-semibold text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 flex items-center justify-center"
             aria-label={localization.aria_user_account_menu}
+            data-testid="user-account-button"
           >
             {getUserInitials()}
           </button>

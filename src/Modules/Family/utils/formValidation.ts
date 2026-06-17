@@ -94,7 +94,7 @@ export const ERROR_MESSAGES = getErrorMessage();
 /**
  * Validates if a field is required and not empty
  */
-export const validateRequired = (value: any, fieldName: string = 'Field'): ValidationResult => {
+export const validateRequired = (value: any, fieldName = 'Field'): ValidationResult => {
   if (!value || (typeof value === 'string' && value.trim() === '')) {
     return {
       isValid: false,
@@ -230,7 +230,7 @@ export const validatePasswordConfirm = (
 /**
  * Validates name format
  */
-export const validateName = (name: string, fieldName: string = 'Name'): ValidationResult => {
+export const validateName = (name: string, fieldName = 'Name'): ValidationResult => {
   if (!name) {
     return {
       isValid: false,

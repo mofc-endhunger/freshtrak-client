@@ -302,7 +302,7 @@ export class HouseholdsApiService {
   /**
    * Retry failed requests
    */
-  private async retryRequest<T>(requestFn: () => Promise<T>, attempt: number = 1): Promise<T> {
+  private async retryRequest<T>(requestFn: () => Promise<T>, attempt = 1): Promise<T> {
     try {
       return await requestFn();
     } catch (error: any) {

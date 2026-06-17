@@ -38,6 +38,7 @@ export interface LocalizationStrings {
   home_stay: string;
   home_findfood: string;
   home_comming_soon: string;
+  home_create_account_button: string;
   home_zip_details: string;
   home_dashboard: string;
   home_dashboard_org: string;

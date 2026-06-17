@@ -2,19 +2,65 @@ name: CI
 
 on:
   push:
-    branches: [main, beta]
+    branches: [dev, beta]
   pull_request:
-    branches: [main, beta]
+    branches: [dev, beta]
 
 jobs:
-  lint-and-test:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
       - run: npm ci
       - run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
       - run: npm run test:ci
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npx playwright test
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5000
+          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          REACT_APP_REGISTRATION_API: ${{ vars.REACT_APP_REGISTRATION_API }}
+          REACT_APP_PANTRY_FINDER_API: ${{ vars.REACT_APP_PANTRY_FINDER_API }}
+          REACT_APP_AWS_REGION: ${{ vars.REACT_APP_AWS_REGION }}
+          REACT_APP_USER_POOL_ID: ${{ vars.REACT_APP_USER_POOL_ID }}
+          REACT_APP_USER_POOL_CLIENT_ID: ${{ vars.REACT_APP_USER_POOL_CLIENT_ID }}
+          REACT_APP_CLIENT_URL: ${{ vars.REACT_APP_CLIENT_URL }}
+          REACT_APP_FRESHTRAK_PARTNERS_URL: ${{ vars.REACT_APP_FRESHTRAK_PARTNERS_URL }}
+          REACT_APP_GTM_ID: ${{ vars.REACT_APP_GTM_ID }}
+          REACT_APP_IMAGES_BASE_URL: ${{ vars.REACT_APP_IMAGES_BASE_URL }}
+          REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
+          REACT_APP_GOOGLE_GEOLOCATION_KEY: ${{ secrets.REACT_APP_GOOGLE_GEOLOCATION_KEY }}
+      - uses: actions/upload-artifact@v6
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

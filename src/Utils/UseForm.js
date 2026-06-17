@@ -25,7 +25,7 @@ const UseForm = (props, validations, callback, errorToComponent = false) => {
         return valueLength <= limit ? '' : `This value cannot be more than ${limit} characters`;
       case 'is_address':
         const validAddress = new RegExp('^[-().,#\/a-zA-Z0-9 ]*$');
-        let errors_address = validAddress.test(value);
+        const errors_address = validAddress.test(value);
         return errors_address
           ? ''
           : localization.error_street_address_required || 'Enter a valid address';
@@ -36,15 +36,15 @@ const UseForm = (props, validations, callback, errorToComponent = false) => {
 
   const handleErrors = (e) => {
     if (typeof e.target === 'undefined') {
-      let data = e;
+      const data = e;
       let count = 0;
-      for (let key in data) {
+      for (const key in data) {
         // get index and check for last index and set true
-        let keyExists = key in validations;
+        const keyExists = key in validations;
         if (keyExists) {
           count++;
           if (count === Object.keys(validations).length) {
-            let loopFinish = processValidations(data[key], validations[key], key, true);
+            const loopFinish = processValidations(data[key], validations[key], key, true);
             return loopFinish;
           } else {
             processValidations(data[key], validations[key], key);
@@ -52,8 +52,8 @@ const UseForm = (props, validations, callback, errorToComponent = false) => {
         }
       }
     } else {
-      let { name, value } = e.target;
-      let nameExists = name in validations;
+      const { name, value } = e.target;
+      const nameExists = name in validations;
       if (nameExists) {
         processValidations(value, validations[name], name);
       }
@@ -68,7 +68,7 @@ const UseForm = (props, validations, callback, errorToComponent = false) => {
 
     for (let i = 0; i < validate.length; i++) {
       count++;
-      let splitKey = validate[i].split(':');
+      const splitKey = validate[i].split(':');
       if (typeof splitKey[1] !== 'undefined') {
         validator = splitKey[0];
         limit = splitKey[1];
@@ -96,7 +96,7 @@ const UseForm = (props, validations, callback, errorToComponent = false) => {
   };
 
   useEffect(() => {
-    for (let keys in errors) {
+    for (const keys in errors) {
       if (errors[keys] === null || errors[keys] === '') {
         delete errors[keys];
       }

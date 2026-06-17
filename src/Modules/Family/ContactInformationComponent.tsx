@@ -73,6 +73,7 @@ const ContactInformationComponent: React.FC<ContactInformationComponentProps> = 
             name={phoneFieldName}
             placeholder="(xxx) xxx-xxxx"
             id="phone"
+            data-testid="phone-input"
             value={phone}
             onChange={(e: string) => {
               setValue('phone', e, { shouldValidate: true });

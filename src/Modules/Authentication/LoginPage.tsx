@@ -246,7 +246,10 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-start justify-center p-4">
+    <div
+      className="min-h-screen bg-gray-50 flex items-start justify-center p-4"
+      data-testid="login-page"
+    >
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
         {/* title */}
         <h1 className="text-2xl font-bold mb-6 text-center">{getFormTitle()}</h1>
@@ -261,6 +264,7 @@ const LoginPage: React.FC = () => {
                 size="sm"
                 onClick={() => switchTab('signin')}
                 className="flex-1"
+                data-testid="signin-tab"
               >
                 {localization.button_sign_in}
               </Button>
@@ -269,6 +273,7 @@ const LoginPage: React.FC = () => {
                 size="sm"
                 onClick={() => switchTab('signup')}
                 className="flex-1"
+                data-testid="signup-tab"
               >
                 {localization.button_sign_up}
               </Button>
@@ -277,7 +282,10 @@ const LoginPage: React.FC = () => {
 
           {/* Error Message */}
           {errorMessage && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div
+              className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md"
+              data-testid="auth-error-message"
+            >
               <p className="text-sm text-red-600">{errorMessage}</p>
             </div>
           )}
@@ -353,6 +361,7 @@ const LoginPage: React.FC = () => {
                   onClick={onGuestLogin}
                   disabled={isLoading}
                   className="w-full"
+                  data-testid="guest-login-button"
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center space-x-2">
@@ -374,6 +383,7 @@ const LoginPage: React.FC = () => {
             variant="ghost"
             onClick={() => navigate(RENDER_URL.ROOT_URL)}
             className="text-gray-600 hover:text-gray-900"
+            data-testid="back-to-home-button"
           >
             ← {localization.button_back_to_home || 'Back to Home'}
           </Button>
@@ -385,6 +395,7 @@ const LoginPage: React.FC = () => {
             variant="link"
             onClick={() => navigate(RENDER_URL.CASE_MANAGER_LOGIN_URL)}
             className="text-xs text-gray-400 hover:text-gray-600 h-auto p-0"
+            data-testid="case-manager-link"
           >
             {localization.cm_login_link}
           </Button>

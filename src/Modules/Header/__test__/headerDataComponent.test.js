@@ -18,7 +18,7 @@ test('should render without errors', () => {
         <HeaderDataComponent />
       </Provider>,
     );
-  }).not.toThrowError();
+  }).not.toThrow();
 });
 
 test(`should render 'Find food resources...' if location is not the event list url`, () => {

@@ -21,7 +21,7 @@ import { DashBoardContainerProps } from './types/dashboard.types';
 const DashBoardContainer: React.FC<DashBoardContainerProps> = () => {
   return (
     <React.Fragment>
-      <section>
+      <section data-testid="dashboard-page">
         <DashBoardDataComponent />
       </section>
       <section className="bg-gray-100">

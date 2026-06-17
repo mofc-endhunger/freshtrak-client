@@ -3,15 +3,15 @@ const isArray = (data) => {
 };
 
 const serviceCatFilter = (agencyData) => {
-  let categories = [];
+  const categories = [];
   if (isArray(agencyData)) {
     agencyData.forEach((item) => {
-      let { events } = item;
+      const { events } = item;
       if (isArray(events)) {
         events.forEach((obj) => {
-          let { service_category } = obj;
+          const { service_category } = obj;
           if (service_category && service_category.id) {
-            let duplicates = categories.filter((i) => i.id === service_category.id);
+            const duplicates = categories.filter((i) => i.id === service_category.id);
             if (duplicates.length === 0) {
               categories.push(service_category);
             }

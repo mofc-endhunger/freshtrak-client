@@ -5,7 +5,7 @@ import AboutFreshTrakComponent from './AboutFreshTrakComponent';
 import WorkingWithFreshTrakComponent from './WorkingWithFreshTrakComponent';
 
 const StaticPageContainer = (props) => {
-  let location = useLocation();
+  const location = useLocation();
   return (
     <React.Fragment>
       {location.pathname === RENDER_URL.FRESHTRAK_ABOUT ? (

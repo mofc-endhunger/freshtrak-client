@@ -76,18 +76,18 @@ export interface ApiHouseholdMember {
 }
 
 // Household API responses
-export interface HouseholdResponse extends ApiResponse<Household> {}
-export interface HouseholdListResponse extends ApiResponse<Household[]> {}
+export type HouseholdResponse = ApiResponse<Household>;
+export type HouseholdListResponse = ApiResponse<Household[]>;
 
 // Member API responses
-export interface MemberResponse extends ApiResponse<HouseholdMember> {}
-export interface MemberListResponse extends ApiResponse<HouseholdMember[]> {}
+export type MemberResponse = ApiResponse<HouseholdMember>;
+export type MemberListResponse = ApiResponse<HouseholdMember[]>;
 
 // API Request types
-export interface CreateHouseholdApiRequest extends CreateHouseholdRequest {}
-export interface UpdateHouseholdApiRequest extends UpdateHouseholdRequest {}
-export interface CreateMemberApiRequest extends CreateMemberRequest {}
-export interface UpdateMemberApiRequest extends UpdateMemberRequest {}
+export type CreateHouseholdApiRequest = CreateHouseholdRequest;
+export type UpdateHouseholdApiRequest = UpdateHouseholdRequest;
+export type CreateMemberApiRequest = CreateMemberRequest;
+export type UpdateMemberApiRequest = UpdateMemberRequest;
 
 // API Endpoint configuration
 export interface HouseholdApiEndpoints {

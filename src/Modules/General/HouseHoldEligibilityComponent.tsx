@@ -21,7 +21,7 @@ const HouseHoldEligibilityComponent: React.FC<HouseHoldEligibilityComponentProps
   const [showEligibilityModal, setShowEligibilityModal] = useState<boolean>(false);
   let columnData: string[] = [];
   let rowsData: (string | number)[][] = [];
-  let addOnData: string = '';
+  let addOnData = '';
 
   if (body) {
     try {

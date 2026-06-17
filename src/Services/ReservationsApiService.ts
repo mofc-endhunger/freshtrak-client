@@ -444,8 +444,8 @@ export class ReservationsApiService {
    */
   private getMockReservations(filter: ReservationFilter): ReservationsResponse {
     let reservations: Reservation[];
-    let upcomingCount = MOCK_UPCOMING_RESERVATIONS.length;
-    let pastCount = MOCK_PAST_RESERVATIONS.length;
+    const upcomingCount = MOCK_UPCOMING_RESERVATIONS.length;
+    const pastCount = MOCK_PAST_RESERVATIONS.length;
 
     switch (filter) {
       case 'upcoming':

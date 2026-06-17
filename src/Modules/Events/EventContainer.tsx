@@ -161,7 +161,7 @@ const EventContainer: React.FC = () => {
   const getFoodbanks = async (zip: string): Promise<void> => {
     if (zip) {
       setLoading(true);
-      let foodBankUri = API_URL.FOODBANK_LIST;
+      const foodBankUri = API_URL.FOODBANK_LIST;
 
       try {
         const resp = await axios.get(foodBankUri, {
@@ -218,7 +218,7 @@ const EventContainer: React.FC = () => {
   localStorage.setItem('search_zip', `${zipCode}`);
 
   return (
-    <div>
+    <div data-testid="event-list-page">
       <section className="bg-[#F2F0F4]">
         <div className="container mx-auto px-4 pt-24 pb-24">
           <div className="min-h-[130px] bg-white rounded-lg shadow-md -mt-56 mb-12 mx-auto p-8 text-left sm:w-full sm:min-w-auto sm:p-6 sm:-mt-36 md:w-11/12 md:min-w-auto lg:min-w-[600px] lg:w-auto lg:max-w-[900px]">

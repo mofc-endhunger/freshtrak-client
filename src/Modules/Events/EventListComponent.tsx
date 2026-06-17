@@ -237,7 +237,7 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
           </div>
         )}
         {Object.keys(events).length === 0 && (
-          <h3 className="text-xl font-semibold text-gray-700">
+          <h3 className="text-xl font-semibold text-gray-700" data-testid="no-events-message">
             {localization.no_events_scheduled}
           </h3>
         )}
@@ -316,7 +316,9 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
         </div>
       )}
       {Object.keys(events).length === 0 && (
-        <h3 className="text-xl font-semibold text-gray-700">{localization.no_events_scheduled}</h3>
+        <h3 className="text-xl font-semibold text-gray-700" data-testid="no-events-message">
+          {localization.no_events_scheduled}
+        </h3>
       )}
       {Object.keys(events).length > 0 && (
         <div className="flex flex-col xl:flex-row gap-4">

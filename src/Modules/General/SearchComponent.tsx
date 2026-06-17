@@ -84,7 +84,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
       setAddress(value);
 
       if (place && place.address_components) {
-        let destructuredAddress = getDestructured(place.address_components);
+        const destructuredAddress = getDestructured(place.address_components);
         setAddress(
           destructuredAddress['street_number'] !== undefined
             ? `${destructuredAddress['street_number']} ${destructuredAddress['route']}`
@@ -103,7 +103,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
     };
 
     const getDestructured = (address_components: AddressComponent[]) => {
-      let destructured: Record<string, string> = {};
+      const destructured: Record<string, string> = {};
       // eslint-disable-next-line array-callback-return
       address_components.filter((component) => {
         switch (component['types'][0]) {
@@ -146,6 +146,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
                   type="text"
                   id="zip_code"
                   defaultValue={zipCode}
+                  data-testid="zip-code-input"
                   className="mt-1 min-h-[50px] border-[#392947] w-full text-gray-600 bg-white outline-none focus:border-[#392947] focus:shadow-[0_0_0_0.2rem_rgba(0,123,255,0.25)] focus:ring-0 focus-visible:border-[#392947] focus-visible:ring-0 focus-visible:ring-transparent"
                   {...register('zip_code', {
                     required: true,
@@ -191,6 +192,7 @@ const SearchComponent = forwardRef<HTMLDivElement, SearchComponentProps>(
               value="Search For Resources"
               className="w-full min-h-[50px]"
               disabled={isLoading}
+              data-testid="search-submit"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">

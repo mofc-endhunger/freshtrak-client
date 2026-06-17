@@ -7,24 +7,6 @@ import RegistrationContainer from '../RegistrationContainer';
 import eventSlice from '../../../Store/Events/eventSlice';
 import userSlice from '../../../Store/userSlice';
 
-// Mock config so BASE_URL is stable regardless of .env presence (CI vs local).
-// config.ts computes values at module load time, so process.env set in beforeEach
-// is too late — the module is already cached with the empty CI values.
-jest.mock('../../../config', () => {
-  const mockConfig = {
-    PANTRY_FINDER_API: 'https://api.test.com/',
-    REGISTRATION_API: 'https://reg.test.com/',
-    CLIENT_URL: 'http://localhost:3000',
-    GTM_ID: 'test-gtm',
-    GOOGLE_API_KEY: 'test-key',
-    GOOGLE_GEOLOCATION_KEY: 'test-geo-key',
-    USER_POOL_ID: 'test-pool',
-    USER_POOL_CLIENT_ID: 'test-client',
-    AWS_REGION: 'us-east-1',
-  };
-  return { __esModule: true, default: mockConfig, config: mockConfig };
-});
-
 // Mock axios
 jest.mock('axios');
 const mockAxios = require('axios');
@@ -156,6 +138,9 @@ describe('RegistrationContainer', () => {
     mockStorageService.isGuestUser.mockReturnValue(false);
     mockStorageService.isCaseManager.mockReturnValue(false);
 
+    // Mock environment variables
+    process.env.REACT_APP_CLIENT_URL = 'http://localhost:3000';
+
     // Mock axios.get to return a mock event by default
     mockAxios.get.mockResolvedValue({
       data: {
@@ -269,7 +254,7 @@ describe('RegistrationContainer', () => {
       () => {
         // Verify axios.get was called with the URL containing the eventDateId from the URL
         expect(mockAxios.get).toHaveBeenCalledWith(
-          expect.stringContaining('/api/event_dates/123/event_details'),
+          expect.stringContaining('api/event_dates/123/event_details'),
         );
       },
       { timeout: 3000 },

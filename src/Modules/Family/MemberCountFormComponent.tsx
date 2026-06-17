@@ -164,6 +164,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
               className="w-16 h-8 text-center mx-2 border-none"
               name="seniors_in_household"
               id="seniors_in_household"
+              data-testid="senior-count-input"
               value={countSenior}
               onChange={() => {}}
               {...register('seniors_in_household')}
@@ -217,6 +218,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
             className="w-16 h-8 text-center mx-2 border-none"
             name="adults_in_household"
             id="adults_in_household"
+            data-testid="adult-count-input"
             value={countAdult}
             onChange={() => {}}
             {...register('adults_in_household')}
@@ -269,6 +271,7 @@ const MemberCountFormComponent: React.FC<MemberCountFormComponentProps> = ({
             className="w-16 h-8 text-center mx-2 border-none"
             name="children_in_household"
             id="children_in_household"
+            data-testid="child-count-input"
             value={countKid}
             onChange={() => {}}
             {...register('children_in_household')}

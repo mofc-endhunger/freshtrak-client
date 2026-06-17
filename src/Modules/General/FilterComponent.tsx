@@ -65,6 +65,7 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
                 size="sm"
                 onClick={(e) => closeFilter(e)}
                 className="p-1 h-auto bg-[#392947] hover:bg-[#392947]/90"
+                data-testid="filter-close"
               >
                 <img
                   alt={localization.alt_close_filter || 'close filter'}
@@ -76,7 +77,7 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
             <div className="flex flex-col sm:flex-row flex-wrap items-end gap-4 pt-3">
               <div className="w-full sm:flex-1 min-w-0">
                 {distance.show && (
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-testid="filter-distance">
                     <Label htmlFor="distance">{localization.by_distance}</Label>
                     <Select
                       defaultValue={distance.defaultValue}
@@ -132,7 +133,7 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
               </div>
               <div className="w-full sm:flex-1 min-w-0">
                 {availability.show && (
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-testid="filter-availability">
                     <Label htmlFor="availability">{localization.by_availability}</Label>
                     {/* Availability filter dropdown - filters events by time periods */}
                     <Select
@@ -182,7 +183,7 @@ const FilterComponent = forwardRef<HTMLDivElement, FilterComponentProps>(
               </div>
               <div className="w-full sm:flex-1 min-w-0">
                 {reservations.show && (
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-testid="filter-reservations">
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="reservations"

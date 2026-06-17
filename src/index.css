@@ -1,9 +1,9 @@
+/* Import custom styles for complex components */
+@import url('./Assets/css/custom-styles.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import custom styles for complex components */
-@import url('./Assets/css/custom-styles.css');
 
 /* Base styles */
 body {

@@ -144,7 +144,7 @@ const AccountPage: React.FC = () => {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-white py-8">
+      <div className="min-h-screen bg-white py-8" data-testid="account-page">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="mb-8">
@@ -153,6 +153,7 @@ const AccountPage: React.FC = () => {
                 variant="ghost"
                 onClick={() => navigate(RENDER_URL.ROOT_URL)}
                 className="text-gray-600 hover:text-gray-900"
+                data-testid="back-to-home"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {localization.button_back_to_home}
@@ -163,13 +164,19 @@ const AccountPage: React.FC = () => {
             <div className="flex flex-col items-center py-8">
               {/* Avatar */}
               <div className="relative">
-                <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-xl">
+                <div
+                  className="h-16 w-16 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-xl"
+                  data-testid="user-avatar"
+                >
                   {getUserInitials()}
                 </div>
               </div>
 
               {/* User Name */}
-              <h1 className="font-noto-sans font-bold text-2xl leading-[35px] tracking-normal text-center text-gray-900 mt-4">
+              <h1
+                className="font-noto-sans font-bold text-2xl leading-[35px] tracking-normal text-center text-gray-900 mt-4"
+                data-testid="user-display-name"
+              >
                 {householdData?.members && householdData.members.length > 0
                   ? `${householdData.members[0].first_name} ${householdData.members[0].last_name} ${getSuffixFromId(householdData.members[0].suffix_id)}`
                   : user?.name || user?.email}
@@ -189,8 +196,12 @@ const AccountPage: React.FC = () => {
           {/* Tabs Navigation */}
           <Tabs defaultValue="summary" className="w-full">
             <TabsList>
-              <TabsTrigger value="summary">{localization.tab_summary}</TabsTrigger>
-              <TabsTrigger value="account">{localization.tab_account}</TabsTrigger>
+              <TabsTrigger value="summary" data-testid="tab-summary">
+                {localization.tab_summary}
+              </TabsTrigger>
+              <TabsTrigger value="account" data-testid="tab-account">
+                {localization.tab_account}
+              </TabsTrigger>
             </TabsList>
 
             {/* Summary Tab Content */}

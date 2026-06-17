@@ -46,7 +46,7 @@ const RegistrationTextInfoComponent: React.FC<RegistrationTextInfoComponentProps
           className="w-full md:w-auto"
           type="submit"
           variant="highlight"
-          data-testid="continue button"
+          data-testid="register-now-button"
           onClick={clickedRegisterNow}
         >
           {localization.register}

@@ -103,6 +103,7 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
           placeholder={localization.placeholder_enter_email_simple}
           {...register('email')}
           className={errors.email ? 'border-red-500' : ''}
+          data-testid="email-input"
         />
         {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
       </div>
@@ -115,6 +116,7 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
           placeholder={localization.placeholder_enter_password}
           {...register('password')}
           className={errors.password ? 'border-red-500' : ''}
+          data-testid="password-input"
         />
         {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
       </div>
@@ -125,6 +127,7 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
             type="button"
             onClick={onForgotPassword}
             className="text-sm text-primary hover:underline"
+            data-testid="forgot-password-link"
           >
             {localization.button_forgot_password}
           </button>
@@ -136,6 +139,7 @@ const SignInFormComponent: React.FC<SignInFormComponentProps> = ({
           type="submit"
           className="w-full bg-primary text-white min-h-12 uppercase"
           disabled={isSubmitting || isLoading}
+          data-testid="signin-submit"
         >
           {isSubmitting || isLoading ? (
             <div className="flex items-center justify-center space-x-2">

@@ -28,6 +28,7 @@ const FamilyContainer: React.FC<FamilyContainerProps> = ({
     setValue,
     watch,
     trigger,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<RegistrationFormData>({
     mode: 'onChange',
@@ -79,6 +80,7 @@ const FamilyContainer: React.FC<FamilyContainerProps> = ({
                     watch={watch}
                     getValues={getValues}
                     trigger={trigger}
+                    control={control}
                   />
                 </div>
 

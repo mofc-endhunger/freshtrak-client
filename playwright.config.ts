@@ -12,7 +12,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // Run one worker per browser project in CI (chromium, firefox, webkit).
+  // Locally Playwright auto-selects based on CPU count.
+  workers: process.env.CI ? 3 : undefined,
   reporter: [['html', { open: 'never' }], ['list']],
 
   expect: {

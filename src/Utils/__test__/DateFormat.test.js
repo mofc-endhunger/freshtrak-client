@@ -1,6 +1,21 @@
-import { formatDateForServer } from '../DateFormat';
+import { formatDateDayAndDate, formatDateForServer } from '../DateFormat';
 
 describe('DateFormat', () => {
+  describe('formatDateDayAndDate', () => {
+    it('displays the correct calendar date for a YYYY-MM-DD API string regardless of local timezone', () => {
+      // Regression test: new Date("2026-06-22") is UTC midnight, which in negative-offset
+      // timezones (e.g. UTC-4) would resolve to June 21 — one day too early.
+      // The fix normalises date-only strings to local noon before parsing.
+      const result = formatDateDayAndDate('2026-06-22');
+      expect(result).toMatch(/6\/22\/2026$/);
+    });
+
+    it('includes the correct day of the week', () => {
+      const result = formatDateDayAndDate('2026-06-22');
+      expect(result).toBe('Monday, 6/22/2026');
+    });
+  });
+
   describe('formatDateForServer', () => {
     describe('happy path — spaced format (MM / DD / YYYY)', () => {
       it('returns YYYY-MM-DD for a standard date', () => {

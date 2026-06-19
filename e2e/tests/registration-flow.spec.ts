@@ -61,7 +61,12 @@ async function openTimeslotDialog(
 
   // Wait for the event details page to fully load
   await expect(page).toHaveURL(/\/register\/event\/[^/]+/, { timeout: 10_000 });
-  await page.locator('.back-button').waitFor({ state: 'visible', timeout: 20_000 });
+  // Allow network activity to settle before checking for DOM elements.
+  // Firefox and Webkit are slower to paint React components after navigation.
+  await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {
+    // networkidle may not fire on pages with persistent connections; ignore.
+  });
+  await page.locator('.back-button').waitFor({ state: 'visible', timeout: 30_000 });
 
   // Click Register Now — authenticated users navigate directly to the registration form
   await page.getByTestId(SEL.registerNowButton).click();
@@ -712,6 +717,10 @@ test.describe('Registration Flow – Step 3: Your Family Details', () => {
   test('Previous and Register buttons are visible on Step 3', async ({
     authenticatedPage: page,
   }) => {
+    // Navigation chain is long (search → event → timeslot → modal → step1 → step2 → step3);
+    // triple the default timeout to accommodate Firefox/Webkit rendering latency.
+    test.slow();
+
     const result = await navigateToFamilyStep(page);
     if (!result.ready) {
       test.skip();
@@ -723,6 +732,10 @@ test.describe('Registration Flow – Step 3: Your Family Details', () => {
   });
 
   test('clicking Previous on Step 3 returns to Step 2', async ({ authenticatedPage: page }) => {
+    // Navigation chain is long (search → event → timeslot → modal → step1 → step2 → step3);
+    // triple the default timeout to accommodate Firefox/Webkit rendering latency.
+    test.slow();
+
     const result = await navigateToFamilyStep(page);
     if (!result.ready) {
       test.skip();

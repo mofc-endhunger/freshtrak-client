@@ -6,6 +6,8 @@ import {
   UseFormGetValues,
   UseFormTrigger,
   FieldErrors,
+  Control,
+  useWatch,
 } from 'react-hook-form';
 import localization from '../Localization/LocalizationComponent';
 import { Button } from '../../components/ui/button';
@@ -30,10 +32,18 @@ interface PrimaryInfoFormComponentProps {
   getValues: UseFormGetValues<RegistrationFormData>;
   trigger: UseFormTrigger<RegistrationFormData>;
   errors: FieldErrors<RegistrationFormData>;
+  /** RHF control object — enables useWatch subscriptions for reliable select reactivity. */
+  control: Control<RegistrationFormData>;
   continueHandler?: (values: Partial<RegistrationFormData>) => void;
   className?: string;
   'data-testid'?: string;
   isHouseholdSetup?: boolean;
+  /** Pre-resolved value for the gender Radix UI Select (watched in the form owner). */
+  genderValue?: string;
+  /** Pre-resolved value for the suffix Radix UI Select (watched in the form owner). */
+  suffixValue?: string;
+  /** Pre-resolved value for the preferred-language Radix UI Select (watched in the form owner). */
+  preferredLanguageValue?: string;
 }
 
 const SUFFIX_NONE_VALUE = 'none';
@@ -45,15 +55,41 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
   getValues,
   trigger,
   errors,
+  control,
   continueHandler,
   className = '',
   'data-testid': testId = 'primary-info-form-component',
   isHouseholdSetup = false,
+  genderValue: genderValueProp,
+  suffixValue: suffixValueProp,
+  preferredLanguageValue: preferredLanguageValueProp,
 }) => {
+  // useWatch sets up an RHF subscription that fires reliably after both reset()
+  // and setValue().  Fall back to the parent-supplied prop for backward
+  // compatibility when control is not available (standalone/test usage).
+  const genderFromWatch = useWatch({ control, name: 'gender' });
+  const suffixFromWatch = useWatch({ control, name: 'suffix' });
+  const langFromWatch = useWatch({ control, name: 'preferred_language' });
+
   const date_of_birth = watch('date_of_birth') || '';
-  const suffixValue = watch('suffix') || '';
-  const genderValue = watch('gender') || '';
-  const preferredLanguageValue = watch('preferred_language') || '';
+  const suffixValue =
+    suffixFromWatch != null
+      ? suffixFromWatch
+      : suffixValueProp !== undefined
+        ? suffixValueProp
+        : '';
+  const genderValue =
+    genderFromWatch != null
+      ? genderFromWatch
+      : genderValueProp !== undefined
+        ? genderValueProp
+        : '';
+  const preferredLanguageValue =
+    langFromWatch != null
+      ? langFromWatch
+      : preferredLanguageValueProp !== undefined
+        ? preferredLanguageValueProp
+        : 'en';
 
   useEffect(() => {
     if (!isHouseholdSetup) return;
@@ -67,7 +103,13 @@ const PrimaryInfoFormComponent: React.FC<PrimaryInfoFormComponentProps> = ({
 
   const handleContinue = async () => {
     const values = getValues();
-    const result = await trigger(['first_name', 'last_name', 'date_of_birth', 'gender']);
+    const result = await trigger([
+      'first_name',
+      'last_name',
+      'date_of_birth',
+      'gender',
+      ...(isHouseholdSetup ? (['preferred_language'] as const) : []),
+    ]);
     if (result && continueHandler) {
       continueHandler(values);
     }

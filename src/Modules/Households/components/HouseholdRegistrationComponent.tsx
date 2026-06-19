@@ -39,8 +39,8 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
   // Memoized API service instance
   const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
-  // Component state
-  const [isLoadingUserData, setIsLoadingUserData] = useState<boolean>(false);
+  // Component state — start loading immediately so the form never renders before API data arrives
+  const [isLoadingUserData, setIsLoadingUserData] = useState<boolean>(true);
   const [prefilledData, setPrefilledData] = useState<Partial<RegistrationFormData>>({});
   const [currentHouseholdMembers, setCurrentHouseholdMembers] = useState<ApiHouseholdMember[]>([]);
   const [deletedMemberIds, setDeletedMemberIds] = useState<number[]>([]);

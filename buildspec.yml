@@ -1,10 +1,6 @@
 version: 0.2
 phases:
   install:
-    runtime-versions:
-      nodejs: 20
-    on-failure: ABORT
-  pre_build:
     on-failure: ABORT
     commands:
       - echo "Logging in to ECR..."

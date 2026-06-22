@@ -4,7 +4,7 @@
  * This component now uses the unified HouseholdForm component for consistency.
  */
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useAuth } from '../../Authentication/AuthContext';
 
 // Component imports
@@ -38,6 +38,11 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
 
   // Memoized API service instance
   const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
+
+  // Set to true once /users/me returns a primary member. Used by the authUser
+  // effect below to avoid overwriting API-sourced names with the coarser
+  // Cognito display-name split if useAuth resolves after the API call.
+  const apiDataLoadedRef = useRef<boolean>(false);
 
   // Component state — start loading immediately so the form never renders before API data arrives
   const [isLoadingUserData, setIsLoadingUserData] = useState<boolean>(true);
@@ -111,6 +116,11 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
               ? getLanguageOptionById(userData.language_id)?.code
               : undefined) ??
             'en';
+          // Mark that authoritative API data is available. The authUser effect
+          // checks this flag so it never replaces API-sourced names with the
+          // coarser Cognito display-name split, regardless of which effect
+          // resolves first.
+          apiDataLoadedRef.current = true;
           setPrefilledData({
             first_name: primaryMember.first_name || '',
             last_name: primaryMember.last_name || '',
@@ -149,9 +159,14 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
     fetchUserData();
   }, [householdsApiService]);
 
-  // Pre-populate with auth user data if available
+  // Pre-populate with auth user data as a fallback only when the /users/me
+  // API has not already returned a primary member. If the API effect ran
+  // first (apiDataLoadedRef = true), we keep those API-sourced names because
+  // they are the ground truth; the Cognito display name is a coarser signal
+  // (a single string split on the first space) that can't be trusted to
+  // reconstruct separate first/last names reliably.
   useEffect(() => {
-    if (authUser) {
+    if (authUser && !apiDataLoadedRef.current) {
       const nameParts = authUser.name?.split(' ') || [];
       setPrefilledData((prev) => ({
         ...prev,

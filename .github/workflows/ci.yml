@@ -60,11 +60,75 @@ jobs:
           path: dist/
           retention-days: 1
 
+  # Run auth.setup.ts exactly once to produce the Cognito session state.
+  # Uploading it as an artifact lets all three shards reuse it without
+  # triggering additional sign-ins, avoiding Cognito rate-limit collisions.
+  # This job also warms the Playwright browser cache so shards start faster.
+  e2e-setup:
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: app-build
+          path: dist/
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers (cache miss)
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Install Playwright OS dependencies (cache hit)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium firefox webkit
+
+      - name: Authenticate once
+        run: npx playwright test --project=setup
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5000
+          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          REACT_APP_REGISTRATION_API: ${{ vars.REACT_APP_REGISTRATION_API }}
+          REACT_APP_PANTRY_FINDER_API: ${{ vars.REACT_APP_PANTRY_FINDER_API }}
+          REACT_APP_AWS_REGION: ${{ vars.REACT_APP_AWS_REGION }}
+          REACT_APP_USER_POOL_ID: ${{ vars.REACT_APP_USER_POOL_ID }}
+          REACT_APP_USER_POOL_CLIENT_ID: ${{ vars.REACT_APP_USER_POOL_CLIENT_ID }}
+          REACT_APP_CLIENT_URL: ${{ vars.REACT_APP_CLIENT_URL }}
+          REACT_APP_FRESHTRAK_PARTNERS_URL: ${{ vars.REACT_APP_FRESHTRAK_PARTNERS_URL }}
+          REACT_APP_GTM_ID: ${{ vars.REACT_APP_GTM_ID }}
+          REACT_APP_IMAGES_BASE_URL: ${{ vars.REACT_APP_IMAGES_BASE_URL }}
+          REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
+          REACT_APP_GOOGLE_GEOLOCATION_KEY: ${{ secrets.REACT_APP_GOOGLE_GEOLOCATION_KEY }}
+
+      - name: Upload auth state
+        uses: actions/upload-artifact@v6
+        with:
+          name: e2e-auth-state
+          path: e2e/.auth/
+          retention-days: 1
+
   # e2e runs as a 3-way shard matrix so each runner handles ~1/3 of the tests
   # across all three browsers in parallel, cutting wall-clock time by ~60%.
+  # Shards depend on e2e-setup so the Cognito auth state and browser cache are
+  # ready before any shard starts — no redundant sign-ins, no cache misses.
   e2e:
     runs-on: ubuntu-latest
-    needs: [lint, test, build]
+    needs: [lint, test, e2e-setup]
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -84,6 +148,14 @@ jobs:
           name: app-build
           # Restore into dist/ to match Vite's output path expected by vite preview
           path: dist/
+
+      - name: Download auth state
+        uses: actions/download-artifact@v6
+        with:
+          name: e2e-auth-state
+          # Restores user.json to e2e/.auth/ — auth.setup.ts detects the file
+          # and skips re-authentication, preventing concurrent Cognito sign-ins.
+          path: e2e/.auth/
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4

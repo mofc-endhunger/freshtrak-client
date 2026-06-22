@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import { test as setup, expect } from '@playwright/test';
 import { SEL } from '../helpers/selectors';
 import { TEST_USER, AUTH_STATE_PATH, ROUTES } from '../helpers/test-data';
@@ -5,6 +6,16 @@ import { TEST_USER, AUTH_STATE_PATH, ROUTES } from '../helpers/test-data';
 const MAX_LOGIN_ATTEMPTS = 3;
 
 setup('authenticate test user', async ({ page }) => {
+  // In CI the auth state is produced once by the dedicated e2e-setup job and
+  // downloaded as an artifact before each shard starts. Skip re-authentication
+  // to avoid concurrent Cognito sign-ins across shards hitting rate limits.
+  //
+  // The CI guard is intentional: locally we always perform a fresh login so
+  // a leftover file with expired tokens never silently breaks the test run.
+  if (process.env.CI && existsSync(AUTH_STATE_PATH)) {
+    return;
+  }
+
   setup.setTimeout(180_000);
 
   for (let attempt = 1; attempt <= MAX_LOGIN_ATTEMPTS; attempt++) {

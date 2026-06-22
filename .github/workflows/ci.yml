@@ -100,6 +100,11 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium firefox webkit
 
+      # Pre-create the output directory so Playwright's storageState() has a
+      # parent directory to write into on all runner environments.
+      - name: Create auth state directory
+        run: mkdir -p e2e/.auth
+
       - name: Authenticate once
         run: npx playwright test --project=setup
         env:
@@ -122,8 +127,13 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: e2e-auth-state
-          path: e2e/.auth/
+          # Upload by explicit file path rather than directory to avoid hidden-
+          # directory glob quirks. Fails the job immediately if the file wasn't
+          # produced, so downstream shards get a clear dependency failure rather
+          # than an opaque "artifact not found" error.
+          path: e2e/.auth/user.json
           retention-days: 1
+          if-no-files-found: error
 
   # e2e runs as a 3-way shard matrix so each runner handles ~1/3 of the tests
   # across all three browsers in parallel, cutting wall-clock time by ~60%.

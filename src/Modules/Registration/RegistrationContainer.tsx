@@ -157,6 +157,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
   const householdDataProcessedRef = useRef<boolean>(false);
   // Guards the API-based prefill (RSVP path) so it only runs once per navigation.
   const householdApiFetchedRef = useRef<boolean>(false);
+  // Monotonically-increasing counter scoped to the current navigation. Incremented
+  // by the location-reset effect whenever location.state changes (new navigation).
+  // Used by the RSVP prefill .finally() to distinguish "user state changed within
+  // the same navigation" (safe to release gate) from "user navigated away" (must
+  // keep gate for the new navigation's fetch).
+  const prefillGenerationRef = useRef<number>(0);
 
   // True while the RSVP-path household prefill fetch is in-flight. Initialized
   // eagerly so the form never renders before prefill settles (avoids late-
@@ -394,6 +400,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
   // Reset household data processing flags when location changes
   useEffect(() => {
+    // Advance the generation counter so any in-flight RSVP prefill fetch from the
+    // previous navigation knows it has been superseded and must not release the gate
+    // (which now belongs to the new navigation's fetch).
+    prefillGenerationRef.current += 1;
     householdDataProcessedRef.current = false;
     householdApiFetchedRef.current = false;
     // Re-evaluate whether a prefill fetch is needed for this navigation
@@ -411,8 +421,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
    * and apply the same mapping used by the router-state path above.
    *
    * isHouseholdPrefillLoading (initialised eagerly) keeps the spinner up until
-   * this fetch settles, so the form only renders with complete data and a late
-   * response can never overwrite input the user has already typed.
+   * this fetch settles, so the form only renders with complete data.
+   *
+   * A `cancelled` flag in the closure ensures that if dependencies change while
+   * the fetch is in-flight (e.g. location.state updates or component unmounts),
+   * the stale response is silently discarded rather than applied to the new
+   * navigation's state or a now-unmounted component.
    */
   useEffect(() => {
     const isCognitoSignedIn = StorageService.isLoggedInUser();
@@ -437,9 +451,23 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
     householdApiFetchedRef.current = true;
 
+    // Capture the current navigation generation. The location-reset effect
+    // increments this whenever location.state changes, so .finally() can tell
+    // whether a new navigation started while the fetch was in-flight.
+    const capturedGeneration = prefillGenerationRef.current;
+
+    // Per-effect cancellation flag. Set by the cleanup function when any
+    // dependency changes (including user updating after the .then() applies
+    // household data). Used only in .then()/.catch() to prevent stale data
+    // from being written to state; .finally() uses the generation counter
+    // instead, because cancelled fires on same-navigation user changes too.
+    let cancelled = false;
+
     householdsApiService
       .getUsersMe()
       .then((householdData) => {
+        if (cancelled) return;
+
         const primaryMember =
           householdData.members && householdData.members.length > 0
             ? householdData.members[0]
@@ -483,15 +511,28 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
         }
       })
       .catch((error) => {
+        if (cancelled) return;
         console.error('Error fetching household data for RSVP prefill:', error);
         // Reset the guard so the next RSVP navigation in this session gets a
         // fresh attempt rather than silently staying on stub Cognito data.
         householdApiFetchedRef.current = false;
       })
       .finally(() => {
-        // Always release the loading gate whether the fetch succeeded or failed.
+        // Release the gate only when still within the same navigation.
+        // If the generation advanced (location.state changed) the location-reset
+        // effect has already re-lifted the gate for the new navigation; releasing
+        // it here would allow the form to render before the new fetch completes.
+        // We intentionally do NOT check `cancelled` here: cancelled also fires
+        // when user state changes within the same navigation (e.g. after .then()
+        // applies household data inside act()), which would permanently block the
+        // spinner from clearing.
+        if (prefillGenerationRef.current !== capturedGeneration) return;
         setIsHouseholdPrefillLoading(false);
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [user, location.state, householdsApiService]);
 
   const handleAuthLogin = (): void => {

@@ -24,36 +24,59 @@ jest.mock('../../../Services/ApiService', () => ({
   sendRegistrationConfirmationEmail: jest.fn(),
 }));
 
+const mockGetUsersMe = jest.fn();
+const mockUpdateHousehold = jest.fn().mockResolvedValue({});
+
+const defaultHouseholdData = {
+  members: [
+    {
+      user_id: '1',
+      first_name: 'Jane',
+      last_name: 'Smith',
+      middle_name: 'A',
+      gender_id: 2,
+      suffix_id: null,
+      date_of_birth: '1985-06-15',
+    },
+  ],
+  address_line_1: '456 Oak Ave',
+  address_line_2: 'Apt 3',
+  city: 'Springfield',
+  state: 'IL',
+  zip_code: '62701',
+  phone: '5555551234',
+  email: 'jane@household.com',
+  permission_to_text: true,
+  permission_to_email: true,
+  identification_code: 'HOUSE123',
+  counts: {
+    seniors: 1,
+    adults: 2,
+    children: 1,
+    total: 4,
+  },
+};
+
 jest.mock('../../../Services/HouseholdsApiService', () => ({
   HouseholdsApiService: jest.fn().mockImplementation(() => ({
-    getUsersMe: jest.fn().mockResolvedValue({
-      members: [
-        {
-          user_id: '1',
-          first_name: 'John',
-          last_name: 'Doe',
-        },
-      ],
-      address_line_1: '123 Main St',
-      city: 'Test City',
-      state: 'CA',
-      zip_code: '12345',
-      phone: '1234567890',
-      email: 'john@example.com',
-      counts: {
-        seniors: 0,
-        adults: 1,
-        children: 0,
-        total: 1,
-      },
-    }),
-    updateHousehold: jest.fn().mockResolvedValue({}),
+    getUsersMe: (...args: any[]) => mockGetUsersMe(...args),
+    updateHousehold: (...args: any[]) => mockUpdateHousehold(...args),
   })),
 }));
 
 jest.mock('../RegistrationComponent', () => {
-  return function MockRegistrationComponent() {
-    return <div data-testid="registration-component">Registration Component</div>;
+  return function MockRegistrationComponent({ user }: { user: any }) {
+    return (
+      <div data-testid="registration-component">
+        <span data-testid="user-first-name">{user?.first_name}</span>
+        <span data-testid="user-last-name">{user?.last_name}</span>
+        <span data-testid="user-address">{user?.address_line_1}</span>
+        <span data-testid="user-city">{user?.city}</span>
+        <span data-testid="user-phone">{user?.phone}</span>
+        <span data-testid="user-email">{user?.email}</span>
+        <span data-testid="user-dob">{user?.date_of_birth}</span>
+      </div>
+    );
   };
 });
 
@@ -89,6 +112,11 @@ jest.mock('../../../Utils/StorageService', () => {
     isLoggedInUser: jest.fn(),
     isGuestUser: jest.fn(),
     isCaseManager: jest.fn(),
+    setRegisteredEventDateID: jest.fn(),
+    setItem: jest.fn(),
+    getItem: jest.fn().mockReturnValue(null),
+    setGuestSessionMarker: jest.fn(),
+    clearAuthData: jest.fn(),
   };
   return {
     StorageService: mockStorageService,
@@ -138,6 +166,10 @@ describe('RegistrationContainer', () => {
     mockStorageService.isGuestUser.mockReturnValue(false);
     mockStorageService.isCaseManager.mockReturnValue(false);
 
+    // Default household API response
+    mockGetUsersMe.mockResolvedValue(defaultHouseholdData);
+    mockUpdateHousehold.mockResolvedValue({});
+
     // Mock environment variables
     process.env.REACT_APP_CLIENT_URL = 'http://localhost:3000';
 
@@ -156,12 +188,16 @@ describe('RegistrationContainer', () => {
     });
   });
 
-  const renderWithProviders = (component: React.ReactElement, route = '/register/form/1') => {
+  const renderWithProviders = (
+    component: React.ReactElement,
+    routeEntry: string | { pathname: string; state?: Record<string, unknown> } = '/register/form/1',
+  ) => {
     return render(
       <Provider store={store}>
-        <MemoryRouter initialEntries={[route]}>
+        <MemoryRouter initialEntries={[routeEntry]}>
           <Routes>
             <Route path="/register/form/:eventDateId" element={component} />
+            <Route path="/register/form/:eventDateId/:eventSlotId" element={component} />
           </Routes>
         </MemoryRouter>
       </Provider>,
@@ -213,6 +249,116 @@ describe('RegistrationContainer', () => {
       },
       { timeout: 1000 },
     );
+  });
+
+  describe('RSVP path household prefill', () => {
+    const cognitoUser = { name: 'Cognito User', email: 'cognito@test.com' };
+
+    beforeEach(() => {
+      // Simulate an authenticated Cognito user with no router state (RSVP path)
+      mockStorageService.isLoggedInUser.mockReturnValue(true);
+      mockStorageService.getCognitoUser.mockReturnValue(cognitoUser);
+      mockStorageService.isCaseManager.mockReturnValue(false);
+    });
+
+    it('calls getUsersMe to prefill household data when no householdData in router state', async () => {
+      renderWithProviders(<RegistrationContainer />, '/register/form/1');
+
+      await waitFor(() => {
+        expect(mockGetUsersMe).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('prefills address fields from household API response on RSVP path', async () => {
+      renderWithProviders(<RegistrationContainer />, '/register/form/1');
+
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('user-address')).toHaveTextContent('456 Oak Ave');
+        },
+        { timeout: 3000 },
+      );
+
+      expect(screen.getByTestId('user-city')).toHaveTextContent('Springfield');
+      expect(screen.getByTestId('user-phone')).toHaveTextContent('5555551234');
+      expect(screen.getByTestId('user-email')).toHaveTextContent('jane@household.com');
+    });
+
+    it('prefills name fields from primary household member on RSVP path', async () => {
+      renderWithProviders(<RegistrationContainer />, '/register/form/1');
+
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('user-first-name')).toHaveTextContent('Jane');
+        },
+        { timeout: 3000 },
+      );
+
+      expect(screen.getByTestId('user-last-name')).toHaveTextContent('Smith');
+    });
+
+    it('does NOT call getUsersMe when householdData is already in router state (Register path)', async () => {
+      renderWithProviders(<RegistrationContainer />, {
+        pathname: '/register/form/1',
+        state: {
+          householdData: defaultHouseholdData,
+          event_slot: { event_slot_id: 10, start_time: '09:00', end_time: '10:00' },
+          event_date: '2024-01-01',
+        },
+      });
+
+      // Allow effects to settle
+      await waitFor(() => {
+        expect(screen.getByTestId('registration-component')).toBeInTheDocument();
+      });
+
+      // getUsersMe should not have been called for the RSVP prefill path
+      expect(mockGetUsersMe).not.toHaveBeenCalled();
+    });
+
+    it('renders form with Cognito fallback when getUsersMe API call fails', async () => {
+      mockGetUsersMe.mockRejectedValue(new Error('Network error'));
+
+      renderWithProviders(<RegistrationContainer />, '/register/form/1');
+
+      // Form should still render using Cognito defaults
+      await waitFor(
+        () => {
+          expect(screen.getByTestId('registration-component')).toBeInTheDocument();
+        },
+        { timeout: 3000 },
+      );
+
+      // Name should fall back to Cognito user data
+      expect(screen.getByTestId('user-first-name')).toHaveTextContent('Cognito');
+    });
+
+    it('does not call getUsersMe for case managers', async () => {
+      mockStorageService.isCaseManager.mockReturnValue(true);
+
+      renderWithProviders(<RegistrationContainer />, '/register/form/1');
+
+      await waitFor(() => {
+        expect(screen.getByTestId('registration-component')).toBeInTheDocument();
+      });
+
+      expect(mockGetUsersMe).not.toHaveBeenCalled();
+    });
+
+    it('does not call getUsersMe for unauthenticated users', async () => {
+      mockStorageService.isLoggedInUser.mockReturnValue(false);
+      mockStorageService.getCognitoUser.mockReturnValue(null);
+      mockStorageService.isGuestUser.mockReturnValue(false);
+      mockStorageService.getUserToken.mockReturnValue(null);
+
+      renderWithProviders(<RegistrationContainer />, '/register/form/1');
+
+      await waitFor(() => {
+        expect(screen.getByTestId('auth-modal')).toBeInTheDocument();
+      });
+
+      expect(mockGetUsersMe).not.toHaveBeenCalled();
+    });
   });
 
   test('always fetches fresh event data based on URL eventDateId', async () => {

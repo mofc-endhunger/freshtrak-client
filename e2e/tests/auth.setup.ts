@@ -9,7 +9,10 @@ setup('authenticate test user', async ({ page }) => {
   // In CI the auth state is produced once by the dedicated e2e-setup job and
   // downloaded as an artifact before each shard starts. Skip re-authentication
   // to avoid concurrent Cognito sign-ins across shards hitting rate limits.
-  if (existsSync(AUTH_STATE_PATH)) {
+  //
+  // The CI guard is intentional: locally we always perform a fresh login so
+  // a leftover file with expired tokens never silently breaks the test run.
+  if (process.env.CI && existsSync(AUTH_STATE_PATH)) {
     return;
   }
 

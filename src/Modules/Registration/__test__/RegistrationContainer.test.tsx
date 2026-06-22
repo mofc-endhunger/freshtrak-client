@@ -316,12 +316,43 @@ describe('RegistrationContainer', () => {
       expect(mockGetUsersMe).not.toHaveBeenCalled();
     });
 
+    it('holds the spinner until getUsersMe resolves (no early form render)', async () => {
+      // Delay the API response so we can assert the spinner is present before it resolves
+      let resolveHousehold!: (v: typeof defaultHouseholdData) => void;
+      mockGetUsersMe.mockReturnValue(
+        new Promise<typeof defaultHouseholdData>((res) => {
+          resolveHousehold = res;
+        }),
+      );
+
+      renderWithProviders(<RegistrationContainer />, '/register/form/1');
+
+      // Wait for the event to load (spinner from isLoading clears), but household fetch still in-flight
+      await waitFor(() => {
+        expect(mockGetUsersMe).toHaveBeenCalledTimes(1);
+      });
+
+      // The form must not be visible while prefill is still loading
+      expect(screen.queryByTestId('registration-component')).not.toBeInTheDocument();
+
+      // Now resolve the household fetch
+      await act(async () => {
+        resolveHousehold(defaultHouseholdData);
+      });
+
+      // Form should now appear with household data
+      await waitFor(() => {
+        expect(screen.getByTestId('registration-component')).toBeInTheDocument();
+      });
+      expect(screen.getByTestId('user-address')).toHaveTextContent('456 Oak Ave');
+    });
+
     it('renders form with Cognito fallback when getUsersMe API call fails', async () => {
       mockGetUsersMe.mockRejectedValue(new Error('Network error'));
 
       renderWithProviders(<RegistrationContainer />, '/register/form/1');
 
-      // Form should still render using Cognito defaults
+      // Form should still render using Cognito defaults after the failed fetch
       await waitFor(
         () => {
           expect(screen.getByTestId('registration-component')).toBeInTheDocument();
@@ -333,9 +364,31 @@ describe('RegistrationContainer', () => {
       expect(screen.getByTestId('user-first-name')).toHaveTextContent('Cognito');
     });
 
+    it('resets the fetch guard after a failure so the next navigation can retry', async () => {
+      // First navigation — API fails
+      mockGetUsersMe.mockRejectedValueOnce(new Error('Network error'));
+
+      const { unmount } = renderWithProviders(<RegistrationContainer />, '/register/form/1');
+
+      await waitFor(() => {
+        expect(screen.getByTestId('registration-component')).toBeInTheDocument();
+      });
+
+      // Guard must have been reset so re-mount (simulating a new navigation) retries
+      unmount();
+      mockGetUsersMe.mockResolvedValue(defaultHouseholdData);
+
+      renderWithProviders(<RegistrationContainer />, '/register/form/2');
+
+      await waitFor(() => {
+        expect(mockGetUsersMe).toHaveBeenCalledTimes(2);
+      });
+    });
+
     it('does not call getUsersMe for case managers', async () => {
       mockStorageService.isCaseManager.mockReturnValue(true);
-
+      // For case managers isHouseholdPrefillLoading initialises to false, so
+      // the form renders without needing a household fetch.
       renderWithProviders(<RegistrationContainer />, '/register/form/1');
 
       await waitFor(() => {

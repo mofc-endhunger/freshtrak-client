@@ -158,6 +158,16 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
   // Guards the API-based prefill (RSVP path) so it only runs once per navigation.
   const householdApiFetchedRef = useRef<boolean>(false);
 
+  // True while the RSVP-path household prefill fetch is in-flight. Initialized
+  // eagerly so the form never renders before prefill settles (avoids late-
+  // clobber of user input if the user starts typing before the API responds).
+  const [isHouseholdPrefillLoading, setIsHouseholdPrefillLoading] = useState<boolean>(
+    () =>
+      StorageService.isLoggedInUser() &&
+      !StorageService.isCaseManager() &&
+      !Boolean(location.state?.householdData),
+  );
+
   const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
   const event = useSelector(selectEvent);
@@ -204,6 +214,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
     setIsError(false);
     setPageError(false);
     setErrors([]);
+    // Allow a fresh RSVP prefill fetch for the new event
+    householdApiFetchedRef.current = false;
 
     // Always fetch fresh event data based on URL parameter
     if (eventDateId) {
@@ -384,6 +396,12 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
   useEffect(() => {
     householdDataProcessedRef.current = false;
     householdApiFetchedRef.current = false;
+    // Re-evaluate whether a prefill fetch is needed for this navigation
+    setIsHouseholdPrefillLoading(
+      StorageService.isLoggedInUser() &&
+        !StorageService.isCaseManager() &&
+        !Boolean(location.state?.householdData),
+    );
   }, [location.state]);
 
   /**
@@ -391,18 +409,23 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
    * state (i.e. RSVP events that skip the timeslot modal) still deserve full
    * household prefill.  Fetch /users/me once the user object is initialised
    * and apply the same mapping used by the router-state path above.
+   *
+   * isHouseholdPrefillLoading (initialised eagerly) keeps the spinner up until
+   * this fetch settles, so the form only renders with complete data and a late
+   * response can never overwrite input the user has already typed.
    */
   useEffect(() => {
     const isCognitoSignedIn = StorageService.isLoggedInUser();
     const hasRouterHouseholdData = Boolean(location.state?.householdData);
 
-    if (
-      !user ||
-      !isCognitoSignedIn ||
-      StorageService.isCaseManager() ||
-      hasRouterHouseholdData ||
-      householdApiFetchedRef.current
-    ) {
+    if (!user || !isCognitoSignedIn || StorageService.isCaseManager() || hasRouterHouseholdData) {
+      // Nothing to fetch — release the loading gate so the form can render.
+      setIsHouseholdPrefillLoading(false);
+      return;
+    }
+
+    if (householdApiFetchedRef.current) {
+      // Already in-flight or completed for this navigation — do not restart.
       return;
     }
 
@@ -455,6 +478,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
       })
       .catch((error) => {
         console.error('Error fetching household data for RSVP prefill:', error);
+        // Reset the guard so the next RSVP navigation in this session gets a
+        // fresh attempt rather than silently staying on stub Cognito data.
+        householdApiFetchedRef.current = false;
+      })
+      .finally(() => {
+        // Always release the loading gate whether the fetch succeeded or failed.
+        setIsHouseholdPrefillLoading(false);
       });
   }, [user, location.state, householdsApiService]);
 
@@ -1030,9 +1060,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
     );
   }
 
-  // Show spinner while loading or if user/event data is not ready
+  // Show spinner while loading, while household prefill is in-flight, or if
+  // user/event data is not ready. The isHouseholdPrefillLoading gate ensures
+  // the form only renders after household data has been fetched, preventing a
+  // late API response from overwriting fields the user already filled in.
   if (
     isLoading ||
+    isHouseholdPrefillLoading ||
     !user ||
     typeof user !== 'object' ||
     !selectedEvent ||

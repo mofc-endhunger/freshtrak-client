@@ -29,10 +29,10 @@ jobs:
       - run: npm ci
       - run: npm run test:ci
 
-  e2e:
+  # Build the production bundle once and share it with all e2e shards.
+  # This removes the per-shard build cost (~60-90s) from the e2e critical path.
+  build:
     runs-on: ubuntu-latest
-    needs: [lint, test]
-    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -41,8 +41,65 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx playwright install --with-deps chromium firefox webkit
-      - run: npx playwright test
+        env:
+          REACT_APP_REGISTRATION_API: ${{ vars.REACT_APP_REGISTRATION_API }}
+          REACT_APP_PANTRY_FINDER_API: ${{ vars.REACT_APP_PANTRY_FINDER_API }}
+          REACT_APP_AWS_REGION: ${{ vars.REACT_APP_AWS_REGION }}
+          REACT_APP_USER_POOL_ID: ${{ vars.REACT_APP_USER_POOL_ID }}
+          REACT_APP_USER_POOL_CLIENT_ID: ${{ vars.REACT_APP_USER_POOL_CLIENT_ID }}
+          REACT_APP_CLIENT_URL: ${{ vars.REACT_APP_CLIENT_URL }}
+          REACT_APP_FRESHTRAK_PARTNERS_URL: ${{ vars.REACT_APP_FRESHTRAK_PARTNERS_URL }}
+          REACT_APP_GTM_ID: ${{ vars.REACT_APP_GTM_ID }}
+          REACT_APP_IMAGES_BASE_URL: ${{ vars.REACT_APP_IMAGES_BASE_URL }}
+          REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
+          REACT_APP_GOOGLE_GEOLOCATION_KEY: ${{ secrets.REACT_APP_GOOGLE_GEOLOCATION_KEY }}
+      - uses: actions/upload-artifact@v6
+        with:
+          name: app-build
+          path: build/
+          retention-days: 1
+
+  # e2e runs as a 3-way shard matrix so each runner handles ~1/3 of the tests
+  # across all three browsers in parallel, cutting wall-clock time by ~60%.
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [lint, test, build]
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/3', '2/3', '3/3']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: app-build
+          path: build/
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: pw-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers (cache miss)
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Install Playwright OS dependencies (cache hit)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium firefox webkit
+
+      - name: Run Playwright tests (shard ${{ matrix.shard }})
+        run: npx playwright test --shard=${{ matrix.shard }}
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:5000
           E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
@@ -58,8 +115,40 @@ jobs:
           REACT_APP_IMAGES_BASE_URL: ${{ vars.REACT_APP_IMAGES_BASE_URL }}
           REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
           REACT_APP_GOOGLE_GEOLOCATION_KEY: ${{ secrets.REACT_APP_GOOGLE_GEOLOCATION_KEY }}
-      - uses: actions/upload-artifact@v6
+
+      - name: Upload blob report
+        uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
+        with:
+          name: blob-report-${{ strategy.job-index }}
+          path: blob-report/
+          retention-days: 1
+
+  # Merge the per-shard blob reports into a single HTML report once all
+  # shards finish (whether they passed or failed).
+  e2e-report:
+    runs-on: ubuntu-latest
+    needs: e2e
+    if: ${{ !cancelled() }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Download all blob reports
+        uses: actions/download-artifact@v6
+        with:
+          pattern: blob-report-*
+          merge-multiple: true
+          path: all-blob-reports/
+
+      - name: Merge reports
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+      - uses: actions/upload-artifact@v6
         with:
           name: playwright-report
           path: playwright-report/

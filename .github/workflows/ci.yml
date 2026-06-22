@@ -195,11 +195,16 @@ jobs:
 
       - name: Upload blob report
         uses: actions/upload-artifact@v6
-        if: ${{ !cancelled() }}
+        # always() ensures upload runs whether tests passed, failed, or the
+        # shard was cancelled mid-run — partial results are still mergeable.
+        # if-no-files-found: ignore handles the edge case where Playwright
+        # exited before writing any output (e.g. webServer failed to start).
+        if: always()
         with:
           name: blob-report-${{ strategy.job-index }}
           path: blob-report/
           retention-days: 1
+          if-no-files-found: ignore
 
   # Merge the per-shard blob reports into a single HTML report once all
   # shards finish (whether they passed or failed).

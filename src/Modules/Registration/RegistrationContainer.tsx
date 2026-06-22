@@ -418,8 +418,14 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
     const isCognitoSignedIn = StorageService.isLoggedInUser();
     const hasRouterHouseholdData = Boolean(location.state?.householdData);
 
-    if (!user || !isCognitoSignedIn || StorageService.isCaseManager() || hasRouterHouseholdData) {
-      // Nothing to fetch — release the loading gate so the form can render.
+    if (!user) {
+      // User not yet initialised — keep the loading gate up and wait for the
+      // next effect run (triggered when user state is set by the auth effect).
+      return;
+    }
+
+    if (!isCognitoSignedIn || StorageService.isCaseManager() || hasRouterHouseholdData) {
+      // Definitely no household fetch needed for this path — release the gate.
       setIsHouseholdPrefillLoading(false);
       return;
     }

@@ -152,15 +152,13 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
             children_in_household: additionalCounts.children,
           });
         } else {
-          // No members yet (new household or all members removed). Still apply
-          // household-level preferences from the API and lock the gate so the
-          // authUser effect cannot flip permission_to_email back to true after
-          // the API has already indicated the user's actual preference.
-          //
-          // We merge rather than replace so that name fields supplied by the
-          // authUser effect (which runs synchronously before this async branch
-          // resolves) are preserved — there is no API member to source them from.
-          apiDataLoadedRef.current = true;
+          // No members yet (new household or all members removed). Apply
+          // household-level preferences (address, contact prefs) from the API
+          // via functional merge so they take effect without blocking the authUser
+          // name fallback. We intentionally do NOT set apiDataLoadedRef here:
+          // the API returned no member names, so Cognito names remain the best
+          // available source and the authUser effect must be allowed to run if
+          // authUser resolves after this branch completes.
           setPrefilledData((prev) => ({ ...prev, ...householdFields }));
         }
       } catch (error) {
@@ -177,11 +175,16 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
   }, [householdsApiService]);
 
   // Pre-populate with auth user data as a fallback only when the /users/me
-  // API has not already returned a primary member. If the API effect ran
-  // first (apiDataLoadedRef = true), we keep those API-sourced names because
-  // they are the ground truth; the Cognito display name is a coarser signal
-  // (a single string split on the first space) that can't be trusted to
-  // reconstruct separate first/last names reliably.
+  // API has not already returned a primary member. If the API effect ran first
+  // with member data (apiDataLoadedRef = true), those API-sourced names are
+  // authoritative — a Cognito display name split on the first space cannot
+  // reliably reconstruct separate first/last names.
+  //
+  // When the API returned no members (apiDataLoadedRef = false), the authUser
+  // effect is still allowed to run so names are filled from Cognito. In that
+  // case we use `prev.permission_to_email ?? true` so that if the API merge
+  // already wrote a `false` preference into prev, it is preserved.  The `??`
+  // only falls back to `true` when the field is still undefined (pre-API state).
   useEffect(() => {
     if (authUser && !apiDataLoadedRef.current) {
       const nameParts = authUser.name?.split(' ') || [];
@@ -190,7 +193,7 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
         first_name: nameParts[0] || '',
         last_name: nameParts.slice(1).join(' ') || '',
         email: authUser.email || '',
-        permission_to_email: true,
+        permission_to_email: prev.permission_to_email ?? true,
       }));
     }
   }, [authUser]);

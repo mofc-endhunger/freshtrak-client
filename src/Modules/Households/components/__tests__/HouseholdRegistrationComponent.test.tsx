@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import HouseholdRegistrationComponent from '../HouseholdRegistrationComponent';
 
 // ---------------------------------------------------------------------------
@@ -225,7 +225,44 @@ describe('HouseholdRegistrationComponent', () => {
       // authUser fires first (synchronous), API merges on top — names preserved.
       expect(lastCall.prefilledData.first_name).toBe('Cognito');
       expect(lastCall.prefilledData.last_name).toBe('User');
-      // API-sourced preference must survive; authUser sets permission_to_email: true.
+      // API-sourced preference must survive; authUser would have set true.
+      expect(lastCall.prefilledData.permission_to_email).toBe(false);
+    });
+
+    it('fills Cognito names when API returns no members and authUser arrives after the API resolves', async () => {
+      // Simulate authUser being null on first render so the API effect runs first,
+      // then authUser resolves later and the names should still be filled.
+      mockUseAuth.mockReturnValue({ user: null });
+
+      let resolveGetUsersMe!: (v: unknown) => void;
+      mockGetUsersMe.mockReturnValue(
+        new Promise((res) => {
+          resolveGetUsersMe = res;
+        }),
+      );
+
+      const { rerender } = renderComponent();
+
+      // Resolve the API with no members while authUser is still null.
+      await act(async () => {
+        resolveGetUsersMe({ members: [], counts: {}, permission_to_email: false });
+      });
+
+      // Now authUser resolves — re-render with the Cognito user available.
+      mockUseAuth.mockReturnValue({ user: cognitoUser });
+      rerender(<HouseholdRegistrationComponent onComplete={onComplete} onCancel={onCancel} />);
+
+      await screen.findByTestId('household-form');
+
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
+        prefilledData: Record<string, unknown>;
+      };
+      // Names must come from Cognito (API provided none).
+      expect(lastCall.prefilledData.first_name).toBe('Cognito');
+      expect(lastCall.prefilledData.last_name).toBe('User');
+      // API-sourced preference must still win (prev.permission_to_email ?? true).
       expect(lastCall.prefilledData.permission_to_email).toBe(false);
     });
 

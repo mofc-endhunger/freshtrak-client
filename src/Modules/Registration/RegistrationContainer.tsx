@@ -220,8 +220,11 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
     setIsError(false);
     setPageError(false);
     setErrors([]);
-    // Allow a fresh RSVP prefill fetch for the new event
+    // Allow a fresh RSVP prefill fetch for the new event and advance the
+    // generation counter so any in-flight fetch from the previous event cannot
+    // release the loading gate that now belongs to the new event.
     householdApiFetchedRef.current = false;
+    prefillGenerationRef.current += 1;
 
     // Always fetch fresh event data based on URL parameter
     if (eventDateId) {
@@ -533,7 +536,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
     return () => {
       cancelled = true;
     };
-  }, [user, location.state, householdsApiService]);
+  }, [user, eventDateId, location.state, householdsApiService]);
 
   const handleAuthLogin = (): void => {
     const token = StorageService.getUserToken();

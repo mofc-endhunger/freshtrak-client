@@ -7,14 +7,24 @@ const MAX_LOGIN_ATTEMPTS = 3;
 
 /**
  * Validates that the Playwright storage-state file at the given path contains
- * usable authentication data.  Three checks must all pass:
+ * usable authentication data.  All checks must pass:
  *
  *   1. The file exists and parses as valid JSON.
  *   2. At least one origin with localStorage entries is present (an auth state
  *      written before Cognito login completes would be empty).
- *   3. No JWT found in localStorage has an expired `exp` claim — Cognito issues
- *      short-lived (~1 h) idTokens, so a stale artifact that predates the next
- *      CI run must not silently pass.
+ *   3. At least one JWT is found in localStorage AND at least one of those
+ *      JWTs has a non-expired `exp` claim.
+ *
+ * The JWT check deliberately uses an "any valid" rather than "none expired"
+ * strategy for two reasons:
+ *   - Cognito stores both an idToken and an accessToken; finding either one
+ *     valid is sufficient for a usable session.
+ *   - Rejecting on the first expired entry would fail spuriously when
+ *     localStorage also holds another, still-valid token for the same session.
+ *
+ * Requiring at least one JWT (rather than just any localStorage items) prevents
+ * a corrupt or pre-login artifact — which would have storage entries but no
+ * Cognito tokens — from being mistakenly accepted.
  */
 function hasValidStorageState(filePath: string): boolean {
   if (!existsSync(filePath)) return false;
@@ -32,25 +42,34 @@ function hasValidStorageState(filePath: string): boolean {
     const allItems: LocalStorageItem[] = origins.flatMap((o) => o.localStorage ?? []);
     if (allItems.length === 0) return false;
 
-    // Reject if any decodable JWT is expired.
+    // Scan for JWT-shaped values (header.payload.signature where both header
+    // and payload are base64url-encoded JSON objects starting with "{").
+    // We require finding at least one valid (non-expired) JWT:
+    //   • No JWT found          → probably a pre-login or corrupt artifact → false
+    //   • All found JWTs expired → stale artifact → false
+    //   • At least one valid JWT → usable session → true (early return)
     const nowSecs = Math.floor(Date.now() / 1000);
+
     for (const { value } of allItems) {
-      // A JWT has the form: <base64url>.<base64url>.<base64url> where the first
-      // two segments decode to JSON objects that begin with "{".
       if (!/^eyJ[\w-]+\.eyJ[\w-]+\.[\w-]+$/.test(value)) continue;
       try {
         const payload = JSON.parse(
           Buffer.from(value.split('.')[1], 'base64url').toString('utf-8'),
         ) as { exp?: number };
-        if (typeof payload.exp === 'number' && payload.exp <= nowSecs) {
-          return false;
+        // A token with no `exp` (uncommon but valid) is treated as non-expiring.
+        if (typeof payload.exp !== 'number' || payload.exp > nowSecs) {
+          return true; // At least one valid JWT — session is usable.
         }
       } catch {
-        // Unparseable JWT segment — skip; other tokens govern the decision.
+        // Unparseable payload — skip; keep looking.
       }
     }
 
-    return true;
+    // Reaching here means either:
+    //   (a) no JWT-shaped values were present (pre-login or corrupt artifact), or
+    //   (b) every decoded JWT was expired.
+    // Both cases indicate an unusable auth state.
+    return false;
   } catch {
     return false;
   }

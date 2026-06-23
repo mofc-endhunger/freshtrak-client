@@ -129,7 +129,9 @@ describe('HouseholdRegistrationComponent', () => {
       renderComponent();
       await screen.findByTestId('household-form');
 
-      const lastCall = mockHouseholdForm.mock.calls.at(-1)?.[0] as {
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
         prefilledData: Record<string, unknown>;
       };
       expect(lastCall.prefilledData.first_name).toBe('Jane');
@@ -147,7 +149,9 @@ describe('HouseholdRegistrationComponent', () => {
       // Re-render with updated auth context value would not happen automatically in this test
       // since useAuth is a hook called on render. The ref check prevents overwrite, so we
       // verify the form received API names in the last call before auth re-resolution.
-      const lastCall = mockHouseholdForm.mock.calls.at(-1)?.[0] as {
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
         prefilledData: Record<string, unknown>;
       };
       expect(lastCall.prefilledData.first_name).toBe('Jane');
@@ -161,7 +165,9 @@ describe('HouseholdRegistrationComponent', () => {
       renderComponent();
       await screen.findByTestId('household-form');
 
-      const lastCall = mockHouseholdForm.mock.calls.at(-1)?.[0] as {
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
         prefilledData: Record<string, unknown>;
       };
       expect(lastCall.prefilledData.email).toBe('jane@api.com');
@@ -172,7 +178,9 @@ describe('HouseholdRegistrationComponent', () => {
       renderComponent();
       await screen.findByTestId('household-form');
 
-      const lastCall = mockHouseholdForm.mock.calls.at(-1)?.[0] as {
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
         prefilledData: Record<string, unknown>;
       };
       expect(lastCall.prefilledData.permission_to_email).toBe(false);
@@ -185,7 +193,9 @@ describe('HouseholdRegistrationComponent', () => {
       renderComponent();
       await screen.findByTestId('household-form');
 
-      const lastCall = mockHouseholdForm.mock.calls.at(-1)?.[0] as {
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
         prefilledData: Record<string, unknown>;
       };
       // "Cognito User" split on first space → first="Cognito", last="User"
@@ -193,16 +203,30 @@ describe('HouseholdRegistrationComponent', () => {
       expect(lastCall.prefilledData.last_name).toBe('User');
     });
 
-    it('falls back to Cognito names when API returns no members', async () => {
-      mockGetUsersMe.mockResolvedValue({ members: [], counts: {} });
+    it('preserves Cognito names but applies API preferences when API returns no members', async () => {
+      // When the household exists but has no members yet, the API still carries
+      // household-level preferences (address, permission_to_email, etc.).  The
+      // component should merge: names from the synchronous Cognito fallback are
+      // kept (no member API source), but contact preferences from the API win.
+      mockGetUsersMe.mockResolvedValue({
+        members: [],
+        counts: {},
+        permission_to_email: false, // API says no email — must NOT be flipped to true
+        permission_to_text: false,
+      });
       renderComponent();
       await screen.findByTestId('household-form');
 
-      const lastCall = mockHouseholdForm.mock.calls.at(-1)?.[0] as {
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
         prefilledData: Record<string, unknown>;
       };
+      // authUser fires first (synchronous), API merges on top — names preserved.
       expect(lastCall.prefilledData.first_name).toBe('Cognito');
       expect(lastCall.prefilledData.last_name).toBe('User');
+      // API-sourced preference must survive; authUser sets permission_to_email: true.
+      expect(lastCall.prefilledData.permission_to_email).toBe(false);
     });
 
     it('falls back to Cognito email when API fails', async () => {
@@ -210,7 +234,9 @@ describe('HouseholdRegistrationComponent', () => {
       renderComponent();
       await screen.findByTestId('household-form');
 
-      const lastCall = mockHouseholdForm.mock.calls.at(-1)?.[0] as {
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
         prefilledData: Record<string, unknown>;
       };
       expect(lastCall.prefilledData.email).toBe('cognito@test.com');
@@ -231,7 +257,9 @@ describe('HouseholdRegistrationComponent', () => {
       renderComponent();
       await screen.findByTestId('household-form');
 
-      const lastCall = mockHouseholdForm.mock.calls.at(-1)?.[0] as {
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
         prefilledData: Record<string, unknown>;
       };
       expect(lastCall.prefilledData.address_line_1).toBe('123 API St');

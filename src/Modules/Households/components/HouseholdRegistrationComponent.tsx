@@ -76,31 +76,57 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
     }
   };
 
-  // Pre-populate form with primary member data from /users/me
+  // Pre-populate form with data from /users/me
   useEffect(() => {
     const fetchUserData = async () => {
       setIsLoadingUserData(true);
       try {
         const userData = await householdsApiService.getUsersMe();
 
-        // Pre-populate primary member data if available
-        if (userData && userData.members && userData.members.length > 0) {
+        // Convert gender_id to the lowercase string form expected by the form.
+        const getGenderForForm = (genderId: number | null): string => {
+          if (!genderId) return '';
+          const gender = getGenderFromId(genderId);
+          if (!gender) return '';
+          const genderMap: Record<string, string> = {
+            male: 'male',
+            female: 'female',
+            other: 'other',
+            prefer_not_to_say: 'not_specify',
+          };
+          return genderMap[gender] || '';
+        };
+
+        const preferredLang =
+          (userData.preferred_language && getLanguageCodes().includes(userData.preferred_language)
+            ? userData.preferred_language
+            : null) ??
+          (typeof userData.language_id === 'number'
+            ? getLanguageOptionById(userData.language_id)?.code
+            : undefined) ??
+          'en';
+
+        // Household-level fields (address, contact preferences, language) are
+        // always applied when the API call succeeds, even when no members exist
+        // yet. This prevents the authUser fallback from overwriting API-sourced
+        // preferences (e.g. permission_to_email: false) for a newly-created
+        // household that hasn't added members yet.
+        const householdFields = {
+          preferred_language: preferredLang,
+          phone: userData.phone || '',
+          email: userData.email || '',
+          address_line_1: userData.address_line_1 || '',
+          address_line_2: userData.address_line_2 || '',
+          city: userData.city || '',
+          state: userData.state || '',
+          zip_code: userData.zip_code || '',
+          permission_to_text: userData.permission_to_text ?? false,
+          permission_to_email: userData.permission_to_email ?? false,
+        };
+
+        if (userData.members && userData.members.length > 0) {
           setCurrentHouseholdMembers(userData.members);
           const primaryMember = userData.members[0];
-
-          // Convert gender_id to form value (lowercase format expected by form)
-          const getGenderForForm = (genderId: number | null): string => {
-            if (!genderId) return '';
-            const gender = getGenderFromId(genderId);
-            if (!gender) return '';
-            const genderMap: Record<string, string> = {
-              male: 'male',
-              female: 'female',
-              other: 'other',
-              prefer_not_to_say: 'not_specify',
-            };
-            return genderMap[gender] || '';
-          };
 
           // Compute additional-member counts (excludes HOH from the correct age bucket)
           const additionalCounts = getAdditionalMemberCounts(
@@ -108,48 +134,39 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
             primaryMember.date_of_birth,
           );
 
-          const preferredLang =
-            (userData.preferred_language && getLanguageCodes().includes(userData.preferred_language)
-              ? userData.preferred_language
-              : null) ??
-            (typeof userData.language_id === 'number'
-              ? getLanguageOptionById(userData.language_id)?.code
-              : undefined) ??
-            'en';
           // Mark that authoritative API data is available. The authUser effect
           // checks this flag so it never replaces API-sourced names with the
           // coarser Cognito display-name split, regardless of which effect
           // resolves first.
           apiDataLoadedRef.current = true;
           setPrefilledData({
+            ...householdFields,
             first_name: primaryMember.first_name || '',
             last_name: primaryMember.last_name || '',
             middle_name: primaryMember.middle_name || '',
             suffix: getSuffixFromId(primaryMember.suffix_id),
             date_of_birth: convertDateFormat(primaryMember.date_of_birth || ''),
             gender: getGenderForForm(primaryMember.gender_id || null),
-            preferred_language: preferredLang,
-            phone: userData.phone || '',
-            email: userData.email || '',
-            address_line_1: userData.address_line_1 || '',
-            address_line_2: userData.address_line_2 || '',
-            city: userData.city || '',
-            state: userData.state || '',
-            zip_code: userData.zip_code || '',
-            // Contact preferences
-            permission_to_text: userData.permission_to_text ?? false,
-            permission_to_email: userData.permission_to_email ?? false,
             seniors_in_household: additionalCounts.seniors,
             adults_in_household: additionalCounts.adults,
             children_in_household: additionalCounts.children,
           });
         } else {
-          // No members found - set empty prefilled data
-          console.error('No members found in user data');
+          // No members yet (new household or all members removed). Still apply
+          // household-level preferences from the API and lock the gate so the
+          // authUser effect cannot flip permission_to_email back to true after
+          // the API has already indicated the user's actual preference.
+          //
+          // We merge rather than replace so that name fields supplied by the
+          // authUser effect (which runs synchronously before this async branch
+          // resolves) are preserved — there is no API member to source them from.
+          apiDataLoadedRef.current = true;
+          setPrefilledData((prev) => ({ ...prev, ...householdFields }));
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
-        // Still allow the form to proceed even if API fails
+        // Still allow the form to proceed even if API fails.
+        // apiDataLoadedRef stays false, so the authUser effect provides fallback.
       } finally {
         // Always set loading to false to prevent infinite spinner
         setIsLoadingUserData(false);

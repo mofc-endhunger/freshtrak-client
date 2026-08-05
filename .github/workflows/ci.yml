@@ -42,11 +42,15 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium firefox webkit
-      - run: npx playwright test
+      - name: Generate runtime config for E2E
+        run: |
+          echo "window._env_ = {" > dist/runtime-config.js
+          env | grep '^REACT_APP_' | while IFS='=' read -r name value; do
+            key=$(echo "$name" | sed 's/^REACT_APP_//')
+            echo "  $key: \"$value\"," >> dist/runtime-config.js
+          done
+          echo "};" >> dist/runtime-config.js
         env:
-          PLAYWRIGHT_BASE_URL: http://localhost:5000
-          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
-          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
           REACT_APP_REGISTRATION_API: ${{ vars.REACT_APP_REGISTRATION_API }}
           REACT_APP_PANTRY_FINDER_API: ${{ vars.REACT_APP_PANTRY_FINDER_API }}
           REACT_APP_AWS_REGION: ${{ vars.REACT_APP_AWS_REGION }}
@@ -58,6 +62,11 @@ jobs:
           REACT_APP_IMAGES_BASE_URL: ${{ vars.REACT_APP_IMAGES_BASE_URL }}
           REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
           REACT_APP_GOOGLE_GEOLOCATION_KEY: ${{ secrets.REACT_APP_GOOGLE_GEOLOCATION_KEY }}
+      - run: npx playwright test
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5000
+          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
       - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:

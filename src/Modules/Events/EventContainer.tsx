@@ -13,6 +13,7 @@ import { DEFAULT_DISTANCE } from '../../Utils/Constants';
 import serviceCatFilter from '../../Utils/serviceCatFilter';
 import LoadingSpinner from '../General/LoadingSpinner';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
+import { ExternalAgency } from './types/externalAgency.types';
 
 // Number of events to render per batch for progressive loading
 const EVENTS_PER_BATCH = 30;
@@ -60,6 +61,7 @@ const EventContainer: React.FC = () => {
   const [agencyData, setAgencyData] = useState<Agency[]>([]);
   const [filteredData, setFilteredData] = useState<Agency[]>([]);
   const [zip, setZip] = useState<string | null>(null);
+  const [externalAgencies, setExternalAgencies] = useState<ExternalAgency[]>([]);
 
   // Progressive rendering state - track number of events to show
   const [visibleEventCount, setVisibleEventCount] = useState<number>(EVENTS_PER_BATCH);
@@ -89,9 +91,25 @@ const EventContainer: React.FC = () => {
     isLoading: loadingMore,
   });
 
+  const getExternalAgencies = async (): Promise<void> => {
+    if (zipCode) {
+      try {
+        const params: Record<string, string> = { zip_code: zipCode };
+        if (distance && distance !== 'All distances') {
+          params.distance = String(distance);
+        }
+        const resp = await axios.get(API_URL.EXTERNAL_AGENCIES, { params });
+        setExternalAgencies(resp.data.external_agencies || []);
+      } catch (err) {
+        setExternalAgencies([]);
+      }
+    }
+  };
+
   const getEvents = async (): Promise<void> => {
     if (zipCode) {
       setLoading(true);
+      setExternalAgencies([]);
       try {
         // When "All distances" is selected, omit distance so backend uses findByZip (no radius filter).
         const params: Record<string, string> = {
@@ -114,8 +132,10 @@ const EventContainer: React.FC = () => {
           setFilteredData(agencies);
         }
         setLoading(false);
+        getExternalAgencies();
       } catch (err) {
         setLoading(false);
+        getExternalAgencies();
       }
     }
   };
@@ -253,6 +273,7 @@ const EventContainer: React.FC = () => {
               lastItemRef={lastElementRef}
               loadingMore={loadingMore}
               onHasMoreChange={setHasMoreEvents}
+              externalAgencies={externalAgencies}
             />
           )}
           {loading && <LoadingSpinner />}

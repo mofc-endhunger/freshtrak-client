@@ -5,6 +5,7 @@ import {
   filterEventsByAvailability,
   filterEventsByReservations,
 } from '../../Utils/availabilityFilter';
+import { ExternalAgency } from './types/externalAgency.types';
 
 interface Agency {
   id: string;
@@ -24,6 +25,7 @@ interface EventListContainerProps {
   lastItemRef?: (node: HTMLElement | null) => void;
   loadingMore?: boolean;
   onHasMoreChange?: (hasMore: boolean) => void;
+  externalAgencies?: ExternalAgency[];
 }
 
 const EventListContainer: React.FC<EventListContainerProps> = ({
@@ -36,6 +38,7 @@ const EventListContainer: React.FC<EventListContainerProps> = ({
   lastItemRef,
   loadingMore = false,
   onHasMoreChange,
+  externalAgencies = [],
 }) => {
   const allEvents = useMemo(() => EventHandler(agencyData), [agencyData]);
 
@@ -85,6 +88,7 @@ const EventListContainer: React.FC<EventListContainerProps> = ({
       lastItemRef={lastItemRef}
       loadingMore={loadingMore}
       hasMore={hasMore}
+      externalAgencies={externalAgencies}
     />
   );
 };

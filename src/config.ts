@@ -29,11 +29,10 @@ interface EnvConfig {
 const hasRuntimeConfig = typeof window !== 'undefined' && window._env_;
 
 function getViteEnv(): Record<string, string | undefined> {
-  try {
-    return import.meta.env || {};
-  } catch (error) {
-    return {};
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env as Record<string, string | undefined>;
   }
+  return {};
 }
 
 /**

@@ -30,18 +30,10 @@ const hasRuntimeConfig = typeof window !== 'undefined' && window._env_;
 
 function getViteEnv(): Record<string, string | undefined> {
   try {
-    const viteEnvAccessor = new Function(
-      'return (typeof import.meta !== "undefined" && import.meta.env) ? import.meta.env : {};',
-    );
-    const viteEnv = viteEnvAccessor();
-    if (viteEnv && typeof viteEnv === 'object') {
-      return viteEnv as Record<string, string | undefined>;
-    }
+    return import.meta.env || {};
   } catch (error) {
-    // Jest and some build contexts don't support import.meta; ignore and fall back.
+    return {};
   }
-
-  return {};
 }
 
 /**

@@ -12,12 +12,12 @@
  */
 export const geocodeAddress = async (address, city, state, zip) => {
   try {
-    // Return null if any required address component is missing
-    if (!address || !city || !state || !zip) {
+    // Return null if no address components are provided
+    if (!address && !city && !state && !zip) {
       return null;
     }
 
-    const fullAddress = `${address}, ${city}, ${state} ${zip}`;
+    const fullAddress = [address, city, state, zip].filter(Boolean).join(', ');
 
     // Use Google Geocoding API if available
     if (window.google && window.google.maps && window.google.maps.Geocoder) {

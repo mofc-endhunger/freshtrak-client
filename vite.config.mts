@@ -56,6 +56,10 @@ export default defineConfig(({ mode }) => {
           target: pantryApiTarget,
           changeOrigin: true,
         },
+        '/api/external-agencies': {
+          target: pantryApiTarget,
+          changeOrigin: true,
+        },
         '/api/foodbanks': {
           target: pantryApiTarget,
           changeOrigin: true,

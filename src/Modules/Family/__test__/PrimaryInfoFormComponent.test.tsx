@@ -1,6 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PrimaryInfoFormComponent from '../PrimaryInfoFormComponent';
+import { Control } from 'react-hook-form';
+
+import { useWatch } from 'react-hook-form';
+
+// Mock useWatch so tests don't depend on a real RHF control instance.
+// Individual tests override the mock when they need specific return values.
+jest.mock('react-hook-form', () => ({
+  ...jest.requireActual('react-hook-form'),
+  useWatch: jest.fn().mockReturnValue(undefined),
+}));
 
 jest.mock('../../Localization/LocalizationComponent', () => ({
   register_who_are_you: 'Who are you?',
@@ -53,6 +63,7 @@ const mockSetValue = jest.fn();
 const mockGetValues = jest.fn();
 const mockTrigger = jest.fn();
 const mockErrors = {};
+const mockControl = {} as Control<any>;
 
 const defaultProps = {
   register: mockRegister,
@@ -61,6 +72,7 @@ const defaultProps = {
   getValues: mockGetValues,
   trigger: mockTrigger,
   errors: mockErrors,
+  control: mockControl,
   continueHandler: jest.fn(),
 };
 
@@ -68,6 +80,8 @@ describe('PrimaryInfoFormComponent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockWatch.mockReturnValue('');
+    // Default: useWatch returns undefined so prop/fallback values take over.
+    (useWatch as jest.Mock).mockReturnValue(undefined);
     mockRegister.mockImplementation((name, options) => ({
       name,
       onChange: jest.fn(),
@@ -525,6 +539,101 @@ describe('PrimaryInfoFormComponent', () => {
       expect(() => {
         unmount();
       }).not.toThrow();
+    });
+  });
+
+  describe('Pre-filled Select Values (useWatch-based)', () => {
+    test('should display gender value returned by useWatch', () => {
+      // Simulate the form returning 'female' via useWatch (as happens after reset + setValue).
+      (useWatch as jest.Mock).mockImplementation(({ name }: { name: string }) => {
+        if (name === 'gender') return 'female';
+        return undefined;
+      });
+
+      renderComponent();
+
+      const genderTrigger = screen.getByTestId('gender-select');
+      expect(genderTrigger).toHaveTextContent('Female');
+    });
+
+    test('should fall back to genderValue prop when useWatch returns undefined', () => {
+      // useWatch returns undefined (field not yet registered) — prop should be used.
+      (useWatch as jest.Mock).mockReturnValue(undefined);
+
+      renderComponent({ genderValue: 'female' });
+
+      const genderTrigger = screen.getByTestId('gender-select');
+      expect(genderTrigger).toHaveTextContent('Female');
+    });
+
+    test('should display suffix value returned by useWatch', () => {
+      (useWatch as jest.Mock).mockImplementation(({ name }: { name: string }) => {
+        if (name === 'suffix') return 'Jr';
+        return undefined;
+      });
+
+      renderComponent();
+
+      const suffixTrigger = screen.getByTestId('suffix-select');
+      expect(suffixTrigger).toHaveTextContent('Jr');
+    });
+
+    test('should fall back to suffixValue prop when useWatch returns undefined', () => {
+      (useWatch as jest.Mock).mockReturnValue(undefined);
+
+      renderComponent({ suffixValue: 'Sr' });
+
+      const suffixTrigger = screen.getByTestId('suffix-select');
+      expect(suffixTrigger).toHaveTextContent('Sr');
+    });
+
+    test('should display preferred language value from useWatch in household setup mode', () => {
+      (useWatch as jest.Mock).mockImplementation(({ name }: { name: string }) => {
+        if (name === 'preferred_language') return 'en';
+        return undefined;
+      });
+
+      renderComponent({ isHouseholdSetup: true });
+
+      const langTrigger = screen.getByTestId('preferred-language-select');
+      expect(langTrigger).toHaveTextContent('English');
+    });
+
+    test('should fall back to preferredLanguageValue prop when useWatch returns undefined', () => {
+      (useWatch as jest.Mock).mockReturnValue(undefined);
+
+      renderComponent({ isHouseholdSetup: true, preferredLanguageValue: 'en' });
+
+      const langTrigger = screen.getByTestId('preferred-language-select');
+      expect(langTrigger).toHaveTextContent('English');
+    });
+
+    test('should show no selection when gender is empty and useWatch returns undefined', () => {
+      (useWatch as jest.Mock).mockReturnValue(undefined);
+
+      renderComponent({ genderValue: '' });
+
+      const genderTrigger = screen.getByTestId('gender-select');
+      expect(genderTrigger).toBeInTheDocument();
+    });
+
+    test('should validate only required fields (no preferred_language) in non-setup mode', async () => {
+      const user = userEvent.setup();
+      mockTrigger.mockResolvedValue(true);
+      mockGetValues.mockReturnValue({});
+      const mockContinueHandler = jest.fn();
+
+      renderComponent({ continueHandler: mockContinueHandler });
+
+      const continueButton = screen.getByTestId('continue-button');
+      await user.click(continueButton);
+
+      expect(mockTrigger).toHaveBeenCalledWith([
+        'first_name',
+        'last_name',
+        'date_of_birth',
+        'gender',
+      ]);
     });
   });
 });

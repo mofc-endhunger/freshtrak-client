@@ -33,7 +33,6 @@ interface HouseholdSignUpWrapperProps {
  */
 export const HouseholdSignUpWrapper: React.FC<HouseholdSignUpWrapperProps> = ({
   children,
-  onSignUpSuccess,
   onSignUpError,
 }) => {
   const { user, isAuthenticated, needsHouseholdSetup, setNeedsHouseholdSetup } = useAuth();

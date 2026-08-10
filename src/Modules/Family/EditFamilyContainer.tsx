@@ -26,6 +26,7 @@ const EditFamilyContainer: React.FC = () => {
     watch,
     setValue,
     trigger,
+    control,
   } = useForm<RegistrationFormData>();
 
   const onSubmit = (data: RegistrationFormData) => {
@@ -95,6 +96,7 @@ const EditFamilyContainer: React.FC = () => {
                     watch={watch}
                     setValue={setValue}
                     trigger={trigger}
+                    control={control}
                   />
                   <MemberCountFormComponent
                     register={register}

@@ -313,8 +313,12 @@ describe('RegistrationConfirmComponent', () => {
 
     it('displays registrant information', () => {
       renderWithState(cmLocationState);
-      const matches = screen.getAllByText(mockFamily.first_name, { exact: false });
-      expect(matches.length).toBeGreaterThan(0);
+      expect(
+        screen.getByRole('heading', {
+          level: 3,
+          name: new RegExp(mockFamily.first_name, 'i'),
+        }),
+      ).toBeInTheDocument();
     });
 
     it('shows print and save buttons', () => {

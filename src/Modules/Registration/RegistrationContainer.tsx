@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState, useRef, useCallback } from 'react';
+import React, { Fragment, useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import config from '../../config';
@@ -37,11 +37,14 @@ import {
   ApiResponse,
 } from './types/registration.types';
 
-// Convert date from yyyy-mm-dd to MM / DD / YYYY format for form display
-function convertDateFormat(dateString: string): string {
-  if (!dateString || dateString === '1900-01-01') {
-    return '';
-  }
+// ---------------------------------------------------------------------------
+// Module-level helpers shared between the router-state and API-fetch prefill
+// paths so the logic stays in one place.
+// ---------------------------------------------------------------------------
+
+/** Convert yyyy-mm-dd → "MM / DD / YYYY" (format expected by the form). */
+const convertHouseholdDateFormat = (dateString: string): string => {
+  if (!dateString || dateString === '1900-01-01') return '';
   try {
     const [year, month, day] = dateString.split('-').map(Number);
     if (
@@ -57,28 +60,25 @@ function convertDateFormat(dateString: string): string {
     ) {
       return '';
     }
-    const monthStr = String(month).padStart(2, '0');
-    const dayStr = String(day).padStart(2, '0');
-    const yearStr = String(year);
-    return `${monthStr} / ${dayStr} / ${yearStr}`;
-  } catch (error) {
+    return `${String(month).padStart(2, '0')} / ${String(day).padStart(2, '0')} / ${String(year)}`;
+  } catch {
     return '';
   }
-}
+};
 
-// Convert gender_id to form value (lowercase format expected by form)
-function getGenderForForm(genderId: number | null): string {
+/** Convert a household gender_id to the form value expected by HouseholdForm. */
+const getGenderForForm = (genderId: number | null): string => {
   if (!genderId) return '';
   const gender = getGenderFromId(genderId);
   if (!gender) return '';
-  const genderMap: Record<string, string> = {
+  const map: Record<string, string> = {
     male: 'male',
     female: 'female',
     other: 'other',
     prefer_not_to_say: 'not_specify',
   };
-  return genderMap[gender] || '';
-}
+  return map[gender] || '';
+};
 
 // Utility to sanitize user object
 function sanitizeUser(user: any): RegistrationFormData {
@@ -155,6 +155,26 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
   const [householdMembers, setHouseholdMembers] = useState<any[]>([]);
   const redirectTimeout = useRef<NodeJS.Timeout | null>(null);
   const householdDataProcessedRef = useRef<boolean>(false);
+  // Guards the API-based prefill (RSVP path) so it only runs once per navigation.
+  const householdApiFetchedRef = useRef<boolean>(false);
+  // Monotonically-increasing counter scoped to the current navigation. Incremented
+  // by the location-reset effect whenever location.state changes (new navigation).
+  // Used by the RSVP prefill .finally() to distinguish "user state changed within
+  // the same navigation" (safe to release gate) from "user navigated away" (must
+  // keep gate for the new navigation's fetch).
+  const prefillGenerationRef = useRef<number>(0);
+
+  // True while the RSVP-path household prefill fetch is in-flight. Initialized
+  // eagerly so the form never renders before prefill settles (avoids late-
+  // clobber of user input if the user starts typing before the API responds).
+  const [isHouseholdPrefillLoading, setIsHouseholdPrefillLoading] = useState<boolean>(
+    () =>
+      StorageService.isLoggedInUser() &&
+      !StorageService.isCaseManager() &&
+      !Boolean(location.state?.householdData),
+  );
+
+  const householdsApiService = useMemo(() => new HouseholdsApiService(), []);
 
   const event = useSelector(selectEvent);
   // Don't initialize from Redux cache - always start fresh to avoid stale data from previous sessions
@@ -200,6 +220,11 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
     setIsError(false);
     setPageError(false);
     setErrors([]);
+    // Allow a fresh RSVP prefill fetch for the new event and advance the
+    // generation counter so any in-flight fetch from the previous event cannot
+    // release the loading gate that now belongs to the new event.
+    householdApiFetchedRef.current = false;
+    prefillGenerationRef.current += 1;
 
     // Always fetch fresh event data based on URL parameter
     if (eventDateId) {
@@ -274,62 +299,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
               permission_to_text: false,
               permission_to_email: true,
             };
-            const initialUser = sanitizeUser(cognitoUserObj);
-            setUser(initialUser);
-
-            // Fetch full household data from /users/me to prefill DOB, address, gender, etc.
-            const householdsApiService = HouseholdsApiService.getInstance();
-            householdsApiService
-              .getUsersMe()
-              .then((householdData) => {
-                const primaryMember =
-                  householdData.members && householdData.members.length > 0
-                    ? householdData.members[0]
-                    : null;
-
-                const counts = getAdditionalMemberCounts(
-                  householdData.counts || {},
-                  primaryMember?.date_of_birth,
-                );
-
-                setUser((prev) => {
-                  if (!prev) return prev;
-                  return {
-                    ...prev,
-                    address_line_1: householdData.address_line_1 || prev.address_line_1,
-                    address_line_2: householdData.address_line_2 || prev.address_line_2,
-                    city: householdData.city || prev.city,
-                    state: householdData.state || prev.state,
-                    zip_code: householdData.zip_code || prev.zip_code,
-                    phone: householdData.phone || prev.phone,
-                    email: householdData.email || prev.email,
-                    permission_to_text: householdData.permission_to_text ?? prev.permission_to_text,
-                    permission_to_email:
-                      householdData.permission_to_email ?? prev.permission_to_email,
-                    date_of_birth: primaryMember
-                      ? convertDateFormat(primaryMember.date_of_birth || '')
-                      : prev.date_of_birth || '',
-                    gender: primaryMember
-                      ? getGenderForForm(primaryMember.gender_id || null)
-                      : prev.gender || '',
-                    suffix: primaryMember
-                      ? getSuffixFromId(primaryMember.suffix_id)
-                      : prev.suffix || '',
-                    seniors_in_household: counts.seniors,
-                    adults_in_household: counts.adults,
-                    children_in_household: counts.children,
-                    identification_code:
-                      householdData.identification_code || prev.identification_code,
-                  };
-                });
-
-                if (householdData.members && householdData.members.length > 0) {
-                  setHouseholdMembers(householdData.members);
-                }
-              })
-              .catch((error) => {
-                console.error('Error fetching household data:', error);
-              });
+            setUser(sanitizeUser(cognitoUserObj));
           } catch (error) {
             console.error('Error parsing cognitoUser:', error);
           }
@@ -352,6 +322,10 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
 
           const prefilledUser = {
             ...user,
+            // Prefill name from primary household member
+            first_name: primaryMember?.first_name || user.first_name,
+            last_name: primaryMember?.last_name || user.last_name,
+            middle_name: primaryMember?.middle_name || user.middle_name,
             // Prefill address information
             address_line_1: householdData.address_line_1 || user.address_line_1,
             address_line_2: householdData.address_line_2 || user.address_line_2,
@@ -365,7 +339,7 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
             permission_to_email: householdData.permission_to_email ?? user.permission_to_email,
             // Prefill date_of_birth, gender, and suffix from primary member
             date_of_birth: primaryMember
-              ? convertDateFormat(primaryMember.date_of_birth || '')
+              ? convertHouseholdDateFormat(primaryMember.date_of_birth || '')
               : user.date_of_birth || '',
             gender: primaryMember
               ? getGenderForForm(primaryMember.gender_id || null)
@@ -427,10 +401,142 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
     location.state,
   ]);
 
-  // Reset household data processing flag when location changes
+  // Reset household data processing flags when location changes
   useEffect(() => {
+    // Advance the generation counter so any in-flight RSVP prefill fetch from the
+    // previous navigation knows it has been superseded and must not release the gate
+    // (which now belongs to the new navigation's fetch).
+    prefillGenerationRef.current += 1;
     householdDataProcessedRef.current = false;
+    householdApiFetchedRef.current = false;
+    // Re-evaluate whether a prefill fetch is needed for this navigation
+    setIsHouseholdPrefillLoading(
+      StorageService.isLoggedInUser() &&
+        !StorageService.isCaseManager() &&
+        !Boolean(location.state?.householdData),
+    );
   }, [location.state]);
+
+  /**
+   * RSVP path prefill: Cognito users arriving without householdData in router
+   * state (i.e. RSVP events that skip the timeslot modal) still deserve full
+   * household prefill.  Fetch /users/me once the user object is initialised
+   * and apply the same mapping used by the router-state path above.
+   *
+   * isHouseholdPrefillLoading (initialised eagerly) keeps the spinner up until
+   * this fetch settles, so the form only renders with complete data.
+   *
+   * A `cancelled` flag in the closure ensures that if dependencies change while
+   * the fetch is in-flight (e.g. location.state updates or component unmounts),
+   * the stale response is silently discarded rather than applied to the new
+   * navigation's state or a now-unmounted component.
+   */
+  useEffect(() => {
+    const isCognitoSignedIn = StorageService.isLoggedInUser();
+    const hasRouterHouseholdData = Boolean(location.state?.householdData);
+
+    if (!user) {
+      // User not yet initialised — keep the loading gate up and wait for the
+      // next effect run (triggered when user state is set by the auth effect).
+      return;
+    }
+
+    if (!isCognitoSignedIn || StorageService.isCaseManager() || hasRouterHouseholdData) {
+      // Definitely no household fetch needed for this path — release the gate.
+      setIsHouseholdPrefillLoading(false);
+      return;
+    }
+
+    if (householdApiFetchedRef.current) {
+      // Already in-flight or completed for this navigation — do not restart.
+      return;
+    }
+
+    householdApiFetchedRef.current = true;
+
+    // Capture the current navigation generation. The location-reset effect
+    // increments this whenever location.state changes, so .finally() can tell
+    // whether a new navigation started while the fetch was in-flight.
+    const capturedGeneration = prefillGenerationRef.current;
+
+    // Per-effect cancellation flag. Set by the cleanup function when any
+    // dependency changes (including user updating after the .then() applies
+    // household data). Used only in .then()/.catch() to prevent stale data
+    // from being written to state; .finally() uses the generation counter
+    // instead, because cancelled fires on same-navigation user changes too.
+    let cancelled = false;
+
+    householdsApiService
+      .getUsersMe()
+      .then((householdData) => {
+        if (cancelled) return;
+
+        const primaryMember =
+          householdData.members && householdData.members.length > 0
+            ? householdData.members[0]
+            : null;
+
+        const counts = getAdditionalMemberCounts(
+          householdData.counts || {},
+          primaryMember?.date_of_birth,
+        );
+
+        setUser((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            first_name: primaryMember?.first_name || prev.first_name,
+            last_name: primaryMember?.last_name || prev.last_name,
+            middle_name: primaryMember?.middle_name || prev.middle_name,
+            suffix: primaryMember ? getSuffixFromId(primaryMember.suffix_id) : prev.suffix,
+            date_of_birth: primaryMember
+              ? convertHouseholdDateFormat(primaryMember.date_of_birth || '')
+              : prev.date_of_birth,
+            gender: primaryMember ? getGenderForForm(primaryMember.gender_id || null) : prev.gender,
+            address_line_1: householdData.address_line_1 || prev.address_line_1,
+            address_line_2: householdData.address_line_2 || prev.address_line_2,
+            city: householdData.city || prev.city,
+            state: householdData.state || prev.state,
+            zip_code: householdData.zip_code || prev.zip_code,
+            phone: householdData.phone || prev.phone,
+            email: householdData.email || prev.email,
+            permission_to_text: householdData.permission_to_text ?? prev.permission_to_text,
+            permission_to_email: householdData.permission_to_email ?? prev.permission_to_email,
+            seniors_in_household: counts.seniors,
+            adults_in_household: counts.adults,
+            children_in_household: counts.children,
+            identification_code: householdData.identification_code || prev.identification_code,
+          };
+        });
+
+        if (householdData.members && householdData.members.length > 0) {
+          setHouseholdMembers(householdData.members);
+        }
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error('Error fetching household data for RSVP prefill:', error);
+        // Reset the guard so the next RSVP navigation in this session gets a
+        // fresh attempt rather than silently staying on stub Cognito data.
+        householdApiFetchedRef.current = false;
+      })
+      .finally(() => {
+        // Release the gate only when still within the same navigation.
+        // If the generation advanced (location.state changed) the location-reset
+        // effect has already re-lifted the gate for the new navigation; releasing
+        // it here would allow the form to render before the new fetch completes.
+        // We intentionally do NOT check `cancelled` here: cancelled also fires
+        // when user state changes within the same navigation (e.g. after .then()
+        // applies household data inside act()), which would permanently block the
+        // spinner from clearing.
+        if (prefillGenerationRef.current !== capturedGeneration) return;
+        setIsHouseholdPrefillLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, eventDateId, location.state, householdsApiService]);
 
   const handleAuthLogin = (): void => {
     const token = StorageService.getUserToken();
@@ -1004,9 +1110,13 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
     );
   }
 
-  // Show spinner while loading or if user/event data is not ready
+  // Show spinner while loading, while household prefill is in-flight, or if
+  // user/event data is not ready. The isHouseholdPrefillLoading gate ensures
+  // the form only renders after household data has been fetched, preventing a
+  // late API response from overwriting fields the user already filled in.
   if (
     isLoading ||
+    isHouseholdPrefillLoading ||
     !user ||
     typeof user !== 'object' ||
     !selectedEvent ||

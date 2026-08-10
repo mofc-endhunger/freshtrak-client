@@ -256,8 +256,15 @@ jobs:
     # Run when shards finished (success or failure) — both states mean blob
     # reports were uploaded and can be merged. Explicitly exclude 'skipped'
     # (e.g. e2e-setup failed so e2e never ran) and 'cancelled' (no artifacts
-    # uploaded), which always() would incorrectly include.
-    if: ${{ needs.e2e.result == 'success' || needs.e2e.result == 'failure' }}
+    # uploaded), which a bare always() would incorrectly include.
+    #
+    # The !cancelled() call is required, not stylistic: a condition built only
+    # from needs.*.result comparisons does not override the implicit skip that
+    # GitHub applies when a needed job fails, so this job was silently skipped
+    # on exactly the runs whose report was worth reading. Including an
+    # always()-family function opts out of that skip, and the result check then
+    # narrows it back down to the two states that produced artifacts.
+    if: ${{ !cancelled() && (needs.e2e.result == 'success' || needs.e2e.result == 'failure') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6

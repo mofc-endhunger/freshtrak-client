@@ -14,9 +14,17 @@ import serviceCatFilter from '../../Utils/serviceCatFilter';
 import LoadingSpinner from '../General/LoadingSpinner';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { ExternalAgency } from './types/externalAgency.types';
+import localization from '../Localization/LocalizationComponent';
 
 // Number of events to render per batch for progressive loading
 const EVENTS_PER_BATCH = 30;
+
+// Upper bound on how long a search may stay in its loading state. axios has no
+// default timeout, so without this a request that never settles leaves the page
+// showing "Searching..." indefinitely with no way for the user to tell that
+// anything is wrong. Sized well above observed latency (~5s for api/agencies
+// under normal load) so it only trips on a genuine stall, not a slow response.
+const REQUEST_TIMEOUT_MS = 20_000;
 
 interface Agency {
   id: string;
@@ -57,6 +65,10 @@ const EventContainer: React.FC = () => {
   });
 
   const [serverError, setServerError] = useState<boolean>(false);
+  // Distinct from `serverError`, which reports a foodbank-lookup failure. This
+  // tracks the events search itself so a failed search surfaces an error and a
+  // retry instead of silently rendering an empty result set.
+  const [eventsError, setEventsError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [agencyData, setAgencyData] = useState<Agency[]>([]);
   const [filteredData, setFilteredData] = useState<Agency[]>([]);
@@ -98,9 +110,14 @@ const EventContainer: React.FC = () => {
         if (distance && distance !== 'All distances') {
           params.distance = String(distance);
         }
-        const resp = await axios.get(API_URL.EXTERNAL_AGENCIES, { params });
+        const resp = await axios.get(API_URL.EXTERNAL_AGENCIES, {
+          params,
+          timeout: REQUEST_TIMEOUT_MS,
+        });
         setExternalAgencies(resp.data.external_agencies || []);
       } catch (err) {
+        // External agencies are supplementary — a failure here must not block or
+        // error the primary event results, so it degrades to an empty list.
         setExternalAgencies([]);
       }
     }
@@ -109,6 +126,7 @@ const EventContainer: React.FC = () => {
   const getEvents = async (): Promise<void> => {
     if (zipCode) {
       setLoading(true);
+      setEventsError(false);
       setExternalAgencies([]);
       try {
         // When "All distances" is selected, omit distance so backend uses findByZip (no radius filter).
@@ -121,6 +139,7 @@ const EventContainer: React.FC = () => {
         }
         const resp = await axios.get(API_URL.EVENTS_LIST, {
           params,
+          timeout: REQUEST_TIMEOUT_MS,
         });
         const {
           data: { agencies },
@@ -134,6 +153,12 @@ const EventContainer: React.FC = () => {
         setLoading(false);
         getExternalAgencies();
       } catch (err) {
+        // Distinguish failure from "search returned nothing": without this the
+        // page renders the no-events message, which tells the user there is no
+        // food available when in fact the request never succeeded.
+        setEventsError(true);
+        setAgencyData([]);
+        setFilteredData([]);
         setLoading(false);
         getExternalAgencies();
       }
@@ -186,6 +211,7 @@ const EventContainer: React.FC = () => {
       try {
         const resp = await axios.get(foodBankUri, {
           params: { zip_code: zip },
+          timeout: REQUEST_TIMEOUT_MS,
         });
         const { data } = resp;
         setFoodBankData(data);
@@ -262,7 +288,26 @@ const EventContainer: React.FC = () => {
             )}
             {!loading && <ResourceList />}
           </div>
-          {!loading && (
+          {!loading && eventsError && (
+            <div
+              className="bg-white rounded-lg shadow-md mx-auto p-8 text-center"
+              role="alert"
+              data-testid="events-error"
+            >
+              <h3 className="text-xl font-semibold text-gray-700">
+                {localization.events_load_error}
+              </h3>
+              <button
+                type="button"
+                className="btn-primary mt-4 min-h-[44px] px-6 py-2 rounded-md font-semibold"
+                onClick={() => getEvents()}
+                data-testid="events-error-retry"
+              >
+                {localization.events_load_error_retry}
+              </button>
+            </div>
+          )}
+          {!loading && !eventsError && (
             <EventListContainer
               agencyData={agencyData}
               visibleEventCount={visibleEventCount}

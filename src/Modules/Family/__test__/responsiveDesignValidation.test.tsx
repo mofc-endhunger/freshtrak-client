@@ -2,10 +2,17 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import { Control } from 'react-hook-form';
 import FamilyContainer from '../FamilyContainer';
 import PrimaryInfoFormComponent from '../PrimaryInfoFormComponent';
 import AddressComponent from '../AddressComponent';
 import ContactInformationComponent from '../ContactInformationComponent';
+
+// Stub useWatch so PrimaryInfoFormComponent can render without a real RHF control.
+jest.mock('react-hook-form', () => ({
+  ...jest.requireActual('react-hook-form'),
+  useWatch: jest.fn().mockReturnValue(undefined),
+}));
 
 // Mock Redux store
 const mockStore = configureStore({
@@ -53,6 +60,7 @@ const mockGetValues = jest.fn();
 const mockHandleSubmit = jest.fn();
 const mockTrigger = jest.fn();
 const mockErrors = {};
+const mockControl = {} as Control<any>;
 
 // Default form props for testing
 const defaultFormProps = {
@@ -63,6 +71,7 @@ const defaultFormProps = {
   watch: mockWatch,
   handleSubmit: mockHandleSubmit,
   trigger: mockTrigger,
+  control: mockControl,
 };
 
 // Wrapper component for testing with Redux

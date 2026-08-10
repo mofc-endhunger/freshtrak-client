@@ -63,8 +63,25 @@ export const formatDateForServer = (value) => {
   }
 
   try {
-    const date = new Date(year, month, day);
-    return date.toISOString().split('T')[0];
+    // Build the YYYY-MM-DD string directly to avoid any timezone conversion.
+    // new Date(y, m, d).toISOString() can shift the date by one day for
+    // users in positive UTC-offset timezones (UTC+N), where local midnight
+    // converts to the previous calendar day in UTC.
+
+    // Verify the calendar date actually exists by constructing a local Date and
+    // confirming the parts round-trip.  JS normalises overflowing dates
+    // (e.g. Feb 31 → Mar 3) instead of throwing, so this is the reliable way
+    // to catch impossible inputs like 2000-02-31 before they reach the API.
+    const check = new Date(year, month, day);
+    if (check.getFullYear() !== year || check.getMonth() !== month || check.getDate() !== day) {
+      console.warn('formatDateForServer: Date does not exist in calendar:', value);
+      return '';
+    }
+
+    const mm = String(month + 1).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    const yyyy = String(year);
+    return `${yyyy}-${mm}-${dd}`;
   } catch (error) {
     console.error('formatDateForServer: Error creating date:', error);
     return '';

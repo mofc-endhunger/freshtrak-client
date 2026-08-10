@@ -21,7 +21,7 @@ jest.mock('../../Registration/RegistrationTextComponent', () => {
 jest.mock('../PrimaryInfoFormComponent', () => {
   return function MockPrimaryInfoFormComponent(props: any) {
     return (
-      <div data-testid="primary-info-form">
+      <div data-testid="primary-info-form" data-has-control={props.control ? 'true' : 'false'}>
         <input name="first_name" data-testid="first-name-input" />
         <input name="last_name" data-testid="last-name-input" />
         <input name="date_of_birth" data-testid="date-of-birth-input" />
@@ -172,6 +172,12 @@ describe('FamilyContainer', () => {
       expect(screen.getByTestId('address-component')).toBeInTheDocument();
       expect(screen.getByTestId('contact-information-component')).toBeInTheDocument();
       expect(screen.getByTestId('member-count-component')).toBeInTheDocument();
+    });
+
+    test('should pass form control to primary info form', () => {
+      renderFamilyContainer();
+
+      expect(screen.getByTestId('primary-info-form')).toHaveAttribute('data-has-control', 'true');
     });
 
     test('should render submit button', () => {

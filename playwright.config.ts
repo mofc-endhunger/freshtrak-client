@@ -12,8 +12,13 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: [['html', { open: 'never' }], ['list']],
+  // 4 workers per shard. ubuntu-latest has 4 vCPUs and e2e tests are largely
+  // I/O-bound (network, navigation waits), so 4 concurrent workers saturates
+  // the runner without CPU contention.
+  workers: process.env.CI ? 4 : undefined,
+  // In CI emit a blob report so the merge job can combine shards into one
+  // HTML report. Locally keep the interactive HTML report.
+  reporter: process.env.CI ? [['blob'], ['list']] : [['html', { open: 'never' }], ['list']],
 
   expect: {
     timeout: 10_000,

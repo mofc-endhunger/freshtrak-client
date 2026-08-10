@@ -6,7 +6,7 @@
  */
 
 import React, { Fragment, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 // Component imports
 import PrimaryInfoFormComponent from '../../Modules/Family/PrimaryInfoFormComponent';
@@ -62,7 +62,8 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
   const modeConfig: FormModeConfig =
     mode === 'registration' ? getRegistrationModeConfig() : getHouseholdSetupModeConfig();
 
-  // Form setup
+  // Form setup — seed preferred_language to 'en' so the Select shows English
+  // on the very first render (before the prefilledData reset effect fires).
   const {
     register,
     trigger,
@@ -72,10 +73,21 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
     watch,
     reset,
     setValue,
-  } = useForm<RegistrationFormData>({ mode: 'onChange' });
+    clearErrors,
+    control,
+  } = useForm<RegistrationFormData>({
+    mode: 'onChange',
+    defaultValues: { preferred_language: 'en' },
+  });
 
-  // Create a wrapper function for watch to match child component expectations
+  // useWatch sets up proper RHF subscriptions that respond to both reset() and
+  // setValue() notifications, unlike watch() called during render which can miss
+  // the setValue notification (its subject payload only carries { name, values }
+  // which doesn't satisfy the root subscriber's form-state check).
   const watchField = watch;
+  const genderWatchValue = useWatch({ control, name: 'gender' }) ?? '';
+  const suffixWatchValue = useWatch({ control, name: 'suffix' }) ?? '';
+  const preferredLanguageWatchValue = useWatch({ control, name: 'preferred_language' }) ?? 'en';
 
   // Component state
   const [state, setState] = useState<HouseholdFormState>({
@@ -296,7 +308,19 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
   };
 
   // Step navigation handlers
-  const continueHandler = (values: Partial<RegistrationFormData>): void => {
+  const continueHandler = async (values: Partial<RegistrationFormData>): Promise<void> => {
+    // In household setup mode, validate required step 1 fields before advancing
+    if (mode === 'householdSetup' && state.formStep === HouseholdFormStep.PRIMARY_INFO) {
+      const isValid = await trigger([
+        'first_name',
+        'last_name',
+        'date_of_birth',
+        'gender',
+        'preferred_language',
+      ]);
+      if (!isValid) return;
+    }
+
     setState((prev) => ({
       ...prev,
       formValues: { ...prev.formValues, ...values },
@@ -340,6 +364,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
   };
 
   const previousHandler = (): void => {
+    // Clear any stale validation errors so they don't appear prematurely on the previous step
+    clearErrors();
+
     if (mode === 'householdSetup') {
       // Handle navigation from family member details step
       if (state.formStep === HouseholdFormStep.FAMILY_MEMBER_DETAILS) {
@@ -657,11 +684,15 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
             register={register}
             errors={errors}
             watch={watchField}
+            control={control}
             continueHandler={continueHandler}
             getValues={getValues}
             trigger={trigger}
             setValue={setValue}
             isHouseholdSetup={mode === 'householdSetup'}
+            genderValue={genderWatchValue}
+            suffixValue={suffixWatchValue}
+            preferredLanguageValue={preferredLanguageWatchValue}
           />
         );
 
@@ -985,9 +1016,9 @@ const HouseholdForm: React.FC<HouseholdFormProps> = ({
                     {!isFinalStep && state.formStep !== HouseholdFormStep.FAMILY_MEMBER_DETAILS && (
                       <Button
                         type="button"
-                        onClick={() => {
+                        onClick={async () => {
                           const currentValues = getValues();
-                          continueHandler(currentValues);
+                          await continueHandler(currentValues);
                         }}
                         variant="highlight"
                         className="w-full sm:w-auto sm:min-w-48"

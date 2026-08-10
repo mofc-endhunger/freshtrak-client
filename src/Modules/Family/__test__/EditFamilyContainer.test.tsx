@@ -29,8 +29,11 @@ jest.mock("../AddressComponent", () => ({
 
 jest.mock("../PrimaryInfoFormComponent", () => ({
 	__esModule: true,
-	default: ({ register, errors, getValues }: any) => (
-		<div data-testid="primary-info-component">
+	default: ({ register, errors, getValues, control }: any) => (
+		<div
+			data-testid="primary-info-component"
+			data-has-control={control ? "true" : "false"}
+		>
 			<input
 				{...register("first_name")}
 				data-testid="first-name"
@@ -90,6 +93,8 @@ const mockReset = jest.fn();
 const mockErrors = {};
 const mockWatch = jest.fn();
 const mockSetValue = jest.fn();
+const mockTrigger = jest.fn();
+const mockControl = {};
 
 jest.mock("react-hook-form", () => ({
 	useForm: () => ({
@@ -100,6 +105,8 @@ jest.mock("react-hook-form", () => ({
 		reset: mockReset,
 		watch: mockWatch,
 		setValue: mockSetValue,
+		trigger: mockTrigger,
+		control: mockControl,
 	}),
 }));
 
@@ -284,9 +291,11 @@ describe("EditFamilyContainer", () => {
 			renderEditFamilyContainer();
 			await finishInitialLoading();
 
-			expect(
-				screen.getByTestId("primary-info-component")
-			).toBeInTheDocument();
+			expect(screen.getByTestId("primary-info-component")).toBeInTheDocument();
+			expect(screen.getByTestId("primary-info-component")).toHaveAttribute(
+				"data-has-control",
+				"true"
+			);
 		});
 
 		it("passes correct props to MemberCountFormComponent", async () => {

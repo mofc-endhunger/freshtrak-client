@@ -174,7 +174,12 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     needs: [lint, test, e2e-setup]
-    timeout-minutes: 30
+    # Sized for one worker per shard (see the workers comment in
+    # playwright.config.ts). A shard runs ~1/3 of the suite serially, so expect
+    # ~16-20 min rather than the ~7 min seen at 4 workers. Kept well clear of
+    # that so a slow-but-working run fails on a real assertion instead of an
+    # ambiguous job timeout.
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:

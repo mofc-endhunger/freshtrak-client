@@ -53,6 +53,38 @@ jobs:
           REACT_APP_IMAGES_BASE_URL: ${{ vars.REACT_APP_IMAGES_BASE_URL }}
           REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
           REACT_APP_GOOGLE_GEOLOCATION_KEY: ${{ secrets.REACT_APP_GOOGLE_GEOLOCATION_KEY }}
+      # index.html loads /runtime-config.js to populate window._env_, which is the
+      # only config source that works in the built bundle. The vite `define` block
+      # cannot substitute for it: define does literal text replacement of
+      # `process.env.REACT_APP_X`, but src/config.ts reads keys dynamically
+      # (viteEnv[reactAppKey]), so no replacement ever occurs and `process` is
+      # undefined in the browser. Without this file every config value is "" and
+      # Cognito sign-in fails, taking the whole e2e suite with it.
+      #
+      # Generated here, before the artifact upload, so e2e-setup and all shards
+      # inherit it via app-build rather than each regenerating it.
+      - name: Generate runtime config
+        run: |
+          echo "window._env_ = {" > dist/runtime-config.js
+          env | grep '^REACT_APP_' | while IFS='=' read -r name value; do
+            key="${name#REACT_APP_}"
+            echo "  $key: \"$value\"," >> dist/runtime-config.js
+          done
+          echo "};" >> dist/runtime-config.js
+          echo "--- generated keys ---"
+          grep -o '^  [A-Z_]*:' dist/runtime-config.js || echo "WARNING: no REACT_APP_* vars found"
+        env:
+          REACT_APP_REGISTRATION_API: ${{ vars.REACT_APP_REGISTRATION_API }}
+          REACT_APP_PANTRY_FINDER_API: ${{ vars.REACT_APP_PANTRY_FINDER_API }}
+          REACT_APP_AWS_REGION: ${{ vars.REACT_APP_AWS_REGION }}
+          REACT_APP_USER_POOL_ID: ${{ vars.REACT_APP_USER_POOL_ID }}
+          REACT_APP_USER_POOL_CLIENT_ID: ${{ vars.REACT_APP_USER_POOL_CLIENT_ID }}
+          REACT_APP_CLIENT_URL: ${{ vars.REACT_APP_CLIENT_URL }}
+          REACT_APP_FRESHTRAK_PARTNERS_URL: ${{ vars.REACT_APP_FRESHTRAK_PARTNERS_URL }}
+          REACT_APP_GTM_ID: ${{ vars.REACT_APP_GTM_ID }}
+          REACT_APP_IMAGES_BASE_URL: ${{ vars.REACT_APP_IMAGES_BASE_URL }}
+          REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
+          REACT_APP_GOOGLE_GEOLOCATION_KEY: ${{ secrets.REACT_APP_GOOGLE_GEOLOCATION_KEY }}
       - uses: actions/upload-artifact@v6
         with:
           name: app-build

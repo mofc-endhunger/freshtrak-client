@@ -8,6 +8,13 @@ export default defineConfig(({ mode }) => {
   const registrationApiTarget = env.REACT_APP_REGISTRATION_API || 'http://localhost:3001';
 
   return {
+    define: {
+      ...Object.fromEntries(
+        Object.entries(env)
+          .filter(([key]) => key.startsWith('REACT_APP_') || key.startsWith('VITE_'))
+          .map(([key, val]) => [`process.env.${key}`, JSON.stringify(val)])
+      ),
+    },
     plugins: [
       {
         name: 'treat-js-files-as-jsx',
@@ -41,10 +48,15 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
     },
     server: {
+      host: '0.0.0.0',
       port: 5000,
       strictPort: true,
       proxy: {
         '/api/agencies': {
+          target: pantryApiTarget,
+          changeOrigin: true,
+        },
+        '/api/external-agencies': {
           target: pantryApiTarget,
           changeOrigin: true,
         },

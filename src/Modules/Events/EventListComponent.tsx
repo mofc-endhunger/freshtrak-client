@@ -7,8 +7,10 @@ import EventCardComponent from './EventCardComponent';
 import EventMapComponent, { EventLocation } from './EventMapComponent';
 import ViewToggle, { ViewMode } from './ViewToggle';
 import { formatDateDayAndDate } from '../../Utils/DateFormat';
+import ExternalAgencyCardComponent from './ExternalAgencyCardComponent';
 import '../../Assets/scss/main.scss';
 import localization from '../Localization/LocalizationComponent';
+import { ExternalAgency } from './types/externalAgency.types';
 
 const VIEW_MODE_STORAGE_KEY = 'freshtrak_event_view_mode';
 
@@ -88,6 +90,7 @@ interface EventListComponentProps {
   lastItemRef?: (node: HTMLElement | null) => void;
   loadingMore?: boolean;
   hasMore?: boolean;
+  externalAgencies?: ExternalAgency[];
 }
 
 const EventListComponent: React.FC<EventListComponentProps> = ({
@@ -101,7 +104,13 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
   lastItemRef,
   loadingMore = false,
   hasMore = false,
+  externalAgencies = [],
 }) => {
+  const [highlightedExternalIndex, setHighlightedExternalIndex] = useState<number | null>(null);
+  const [focusedExternalMapIndex, setFocusedExternalMapIndex] = useState<number | null>(null);
+  const externalSectionRef = useRef<HTMLDivElement>(null);
+  const externalCardRefsMap = useRef<Map<number, HTMLDivElement>>(new Map());
+
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const stored = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
     return stored === 'list' || stored === 'grid' ? stored : 'grid';
@@ -215,6 +224,92 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
     [flattenedEvents],
   );
 
+  const handleExternalMarkerHover = useCallback(
+    (_agency: ExternalAgency | null, index: number | null) => {
+      setHighlightedExternalIndex(index);
+    },
+    [],
+  );
+
+  const handleExternalMarkerClick = useCallback((_agency: ExternalAgency, index: number) => {
+    const cardElement = externalCardRefsMap.current.get(index);
+    if (cardElement) {
+      cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlightedExternalIndex(index);
+      setTimeout(() => setHighlightedExternalIndex(null), 2000);
+    }
+  }, []);
+
+  // Handle external agency card click - pan map to marker
+  const handleExternalCardClick = useCallback((index: number) => {
+    if (mapContainerRef.current) {
+      const mapRect = mapContainerRef.current.getBoundingClientRect();
+      const isMapInView = mapRect.top < window.innerHeight && mapRect.bottom > 0;
+
+      if (!isMapInView) {
+        mapContainerRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+        setTimeout(() => {
+          setFocusedExternalMapIndex(index);
+          setTimeout(() => setFocusedExternalMapIndex(null), 1000);
+        }, 500);
+      } else {
+        setFocusedExternalMapIndex(index);
+        setTimeout(() => setFocusedExternalMapIndex(null), 1000);
+      }
+    } else {
+      setFocusedExternalMapIndex(index);
+      setTimeout(() => setFocusedExternalMapIndex(null), 1000);
+    }
+  }, []);
+
+  // Scroll to external agencies section, retrying if lazy-loaded content shifts it
+  const scrollToExternalAgencies = useCallback(() => {
+    let attempts = 0;
+
+    const tryScroll = () => {
+      const el = externalSectionRef.current;
+      if (!el || attempts > 20) return;
+      attempts++;
+
+      // Scroll within the list container if it's a scrollable parent
+      const scrollParent = listContainerRef.current;
+      if (scrollParent && scrollParent.scrollHeight > scrollParent.clientHeight) {
+        // Nested scrollable container (list view) — scroll within it
+        const parentRect = scrollParent.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const offsetTop = elRect.top - parentRect.top + scrollParent.scrollTop;
+        scrollParent.scrollTo({ top: offsetTop, behavior: 'smooth' });
+      } else {
+        // Page-level scroll (grid view)
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Retry — lazy loading may have shifted the target
+      setTimeout(() => {
+        const elAfter = externalSectionRef.current;
+        if (!elAfter) return;
+        const rect = elAfter.getBoundingClientRect();
+        // If not yet near the top of viewport/container, keep trying
+        if (rect.top > 150) {
+          tryScroll();
+        }
+      }, 500);
+    };
+
+    tryScroll();
+  }, []);
+
+  const setExternalCardRef = useCallback((index: number, element: HTMLDivElement | null) => {
+    if (element) {
+      externalCardRefsMap.current.set(index, element);
+    } else {
+      externalCardRefsMap.current.delete(index);
+    }
+  }, []);
+
   // Register card ref
   const setCardRef = useCallback((id: string, element: HTMLDivElement | null) => {
     if (element) {
@@ -234,6 +329,17 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
               {localization.resource_zip_code_events} {zipCode}
             </h2>
             <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+          </div>
+        )}
+        {externalAgencies.length > 0 && (
+          <div className="mb-4">
+            <button
+              onClick={scrollToExternalAgencies}
+              className="text-gray-600 hover:text-gray-800 font-semibold text-base underline cursor-pointer"
+            >
+              {externalAgencies.length}{' '}
+              {localization.additional_agencies_found || 'Additional Agencies Found'}
+            </button>
           </div>
         )}
         {Object.keys(events).length === 0 && (
@@ -300,6 +406,31 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
             <span>{localization.no_more_events || 'No more events to load'}</span>
           </div>
         )}
+
+        {/* External Agencies Section */}
+        {externalAgencies.length > 0 && (
+          <div ref={externalSectionRef} id="external-agencies" className="space-y-4 mt-8">
+            <h3 className="text-lg font-semibold text-gray-800">
+              {localization.additional_agencies_header || 'Additional Agencies'}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {externalAgencies.map((agency, idx) => (
+                <div
+                  key={agency.id}
+                  ref={(el) => setExternalCardRef(idx, el)}
+                  onMouseEnter={() => setHighlightedExternalIndex(idx)}
+                  onMouseLeave={() => setHighlightedExternalIndex(null)}
+                >
+                  <ExternalAgencyCardComponent
+                    agency={agency}
+                    variant="tile"
+                    isHighlighted={highlightedExternalIndex === idx}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -315,12 +446,23 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
           <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
         </div>
       )}
-      {Object.keys(events).length === 0 && (
+      {externalAgencies.length > 0 && (
+        <div className="mb-4">
+          <button
+            onClick={scrollToExternalAgencies}
+            className="text-gray-600 hover:text-gray-800 font-semibold text-base underline cursor-pointer"
+          >
+            {externalAgencies.length}{' '}
+            {localization.additional_agencies_found || 'Additional Agencies Found'}
+          </button>
+        </div>
+      )}
+      {Object.keys(events).length === 0 && externalAgencies.length === 0 && (
         <h3 className="text-xl font-semibold text-gray-700" data-testid="no-events-message">
           {localization.no_events_scheduled}
         </h3>
       )}
-      {Object.keys(events).length > 0 && (
+      {(Object.keys(events).length > 0 || externalAgencies.length > 0) && (
         <div className="flex flex-col xl:flex-row gap-4">
           {/* Map Section */}
           <div ref={mapContainerRef} className="w-full xl:w-2/5 xl:sticky xl:top-4 xl:self-start">
@@ -335,6 +477,11 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
                 highlightedIndex={highlightedEventIndex}
                 focusedIndex={focusedMapIndex}
                 className="h-[350px] xl:h-[calc(100vh-200px)]"
+                externalAgencies={externalAgencies}
+                onExternalMarkerClick={handleExternalMarkerClick}
+                onExternalMarkerHover={handleExternalMarkerHover}
+                highlightedExternalIndex={highlightedExternalIndex}
+                focusedExternalIndex={focusedExternalMapIndex}
               />
             </div>
           </div>
@@ -345,6 +492,12 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
             className="w-full xl:w-3/5 xl:max-h-[calc(100vh-200px)] xl:overflow-y-auto"
           >
             <div className="space-y-6 px-4">
+              {Object.keys(events).length === 0 && (
+                <h3 className="text-xl font-semibold text-gray-700" data-testid="no-events-message">
+                  {localization.no_events_scheduled}
+                </h3>
+              )}
+
               {(() => {
                 const dateEntries = Object.entries(events);
                 const lastDateIndex = dateEntries.length - 1;
@@ -416,6 +569,33 @@ const EventListComponent: React.FC<EventListComponentProps> = ({
               {!hasMore && Object.keys(events).length > 0 && !loadingMore && (
                 <div className="text-center py-4 text-gray-500">
                   <span>{localization.no_more_events || 'No more events to load'}</span>
+                </div>
+              )}
+
+              {/* External Agencies Section */}
+              {externalAgencies.length > 0 && (
+                <div ref={externalSectionRef} id="external-agencies" className="space-y-3 mt-6">
+                  <h3 className="text-lg font-semibold text-gray-800 sticky top-0 bg-[#F2F0F4] py-2 z-10">
+                    {localization.additional_agencies_header || 'Additional Agencies'}
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {externalAgencies.map((agency, idx) => (
+                      <div
+                        key={agency.id}
+                        ref={(el) => setExternalCardRef(idx, el)}
+                        className="cursor-pointer"
+                        onClick={() => handleExternalCardClick(idx)}
+                        onMouseEnter={() => setHighlightedExternalIndex(idx)}
+                        onMouseLeave={() => setHighlightedExternalIndex(null)}
+                      >
+                        <ExternalAgencyCardComponent
+                          agency={agency}
+                          variant="list"
+                          isHighlighted={highlightedExternalIndex === idx}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

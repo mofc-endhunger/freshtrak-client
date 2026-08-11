@@ -30,6 +30,8 @@ const localization = new LocalizedStrings({
     resource_zip_code: 'Resource Events In Zip Code',
     resource_zip_code_events: 'Resource Events Serving Residents of Zip Code',
     no_events_scheduled: 'No Events Currently Scheduled',
+    events_load_error: 'We couldn’t load events right now. Please try again.',
+    events_load_error_retry: 'Try Again',
     refine_your_results: 'REFINE YOUR RESULTS',
     by_distance: 'by Distance',
     by_service_catogory: 'by Service Category',
@@ -881,6 +883,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Have you saved or printed the confirmation information? This data will not be available after you leave this page.',
     family_member_count_plural: 'family members',
+    additional_agencies_found: 'Additional Agencies Found',
+    additional_agencies_header: 'Additional Agencies',
+    visit_website: 'Visit Website',
+    view_listing: 'View Listing',
+    external_agency_hours: 'Hours',
   },
 
   spa: {
@@ -913,6 +920,9 @@ const localization = new LocalizedStrings({
     resource_zip_code: 'Eventos de recursos en código postal',
     resource_zip_code_events: 'Eventos de recursos que sirven a los residentes del código postal',
     no_events_scheduled: 'No hay eventos programados actualmente',
+    events_load_error:
+      'No pudimos cargar los eventos en este momento. Por favor, inténtelo de nuevo.',
+    events_load_error_retry: 'Intentar de nuevo',
     refine_your_results: 'REFINA TUS RESULTADOS',
     by_distance: 'a distancia',
     by_service_catogory: 'por categoría de servicio',
@@ -1771,6 +1781,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       '¿Ha guardado o impreso la información de confirmación? Estos datos no estarán disponibles después de salir de esta página.',
     family_member_count_plural: 'miembros de la familia',
+    additional_agencies_found: 'Agencias Adicionales Encontradas',
+    additional_agencies_header: 'Agencias Adicionales',
+    visit_website: 'Visitar Sitio Web',
+    view_listing: 'Ver Listado',
+    external_agency_hours: 'Horario',
   },
   som: {
     home_freshtrack: 'FreshTrak waxay halkan u joogtaa inay ku caawiso!',
@@ -1802,6 +1817,8 @@ const localization = new LocalizedStrings({
     resource_zip_code: 'Dhacdooyinka Kheyraadka ee Lambarka Zip',
     resource_zip_code_events: 'Dhacdooyinka Kheyraadka ee loogu adeegayo Dadka Deggan Zip Code',
     no_events_scheduled: 'Dhacdooyin Majiraan Waqtigaan la qorsheeyay',
+    events_load_error: 'Ma awoodnay inaan soo dejino dhacdooyinka hadda. Fadlan isku day mar kale.',
+    events_load_error_retry: 'Isku day mar kale',
     refine_your_results: 'NATIIJADA NATIIJADAADA',
     by_distance: 'by Maskaxdii Dunid',
     by_service_catogory: 'by Qaybta Adeegga',
@@ -2657,6 +2674,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Ma keydisay ama daabacday macluumaadka xaqiijinta? Xogtan lama heli doono markaad ka tagto boggan.',
     family_member_count_plural: 'xubnaha qoyska',
+    additional_agencies_found: "Hay'adaha Dheeraadka ah ee la Helay",
+    additional_agencies_header: "Hay'adaha Dheeraadka ah",
+    visit_website: 'Booqo Websaydhka',
+    view_listing: 'Arag Liiska',
+    external_agency_hours: 'Saacadaha',
   },
   rus: {
     home_freshtrack: 'FreshTrak здесь, чтобы помочь!',
@@ -2688,6 +2710,8 @@ const localization = new LocalizedStrings({
     resource_zip_code: 'События ресурсов в почтовом индексе',
     resource_zip_code_events: 'События ресурсов, обслуживающие жителей почтового индекса',
     no_events_scheduled: 'В настоящее время нет запланированных мероприятий',
+    events_load_error: 'Не удалось загрузить мероприятия. Пожалуйста, попробуйте снова.',
+    events_load_error_retry: 'Попробовать снова',
     refine_your_results: 'Уточните свои результаты',
     by_distance: 'по расстоянию',
     by_service_catogory: 'по категории услуг',
@@ -3550,6 +3574,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Вы сохранили или распечатали информацию о подтверждении? Эти данные будут недоступны после того, как вы покинете эту страницу.',
     family_member_count_plural: 'членов семьи',
+    additional_agencies_found: 'Дополнительные агентства найдены',
+    additional_agencies_header: 'Дополнительные агентства',
+    visit_website: 'Посетить веб-сайт',
+    view_listing: 'Посмотреть объявление',
+    external_agency_hours: 'Часы работы',
   },
   tur: {
     home_freshtrack: 'FreshTrak yardım etmek için burada!',
@@ -3581,6 +3610,8 @@ const localization = new LocalizedStrings({
     resource_zip_code: 'Posta Kodundaki Kaynak Olayları',
     resource_zip_code_events: 'Posta Kodu Sakinlerine Hizmet Veren Kaynak Olayları',
     no_events_scheduled: 'Şu anda Planlanmış Etkinlik Yok',
+    events_load_error: 'Etkinlikler şu anda yüklenemedi. Lütfen tekrar deneyin.',
+    events_load_error_retry: 'Tekrar Dene',
     refine_your_results: 'SONUÇLARINIZI DÜZELTİN',
     by_distance: 'Mesafeye göre',
     by_service_catogory: 'Hizmet Kategorisine göre',
@@ -4433,6 +4464,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'Onay bilgilerini kaydettiniz veya yazdırdınız mı? Bu sayfadan ayrıldıktan sonra bu veriler kullanılamayacaktır.',
     family_member_count_plural: 'aile üyeleri',
+    additional_agencies_found: 'Ek Kuruluşlar Bulundu',
+    additional_agencies_header: 'Ek Kuruluşlar',
+    visit_website: 'Web Sitesini Ziyaret Et',
+    view_listing: 'Listeyi Görüntüle',
+    external_agency_hours: 'Çalışma Saatleri',
   },
   ara: {
     home_freshtrack: 'FreshTrak هنا للمساعدة!',
@@ -4463,6 +4499,8 @@ const localization = new LocalizedStrings({
     resource_zip_code: 'أحداث المورد في الرمز البريدي',
     resource_zip_code_events: 'أحداث المورد التي تخدم سكان الرمز البريدي',
     no_events_scheduled: 'لا توجد أحداث مجدولة حاليا',
+    events_load_error: 'لم نتمكن من تحميل الأحداث في الوقت الحالي. يرجى المحاولة مرة أخرى.',
+    events_load_error_retry: 'حاول مرة أخرى',
     refine_your_results: 'حسّن نتائجك',
     by_distance: 'عن طريق المسافة',
     by_service_catogory: 'حسب فئة الخدمة',
@@ -5301,6 +5339,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'هل قمت بحفظ أو طباعة معلومات التأكيد؟ لن تكون هذه البيانات متاحة بعد مغادرة هذه الصفحة.',
     family_member_count_plural: 'أفراد الأسرة',
+    additional_agencies_found: 'تم العثور على وكالات إضافية',
+    additional_agencies_header: 'وكالات إضافية',
+    visit_website: 'زيارة الموقع الإلكتروني',
+    view_listing: 'عرض القائمة',
+    external_agency_hours: 'ساعات العمل',
   },
   zho: {
     home_freshtrack: 'FreshTrak在這里為您提供幫助',
@@ -5327,6 +5370,8 @@ const localization = new LocalizedStrings({
     resource_zip_code: '邮政编码中的资源事件',
     resource_zip_code_events: '为居民提供服务的资源事件',
     no_events_scheduled: '目前未安排活动',
+    events_load_error: '目前无法加载活动。请重试。',
+    events_load_error_retry: '重试',
     refine_your_results: '完善您的结果',
     by_distance: '按距离',
     by_service_catogory: '按服务类别',
@@ -6155,6 +6200,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       '您是否已保存或打印确认信息？离开此页面后将无法获取这些数据。',
     family_member_count_plural: '家庭成员',
+    additional_agencies_found: '找到更多机构',
+    additional_agencies_header: '更多机构',
+    visit_website: '访问网站',
+    view_listing: '查看列表',
+    external_agency_hours: '营业时间',
   },
   hin: {
     home_freshtrack: 'FreshTrak मदद करने के लिए यहाँ है!',
@@ -6185,6 +6235,8 @@ const localization = new LocalizedStrings({
     resource_zip_code: 'ज़िप कोड में संसाधन घटनाएँ',
     resource_zip_code_events: 'ज़िप कोड के निवासियों की सेवा के संसाधन कार्यक्रम',
     no_events_scheduled: 'वर्तमान में कोई कार्यक्रम निर्धारित नहीं है',
+    events_load_error: 'हम अभी कार्यक्रम लोड नहीं कर सके। कृपया पुनः प्रयास करें।',
+    events_load_error_retry: 'पुनः प्रयास करें',
     refine_your_results: 'अपने परिणामों को पढ़ें',
     by_distance: 'दूरी द्वारा',
     by_service_catogory: 'सेवा श्रेणी द्वारा',
@@ -7010,6 +7062,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'क्या आपने पुष्टि जानकारी सहेज ली है या प्रिंट कर लिया है? इस पृष्ठ से जाने के बाद यह डेटा उपलब्ध नहीं होगा।',
     family_member_count_plural: 'परिवार के सदस्य',
+    additional_agencies_found: 'अतिरिक्त एजेंसियां मिलीं',
+    additional_agencies_header: 'अतिरिक्त एजेंसियां',
+    visit_website: 'वेबसाइट पर जाएं',
+    view_listing: 'सूची देखें',
+    external_agency_hours: 'समय',
 
     // FEEDBACK
     feedback_give_feedback: 'प्रतिक्रिया दें',
@@ -7065,6 +7122,8 @@ const localization = new LocalizedStrings({
     resource_zip_code: 'जिप कोडमा स्रोत घटनाहरू',
     resource_zip_code_events: 'Zip Code को बासिन्दाको सेवा गर्ने स्रोत घटनाक्रम',
     no_events_scheduled: 'हाल कुनै कार्यक्रमहरू तालिकाबद्ध गरिएको छैन',
+    events_load_error: 'हामी अहिले कार्यक्रमहरू लोड गर्न सकेनौं। कृपया पुनः प्रयास गर्नुहोस्।',
+    events_load_error_retry: 'पुनः प्रयास गर्नुहोस्',
     refine_your_results: 'तपाइँका परिणामहरूलाई परिष्कृत गर्नुहोस',
     by_distance: 'दूरी बाट',
     by_service_catogory: 'सेवा कोटी द्वारा',
@@ -7918,6 +7977,11 @@ const localization = new LocalizedStrings({
     cm_save_before_leaving_description:
       'के तपाईंले पुष्टि जानकारी बचत गर्नुभयो वा प्रिन्ट गर्नुभयो? यो पृष्ठ छोडेपछि यो डेटा उपलब्ध हुनेछैन।',
     family_member_count_plural: 'परिवारका सदस्यहरू',
+    additional_agencies_found: 'थप एजेन्सीहरू फेला पारियो',
+    additional_agencies_header: 'थप एजेन्सीहरू',
+    visit_website: 'वेबसाइट हेर्नुहोस्',
+    view_listing: 'सूची हेर्नुहोस्',
+    external_agency_hours: 'समय',
   },
 });
 

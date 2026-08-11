@@ -7,8 +7,17 @@ on:
     branches: [dev, beta]
 
 jobs:
+  # Every job carries a timeout. Without one GitHub applies its 6-hour default,
+  # so a job that wedges holds a runner and blocks the PR status for the rest of
+  # the day. Observed on run 31501095075: the `test` job reported every step —
+  # including "Complete job" — as successful, yet the job never finalised and the
+  # run sat in_progress for 30+ minutes. The cancel API returned HTTP 500, so it
+  # could not even be stopped by hand. These limits are sized several times the
+  # observed runtime so they only trip on a genuine stall, never on a slow run.
   lint:
     runs-on: ubuntu-latest
+    # Observed ~1 min.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -20,6 +29,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    # Observed ~2-3 min for 70 suites / 975 tests with coverage.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -33,6 +44,8 @@ jobs:
   # This removes the per-shard build cost (~60-90s) from the e2e critical path.
   build:
     runs-on: ubuntu-latest
+    # Observed ~1 min.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -41,6 +54,38 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          REACT_APP_REGISTRATION_API: ${{ vars.REACT_APP_REGISTRATION_API }}
+          REACT_APP_PANTRY_FINDER_API: ${{ vars.REACT_APP_PANTRY_FINDER_API }}
+          REACT_APP_AWS_REGION: ${{ vars.REACT_APP_AWS_REGION }}
+          REACT_APP_USER_POOL_ID: ${{ vars.REACT_APP_USER_POOL_ID }}
+          REACT_APP_USER_POOL_CLIENT_ID: ${{ vars.REACT_APP_USER_POOL_CLIENT_ID }}
+          REACT_APP_CLIENT_URL: ${{ vars.REACT_APP_CLIENT_URL }}
+          REACT_APP_FRESHTRAK_PARTNERS_URL: ${{ vars.REACT_APP_FRESHTRAK_PARTNERS_URL }}
+          REACT_APP_GTM_ID: ${{ vars.REACT_APP_GTM_ID }}
+          REACT_APP_IMAGES_BASE_URL: ${{ vars.REACT_APP_IMAGES_BASE_URL }}
+          REACT_APP_GOOGLE_API_KEY: ${{ secrets.REACT_APP_GOOGLE_API_KEY }}
+          REACT_APP_GOOGLE_GEOLOCATION_KEY: ${{ secrets.REACT_APP_GOOGLE_GEOLOCATION_KEY }}
+      # index.html loads /runtime-config.js to populate window._env_, which is the
+      # only config source that works in the built bundle. The vite `define` block
+      # cannot substitute for it: define does literal text replacement of
+      # `process.env.REACT_APP_X`, but src/config.ts reads keys dynamically
+      # (viteEnv[reactAppKey]), so no replacement ever occurs and `process` is
+      # undefined in the browser. Without this file every config value is "" and
+      # Cognito sign-in fails, taking the whole e2e suite with it.
+      #
+      # Generated here, before the artifact upload, so e2e-setup and all shards
+      # inherit it via app-build rather than each regenerating it.
+      - name: Generate runtime config
+        run: |
+          echo "window._env_ = {" > dist/runtime-config.js
+          env | grep '^REACT_APP_' | while IFS='=' read -r name value; do
+            key="${name#REACT_APP_}"
+            echo "  $key: \"$value\"," >> dist/runtime-config.js
+          done
+          echo "};" >> dist/runtime-config.js
+          echo "--- generated keys ---"
+          grep -o '^  [A-Z_]*:' dist/runtime-config.js || echo "WARNING: no REACT_APP_* vars found"
         env:
           REACT_APP_REGISTRATION_API: ${{ vars.REACT_APP_REGISTRATION_API }}
           REACT_APP_PANTRY_FINDER_API: ${{ vars.REACT_APP_PANTRY_FINDER_API }}
@@ -142,7 +187,12 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     needs: [lint, test, e2e-setup]
-    timeout-minutes: 30
+    # Sized for one worker per shard (see the workers comment in
+    # playwright.config.ts). A shard runs ~1/3 of the suite serially, so expect
+    # ~16-20 min rather than the ~7 min seen at 4 workers. Kept well clear of
+    # that so a slow-but-working run fails on a real assertion instead of an
+    # ambiguous job timeout.
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -221,11 +271,20 @@ jobs:
   e2e-report:
     runs-on: ubuntu-latest
     needs: e2e
+    # Observed <1 min; downloading and merging blob reports is I/O-bound.
+    timeout-minutes: 15
     # Run when shards finished (success or failure) — both states mean blob
     # reports were uploaded and can be merged. Explicitly exclude 'skipped'
     # (e.g. e2e-setup failed so e2e never ran) and 'cancelled' (no artifacts
-    # uploaded), which always() would incorrectly include.
-    if: ${{ needs.e2e.result == 'success' || needs.e2e.result == 'failure' }}
+    # uploaded), which a bare always() would incorrectly include.
+    #
+    # The !cancelled() call is required, not stylistic: a condition built only
+    # from needs.*.result comparisons does not override the implicit skip that
+    # GitHub applies when a needed job fails, so this job was silently skipped
+    # on exactly the runs whose report was worth reading. Including an
+    # always()-family function opts out of that skip, and the result check then
+    # narrows it back down to the two states that produced artifacts.
+    if: ${{ !cancelled() && (needs.e2e.result == 'success' || needs.e2e.result == 'failure') }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6

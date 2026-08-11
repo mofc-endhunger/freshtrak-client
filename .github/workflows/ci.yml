@@ -7,8 +7,17 @@ on:
     branches: [dev, beta]
 
 jobs:
+  # Every job carries a timeout. Without one GitHub applies its 6-hour default,
+  # so a job that wedges holds a runner and blocks the PR status for the rest of
+  # the day. Observed on run 31501095075: the `test` job reported every step —
+  # including "Complete job" — as successful, yet the job never finalised and the
+  # run sat in_progress for 30+ minutes. The cancel API returned HTTP 500, so it
+  # could not even be stopped by hand. These limits are sized several times the
+  # observed runtime so they only trip on a genuine stall, never on a slow run.
   lint:
     runs-on: ubuntu-latest
+    # Observed ~1 min.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -20,6 +29,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    # Observed ~2-3 min for 70 suites / 975 tests with coverage.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -33,6 +44,8 @@ jobs:
   # This removes the per-shard build cost (~60-90s) from the e2e critical path.
   build:
     runs-on: ubuntu-latest
+    # Observed ~1 min.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -258,6 +271,8 @@ jobs:
   e2e-report:
     runs-on: ubuntu-latest
     needs: e2e
+    # Observed <1 min; downloading and merging blob reports is I/O-bound.
+    timeout-minutes: 15
     # Run when shards finished (success or failure) — both states mean blob
     # reports were uploaded and can be merged. Explicitly exclude 'skipped'
     # (e.g. e2e-setup failed so e2e never ran) and 'cancelled' (no artifacts

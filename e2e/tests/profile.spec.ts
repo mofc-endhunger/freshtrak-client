@@ -3,6 +3,22 @@ import { test as baseTest, expect as baseExpect } from '@playwright/test';
 import { SEL } from '../helpers/selectors';
 import { ROUTES } from '../helpers/test-data';
 
+// Budget for assertions that wait on the Account page's household data.
+//
+// The page issues three requests on mount (/users/me, plus reservations for
+// ?type=upcoming and ?type=past). The beta registration API processes these
+// effectively one at a time, so latency scales with total in-flight requests —
+// measured against the beta host as 1.8s at 1 concurrent, 4.9s at 3, 9.3s at 6,
+// 14.3s at 9, 18.2s at 12. CI runs three shards in parallel, so nine requests
+// are in flight and the slowest lands around 14.3s before network overhead.
+//
+// The previous 15s budget therefore sat directly on the cliff edge and failed
+// intermittently (2 of these tests failed on one run, all 9 on the next). 30s
+// gives roughly 2x headroom at CI's own concurrency. This is a budget matched to
+// measured reality, not a fix — the underlying API throughput is tracked in
+// SUP-502, and lowering this again depends on that work.
+const HOUSEHOLD_DATA_TIMEOUT = 30_000;
+
 // ── Auth guard (unauthenticated) ─────────────────────────────────
 
 baseTest.describe('Profile - Auth Guard', () => {
@@ -52,7 +68,9 @@ test.describe('Profile / Account Page', () => {
     const householdSection = page.getByTestId(SEL.householdMembersSection);
 
     // Wait for loading to finish, then check for either info or prompt
-    await expect(infoSection.or(householdSection).first()).toBeVisible({ timeout: 15_000 });
+    await expect(infoSection.or(householdSection).first()).toBeVisible({
+      timeout: HOUSEHOLD_DATA_TIMEOUT,
+    });
   });
 
   test('switching back to Summary shows reservations area', async ({ authenticatedPage: page }) => {
@@ -70,7 +88,7 @@ test.describe('Profile / Account Page', () => {
 
     // Wait for account info to load (may take time due to API call)
     await expect(page.getByTestId(SEL.accountInfoSection)).toBeVisible({
-      timeout: 15_000,
+      timeout: HOUSEHOLD_DATA_TIMEOUT,
     });
     await expect(page.getByTestId(SEL.householdMembersSection)).toBeVisible();
   });
@@ -79,7 +97,7 @@ test.describe('Profile / Account Page', () => {
     await page.getByTestId(SEL.tabAccount).click();
 
     await expect(page.getByTestId(SEL.updateHouseholdButton)).toBeVisible({
-      timeout: 15_000,
+      timeout: HOUSEHOLD_DATA_TIMEOUT,
     });
     await page.getByTestId(SEL.updateHouseholdButton).click();
 

@@ -11,7 +11,8 @@ interface PrintableConfirmationCardProps {
   eventTime: string;
   identificationCode: string;
   eventDateId: string | null;
-  eventSlotId?: string;
+  // Numeric in the form-based registration flow, string in the household flow.
+  eventSlotId?: string | number;
 }
 
 const PrintableConfirmationCard: React.FC<PrintableConfirmationCardProps> = ({
@@ -132,7 +133,7 @@ export const generateConfirmationCardPNG = async (
   eventTime: string,
   identificationCode: string,
   eventDateId: string | null,
-  eventSlotId?: string,
+  eventSlotId?: string | number,
 ): Promise<void> => {
   try {
     // Font family constant for consistent styling across the card

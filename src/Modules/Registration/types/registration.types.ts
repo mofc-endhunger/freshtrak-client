@@ -194,6 +194,17 @@ export interface RegistrationComponentProps {
 }
 
 /**
+ * The appointment window a registrant reserved, as carried in router state to the
+ * confirmation page. Passed as `eventTimeStamp` by the form-based registration flow
+ * and as `event_slot` by the household quick-confirm flow.
+ */
+export interface ReservedSlot {
+  start_time?: string;
+  end_time?: string;
+  event_slot_id?: string | number;
+}
+
+/**
  * RegistrationConfirmComponent props
  */
 export interface RegistrationConfirmProps {

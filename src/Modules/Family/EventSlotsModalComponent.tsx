@@ -248,11 +248,26 @@ const EventSlotsModalComponent: React.FC<EventSlotsModalProps> = ({
       );
 
       if (result.success) {
-        // Registration successful - navigate to confirmation page
+        // Persist the event date ID the same way the form-based registration flow does
+        // (RegistrationContainer), so the confirmation page can build a complete
+        // PantryTrak check-in QR code.
+        if (eventDateId) {
+          StorageService.setRegisteredEventDateID(eventDateId);
+        }
+
+        // Registration successful - navigate to confirmation page.
+        // eventTimeStamp is the shape RegistrationConfirmComponent reads the reserved
+        // window from; without it the page falls back to the overall event hours.
         navigate(`${RENDER_URL.REGISTRATION_CONFIRM_URL}`, {
           state: {
             event_slot: selectedSlot,
             event_date: eventDate,
+            eventDateId,
+            eventTimeStamp: {
+              start_time: selectedSlot.start_time,
+              end_time: selectedSlot.end_time,
+              event_slot_id: selectedSlot.event_slot_id,
+            },
             registrationMethod: 'household',
             user: transformHouseholdDataToUserData(householdData),
           },

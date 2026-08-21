@@ -75,7 +75,16 @@ jest.mock('../../Localization/LocalizationComponent', () => ({
 }));
 
 jest.mock('../components/PrintableConfirmationCard', () => {
-  const MockPrintable = () => <div data-testid="printable-card">Printable</div>;
+  const MockPrintable = ({ eventTime, eventSlotId, eventDateId }: any) => (
+    <div
+      data-testid="printable-card"
+      data-event-time={eventTime}
+      data-event-slot-id={eventSlotId ?? ''}
+      data-event-date-id={eventDateId ?? ''}
+    >
+      Printable
+    </div>
+  );
   return {
     __esModule: true,
     default: MockPrintable,
@@ -242,6 +251,61 @@ describe('RegistrationConfirmComponent', () => {
     // Verify the identification code is displayed (appears in multiple places)
     const identificationCodes = getAllByText(identification_code);
     expect(identificationCodes.length).toBeGreaterThan(0);
+  });
+
+  // SUP-559: the household quick-confirm flow (EventSlotsModalComponent) passes the
+  // reserved window as `event_slot`, while the form-based flow passes `eventTimeStamp`.
+  // Both must render the specific appointment window, never the overall event hours.
+  describe('reserved appointment window', () => {
+    const reservedWindow = { start_time: '10:20 AM', end_time: '10:30 AM' };
+    const eventHours = `${eventData.startTime} -${eventData.endTime}`;
+
+    it('displays the reserved window when passed as eventTimeStamp', () => {
+      renderWithState({
+        user: mockFamily,
+        eventTimeStamp: { ...reservedWindow, event_slot_id: '77' },
+      });
+
+      expect(screen.getByText('10:20 AM - 10:30 AM')).toBeInTheDocument();
+      expect(screen.queryByText(eventHours)).not.toBeInTheDocument();
+    });
+
+    it('displays the reserved window when passed as event_slot (household flow)', () => {
+      renderWithState({
+        user: mockFamily,
+        event_slot: { ...reservedWindow, event_slot_id: '77' },
+      });
+
+      expect(screen.getByText('10:20 AM - 10:30 AM')).toBeInTheDocument();
+      expect(screen.queryByText(eventHours)).not.toBeInTheDocument();
+    });
+
+    it('falls back to event hours when no window was reserved', () => {
+      renderWithState({ user: mockFamily });
+
+      expect(screen.getByText(eventHours)).toBeInTheDocument();
+    });
+
+    it('passes the reserved window and slot id to the printable card', () => {
+      renderWithState({
+        user: mockFamily,
+        event_slot: { ...reservedWindow, event_slot_id: '77' },
+      });
+
+      const card = screen.getByTestId('printable-card');
+      expect(card).toHaveAttribute('data-event-time', '10:20 AM - 10:30 AM');
+      expect(card).toHaveAttribute('data-event-slot-id', '77');
+    });
+
+    it('prefers the event date id from router state over session storage', () => {
+      renderWithState({
+        user: mockFamily,
+        eventDateId: '456',
+        event_slot: { ...reservedWindow, event_slot_id: '77' },
+      });
+
+      expect(screen.getByTestId('printable-card')).toHaveAttribute('data-event-date-id', '456');
+    });
   });
 
   describe('Case Manager confirmation view', () => {

@@ -14,6 +14,54 @@ import { Checkbox } from '../../components/ui/checkbox';
 
 import type { RegistrationFormData } from '../Registration/types/registration.types';
 
+// Absolute rather than in-app routes: Twilio reviews the rendered consent
+// statement and follows these links from outside the app, so they must resolve
+// publicly even when the page itself is served from a non-production host.
+const PRIVACY_POLICY_URL = 'https://www.freshtrak.com/privacy';
+const TERMS_OF_USE_URL = 'https://www.freshtrak.com/terms';
+
+const POLICY_LINK_TOKENS = {
+  privacyPolicy: PRIVACY_POLICY_URL,
+  termsOfUse: TERMS_OF_USE_URL,
+} as const;
+
+type PolicyLinkToken = keyof typeof POLICY_LINK_TOKENS;
+
+const POLICY_LINK_LABELS: Record<PolicyLinkToken, () => string> = {
+  privacyPolicy: () => localization.privacy_policy_link,
+  termsOfUse: () => localization.terms_of_use_link,
+};
+
+/**
+ * Render a consent string that embeds `{privacyPolicy}` / `{termsOfUse}` tokens.
+ *
+ * The sentence is stored as a whole template per locale rather than as
+ * prefix/middle/suffix fragments because languages order the two links (and the
+ * words around them) differently — concatenating fragments would produce broken
+ * grammar in several of the nine locales we ship.
+ */
+const renderWithPolicyLinks = (template: string): React.ReactNode[] =>
+  template.split(/(\{privacyPolicy\}|\{termsOfUse\})/).map((part, index) => {
+    const isToken = part.startsWith('{') && part.endsWith('}');
+    const token = isToken ? (part.slice(1, -1) as PolicyLinkToken) : null;
+
+    if (!token || !(token in POLICY_LINK_TOKENS)) {
+      return <React.Fragment key={index}>{part}</React.Fragment>;
+    }
+
+    return (
+      <a
+        key={index}
+        href={POLICY_LINK_TOKENS[token]}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-indigo-600 hover:text-indigo-500 underline"
+      >
+        {POLICY_LINK_LABELS[token]()}
+      </a>
+    );
+  });
+
 interface ContactInformationComponentProps {
   register: UseFormRegister<RegistrationFormData>;
   errors?: FieldErrors<RegistrationFormData>;
@@ -115,9 +163,11 @@ const ContactInformationComponent: React.FC<ContactInformationComponentProps> = 
 
       {/* Phone Permission Checkbox */}
       {showPhonePermissions && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-start space-x-2">
           <Checkbox
             id="permission_to_text"
+            className="mt-0.5 shrink-0"
+            aria-labelledby="permission_to_text_label"
             checked={permissionToTextChecked}
             onCheckedChange={(checked) =>
               setValue('permission_to_text', !!checked, {
@@ -125,9 +175,19 @@ const ContactInformationComponent: React.FC<ContactInformationComponentProps> = 
               })
             }
           />
-          <Label htmlFor="permission_to_text" className="text-sm text-gray-700 font-normal">
-            <span data-testid="phone permission">{localization.phone_contact_you}</span>
-          </Label>
+          {/* Deliberately a <span> and not a <label>. The consent statement embeds the
+              Privacy Policy and Terms of Use links, and a label forwards clicks on its
+              descendants to its control — so tapping a policy link would silently flip
+              the user's SMS consent. aria-labelledby gives the checkbox the same
+              accessible name without that activation behavior. items-start keeps the
+              box on the first line now that the statement wraps. */}
+          <span
+            id="permission_to_text_label"
+            data-testid="phone permission"
+            className="text-sm text-gray-700 font-normal leading-normal"
+          >
+            {renderWithPolicyLinks(localization.phone_contact_you)}
+          </span>
         </div>
       )}
 
@@ -149,6 +209,12 @@ const ContactInformationComponent: React.FC<ContactInformationComponentProps> = 
               required: !watch('no_email') ? localization.error_email_required : false,
             })}
           />
+          {/* Transactional-use disclosure. Deliberately NOT part of the opt-in below:
+              confirmations, reminders and security codes are part of the account
+              relationship, which CAN-SPAM treats separately from marketing consent. */}
+          <div className="text-sm text-gray-500" data-testid="email-transactional-disclaimer">
+            {localization.email_transactional_disclaimer}
+          </div>
           <div className="text-sm text-gray-500">
             {localization.label_no_email_question}{' '}
             <a

@@ -72,7 +72,9 @@ export const HouseholdContainer: React.FC<HouseholdContainerProps> = ({ classNam
               state: '',
               zip_code: '',
               primary_date_of_birth: '',
-              permission_to_email: true,
+              // CAN-SPAM: marketing email consent must be affirmative, so a household
+              // created before the user has answered starts opted out.
+              permission_to_email: false,
               language_id: 1, // English id in backend language table
               adult_count: 0,
               child_count: 0,

@@ -182,9 +182,11 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
   //
   // When the API returned no members (apiDataLoadedRef = false), the authUser
   // effect is still allowed to run so names are filled from Cognito. In that
-  // case we use `prev.permission_to_email ?? true` so that if the API merge
-  // already wrote a `false` preference into prev, it is preserved.  The `??`
-  // only falls back to `true` when the field is still undefined (pre-API state).
+  // case we use `prev.permission_to_email ?? false` so that whichever preference
+  // the API merge already wrote into prev — `true` or `false` — is preserved.
+  // The `??` only falls back when the field is still undefined (pre-API state),
+  // and that fallback is `false`: CAN-SPAM requires marketing email consent to be
+  // affirmative, so an unknown preference must never render as an opted-in checkbox.
   useEffect(() => {
     if (authUser && !apiDataLoadedRef.current) {
       const nameParts = authUser.name?.split(' ') || [];
@@ -193,7 +195,7 @@ const HouseholdRegistrationComponent: React.FC<HouseholdRegistrationComponentPro
         first_name: nameParts[0] || '',
         last_name: nameParts.slice(1).join(' ') || '',
         email: authUser.email || '',
-        permission_to_email: prev.permission_to_email ?? true,
+        permission_to_email: prev.permission_to_email ?? false,
       }));
     }
   }, [authUser]);

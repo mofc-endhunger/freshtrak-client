@@ -203,6 +203,22 @@ describe('HouseholdRegistrationComponent', () => {
       expect(lastCall.prefilledData.last_name).toBe('User');
     });
 
+    it('defaults permission_to_email to false when neither API nor prev supplies one', async () => {
+      // CAN-SPAM: marketing email consent must be affirmative. When the API
+      // gives us no stored preference, the authUser fallback must leave the
+      // checkbox unchecked rather than opting the user in by default.
+      mockGetUsersMe.mockRejectedValue(new Error('Network error'));
+      renderComponent();
+      await screen.findByTestId('household-form');
+
+      const lastCall = mockHouseholdForm.mock.calls[
+        mockHouseholdForm.mock.calls.length - 1
+      ]?.[0] as {
+        prefilledData: Record<string, unknown>;
+      };
+      expect(lastCall.prefilledData.permission_to_email).toBe(false);
+    });
+
     it('preserves Cognito names but applies API preferences when API returns no members', async () => {
       // When the household exists but has no members yet, the API still carries
       // household-level preferences (address, permission_to_email, etc.).  The
@@ -225,7 +241,7 @@ describe('HouseholdRegistrationComponent', () => {
       // authUser fires first (synchronous), API merges on top — names preserved.
       expect(lastCall.prefilledData.first_name).toBe('Cognito');
       expect(lastCall.prefilledData.last_name).toBe('User');
-      // API-sourced preference must survive; authUser would have set true.
+      // API-sourced preference must survive the authUser merge.
       expect(lastCall.prefilledData.permission_to_email).toBe(false);
     });
 
@@ -262,7 +278,7 @@ describe('HouseholdRegistrationComponent', () => {
       // Names must come from Cognito (API provided none).
       expect(lastCall.prefilledData.first_name).toBe('Cognito');
       expect(lastCall.prefilledData.last_name).toBe('User');
-      // API-sourced preference must still win (prev.permission_to_email ?? true).
+      // API-sourced preference must still win (prev.permission_to_email ?? false).
       expect(lastCall.prefilledData.permission_to_email).toBe(false);
     });
 

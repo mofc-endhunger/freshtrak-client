@@ -297,7 +297,8 @@ const RegistrationContainer: React.FC<RegistrationContainerProps> = () => {
               senior_count: 0,
               child_count: 0,
               permission_to_text: false,
-              permission_to_email: true,
+              // CAN-SPAM: marketing email consent must be affirmative — default off.
+              permission_to_email: false,
             };
             setUser(sanitizeUser(cognitoUserObj));
           } catch (error) {

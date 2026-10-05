@@ -8,10 +8,14 @@ jest.mock('../../Localization/LocalizationComponent', () => ({
   phone_number: 'Phone Number',
   no_phone: 'No Phone Available',
   phone_contact_you:
-    'I agree to receive SMS text message confirmations for my food pantry visit. Message & data rates may apply. Reply STOP to opt out.',
+    'I agree to receive SMS text message confirmations, reminders, and program updates about my food pantry visits. Message frequency varies. Message & data rates may apply. Reply STOP to opt out, HELP for help. See our {privacyPolicy} and {termsOfUse} for more details.',
+  privacy_policy_link: 'Privacy Policy',
+  terms_of_use_link: 'Terms of Use',
   no_email: 'No Email Available',
+  email_transactional_disclaimer:
+    "We'll use your email to send appointment confirmations, reminders, program updates, and security verification codes required to use your account.",
   email_contact_you:
-    'I agree to receive email confirmations and updates about my food pantry visit.',
+    'I agree to receive emails about other food assistance programs, benefits, and services that may be available to me or my family.',
   label_email: 'Email',
   error_phone_number_required: 'Phone number is required',
   error_email_required: 'Email is required',
@@ -200,12 +204,64 @@ describe('ContactInformationComponent', () => {
 
       renderComponent();
 
+      const consent = screen.getByTestId('phone permission');
+      expect(consent).toBeInTheDocument();
+      // Twilio requires each of these clauses verbatim. Asserted on textContent
+      // because the sentence is now split across two anchor elements.
+      expect(consent).toHaveTextContent(
+        /I agree to receive SMS text message confirmations, reminders, and program updates about my food pantry visits\./,
+      );
+      expect(consent).toHaveTextContent(/Message frequency varies\./);
+      expect(consent).toHaveTextContent(/Message & data rates may apply\./);
+      expect(consent).toHaveTextContent(/Reply STOP to opt out, HELP for help\./);
+    });
+
+    test('links the SMS consent statement to the Privacy Policy and Terms of Use', () => {
+      mockWatch.mockImplementation((fieldName: string) => {
+        if (fieldName === 'no_phone_number') return false;
+        return '';
+      });
+
+      renderComponent();
+
+      const privacy = screen.getByRole('link', { name: 'Privacy Policy' });
+      const terms = screen.getByRole('link', { name: 'Terms of Use' });
+
+      expect(privacy).toHaveAttribute('href', 'https://www.freshtrak.com/privacy');
+      expect(terms).toHaveAttribute('href', 'https://www.freshtrak.com/terms');
+
+      // Opened in a new tab so an in-progress registration is not lost.
+      expect(privacy).toHaveAttribute('target', '_blank');
+      expect(privacy).toHaveAttribute('rel', expect.stringContaining('noopener'));
+      expect(terms).toHaveAttribute('target', '_blank');
+      expect(terms).toHaveAttribute('rel', expect.stringContaining('noopener'));
+
+      expect(screen.getByTestId('phone permission')).toContainElement(privacy);
+
+      // Dropping the <label> in favour of aria-labelledby must not cost the
+      // checkbox its accessible name — screen readers still announce the consent.
       expect(
-        screen.getByText(
-          'I agree to receive SMS text message confirmations for my food pantry visit. Message & data rates may apply. Reply STOP to opt out.',
-        ),
-      ).toBeInTheDocument();
-      expect(screen.getByTestId('phone permission')).toBeInTheDocument();
+        screen.getByRole('checkbox', { name: /I agree to receive SMS text message/ }),
+      ).toHaveAttribute('id', 'permission_to_text');
+    });
+
+    test('following a policy link does not toggle the SMS consent checkbox', async () => {
+      const user = userEvent.setup();
+      mockWatch.mockImplementation((fieldName: string) => {
+        if (fieldName === 'no_phone_number') return false;
+        return '';
+      });
+
+      renderComponent();
+      mockSetValue.mockClear();
+
+      await user.click(screen.getByRole('link', { name: 'Privacy Policy' }));
+
+      expect(mockSetValue).not.toHaveBeenCalledWith(
+        'permission_to_text',
+        expect.anything(),
+        expect.anything(),
+      );
     });
   });
 
@@ -293,7 +349,7 @@ describe('ContactInformationComponent', () => {
 
       expect(
         screen.getByText(
-          'I agree to receive email confirmations and updates about my food pantry visit.',
+          'I agree to receive emails about other food assistance programs, benefits, and services that may be available to me or my family.',
         ),
       ).toBeInTheDocument();
       expect(screen.getByTestId('email permission')).toBeInTheDocument();
@@ -318,6 +374,22 @@ describe('ContactInformationComponent', () => {
       expect(mockRegister).toHaveBeenCalledWith('permission_to_text');
       expect(mockRegister).toHaveBeenCalledWith('no_email');
       expect(mockRegister).toHaveBeenCalledWith('permission_to_email');
+    });
+
+    test('shows the transactional email disclaimer outside the marketing opt-in', () => {
+      // CAN-SPAM: confirmations, reminders and security codes are part of the
+      // account relationship, so their disclosure must sit outside the checkbox
+      // the user is consenting with.
+      renderComponent();
+
+      const disclaimer = screen.getByTestId('email-transactional-disclaimer');
+      expect(disclaimer).toHaveTextContent(
+        /security verification codes required to use your account/i,
+      );
+
+      const optIn = screen.getByTestId('email permission');
+      expect(optIn).not.toContainElement(disclaimer);
+      expect(optIn).toHaveTextContent(/other food assistance programs/i);
     });
 
     test('should register phone and email fields for validation', () => {

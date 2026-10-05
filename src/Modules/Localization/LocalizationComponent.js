@@ -58,12 +58,16 @@ const localization = new LocalizedStrings({
     phone_number: 'Phone Number (Mobile Preferred)',
     no_phone: 'No Phone Available',
     phone_contact_you:
-      'I agree to receive SMS text message confirmations for my food pantry visit. Message & data rates may apply. Reply STOP to opt out.',
+      'I agree to receive SMS text message confirmations, reminders, and program updates about my food pantry visits. Message frequency varies. Message & data rates may apply. Reply STOP to opt out, HELP for help. See our {privacyPolicy} and {termsOfUse} for more details.',
+    privacy_policy_link: 'Privacy Policy',
+    terms_of_use_link: 'Terms of Use',
     no_email: 'No Email Available',
     label_no_email_question: 'No Email?',
     label_get_free_email: 'Get one free from Google.',
+    email_transactional_disclaimer:
+      "We'll use your email to send appointment confirmations, reminders, program updates, and security verification codes required to use your account.",
     email_contact_you:
-      'I agree to receive email confirmations and updates about my food pantry visit.',
+      'I agree to receive emails about other food assistance programs, benefits, and services that may be available to me or my family.',
     register_about_family: 'Tell us about your family',
     family_count:
       'How many additional family members are in each age group? (Do not include yourself)',
@@ -949,12 +953,16 @@ const localization = new LocalizedStrings({
     phone_number: 'Número de teléfono (móvil preferido)',
     no_phone: 'No hay teléfono disponible',
     phone_contact_you:
-      'Acepto recibir confirmaciones por mensaje de texto SMS para mi visita al banco de alimentos. Se pueden aplicar tarifas de mensajes y datos. Responda STOP para cancelar.',
+      'Acepto recibir confirmaciones, recordatorios y actualizaciones del programa por mensaje de texto SMS sobre mis visitas al banco de alimentos. La frecuencia de los mensajes varía. Pueden aplicarse tarifas de mensajes y datos. Responda STOP para cancelar la suscripción, HELP para obtener ayuda. Consulte nuestra {privacyPolicy} y nuestros {termsOfUse} para más detalles.',
+    privacy_policy_link: 'Política de Privacidad',
+    terms_of_use_link: 'Términos de Uso',
     no_email: 'No hay correo electrónico disponible',
     label_no_email_question: '¿No tiene correo electrónico?',
     label_get_free_email: 'Obtenga uno gratis de Google.',
+    email_transactional_disclaimer:
+      'Usaremos su correo electrónico para enviarle confirmaciones de citas, recordatorios, actualizaciones del programa y códigos de verificación de seguridad necesarios para usar su cuenta.',
     email_contact_you:
-      'Acepto recibir confirmaciones y actualizaciones por correo electrónico sobre mi visita al banco de alimentos.',
+      'Acepto recibir correos electrónicos sobre otros programas de asistencia alimentaria, beneficios y servicios que puedan estar disponibles para mí o para mi familia.',
     register_about_family: 'Háblanos de tu familia',
     family_count:
       '¿Cuántos miembros adicionales de la familia hay en cada grupo de edad? (No te incluyas a ti mismo)',
@@ -1845,12 +1853,16 @@ const localization = new LocalizedStrings({
     phone_number: 'Lambarka taleefanka (Mobile doorbiday)',
     no_phone: 'Taleefan lamaheli karo',
     phone_contact_you:
-      'Waxaan ogolahay inaan helo xaqiijinta fariin qoraal SMS ah ee booqashadayda kaydka cuntada. Khidmadaha fariimaha iyo xogta ayaa laga yaabaa inay khuseyso. Ku jawaab STOP si aad u joojiso.',
+      'Waxaan ogolahay inaan helo xaqiijin, xusuusin, iyo cusbooneysiin barnaamij oo fariin qoraal SMS ah ku saabsan booqashooyinkayga kaydka cuntada. Inta jeer ee fariimaha ayaa kala duwan. Qiimaha fariimaha iyo xogta ayaa lagu dari karaa. U jawaab STOP si aad uga baxdo, HELP si aad caawimaad u hesho. Fiiri {privacyPolicy} iyo {termsOfUse} si aad u hesho faahfaahin dheeraad ah.',
+    privacy_policy_link: 'Siyaasadda Asturnaanta',
+    terms_of_use_link: 'Shuruudaha Isticmaalka',
     no_email: 'Email Laheli Mayo',
     label_no_email_question: 'Email ma lihid?',
     label_get_free_email: 'Mid bilaash ah ka hel Google.',
+    email_transactional_disclaimer:
+      'Waxaan u isticmaali doonnaa iimaylkaaga si aan kuugu soo dirno xaqiijinta ballanta, xusuusinta, cusbooneysiinta barnaamijka, iyo koodhadhka xaqiijinta ammaanka ee loo baahan yahay si aad u isticmaasho akoonkaaga.',
     email_contact_you:
-      'Waxaan ogolahay inaan helo xaqiijinta iyo cusbooneysiinta iimayl ah ee ku saabsan booqashadayda kaydka cuntada.',
+      "Waxaan ogolahay inaan helo iimaylo ku saabsan barnaamijyo kale oo caawinaadda cuntada ah, faa'iidooyin, iyo adeegyo laga yaabo inay ii diyaar yihiin aniga ama qoyskayga.",
     register_about_family: 'Reerkaaga wax nooga sheeg',
     family_count: "Immisa xubnood oo qoys ah ayaa ku jira da 'kasta? (Ha ku darin naftaada)",
     seniors: 'Waayeelka',
@@ -2738,12 +2750,16 @@ const localization = new LocalizedStrings({
     phone_number: 'Номер телефона (предпочтительно мобильный)',
     no_phone: 'Телефон недоступен',
     phone_contact_you:
-      'Я соглашаюсь получать SMS-подтверждения о моём посещении продовольственного банка. Могут применяться тарифы за сообщения и передачу данных. Отправьте STOP для отмены.',
+      'Я соглашаюсь получать SMS-сообщения с подтверждениями, напоминаниями и обновлениями программы о моих посещениях продовольственного банка. Частота сообщений может меняться. Может взиматься плата за сообщения и передачу данных. Отправьте STOP для отказа, HELP для помощи. Подробнее см. {privacyPolicy} и {termsOfUse}.',
+    privacy_policy_link: 'Политику конфиденциальности',
+    terms_of_use_link: 'Условия использования',
     no_email: 'Электронная почта недоступна',
     label_no_email_question: 'Нет электронной почты?',
     label_get_free_email: 'Получите бесплатно от Google.',
+    email_transactional_disclaimer:
+      'Мы будем использовать вашу электронную почту для отправки подтверждений записи, напоминаний, обновлений программы и кодов безопасности, необходимых для использования вашей учётной записи.',
     email_contact_you:
-      'Я соглашаюсь получать подтверждения и обновления по электронной почте о моём посещении продовольственного банка.',
+      'Я соглашаюсь получать электронные письма о других программах продовольственной помощи, льготах и услугах, которые могут быть доступны мне или моей семье.',
     register_about_family: 'Информация о вашей семье',
     family_count:
       'Сколько дополнительных членов семьи в каждой возрастной группе? (Не включайте себя)',
@@ -3638,12 +3654,16 @@ const localization = new LocalizedStrings({
     phone_number: 'Telefon Numarası (Mobil Tercihli)',
     no_phone: 'Telefon Yok',
     phone_contact_you:
-      'Gıda bankası ziyaretim için SMS metin mesajı onayları almayı kabul ediyorum. Mesaj ve veri ücretleri uygulanabilir. Vazgeçmek için STOP yanıtlayın.',
+      'Gıda bankası ziyaretlerim hakkında SMS ile onay, hatırlatma ve program güncellemeleri almayı kabul ediyorum. Mesaj sıklığı değişiklik gösterir. Mesaj ve veri ücretleri uygulanabilir. Abonelikten çıkmak için STOP, yardım için HELP yazın. Daha fazla bilgi için {privacyPolicy} ve {termsOfUse} sayfalarımıza bakın.',
+    privacy_policy_link: 'Gizlilik Politikası',
+    terms_of_use_link: 'Kullanım Koşulları',
     no_email: 'Kullanılabilir E-posta Yok',
     label_no_email_question: 'E-postanız yok mu?',
     label_get_free_email: "Google'dan ücretsiz bir tane edinin.",
+    email_transactional_disclaimer:
+      'E-posta adresinizi randevu onayları, hatırlatmalar, program güncellemeleri ve hesabınızı kullanmak için gereken güvenlik doğrulama kodlarını göndermek amacıyla kullanacağız.',
     email_contact_you:
-      'Gıda bankası ziyaretim hakkında e-posta onayları ve güncellemeler almayı kabul ediyorum.',
+      'Bana veya aileme sunulabilecek diğer gıda yardımı programları, yardımlar ve hizmetler hakkında e-posta almayı kabul ediyorum.',
     register_about_family: 'Bize ailenden bahset',
     family_count: 'Her yaş grubunda kaç aile üyesi daha var? (Kendinizi dahil etmeyin)',
     seniors: 'Yaşlılar',
@@ -4527,12 +4547,16 @@ const localization = new LocalizedStrings({
     phone_number: 'رقم الهاتف (يفضل الجوال)',
     no_phone: 'لا يوجد هاتف متاح',
     phone_contact_you:
-      'أوافق على تلقي رسائل تأكيد نصية SMS لزيارتي لبنك الطعام. قد تُطبق رسوم الرسائل والبيانات. أرسل STOP لإلغاء الاشتراك.',
+      'أوافق على تلقي رسائل نصية قصيرة (SMS) تتضمن تأكيدات وتذكيرات وتحديثات البرنامج بشأن زياراتي لبنك الطعام. يختلف عدد الرسائل. قد يتم تطبيق رسوم الرسائل والبيانات. أرسل STOP لإلغاء الاشتراك، أو HELP للحصول على المساعدة. اطلع على {privacyPolicy} و{termsOfUse} لمزيد من التفاصيل.',
+    privacy_policy_link: 'سياسة الخصوصية',
+    terms_of_use_link: 'شروط الاستخدام',
     no_email: 'لا يوجد بريد إلكتروني متاح',
     label_no_email_question: 'ليس لديك بريد إلكتروني؟',
     label_get_free_email: 'احصل على واحد مجاناً من Google.',
+    email_transactional_disclaimer:
+      'سنستخدم بريدك الإلكتروني لإرسال تأكيدات المواعيد والتذكيرات وتحديثات البرنامج ورموز التحقق الأمني المطلوبة لاستخدام حسابك.',
     email_contact_you:
-      'أوافق على تلقي تأكيدات وتحديثات عبر البريد الإلكتروني حول زيارتي لبنك الطعام.',
+      'أوافق على تلقي رسائل بريد إلكتروني حول برامج المساعدة الغذائية الأخرى والمزايا والخدمات التي قد تكون متاحة لي أو لعائلتي.',
     register_about_family: 'أخبرنا عن عائلتك',
     family_count: 'كم عدد أفراد الأسرة الإضافيين في كل فئة عمرية؟ (لا تشمل نفسك)',
     seniors: 'كبار السن',
@@ -5398,11 +5422,16 @@ const localization = new LocalizedStrings({
     phone_number: '电话号码（首选移动电话）',
     no_phone: '没有可用的电话',
     phone_contact_you:
-      '我同意接收有关食物银行访问的短信确认。可能会收取短信和数据费用。回复 STOP 取消订阅。',
+      '我同意接收有关我食物银行访问的短信确认、提醒和项目更新。消息频率不固定。可能会产生消息和数据费用。回复 STOP 退订，回复 HELP 获取帮助。详情请参阅我们的{privacyPolicy}和{termsOfUse}。',
+    privacy_policy_link: '隐私政策',
+    terms_of_use_link: '使用条款',
     no_email: '没有可用的电子邮件',
     label_no_email_question: '没有电子邮件？',
     label_get_free_email: '从Google免费获取一个。',
-    email_contact_you: '我同意接收有关食物银行访问的电子邮件确认和更新。',
+    email_transactional_disclaimer:
+      '我们将使用您的电子邮件发送预约确认、提醒、项目更新以及使用您账户所需的安全验证码。',
+    email_contact_you:
+      '我同意接收有关其他食品援助项目、福利和服务的电子邮件，这些可能适用于我或我的家人。',
     register_about_family: '告诉我们你的家人',
     family_count: '每个年龄段还有多少家庭成员？ （不要包括自己)',
     seniors: '老年人',
@@ -6263,12 +6292,16 @@ const localization = new LocalizedStrings({
     phone_number: 'फ़ोन नंबर (मोबाइल पसंदीदा)',
     no_phone: 'कोई फोन उपलब्ध नहीं है',
     phone_contact_you:
-      'मैं अपनी खाद्य बैंक यात्रा के लिए SMS पाठ संदेश पुष्टिकरण प्राप्त करने के लिए सहमत हूँ। संदेश और डेटा शुल्क लागू हो सकते हैं। सदस्यता रद्द करने के लिए STOP उत्तर दें।',
+      'मैं अपनी खाद्य बैंक यात्राओं के बारे में एसएमएस पाठ संदेश पुष्टिकरण, अनुस्मारक और कार्यक्रम अपडेट प्राप्त करने के लिए सहमत हूँ। संदेश आवृत्ति भिन्न होती है। संदेश और डेटा दरें लागू हो सकती हैं। सदस्यता समाप्त करने के लिए STOP और सहायता के लिए HELP का उत्तर दें। अधिक जानकारी के लिए हमारी {privacyPolicy} और {termsOfUse} देखें।',
+    privacy_policy_link: 'गोपनीयता नीति',
+    terms_of_use_link: 'उपयोग की शर्तें',
     no_email: 'कोई ईमेल उपलब्ध नहीं है',
     label_no_email_question: 'ईमेल नहीं है?',
     label_get_free_email: 'Google से एक मुफ़्त प्राप्त करें।',
+    email_transactional_disclaimer:
+      'हम आपके ईमेल का उपयोग अपॉइंटमेंट पुष्टिकरण, अनुस्मारक, कार्यक्रम अपडेट और आपके खाते का उपयोग करने के लिए आवश्यक सुरक्षा सत्यापन कोड भेजने के लिए करेंगे।',
     email_contact_you:
-      'मैं अपनी खाद्य बैंक यात्रा के बारे में ईमेल पुष्टिकरण और अपडेट प्राप्त करने के लिए सहमत हूँ।',
+      'मैं अन्य खाद्य सहायता कार्यक्रमों, लाभों और सेवाओं के बारे में ईमेल प्राप्त करने के लिए सहमत हूँ जो मुझे या मेरे परिवार को उपलब्ध हो सकते हैं।',
     register_about_family: 'अपने परिवार के बारे में हमें बताएं',
     family_count: 'प्रत्येक आयु वर्ग में कितने अतिरिक्त परिवार के सदस्य हैं? (खुद को शामिल न करें)',
     seniors: 'वरिष्ठ',
@@ -7150,12 +7183,16 @@ const localization = new LocalizedStrings({
     phone_number: 'फोन नम्बर (मोबाइल मनपर्दो)',
     no_phone: 'कुनै फोन उपलब्ध छैन',
     phone_contact_you:
-      'म मेरो खाद्य बैंक भ्रमणको लागि SMS पाठ सन्देश पुष्टिकरणहरू प्राप्त गर्न सहमत छु। सन्देश र डाटा शुल्क लागू हुन सक्छ। सदस्यता रद्द गर्न STOP जवाफ दिनुहोस्।',
+      'म मेरो खाद्य बैंक भ्रमणहरूको बारेमा एसएमएस पाठ सन्देश पुष्टिकरण, सम्झना, र कार्यक्रम अपडेटहरू प्राप्त गर्न सहमत छु। सन्देशको आवृत्ति फरक हुन्छ। सन्देश र डाटा शुल्क लाग्न सक्छ। सदस्यता रद्द गर्न STOP र सहायताको लागि HELP पठाउनुहोस्। थप विवरणको लागि हाम्रो {privacyPolicy} र {termsOfUse} हेर्नुहोस्।',
+    privacy_policy_link: 'गोपनीयता नीति',
+    terms_of_use_link: 'प्रयोगका सर्तहरू',
     no_email: 'कुनै ईमेल उपलब्ध छैन',
     label_no_email_question: 'इमेल छैन?',
     label_get_free_email: 'Google बाट एउटा निःशुल्क प्राप्त गर्नुहोस्।',
+    email_transactional_disclaimer:
+      'हामी तपाईंको इमेल प्रयोग गरेर अपोइन्टमेन्ट पुष्टिकरण, सम्झना, कार्यक्रम अपडेट, र तपाईंको खाता प्रयोग गर्न आवश्यक सुरक्षा प्रमाणीकरण कोडहरू पठाउनेछौं।',
     email_contact_you:
-      'म मेरो खाद्य बैंक भ्रमणको बारेमा ईमेल पुष्टिकरण र अपडेटहरू प्राप्त गर्न सहमत छु।',
+      'म मलाई वा मेरो परिवारलाई उपलब्ध हुन सक्ने अन्य खाद्य सहायता कार्यक्रम, सुविधा, र सेवाहरूको बारेमा इमेल प्राप्त गर्न सहमत छु।',
     register_about_family: 'तपाईंको परिवारको बारेमा हामीलाई भन्नुहोस्',
     family_count:
       'प्रत्येक उमेर समूहमा कति अतिरिक्त परिवार सदस्यहरू छन्? (आफूलाई समावेश नगर्नुहोस्)',

@@ -31,10 +31,14 @@ jest.mock('../../Localization/LocalizationComponent', () => ({
   phone_number: 'Phone Number',
   no_phone: 'No Phone Available',
   phone_contact_you:
-    'I agree to receive SMS text message confirmations for my food pantry visit. Message & data rates may apply. Reply STOP to opt out.',
+    'I agree to receive SMS text message confirmations, reminders, and program updates about my food pantry visits. Message frequency varies. Message & data rates may apply. Reply STOP to opt out, HELP for help. See our {privacyPolicy} and {termsOfUse} for more details.',
+  privacy_policy_link: 'Privacy Policy',
+  terms_of_use_link: 'Terms of Use',
   no_email: 'No Email Available',
+  email_transactional_disclaimer:
+    "We'll use your email to send appointment confirmations, reminders, program updates, and security verification codes required to use your account.",
   email_contact_you:
-    'I agree to receive email confirmations and updates about my food pantry visit.',
+    'I agree to receive emails about other food assistance programs, benefits, and services that may be available to me or my family.',
   label_email: 'Email',
   register_where_you_live: 'Where do you live?',
   street_address: 'Street Address',

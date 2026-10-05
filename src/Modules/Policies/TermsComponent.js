@@ -228,8 +228,7 @@ const TermsComponent = (props) => {
         </p>
         <h4 className="mb-2 medium-title font-weight-bold">Contact Us</h4>
         <p className="mobile-text-left caption-text">
-          Please contact us with any questions you have. If you would like to contact us, please
-          call 614-317-9450 or send us an email at freshtrak@midohiofoodbank.org.
+          Please contact us with any questions you have - freshtrak@mofc.org
         </p>
       </div>
     </Fragment>

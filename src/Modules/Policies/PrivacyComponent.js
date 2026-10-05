@@ -13,7 +13,7 @@ const PrivacyComponent = (props) => {
         </div>
         <div className="row mt-3">
           <div className="col-12">
-            <div class="privacy">
+            <div className="privacy">
               <h2 className="font-weight-bold mobile-text-left">
                 <center>FreshTrak Privacy Policy</center>
               </h2>
@@ -25,6 +25,16 @@ const PrivacyComponent = (props) => {
                 communications with you. Throughout this Policy, we may refer to FreshTrak as “we,”
                 “us,” or “our.” “Website” refers to https://freshtrak.com/ and any other microsites
                 or mobile websites we operate or use.
+              </p>
+              <h4 className="mb-2 medium-title font-weight-bold">Text Messaging / SMS Program</h4>
+              <p className="mobile-text-left caption-text">
+                If you opt in to receive SMS text messages from FreshTrak (e.g., appointment or food
+                pantry visit confirmations, reminders, and program updates), we collect your mobile
+                phone number for the sole purpose of that messaging program. No mobile information
+                collected as part of the SMS consent process will be shared with third parties or
+                affiliates for marketing or promotional purposes. This information will only be used
+                to send the text messages you have opted into. You may opt out at any time by
+                replying STOP.
               </p>
               <h4 className="mb-2 medium-title font-weight-bold">Information We Collect</h4>
               <p className="mobile-text-left caption-text">
@@ -199,8 +209,7 @@ const PrivacyComponent = (props) => {
                 information from children under 13. If we learn that we have collected the personal
                 information of a child under the age of 13, we will make reasonable efforts to
                 delete that information from our records. To request deletion of personal
-                information relating to a child under 13, please email us at
-                freshtrak@midohiofoodbank.org.
+                information relating to a child under 13, please email us at freshtrak@mofc.org.
               </p>
               <h4 className="mb-2 medium-title font-weight-bold">
                 Supported Web Browsers and Do Not Track Signals
@@ -232,7 +241,7 @@ const PrivacyComponent = (props) => {
               <h4 className="mb-2 medium-title font-weight-bold">Contact Information</h4>
               <p className="mobile-text-left caption-text">
                 Please send your privacy-related questions, comments, and concerns to us via email
-                at freshtrak@midohiofoodbank.org.
+                at freshtrak@mofc.org.
               </p>
               <h4 className="mb-2 medium-title font-weight-bold">Changes to this Statement</h4>
               <p className="mobile-text-left caption-text">
